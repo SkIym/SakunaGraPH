@@ -6,7 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/"  # starting list page
+BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/2016/"  # starting list page
 DOWNLOAD_DIR = "./downloads"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
