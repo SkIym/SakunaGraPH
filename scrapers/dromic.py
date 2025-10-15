@@ -12,7 +12,7 @@ from datetime import datetime
 from urllib.parse import urlparse, parse_qs, unquote
 
 # === Setup logging ===
-LOG_FILE = f"scraper_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
+LOG_FILE = f"2022_p18_scraper_log_{datetime.now().strftime('%Y%m%d_%H%M%S')}.txt"
 
 # Configure logging
 logging.basicConfig(
@@ -26,8 +26,8 @@ logging.basicConfig(
 
 log = logging.getLogger()
 
-BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/2021"  # starting list page
-DOWNLOAD_DIR = "../data/dromic/2021"
+BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/2022/page/18/"  # starting list page
+DOWNLOAD_DIR = "../data/dromic/2022"
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # === Setup Selenium ===
@@ -199,7 +199,7 @@ def goto_page(page_num):
         return False
 
 # === MAIN LOOP ===
-page = 1
+page = 18
 while True:
     log.info(f"\n📄 Processing page {page}...")
     handle_page()
