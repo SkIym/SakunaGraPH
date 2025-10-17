@@ -26,8 +26,10 @@ logging.basicConfig(
 
 log = logging.getLogger()
 
-BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/2022/page/18/"  # starting list page
-DOWNLOAD_DIR = "../data/dromic/2022"
+BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/2025/"  # starting list page
+DOWNLOAD_DIR = "../data/dromic/2025"
+LAST_SCRAPE_DATE = datetime(2025, 9, 24)            
+
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
 
 # === Setup Selenium ===
@@ -45,6 +47,19 @@ wait = WebDriverWait(driver, 10)
 driver.get(BASE_URL)
 
 # === Helpers ===
+
+def last_date_post_reached():
+    """
+    Check post date if posted after the last scrape or dataset.
+    """
+
+    date_el = driver.find_element(By.CSS_SELECTOR, "span.published.updated")
+    date_text = date_el.text.strip()
+    log.info(f"Post date text: {date_text}")
+
+    post_date = datetime.strptime(date_text, "%B %d, %Y")
+
+    return post_date <= LAST_SCRAPE_DATE
 
 def make_direct_download_link(url: str):
     """
@@ -66,6 +81,7 @@ def make_direct_download_link(url: str):
 
     # Default: return as-is
     return url
+
 def download_file(url: str, filename_hint: str = None):
     """Download a file, preserving the actual filename from the server or URL."""
     try:
@@ -124,7 +140,6 @@ def download_file(url: str, filename_hint: str = None):
     except Exception as e:
         log.error(f"❌ Error downloading {url}: {e}")
 
-
 def extract_first_download_link():
     """
     Looks for the *first* valid download link in multiple possible locations.
@@ -154,7 +169,6 @@ def extract_first_download_link():
                 return make_direct_download_link(href), text
     return None, None
 
-
 def handle_page():
     """Click through all 'Read More' links and download the first document per post."""
     read_mores = driver.find_elements(By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]")
@@ -172,6 +186,11 @@ def handle_page():
 
         try:
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.post-content")))
+
+            # Stop after last scrape date
+            if last_date_post_reached():
+                return True
+
             file_url, file_name = extract_first_download_link()
             if file_url:
                 download_file(file_url, file_name)
@@ -184,6 +203,8 @@ def handle_page():
         driver.back()
         wait.until(EC.presence_of_all_elements_located((By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]")))
         time.sleep(1)
+    
+    return False
 
 def goto_page(page_num):
     """Click pagination button by visible number."""
@@ -199,10 +220,15 @@ def goto_page(page_num):
         return False
 
 # === MAIN LOOP ===
-page = 18
-while True:
+page = 1
+while page < 5:
     log.info(f"\n📄 Processing page {page}...")
-    handle_page()
+
+    stop_scraping = handle_page()
+    if stop_scraping:
+        log.info("\n ✅ Last scraped date reached — stopping further scraping.")
+        break 
+
     page += 1
     if not goto_page(page):
         log.info("\n✅ All pages processed.")

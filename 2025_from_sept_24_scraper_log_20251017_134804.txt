@@ -1,0 +1,307 @@
+2025-10-17 13:48:11,542 — WARNING — Error sending stats to Plausible: error sending request for url (https://plausible.io/api/event)
+2025-10-17 13:48:14,458 — INFO — 
+📄 Processing page 1...
+2025-10-17 13:48:14,476 — INFO — Found 20 posts on this page.
+2025-10-17 13:48:25,471 — INFO — Post date text: October 17, 2025
+2025-10-17 13:48:25,507 — INFO — Mw 6.9 Earthquake Incident in City of Bogo, Cebu [30 Sep 2025]
+2025-10-17 13:48:26,525 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-27-on-the-Effects-of-Magnitude-6.9-Earthquake-in-the-City-of-Bogo-Cebu-as-of-17-October-2025-6AM.pdf
+2025-10-17 13:48:26,528 — INFO — ✅ Saved as: DSWD-DROMIC-Report-27-on-the-Effects-of-Magnitude-6.9-Earthquake-in-the-City-of-Bogo-Cebu-as-of-17-October-2025-6AM.pdf
+2025-10-17 13:48:33,756 — INFO — Post date text: October 17, 2025
+2025-10-17 13:48:33,770 — INFO — Effects of Magnitude 7.4 and 6.8 Earthquakes in Manay, Davao Oriental [10 Oct 2025]
+2025-10-17 13:48:34,545 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-13-on-the-Effects-of-Magnitude-7.4-and-6.8-Earthquakes-in-Manay-Davao-Oriental-as-of-17-October-2025-6AM.pdf
+2025-10-17 13:48:34,547 — INFO — ✅ Saved as: DSWD-DROMIC-Report-13-on-the-Effects-of-Magnitude-7.4-and-6.8-Earthquakes-in-Manay-Davao-Oriental-as-of-17-October-2025-6AM.pdf
+2025-10-17 13:48:41,769 — INFO — Post date text: October 17, 2025
+2025-10-17 13:48:41,787 — INFO — Combined Effects of Southwest Monsoon and Tropical Cyclones “Crising”, “Dante,” and “Emong” [17 Jul 2025]
+2025-10-17 13:48:42,945 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-93-on-the-Combined-Effects-of-Southwest-Monsoon-and-Tropical-Cyclones-Crising-Dante-and-Emong-as-of-17-October-2025-6AM.pdf
+2025-10-17 13:48:42,952 — INFO — ✅ Saved as: DSWD-DROMIC-Report-93-on-the-Combined-Effects-of-Southwest-Monsoon-and-Tropical-Cyclones-Crising-Dante-and-Emong-as-of-17-October-2025-6AM.pdf
+2025-10-17 13:48:50,192 — INFO — Post date text: October 17, 2025
+2025-10-17 13:48:50,207 — INFO — Landslide Incident in Brgy. Baladjay, San Remigio, Antique [11 Jul 2025]
+2025-10-17 13:48:50,873 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Landslide-Incident-in-Brgy.-Baladjay-San-Remigio-Antique-17-October-2025-6AM-.pdf
+2025-10-17 13:48:50,875 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Landslide-Incident-in-Brgy.-Baladjay-San-Remigio-Antique-17-October-2025-6AM-.pdf
+2025-10-17 13:48:58,070 — INFO — Post date text: October 16, 2025
+2025-10-17 13:48:58,085 — INFO — Effects of Typhoon “Paolo” [02 Oct 2025]
+2025-10-17 13:48:58,795 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-15-on-the-Effects-of-Typhoon-Paolo-as-of-16-October-2025-6PM.pdf
+2025-10-17 13:48:58,798 — INFO — ✅ Saved as: DSWD-DROMIC-Report-15-on-the-Effects-of-Typhoon-Paolo-as-of-16-October-2025-6PM.pdf
+2025-10-17 13:49:06,019 — INFO — Post date text: October 16, 2025
+2025-10-17 13:49:06,035 — INFO — Effects of Magnitude 6.0 Earthquake in Cagwait, Surigao del Sur [11 Oct 2025]
+2025-10-17 13:49:06,570 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-3-on-the-Effects-of-Magnitude-6.0-Earthquake-in-Cagwait-Surigao-del-Sur-as-of-16-October-2025-6PM.pdf
+2025-10-17 13:49:06,570 — INFO — ✅ Saved as: DSWD-DROMIC-Report-3-on-the-Effects-of-Magnitude-6.0-Earthquake-in-Cagwait-Surigao-del-Sur-as-of-16-October-2025-6PM.pdf
+2025-10-17 13:49:13,779 — INFO — Post date text: October 16, 2025
+2025-10-17 13:49:13,796 — INFO — Combined Effects of Southwest Monsoon and TCs Mirasol, Nando and Opong [16 Sep 2025]
+2025-10-17 13:49:15,473 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-54-on-the-Combined-Effects-of-Southwest-Monsoon-and-TCs-Mirasol-Nando-and-Opong-as-of-16-October-2025-6PM.pdf
+2025-10-17 13:49:15,489 — INFO — ✅ Saved as: DSWD-DROMIC-Report-54-on-the-Combined-Effects-of-Southwest-Monsoon-and-TCs-Mirasol-Nando-and-Opong-as-of-16-October-2025-6PM.pdf
+2025-10-17 13:49:23,730 — INFO — Post date text: October 16, 2025
+2025-10-17 13:49:23,744 — INFO — Fire Incident in Brgy. 17, Gingoog City, Misamis Oriental [26 Aug 2025]
+2025-10-17 13:49:24,394 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-17-Gingoog-City-Misamis-Oriental-as-of-16-October-2025-6AM.pdf
+2025-10-17 13:49:24,402 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-17-Gingoog-City-Misamis-Oriental-as-of-16-October-2025-6AM.pdf
+2025-10-17 13:49:31,613 — INFO — Post date text: October 15, 2025
+2025-10-17 13:49:31,630 — INFO — Fire Incident in Brgy. 17, Cagayan de Oro City [03 Oct 2025]
+2025-10-17 13:49:32,180 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-6-on-the-Fire-Incident-in-Brgy.-17-City-of-Cagayan-de-Oro-as-of-15-October-2025-6PM.pdf
+2025-10-17 13:49:32,180 — INFO — ✅ Saved as: DSWD-DROMIC-Report-6-on-the-Fire-Incident-in-Brgy.-17-City-of-Cagayan-de-Oro-as-of-15-October-2025-6PM.pdf
+2025-10-17 13:49:39,397 — INFO — Post date text: October 15, 2025
+2025-10-17 13:49:39,414 — INFO — Fire Incident in Brgy. Capilian, Abuyog, Leyte [12 Sep 2025]
+2025-10-17 13:49:39,941 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Capilian-Abuyog-Leyte-as-of-15-October-2025-6PM.pdf
+2025-10-17 13:49:39,946 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Capilian-Abuyog-Leyte-as-of-15-October-2025-6PM.pdf
+2025-10-17 13:49:47,161 — INFO — Post date text: October 15, 2025
+2025-10-17 13:49:47,176 — INFO — Fire Incident in Brgy. Nasaka, Maasin, Iloilo [30 Sep 2025][Terminated]
+2025-10-17 13:49:47,721 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Nasaka-Maasin-Iloilo-15-October-2025-6PM.pdf
+2025-10-17 13:49:47,722 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Nasaka-Maasin-Iloilo-15-October-2025-6PM.pdf
+2025-10-17 13:49:54,958 — INFO — Post date text: October 15, 2025
+2025-10-17 13:49:54,974 — INFO — Flash Flood Incident in Brgy. San Miguel, Iloilo [10 Oct 2025]
+2025-10-17 13:49:55,506 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Flash-Flood-Incident-in-Brgy.-San-Miguel-Iloilo-as-of-15-October-2025-6PM.pdf
+2025-10-17 13:49:55,508 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Flash-Flood-Incident-in-Brgy.-San-Miguel-Iloilo-as-of-15-October-2025-6PM.pdf
+2025-10-17 13:50:02,730 — INFO — Post date text: October 15, 2025
+2025-10-17 13:50:02,746 — INFO — Fire Incident in Brgy. 705, Malate, City of Manila [03 Oct 2025]
+2025-10-17 13:50:03,308 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-705-Malate-City-of-Manila-as-of-15-October-2025-6AM.docx.pdf
+2025-10-17 13:50:03,308 — INFO — ✅ Saved as: DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-705-Malate-City-of-Manila-as-of-15-October-2025-6AM.docx.pdf
+2025-10-17 13:50:10,506 — INFO — Post date text: October 15, 2025
+2025-10-17 13:50:10,522 — INFO — Strong Wind Incident in Oton, Iloilo [07 Oct 2025]
+2025-10-17 13:50:11,065 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Strong-Wind-Incident-in-Oton-Iloilo-as-of-15-October-2025-6AM.docx.pdf
+2025-10-17 13:50:11,065 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Strong-Wind-Incident-in-Oton-Iloilo-as-of-15-October-2025-6AM.docx.pdf
+2025-10-17 13:50:18,271 — INFO — Post date text: October 15, 2025
+2025-10-17 13:50:18,288 — INFO — Strong Wind Incident in Lutayan, Sultan Kudarat [30 Sep 2025]
+2025-10-17 13:50:18,838 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Strong-Wind-Incident-in-Lutayan-Sultan-Kudarat-as-of-15-October-2025-6AM.docx.pdf
+2025-10-17 13:50:18,841 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Strong-Wind-Incident-in-Lutayan-Sultan-Kudarat-as-of-15-October-2025-6AM.docx.pdf
+2025-10-17 13:50:27,109 — INFO — Post date text: October 15, 2025
+2025-10-17 13:50:27,123 — INFO — Fire Incident in Brgy. Sampaguita, Tagana-an, Surigao del Norte [14 Oct 2025]
+2025-10-17 13:50:27,771 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Sampaguita-Tagana-an-Surigao-del-Norte-as-of-15-October-2025-AM.docx.pdf
+2025-10-17 13:50:27,773 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Sampaguita-Tagana-an-Surigao-del-Norte-as-of-15-October-2025-AM.docx.pdf
+2025-10-17 13:50:34,985 — INFO — Post date text: October 15, 2025
+2025-10-17 13:50:35,000 — INFO — Fire Incident in Brgy. Agdahon, Cuartero, Capiz [05 Oct 2025][Terminated]
+2025-10-17 13:50:35,524 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Agdahon-Cuartero-Capiz-15-October-2025-6AM.pdf
+2025-10-17 13:50:35,524 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Agdahon-Cuartero-Capiz-15-October-2025-6AM.pdf
+2025-10-17 13:50:42,741 — INFO — Post date text: October 15, 2025
+2025-10-17 13:50:42,757 — INFO — Fire Incident in Brgy. Bakhaw, Mandurriao, Iloilo City [03 Oct 2025][Terminated]
+2025-10-17 13:50:43,286 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Bakhaw-Mandurriao-Iloilo-City-15-October-2025-6AM.pdf
+2025-10-17 13:50:43,287 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Bakhaw-Mandurriao-Iloilo-City-15-October-2025-6AM.pdf
+2025-10-17 13:50:50,740 — INFO — Post date text: October 14, 2025
+2025-10-17 13:50:50,757 — INFO — Effects of Intertropical Convergence Zone (ITCZ) [06 Oct 2025]
+2025-10-17 13:50:51,379 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-7-on-the-Effects-of-Intertropical-Convergence-Zone-ITCZ-as-of-14-October-2025-6PM.docx.pdf
+2025-10-17 13:50:51,380 — INFO — ✅ Saved as: DSWD-DROMIC-Report-7-on-the-Effects-of-Intertropical-Convergence-Zone-ITCZ-as-of-14-October-2025-6PM.docx.pdf
+2025-10-17 13:50:58,601 — INFO — Post date text: October 13, 2025
+2025-10-17 13:50:58,616 — INFO — Fire Incident in Brgy. Bit-os, Butuan City [29 Aug 2025][Terminated]
+2025-10-17 13:50:59,275 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Bit-os-Butuan-City-13-September-2025-6AM.pdf
+2025-10-17 13:50:59,277 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Bit-os-Butuan-City-13-September-2025-6AM.pdf
+2025-10-17 13:51:01,127 — INFO — 
+📄 Processing page 2...
+2025-10-17 13:51:01,135 — INFO — Found 20 posts on this page.
+2025-10-17 13:51:07,503 — INFO — Post date text: October 13, 2025
+2025-10-17 13:51:07,521 — INFO — Fire Incident in Brgy. Kinamlutan, Butuan City [07 Sep 2025][Terminated]
+2025-10-17 13:51:08,195 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Kinamlutan-Butuan-City-13-October-2025-6AM.pdf
+2025-10-17 13:51:08,196 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Kinamlutan-Butuan-City-13-October-2025-6AM.pdf
+2025-10-17 13:51:15,410 — INFO — Post date text: October 13, 2025
+2025-10-17 13:51:15,426 — INFO — Fire Incident in Brgy. Poblacion, Tagbina, Surigao del Sur [21 Sep 2025][Terminated]
+2025-10-17 13:51:16,063 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Poblacion-Tagbina-Surigao-del-Sur-13-October-2025-6AM.pdf
+2025-10-17 13:51:16,067 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Poblacion-Tagbina-Surigao-del-Sur-13-October-2025-6AM.pdf
+2025-10-17 13:51:23,300 — INFO — Post date text: October 13, 2025
+2025-10-17 13:51:23,315 — INFO — Flash Flood Incidents in Bukidnon [17 Sep 2025]
+2025-10-17 13:51:23,914 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-10-on-the-Flash-Flood-Incidents-in-Bukidnon-as-of-13-October-2025-6AM.docx.pdf
+2025-10-17 13:51:23,917 — INFO — ✅ Saved as: DSWD-DROMIC-Report-10-on-the-Flash-Flood-Incidents-in-Bukidnon-as-of-13-October-2025-6AM.docx.pdf
+2025-10-17 13:51:31,135 — INFO — Post date text: October 10, 2025
+2025-10-17 13:51:31,154 — INFO — Effects of Localized Thunderstorms in Lebak, Sultan Kudarat [05 Oct 2025]
+2025-10-17 13:51:31,718 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Effects-of-Localized-Thunderstorms-in-Lebak-Sultan-Kudarat-as-of-10-October-2025-6PM.pdf
+2025-10-17 13:51:31,719 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Effects-of-Localized-Thunderstorms-in-Lebak-Sultan-Kudarat-as-of-10-October-2025-6PM.pdf
+2025-10-17 13:51:38,923 — INFO — Post date text: October 10, 2025
+2025-10-17 13:51:38,939 — INFO — Fire Incident in Brgy. Baylimango, City of Dapitan, Zamboanga del Norte [10 Sep 2025][Terminated]
+2025-10-17 13:51:39,526 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Baylimango-City-of-Dapitan-Zamboanga-del-Norte-10-October-2025-6AM.pdf
+2025-10-17 13:51:39,528 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Baylimango-City-of-Dapitan-Zamboanga-del-Norte-10-October-2025-6AM.pdf
+2025-10-17 13:51:46,728 — INFO — Post date text: October 10, 2025
+2025-10-17 13:51:46,743 — INFO — Fire Incident in Brgy. Taft, City of Surigao, Surigao del Norte [12 Sep 2025][Terminated]
+2025-10-17 13:51:47,653 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Taft-City-of-Surigao-Surigao-del-Norte-10-October-2025-6AM.pdf
+2025-10-17 13:51:47,654 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Taft-City-of-Surigao-Surigao-del-Norte-10-October-2025-6AM.pdf
+2025-10-17 13:51:54,904 — INFO — Post date text: October 9, 2025
+2025-10-17 13:51:54,924 — INFO — Fire Incident in Brgy. San Vicente, Anahawan, Southern Leyte [23 Sep 2025]
+2025-10-17 13:51:55,577 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-San-Vicente-Anahawan-Southern-Leyte-as-of-09-October-2025-6PM.docx.pdf
+2025-10-17 13:51:55,579 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-San-Vicente-Anahawan-Southern-Leyte-as-of-09-October-2025-6PM.docx.pdf
+2025-10-17 13:52:02,793 — INFO — Post date text: October 9, 2025
+2025-10-17 13:52:02,808 — INFO — Fire Incident in Brgy. 04, San Policarpo, Eastern Samar [01 Oct 2025]
+2025-10-17 13:52:03,506 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-04-San-Policarpo-Eastern-Samar-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:03,507 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-04-San-Policarpo-Eastern-Samar-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:10,768 — INFO — Post date text: October 9, 2025
+2025-10-17 13:52:10,783 — INFO — Effects of Localized Thunderstorms in Mindanao [15 Sep 2025]
+2025-10-17 13:52:11,411 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-6-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:11,413 — INFO — ✅ Saved as: DSWD-DROMIC-Report-6-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:18,630 — INFO — Post date text: October 9, 2025
+2025-10-17 13:52:18,650 — INFO — Effects of Intertropical Convergence Zone (ITCZ) in SOCCSKSARGEN [06 Oct 2025]
+2025-10-17 13:52:19,189 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-3-on-the-Effects-of-Intertropical-Convergence-Zone-ITCZ-in-SOCCSKSARGEN-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:19,190 — INFO — ✅ Saved as: DSWD-DROMIC-Report-3-on-the-Effects-of-Intertropical-Convergence-Zone-ITCZ-in-SOCCSKSARGEN-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:26,425 — INFO — Post date text: October 9, 2025
+2025-10-17 13:52:26,441 — INFO — Fire Incident in Brgy. Mercedes, Silago, Southern Leyte [26 Sep 2025]
+2025-10-17 13:52:26,981 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Mercedes-Silago-Southern-Leyte-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:26,982 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Mercedes-Silago-Southern-Leyte-as-of-09-October-2025-6PM.pdf
+2025-10-17 13:52:35,238 — INFO — Post date text: October 9, 2025
+2025-10-17 13:52:35,254 — INFO — Fire Incident in Brgy. Tambler, City of General Santos [07 Oct 2025]
+2025-10-17 13:52:35,827 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Tambler-City-of-General-Santos-as-of-09-October-2025-6AM.pdf
+2025-10-17 13:52:35,828 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Tambler-City-of-General-Santos-as-of-09-October-2025-6AM.pdf
+2025-10-17 13:52:43,063 — INFO — Post date text: October 9, 2025
+2025-10-17 13:52:43,078 — INFO — Flash Flood Incident in Brgy. Poblacion, Pangantucan, Bukidnon [07 Oct 2025]
+2025-10-17 13:52:43,723 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Flash-Flood-Incident-in-Brgy.-Poblacion-Pangantucan-Bukidnon-as-of-09-October-2025-6AM.pdf
+2025-10-17 13:52:43,725 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Flash-Flood-Incident-in-Brgy.-Poblacion-Pangantucan-Bukidnon-as-of-09-October-2025-6AM.pdf
+2025-10-17 13:52:50,920 — INFO — Post date text: October 8, 2025
+2025-10-17 13:52:50,934 — INFO — Fire Incident in Brgy. Carbon, City of Isabela, Basilan [07 Oct 2025]
+2025-10-17 13:52:51,486 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Carbon-City-of-Isabela-Basilan-as-of-08-October-2025-6PM.pdf
+2025-10-17 13:52:51,488 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Carbon-City-of-Isabela-Basilan-as-of-08-October-2025-6PM.pdf
+2025-10-17 13:52:58,725 — INFO — Post date text: October 8, 2025
+2025-10-17 13:52:58,740 — INFO — Effects of Southwest Monsoon [06 Aug 2025]
+2025-10-17 13:52:59,375 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-10-on-the-Effects-of-Southwest-Monsoon-as-of-08-October-2025-6AM.pdf
+2025-10-17 13:52:59,377 — INFO — ✅ Saved as: DSWD-DROMIC-Report-10-on-the-Effects-of-Southwest-Monsoon-as-of-08-October-2025-6AM.pdf
+2025-10-17 13:53:06,596 — INFO — Post date text: October 8, 2025
+2025-10-17 13:53:06,612 — INFO — Fire Incident in Brgy. Baybay, City of Roxas, Capiz [20 Sep 2025][Terminated]
+2025-10-17 13:53:07,255 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Baybay-City-of-Roxas-Capiz-08-October-2025-6AM.pdf
+2025-10-17 13:53:07,256 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Baybay-City-of-Roxas-Capiz-08-October-2025-6AM.pdf
+2025-10-17 13:53:14,560 — INFO — Post date text: October 7, 2025
+2025-10-17 13:53:14,584 — INFO — Fire Incident in Brgy. Canlapwas, City of Catbalogan, Samar [01 Oct 2025]
+2025-10-17 13:53:15,304 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-Canlapwas-City-of-Catbalogan-Samar-as-of-07-October-2025-6PM.pdf
+2025-10-17 13:53:15,306 — INFO — ✅ Saved as: DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-Canlapwas-City-of-Catbalogan-Samar-as-of-07-October-2025-6PM.pdf
+2025-10-17 13:53:22,566 — INFO — Post date text: October 7, 2025
+2025-10-17 13:53:22,584 — INFO — Effects of Localized Thunderstorms in Mindanao [19 Sep 2025]
+2025-10-17 13:53:23,309 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-07-October-2025-6PM.pdf
+2025-10-17 13:53:23,311 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-07-October-2025-6PM.pdf
+2025-10-17 13:53:30,512 — INFO — Post date text: October 7, 2025
+2025-10-17 13:53:30,527 — INFO — Flash Flood Incidents in Mindanao [18 Sep 2025]
+2025-10-17 13:53:31,200 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Flash-Flood-Incidents-in-Mindanao-as-of-07-October-2025-6PM.docx.pdf
+2025-10-17 13:53:31,202 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Flash-Flood-Incidents-in-Mindanao-as-of-07-October-2025-6PM.docx.pdf
+2025-10-17 13:53:39,523 — INFO — Post date text: October 7, 2025
+2025-10-17 13:53:39,543 — INFO — Flash Flood Incidents in Mindanao [11 Sep 2025]
+2025-10-17 13:53:40,160 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Flash-Flood-Incidents-in-Mindanao-as-of-07-October-2025-6PM.pdf
+2025-10-17 13:53:40,162 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Flash-Flood-Incidents-in-Mindanao-as-of-07-October-2025-6PM.pdf
+2025-10-17 13:53:42,064 — INFO — 
+📄 Processing page 3...
+2025-10-17 13:53:42,075 — INFO — Found 20 posts on this page.
+2025-10-17 13:53:48,252 — INFO — Post date text: October 7, 2025
+2025-10-17 13:53:48,267 — INFO — Fire Incident in Brgy. Our Lady of Lourdes, Jaro, Iloilo City [24 Sep 2025][Terminated]
+2025-10-17 13:53:48,830 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Our-Lady-of-Lourdes-Jaro-Iloilo-City-07-October-2025-6AM.pdf
+2025-10-17 13:53:48,831 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Our-Lady-of-Lourdes-Jaro-Iloilo-City-07-October-2025-6AM.pdf
+2025-10-17 13:53:56,036 — INFO — Post date text: October 7, 2025
+2025-10-17 13:53:56,056 — INFO — Fire Incident in Brgy. San Roque, Tolosa, Leyte [19 Aug 2025][Terminated]
+2025-10-17 13:53:56,701 — INFO — ⬇️  Downloading DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-San-Roque-Tolosa-Leyte-07-October-2025-6AM.pdf
+2025-10-17 13:53:56,702 — INFO — ✅ Saved as: DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-San-Roque-Tolosa-Leyte-07-October-2025-6AM.pdf
+2025-10-17 13:54:03,943 — INFO — Post date text: October 7, 2025
+2025-10-17 13:54:03,961 — INFO — Fire Incident in Brgy. Omaganhan, Tabango, Leyte [27 Aug 2025][Terminated]
+2025-10-17 13:54:04,614 — INFO — ⬇️  Downloading DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-Omaganhan-Tabango-Leyte-07-October-2025-6AM.pdf
+2025-10-17 13:54:04,616 — INFO — ✅ Saved as: DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-Omaganhan-Tabango-Leyte-07-October-2025-6AM.pdf
+2025-10-17 13:54:11,838 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:11,853 — INFO — Fire Incident in Brgy. Nasaka, Maasin, Iloilo [20 Sep 2025]
+2025-10-17 13:54:12,374 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Nasaka-Maasin-Iloilo-06-October-2025-6PM.pdf
+2025-10-17 13:54:12,376 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Nasaka-Maasin-Iloilo-06-October-2025-6PM.pdf
+2025-10-17 13:54:19,613 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:19,629 — INFO — Fire Incident in Brgy. Naslo, Maasin, Iloilo [31 Aug 2025]
+2025-10-17 13:54:20,164 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Naslo-Maasin-Iloilo-06-October-2025-6PM.pdf
+2025-10-17 13:54:20,167 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Naslo-Maasin-Iloilo-06-October-2025-6PM.pdf
+2025-10-17 13:54:27,387 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:27,403 — INFO — Fire Incident in Brgy. 45-Sta. Cruz, Tacloban City [30 Sep 2025]
+2025-10-17 13:54:27,957 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-45-Sta.Cruz-Tacloban-City-as-of-06-October-2025-6PM.pdf
+2025-10-17 13:54:27,959 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-45-Sta.Cruz-Tacloban-City-as-of-06-October-2025-6PM.pdf
+2025-10-17 13:54:35,181 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:35,196 — INFO — Effects of Easterlies in Mindanao [07 Sep 2025]
+2025-10-17 13:54:35,737 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-6-on-the-Effects-of-Easterlies-in-Mindanao-as-of-06-October-2025-6PM.pdf
+2025-10-17 13:54:35,740 — INFO — ✅ Saved as: DSWD-DROMIC-Report-6-on-the-Effects-of-Easterlies-in-Mindanao-as-of-06-October-2025-6PM.pdf
+2025-10-17 13:54:43,044 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:43,060 — INFO — Effects of Localized Thunderstorms in Mindanao [12 Sep 2025]
+2025-10-17 13:54:43,589 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-06-October-2025-6PM.pdf
+2025-10-17 13:54:43,589 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-06-October-2025-6PM.pdf
+2025-10-17 13:54:50,851 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:50,873 — INFO — Strong Wind Incident in Brgy. Kiara, Don Carlos, Bukidnon [11 Sep 2025]
+2025-10-17 13:54:51,710 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Effects-of-Localized-Thunderstorm-in-Brgy.-Kiara-Don-Carlos-Bukidnon-as-of-06-October-2025-6AM.pdf
+2025-10-17 13:54:51,714 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Effects-of-Localized-Thunderstorm-in-Brgy.-Kiara-Don-Carlos-Bukidnon-as-of-06-October-2025-6AM.pdf
+2025-10-17 13:54:58,960 — INFO — Post date text: October 6, 2025
+2025-10-17 13:54:58,977 — INFO — Flooding Incidents in Don Carlos, Bukidnon [10 Sep 2025]
+2025-10-17 13:54:59,536 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-2-on-the-Flooding-Incidents-in-Don-Carlos-Bukidnon-as-of-06-October-2025-6AM.pdf
+2025-10-17 13:54:59,537 — INFO — ✅ Saved as: DSWD-DROMIC-Report-2-on-the-Flooding-Incidents-in-Don-Carlos-Bukidnon-as-of-06-October-2025-6AM.pdf
+2025-10-17 13:55:06,828 — INFO — Post date text: October 5, 2025
+2025-10-17 13:55:06,843 — INFO — Fire Incident in Brgy. Ampayon, City of Butuan [05 Sep 2025][Terminated]
+2025-10-17 13:55:07,512 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Ampayon-City-of-Butuan-05-October-2025-6PM.pdf
+2025-10-17 13:55:07,514 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Ampayon-City-of-Butuan-05-October-2025-6PM.pdf
+2025-10-17 13:55:14,749 — INFO — Post date text: October 5, 2025
+2025-10-17 13:55:14,766 — INFO — Fire Incident in Brgy. Sto Niño, Abuyog, Leyte [20 Aug 2025]
+2025-10-17 13:55:15,347 — INFO — ⬇️  Downloading DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-Sto-Nino-Abuyog-Leyte-05-October-2025-6PM-.pdf
+2025-10-17 13:55:15,347 — INFO — ✅ Saved as: DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-Sto-Nino-Abuyog-Leyte-05-October-2025-6PM-.pdf
+2025-10-17 13:55:22,633 — INFO — Post date text: October 5, 2025
+2025-10-17 13:55:22,648 — INFO — Fire Incident in Brgy. Baylimango, City of Dapitan, Zamboanga del Norte [03 Sep 2025][Terminated]
+2025-10-17 13:55:23,170 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Baylimango-City-of-Dapitan-Zamboanga-del-Norte-05-October-2025-6PM.pdf
+2025-10-17 13:55:23,170 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Baylimango-City-of-Dapitan-Zamboanga-del-Norte-05-October-2025-6PM.pdf
+2025-10-17 13:55:30,377 — INFO — Post date text: October 5, 2025
+2025-10-17 13:55:30,392 — INFO — Fire Incident in Brgy. 21-C, City of Davao [02 Oct 2025]
+2025-10-17 13:55:30,929 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-21-C-City-of-Davao-as-of-05-October-2025-6AM.pdf
+2025-10-17 13:55:30,931 — INFO — ✅ Saved as: DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-21-C-City-of-Davao-as-of-05-October-2025-6AM.pdf
+2025-10-17 13:55:38,194 — INFO — Post date text: October 5, 2025
+2025-10-17 13:55:38,210 — INFO — Fire Incident in Brgy. San Agustin Sur, City of Tandag, Surigao del Sur [31 Aug 2025] [Terminated]
+2025-10-17 13:55:38,841 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-San-Agustin-Sur-City-of-Tandag-Surigao-del-Sur-05-October-2025-6PM.pdf
+2025-10-17 13:55:38,847 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-San-Agustin-Sur-City-of-Tandag-Surigao-del-Sur-05-October-2025-6PM.pdf
+2025-10-17 13:55:47,109 — INFO — Post date text: October 4, 2025
+2025-10-17 13:55:47,124 — INFO — Fire Incident in Brgy. Parang, Cantilan, Surigao del Sur [17 Aug 2025][Terminated]
+2025-10-17 13:55:47,846 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Parang-Cantilan-Surigao-del-Sur-04-October-2025-6PM.pdf
+2025-10-17 13:55:47,849 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Parang-Cantilan-Surigao-del-Sur-04-October-2025-6PM.pdf
+2025-10-17 13:55:55,091 — INFO — Post date text: October 4, 2025
+2025-10-17 13:55:55,107 — INFO — Fire Incident in Brgy. Magosilom, Cantilan, Surigao del Sur [23 Aug 2025][Terminated]
+2025-10-17 13:55:55,888 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Magosilom-Cantilan-Surigao-del-Sur-04-October-2025-6PM.pdf
+2025-10-17 13:55:55,890 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Magosilom-Cantilan-Surigao-del-Sur-04-October-2025-6PM.pdf
+2025-10-17 13:56:03,162 — INFO — Post date text: October 4, 2025
+2025-10-17 13:56:03,185 — INFO — Fire Incident in Brgy. Poblacion, San Miguel, Surigao del Sur [27 Aug 2025]
+2025-10-17 13:56:03,982 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Poblacion-San-Miguel-Surigao-del-Sur-04-October-2025-6PM.pdf
+2025-10-17 13:56:03,984 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Poblacion-San-Miguel-Surigao-del-Sur-04-October-2025-6PM.pdf
+2025-10-17 13:56:11,197 — INFO — Post date text: October 3, 2025
+2025-10-17 13:56:11,211 — INFO — Fire Incident in Brgy. Tetuan, Zamboanga [02 Oct 2025]
+2025-10-17 13:56:11,787 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Tetuan-Zamboanga-City-as-of-03-October-2025-6PM.pdf
+2025-10-17 13:56:11,789 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Tetuan-Zamboanga-City-as-of-03-October-2025-6PM.pdf
+2025-10-17 13:56:19,031 — INFO — Post date text: October 3, 2025
+2025-10-17 13:56:19,049 — INFO — Fire Incident in Brgy. 105, Tondo, City of Manila [13 Sep 2025]
+2025-10-17 13:56:19,606 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Fire-Incident-in-Brgy.-105-Tondo-City-of-Manila-as-of-03-October-2025-6PM.pdf
+2025-10-17 13:56:19,609 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Fire-Incident-in-Brgy.-105-Tondo-City-of-Manila-as-of-03-October-2025-6PM.pdf
+2025-10-17 13:56:21,509 — INFO — 
+📄 Processing page 4...
+2025-10-17 13:56:21,517 — INFO — Found 20 posts on this page.
+2025-10-17 13:56:27,811 — INFO — Post date text: October 2, 2025
+2025-10-17 13:56:27,826 — INFO — Flash Flood Incidents in Mindanao [17 Sep 2025]
+2025-10-17 13:56:28,400 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Flash-Flood-Incidents-in-Mindanao-as-of-02-October-2025-6PM.pdf
+2025-10-17 13:56:28,402 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Flash-Flood-Incidents-in-Mindanao-as-of-02-October-2025-6PM.pdf
+2025-10-17 13:56:35,731 — INFO — Post date text: October 2, 2025
+2025-10-17 13:56:35,747 — INFO — Fire Incident in Brgy. IV, Dagupan City [07 Sep 2025]
+2025-10-17 13:56:36,292 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-IV-Dagupan-City-as-of-02-October-2025-6AM.docx.pdf
+2025-10-17 13:56:36,295 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-IV-Dagupan-City-as-of-02-October-2025-6AM.docx.pdf
+2025-10-17 13:56:43,529 — INFO — Post date text: October 1, 2025
+2025-10-17 13:56:43,546 — INFO — Fire Incident in Brgy. Pogo, City of Alaminos, Pangasinan [10 Sep 2025]
+2025-10-17 13:56:44,076 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Pogo-City-of-Alaminos-Pangasinan-as-of-01-October-2025-6PM.docx.pdf
+2025-10-17 13:56:44,078 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Pogo-City-of-Alaminos-Pangasinan-as-of-01-October-2025-6PM.docx.pdf
+2025-10-17 13:56:52,291 — INFO — Post date text: October 1, 2025
+2025-10-17 13:56:52,306 — INFO — Fire Incident in Brgy. Tumaga, Zamboanga City [29 Sep 2025]
+2025-10-17 13:56:52,911 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-Tumaga-Zamboanga-City-as-of-01-October-2025-6AM.docx.pdf
+2025-10-17 13:56:52,913 — INFO — ✅ Saved as: DSWD-DROMIC-Report-2-on-the-Fire-Incident-in-Brgy.-Tumaga-Zamboanga-City-as-of-01-October-2025-6AM.docx.pdf
+2025-10-17 13:57:00,123 — INFO — Post date text: October 1, 2025
+2025-10-17 13:57:00,138 — INFO — Fire Incident in Brgy. Alas-as, Madalag, Aklan [11 Sep 2025][Terminated]
+2025-10-17 13:57:00,888 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Alas-as-Madalag-Aklan-01-October-2025-6AM-.pdf
+2025-10-17 13:57:00,890 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Alas-as-Madalag-Aklan-01-October-2025-6AM-.pdf
+2025-10-17 13:57:08,113 — INFO — Post date text: October 1, 2025
+2025-10-17 13:57:08,129 — INFO — Effects of Localized Thunderstorms in Mindanao [16 Sep 2025]
+2025-10-17 13:57:08,647 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-2-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-01-October-2025-6AM.pdf
+2025-10-17 13:57:08,654 — INFO — ✅ Saved as: DSWD-DROMIC-Report-2-on-the-Effects-of-Localized-Thunderstorms-in-Mindanao-as-of-01-October-2025-6AM.pdf
+2025-10-17 13:57:15,866 — INFO — Post date text: September 30, 2025
+2025-10-17 13:57:15,881 — INFO — Fire Incident in Tondo, City of Manila [29 Sep 2025]
+2025-10-17 13:57:16,412 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Tondo-City-of-Manila-as-of-30-September-2025-6PM.pdf
+2025-10-17 13:57:16,413 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Tondo-City-of-Manila-as-of-30-September-2025-6PM.pdf
+2025-10-17 13:57:23,654 — INFO — Post date text: September 30, 2025
+2025-10-17 13:57:23,670 — INFO — Fire Incident in Brgy. 70, Caloocan City [26 Sep 2025]
+2025-10-17 13:57:24,192 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-70-Caloocan-City-as-of-30-September-2025-6PM.pdf
+2025-10-17 13:57:24,200 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-70-Caloocan-City-as-of-30-September-2025-6PM.pdf
+2025-10-17 13:57:31,572 — INFO — Post date text: September 28, 2025
+2025-10-17 13:57:31,587 — INFO — Effects of Intertropical Convergence Zone (ITCZ) in Mindanao [20 Aug 2025]
+2025-10-17 13:57:32,232 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-5-on-the-Effects-of-Intertropical-Convergence-Zone-ITCZ-in-Mindanao-as-of-28-September-2025-6PM.docx.pdf
+2025-10-17 13:57:32,232 — INFO — ✅ Saved as: DSWD-DROMIC-Report-5-on-the-Effects-of-Intertropical-Convergence-Zone-ITCZ-in-Mindanao-as-of-28-September-2025-6PM.docx.pdf
+2025-10-17 13:57:39,459 — INFO — Post date text: September 28, 2025
+2025-10-17 13:57:39,475 — INFO — Fire Incident in Brgy. Anahawon, Maramag, Bukidnon [22 Sep 2025]
+2025-10-17 13:57:40,072 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Anahawon-Maramag-Bukidnon-as-of-28-September-2025-6AM-.docx.pdf
+2025-10-17 13:57:40,072 — INFO — ✅ Saved as: DSWD-DROMIC-Report-1-on-the-Fire-Incident-in-Brgy.-Anahawon-Maramag-Bukidnon-as-of-28-September-2025-6AM-.docx.pdf
+2025-10-17 13:57:47,290 — INFO — Post date text: September 27, 2025
+2025-10-17 13:57:47,305 — INFO — Fire Incident in Brgy. 59, City of Tacloban [25 Aug 2025] [Terminated]
+2025-10-17 13:57:48,044 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-59-City-of-Tacloban-27-September-2025-6AM.pdf
+2025-10-17 13:57:48,044 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-59-City-of-Tacloban-27-September-2025-6AM.pdf
+2025-10-17 13:57:56,316 — INFO — Post date text: September 26, 2025
+2025-10-17 13:57:56,338 — INFO — Fire Incident in Brgy. Catadman-Manabay, Ozamis City, Misamis Occidental [06 Jun 2025][Terminated]
+2025-10-17 13:57:56,878 — INFO — ⬇️  Downloading DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-Catadman-Manabay-Ozamis-City-Misamis-Occidental-26-September-2025-6AM.pdf
+2025-10-17 13:57:56,879 — INFO — ✅ Saved as: DSWD-DROMIC-Terminal-Report-on-the-Fire-Incident-in-Brgy.-Catadman-Manabay-Ozamis-City-Misamis-Occidental-26-September-2025-6AM.pdf
+2025-10-17 13:58:04,122 — INFO — Post date text: September 25, 2025
+2025-10-17 13:58:04,141 — INFO — Fire Incident in Brgy. Alaguisoc, Jordan, Guimaras [29 Aug 2025][Terminated]
+2025-10-17 13:58:04,774 — INFO — ⬇️  Downloading DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Alaguisoc-Jordan-Guimaras-25-September-2025-6AM.pdf
+2025-10-17 13:58:04,774 — INFO — ✅ Saved as: DSWD-DROMIC-Report-on-the-Fire-Incident-in-Brgy.-Alaguisoc-Jordan-Guimaras-25-September-2025-6AM.pdf
+2025-10-17 13:58:11,998 — INFO — Post date text: September 24, 2025
+ ✅ Last scraped date reached — stopping further scraping.
