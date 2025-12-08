@@ -1,2 +1,5 @@
 requests
 selenium
+pdfplumber
+pandas
+geopandas
