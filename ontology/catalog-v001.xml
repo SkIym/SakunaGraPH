@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<catalog prefer="public" xmlns="urn:oasis:names:tc:entity:xmlns:xml:catalog">
+    <uri id="Imports Wizard Entry" name="http://www.w3.org/2006/time#2016" uri="http://www.w3.org/2006/time#"/>
+    <uri id="Imports Wizard Entry" name="http://www.w3.org/ns/prov-o-20130430" uri="http://www.w3.org/ns/prov-o#"/>
+    <uri id="Imports Wizard Entry" name="http://www.opengis.net/ont/geosparql/1.1" uri="https://opengeospatial.github.io/ogc-geosparql/geosparql11/geo.ttl"/>
+    <uri id="Imports Wizard Entry" name="http://www.opengis.net/ont/geosparql/1.1" uri="https://opengeospatial.github.io/ogc-geosparql/geosparql11/geo.ttl"/>
+    <group id="Folder Repository, directory=, recursive=true, Auto-Update=true, version=2" prefer="public" xml:base="">
+        <uri id="Automatically generated entry, Timestamp=1764488211116" name="urn:webprotege:ontology:712f9eb9-482f-4203-85a5-3a9b09accf91" uri="sakunaph.owl"/>
+    </group>
+</catalog>
