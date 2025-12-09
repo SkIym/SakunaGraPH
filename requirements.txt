@@ -3,3 +3,4 @@ selenium
 pdfplumber
 pandas
 geopandas
+rdflib
