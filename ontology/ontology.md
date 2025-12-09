@@ -1,14 +1,15 @@
-- Latest: sakunaph-2
+- Latest: sakunagraph
 
 TO DO:
-- rename IRIs (done)
+- find existing disaster domain ontology to extend using current
+- determine ways to store multiple paired values and attributes (itemCost, itemQty, )
+
+DONE:
+- rename IRIs
 - cleanup ontology pitfalls (minor pitfalls are disregarded due to design considerations, only important and critical addressed)
-    - refactor or remove properties without domain or range (done)
-    - add disjointnenss between classes / properties (done)
+    - refactor or remove properties without domain or range 
+    - add disjointnenss between classes / properties 
         - Natural and Technological Disasters 
         - Major Events and Incidents
-    - fix multiple domain issue and make it union (done, just need to scan again)
-    - refactor inverse property relationships (done)
-
-- align with existing ontologies
-- determine ways to store multiple paired values and attributes (itemCost, itemQty, )
+    - fix multiple domain issue and make it union
+    - refactor inverse property relationships 
