@@ -9,7 +9,7 @@ municities_shp_path = "../shapefiles/PH_Adm3_MuniCities.shp"
 
 gdf_regions = gpd.read_file(regions_shp_path, layer='PH_Adm1_Regions.shp')
 gdf_provinces = gpd.read_file(provinces_shp_path, layer='PH_Adm2_ProvDists.shp')
-# gdf_municities = gpd.read_file(municities_shp_path, layer='PH_Adm3_MuniCities.shp')
+gdf_municities = gpd.read_file(municities_shp_path, layer='PH_Adm3_MuniCities.shp')
 
 
 g = Graph()
@@ -39,6 +39,8 @@ for _, row in gdf_regions.iterrows():
     g.add((uri, URIRef(SKG["psgc"]), Literal(psgc)))
     g.add((uri, URIRef(SKG["admLevel"]), Literal(admLevel)))
 
+
+    # Too larege and unneccesary, just refer to an external file
     # geom_wkt = row['geometry'].wkt
     # geom_uri = URIRef(SKG[row['adm1_en'].replace(" ", "_")] + "_geom")
 
@@ -72,8 +74,9 @@ for _, row in gdf_provinces.iterrows():
     for s, p, o in g.triples((None, URIRef(SKG["psgc"]), parentRegion)):
         g.add((uri, URIRef(SKG["isPartOf"]), s))
         
+    # Too larege and unneccesary, just refer to an external file
 
-    # geom_wkt = row['geometry'].wkt
+    # geom_wkt = row['geometry']
     # geom_uri = URIRef(SKG[row['adm2_en'].replace(" ", "_")] + "_geom")
 
     # g.add((geom_uri, RDF.type, GEO.Geometry))
@@ -81,17 +84,27 @@ for _, row in gdf_provinces.iterrows():
 
     # g.add((uri, GEO.hasGeometry, geom_uri))
 
-g.serialize(destination='regions.ttl')
-
 # ===================== MUNICIPALITIES/CITIES
 
-# for _, row in gdf_municities.iterrows():
+for _, row in gdf_municities.iterrows():
 
-#     print(row)
+    if row["adm3_en"] is None:
+        continue
 
-#     uri = URIRef(SKG[row['adm3_en'].replace(" ", "_")]) # Location URI
-#     psgc = row['adm3_psgc']
-#     admLevel = "Municipality" if row['geo_level'] == 'Mun' else "City"
-#     geom_wkt = row['geometry'].wkt
+    print(row["adm3_en"])
+    print("-----------------")
 
-#     print("-----------------")
+    uri = URIRef(SKG[row['adm3_en'].replace(" ", "_")]) # Location URI
+    psgc = row['adm3_psgc']
+    admLevel = "Municipality" if row['geo_level'] == "Mun" else "City"
+
+    g.add((uri, RDF.type, SKG["Municipality"]))
+    g.add((uri, RDFS.label, Literal(row['adm3_en'])))
+    g.add((uri, URIRef(SKG["psgc"]), Literal(psgc)))
+    g.add((uri, URIRef(SKG["admLevel"]), Literal(admLevel)))
+
+    parentProvince = Literal(row['adm2_psgc'])
+    for s, p, o in g.triples((None, URIRef(SKG["psgc"]), parentProvince)):
+        g.add((uri, URIRef(SKG["isPartOf"]), s))
+
+g.serialize(destination='regions.ttl')
