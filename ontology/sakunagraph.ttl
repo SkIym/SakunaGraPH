@@ -134,6 +134,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
             rdfs:domain [ rdf:type owl:Class ;
                           owl:unionOf ( :DisasterEvent
                                         :Impact
+                                        :Preparedness
                                         :Response
                                       )
                         ] ;
@@ -147,6 +148,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
              rdfs:domain [ rdf:type owl:Class ;
                            owl:unionOf ( :DisasterEvent
                                          :Impact
+                                         :Preparedness
                                          :Response
                                        )
                          ] ;
@@ -177,6 +179,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
              rdfs:domain [ rdf:type owl:Class ;
                            owl:unionOf ( :DisasterEvent
                                          :Impact
+                                         :Preparedness
                                          :Response
                                        )
                          ] ;
@@ -190,6 +193,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                  rdfs:domain [ rdf:type owl:Class ;
                                owl:unionOf ( :DisasterEvent
                                              :Impact
+                                             :Preparedness
                                              :Response
                                            )
                              ] ;
@@ -198,12 +202,20 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                  rdfs:label "hasMunicipality"@en .
 
 
+###  https://sakuna.ph/hasPreparedness
+:hasPreparedness rdf:type owl:ObjectProperty ;
+                 rdfs:domain :DisasterEvent ;
+                 rdfs:range :Preparedness ;
+                 rdfs:comment "hasPreparedness" .
+
+
 ###  https://sakuna.ph/hasProvince
 :hasProvince rdf:type owl:ObjectProperty ;
              rdfs:subPropertyOf :hasLocation ;
              rdfs:domain [ rdf:type owl:Class ;
                            owl:unionOf ( :DisasterEvent
                                          :Impact
+                                         :Preparedness
                                          :Response
                                        )
                          ] ;
@@ -217,6 +229,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
            rdfs:domain [ rdf:type owl:Class ;
                          owl:unionOf ( :DisasterEvent
                                        :Impact
+                                       :Preparedness
                                        :Response
                                      )
                        ] ;
@@ -583,9 +596,16 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 
 ###  https://sakuna.ph/evacuationCenters
 :evacuationCenters rdf:type owl:DatatypeProperty ;
-                   rdfs:domain :AffectedPopulation ;
+                   rdfs:domain :PreemptiveEvacuation ;
                    rdfs:range xsd:integer ;
                    rdfs:label "evacuationCenters"@en .
+
+
+###  https://sakuna.ph/evacuationPlan
+:evacuationPlan rdf:type owl:DatatypeProperty ;
+                rdfs:domain :PreemptiveEvacuation ;
+                rdfs:range xsd:string ;
+                rdfs:label "evacuationPlan" .
 
 
 ###  https://sakuna.ph/eventName
@@ -897,6 +917,13 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:label "passengers"@en .
 
 
+###  https://sakuna.ph/policyChanges
+:policyChanges rdf:type owl:DatatypeProperty ;
+               rdfs:domain :Aftermath ;
+               rdfs:range xsd:string ;
+               rdfs:label "policyChanges" .
+
+
 ###  https://sakuna.ph/portName
 :portName rdf:type owl:DatatypeProperty ;
           rdfs:domain [ rdf:type owl:Class ;
@@ -924,6 +951,21 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                         ] ;
             rdfs:range xsd:string ;
             rdfs:label "portStatus"@en .
+
+
+###  https://sakuna.ph/postStructureCost
+:postStructureCost rdf:type owl:DatatypeProperty ;
+                   rdfs:domain :Aftermath ;
+                   rdfs:range xsd:decimal ;
+                   rdfs:comment "Cost of Structure Built post-disaster" ;
+                   rdfs:label "postStructureCost" .
+
+
+###  https://sakuna.ph/postTraining
+:postTraining rdf:type owl:DatatypeProperty ;
+              rdfs:domain :Aftermath ;
+              rdfs:range xsd:string ;
+              rdfs:label "postTraining" .
 
 
 ###  https://sakuna.ph/preemptFamilies
@@ -1000,6 +1042,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
          rdfs:domain [ rdf:type owl:Class ;
                        owl:unionOf ( :DisasterEvent
                                      :Impact
+                                     :Preparedness
                                      :Response
                                    )
                      ] ;
@@ -1021,6 +1064,20 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:domain :Source ;
             rdfs:range xsd:string ;
             rdfs:label "reportName"@en .
+
+
+###  https://sakuna.ph/rescueEquipment
+:rescueEquipment rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Rescue ;
+                 rdfs:range xsd:string ;
+                 rdfs:label "rescueEquipment" .
+
+
+###  https://sakuna.ph/rescueUnit
+:rescueUnit rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Rescue ;
+            rdfs:range xsd:string ;
+            rdfs:label "rescueUnit" .
 
 
 ###  https://sakuna.ph/resolutionDate
@@ -1099,6 +1156,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Stranded ;
                 rdfs:range xsd:integer ;
                 rdfs:label "rollingCargoes"@en .
+
+
+###  https://sakuna.ph/searchRescueRetrievalDone
+:searchRescueRetrievalDone rdf:type owl:DatatypeProperty ;
+                           rdfs:domain :Aftermath ;
+                           rdfs:range xsd:boolean ;
+                           rdfs:comment "was search, rescue, and retrieval done?" ;
+                           rdfs:label "srrDone" .
 
 
 ###  https://sakuna.ph/serviceProvider
@@ -1259,12 +1324,29 @@ geo:Geometry rdf:type owl:Class ;
                                     [ rdf:type owl:Restriction ;
                                       owl:onProperty :displacedPersons ;
                                       owl:someValuesFrom xsd:integer
-                                    ] ,
-                                    [ rdf:type owl:Restriction ;
-                                      owl:onProperty :evacuationCenters ;
-                                      owl:someValuesFrom xsd:integer
                                     ] ;
                     rdfs:label "Affected Population"@en .
+
+
+###  https://sakuna.ph/Aftermath
+:Aftermath rdf:type owl:Class ;
+           rdfs:subClassOf :Response ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :policyChanges ;
+                             owl:someValuesFrom xsd:string
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :postStructureCost ;
+                             owl:someValuesFrom xsd:decimal
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :postTraining ;
+                             owl:someValuesFrom xsd:string
+                           ] ,
+                           [ rdf:type owl:Restriction ;
+                             owl:onProperty :searchRescueRetrievalDone ;
+                             owl:someValuesFrom xsd:boolean
+                           ] .
 
 
 ###  https://sakuna.ph/Agriculture
@@ -2163,7 +2245,15 @@ geo:Geometry rdf:type owl:Class ;
 
 ###  https://sakuna.ph/PreemptiveEvacuation
 :PreemptiveEvacuation rdf:type owl:Class ;
-                      rdfs:subClassOf :Response ,
+                      rdfs:subClassOf :Preparedness ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty :evacuationCenters ;
+                                        owl:someValuesFrom xsd:integer
+                                      ] ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty :evacuationPlan ;
+                                        owl:someValuesFrom xsd:string
+                                      ] ,
                                       [ rdf:type owl:Restriction ;
                                         owl:onProperty :preemptFamilies ;
                                         owl:someValuesFrom xsd:integer
@@ -2177,6 +2267,39 @@ geo:Geometry rdf:type owl:Class ;
                                         owl:someValuesFrom xsd:integer
                                       ] ;
                       rdfs:label "Preemptive Evacuation"@en .
+
+
+###  https://sakuna.ph/Preparedness
+:Preparedness rdf:type owl:Class ;
+              rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                owl:onProperty :fromSource ;
+                                owl:someValuesFrom :Source
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasBarangay ;
+                                owl:someValuesFrom :Barangay
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasLocation ;
+                                owl:someValuesFrom :Location
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasMunicipality ;
+                                owl:someValuesFrom :Municipality
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasProvince ;
+                                owl:someValuesFrom :Province
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasRegion ;
+                                owl:someValuesFrom :Region
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :remarks ;
+                                owl:someValuesFrom xsd:string
+                              ] ;
+              rdfs:label "Preparedness" .
 
 
 ###  https://sakuna.ph/PrionDisease
@@ -2217,6 +2340,20 @@ geo:Geometry rdf:type owl:Class ;
 :Region rdf:type owl:Class ;
         rdfs:subClassOf :Location ;
         rdfs:label "Region"@en .
+
+
+###  https://sakuna.ph/Rescue
+:Rescue rdf:type owl:Class ;
+        rdfs:subClassOf :Preparedness ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :rescueEquipment ;
+                          owl:someValuesFrom xsd:string
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :rescueUnit ;
+                          owl:someValuesFrom xsd:string
+                        ] ;
+        rdfs:label "Rescue" .
 
 
 ###  https://sakuna.ph/Response
