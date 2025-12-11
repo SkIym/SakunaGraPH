@@ -4,3 +4,4 @@ pdfplumber
 pandas
 geopandas
 rdflib
+openpyxl
