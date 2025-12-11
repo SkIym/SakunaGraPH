@@ -8,7 +8,8 @@
 @base <https://sakuna.ph/> .
 
 <https://sakuna.ph/> rdf:type owl:Ontology ;
-                      owl:imports <http://www.opengis.net/ont/geosparql/1.1> .
+                      owl:imports <http://www.opengis.net/ont/geosparql/1.1> ,
+                                  <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology> .
 
 #################################################################
 #    Object Properties
@@ -139,7 +140,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                                       )
                         ] ;
             rdfs:range :Source ;
-            rdfs:label "fromSource"@en .
+            rdfs:label "from source"@en .
 
 
 ###  https://sakuna.ph/hasBarangay
@@ -153,7 +154,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                                        )
                          ] ;
              rdfs:range :Barangay ;
-             rdfs:label "hasBarangay"@en .
+             rdfs:label "has barangay"@en .
 
 
 ###  https://sakuna.ph/hasCausedIncident
@@ -162,7 +163,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                    owl:inverseOf :isCausedBy ;
                    rdfs:domain :MajorEvent ;
                    rdfs:range :Incident ;
-                   rdfs:label "hasCausedIncident"@en .
+                   rdfs:label "has caused incident"@en .
 
 
 ###  https://sakuna.ph/hasImpact
@@ -170,7 +171,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf owl:topObjectProperty ;
            rdfs:domain :DisasterEvent ;
            rdfs:range :Impact ;
-           rdfs:label "hasImpact"@en .
+           rdfs:label "has impact"@en .
 
 
 ###  https://sakuna.ph/hasLocation
@@ -184,7 +185,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                                        )
                          ] ;
              rdfs:range :Location ;
-             rdfs:label "hasLocation"@en .
+             rdfs:label "has location"@en .
 
 
 ###  https://sakuna.ph/hasMunicipality
@@ -199,14 +200,14 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                              ] ;
                  rdfs:range :Municipality ;
                  rdfs:comment "Synonymous with City" ;
-                 rdfs:label "hasMunicipality"@en .
+                 rdfs:label "has municipality or city"@en .
 
 
 ###  https://sakuna.ph/hasPreparedness
 :hasPreparedness rdf:type owl:ObjectProperty ;
                  rdfs:domain :DisasterEvent ;
                  rdfs:range :Preparedness ;
-                 rdfs:comment "hasPreparedness" .
+                 rdfs:label "has preparedness" .
 
 
 ###  https://sakuna.ph/hasProvince
@@ -220,7 +221,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                                        )
                          ] ;
              rdfs:range :Province ;
-             rdfs:label "hasProvince"@en .
+             rdfs:label "has province"@en .
 
 
 ###  https://sakuna.ph/hasRegion
@@ -234,7 +235,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                                      )
                        ] ;
            rdfs:range :Region ;
-           rdfs:label "hasRegion"@en .
+           rdfs:label "has region"@en .
 
 
 ###  https://sakuna.ph/hasResponse
@@ -242,14 +243,14 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
              rdfs:subPropertyOf owl:topObjectProperty ;
              rdfs:domain :DisasterEvent ;
              rdfs:range :Response ;
-             rdfs:label "hasResponse"@en .
+             rdfs:label "has response"@en .
 
 
 ###  https://sakuna.ph/hasSubtype
 :hasSubtype rdf:type owl:ObjectProperty ;
             rdfs:domain :DisasterEvent ;
             rdfs:range :DisasterType ;
-            rdfs:label "hasSubtype"@en .
+            rdfs:label "has disaster subtype"@en .
 
 
 ###  https://sakuna.ph/hasType
@@ -257,7 +258,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
          rdfs:subPropertyOf owl:topObjectProperty ;
          rdfs:domain :DisasterEvent ;
          rdfs:range :DisasterType ;
-         rdfs:label "hasType"@en .
+         rdfs:label "has disaster type"@en .
 
 
 ###  https://sakuna.ph/isCausedBy
@@ -265,7 +266,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
             rdfs:subPropertyOf owl:topObjectProperty ;
             rdfs:domain :Incident ;
             rdfs:range :MajorEvent ;
-            rdfs:label "isCausedBy"@en .
+            rdfs:label "is caused by"@en .
 
 
 ###  https://sakuna.ph/isPartOf
@@ -284,7 +285,7 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                                      :Region
                                    )
                      ] ;
-          rdfs:label "isPartOf"@en .
+          rdfs:label "is part of"@en .
 
 
 #################################################################
@@ -331,28 +332,29 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/admLevel
 :admLevel rdf:type owl:DatatypeProperty ;
           rdfs:domain :Location ;
-          rdfs:range xsd:string .
+          rdfs:range xsd:string ;
+          rdfs:label "adminstration level" .
 
 
 ###  https://sakuna.ph/affectedBarangays
 :affectedBarangays rdf:type owl:DatatypeProperty ;
                    rdfs:domain :AffectedPopulation ;
                    rdfs:range xsd:integer ;
-                   rdfs:label "affectedBarangays"@en .
+                   rdfs:label "affected barangays"@en .
 
 
 ###  https://sakuna.ph/affectedFamilies
 :affectedFamilies rdf:type owl:DatatypeProperty ;
                   rdfs:domain :AffectedPopulation ;
                   rdfs:range xsd:integer ;
-                  rdfs:label "affectedFamilies"@en .
+                  rdfs:label "affected families"@en .
 
 
 ###  https://sakuna.ph/affectedPersons
 :affectedPersons rdf:type owl:DatatypeProperty ;
                  rdfs:domain :AffectedPopulation ;
                  rdfs:range xsd:integer ;
-                 rdfs:label "affectedPersons"@en .
+                 rdfs:label "affected persons"@en .
 
 
 ###  https://sakuna.ph/agencyLGUsPresent
@@ -360,14 +362,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                    rdfs:subPropertyOf owl:topDataProperty ;
                    rdfs:domain :Assistance ;
                    rdfs:range xsd:string ;
-                   rdfs:label "agencyLGUsPresent"@en .
+                   rdfs:label "agency and LGUs present"@en .
 
 
 ###  https://sakuna.ph/agricultureClassification
 :agricultureClassification rdf:type owl:DatatypeProperty ;
                            rdfs:domain :Agriculture ;
                            rdfs:range xsd:string ;
-                           rdfs:label "agricultureClassification"@en .
+                           rdfs:label "agriculture classification"@en .
 
 
 ###  https://sakuna.ph/agricultureDamageAmount
@@ -375,14 +377,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                          rdfs:domain :Agriculture ;
                          rdfs:range xsd:decimal ;
                          rdfs:comment "From Department of Geography digitized archives" ;
-                         rdfs:label "agricultureDamageAmount"@en .
+                         rdfs:label "agriculture damage amount"@en .
 
 
 ###  https://sakuna.ph/agricultureType
 :agricultureType rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Agriculture ;
                  rdfs:range xsd:string ;
-                 rdfs:label "agricultureType"@en .
+                 rdfs:label "agriculture type"@en .
 
 
 ###  https://sakuna.ph/airline
@@ -396,7 +398,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :airportType rdf:type owl:DatatypeProperty ;
              rdfs:domain :Airports ;
              rdfs:range xsd:string ;
-             rdfs:label "airportType"@en .
+             rdfs:label "airport type"@en .
 
 
 ###  https://sakuna.ph/allocatedFunds
@@ -404,7 +406,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain :Assistance ;
                 rdfs:range xsd:decimal ;
-                rdfs:label "allocatedFunds"@en .
+                rdfs:label "allocated funds"@en .
 
 
 ###  https://sakuna.ph/amountDSWD
@@ -412,7 +414,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:subPropertyOf owl:topDataProperty ;
             rdfs:domain :Assistance ;
             rdfs:range xsd:decimal ;
-            rdfs:label "amountDSWD"@en .
+            rdfs:label "amount from DWSD"@en .
 
 
 ###  https://sakuna.ph/amountLGU
@@ -420,7 +422,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:domain :Assistance ;
            rdfs:range xsd:decimal ;
-           rdfs:label "amountLGU"@en .
+           rdfs:label "amount from LGU"@en .
 
 
 ###  https://sakuna.ph/amountNGOs
@@ -428,7 +430,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:subPropertyOf owl:topDataProperty ;
             rdfs:domain :Assistance ;
             rdfs:range xsd:decimal ;
-            rdfs:label "amountNGOs"@en .
+            rdfs:label "amount from NGOs"@en .
 
 
 ###  https://sakuna.ph/amountOCD
@@ -436,7 +438,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:domain :Assistance ;
            rdfs:range xsd:decimal ;
-           rdfs:label "amountOCD"@en .
+           rdfs:label "amount from OCD"@en .
 
 
 ###  https://sakuna.ph/amountOtherGOs
@@ -444,14 +446,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain :Assistance ;
                 rdfs:range xsd:decimal ;
-                rdfs:label "amountOtherGOs"@en .
+                rdfs:label "amount from other GOs"@en .
 
 
 ###  https://sakuna.ph/areDamsAffected
 :areDamsAffected rdf:type owl:DatatypeProperty ;
                  rdfs:domain :WaterDisruption ;
                  rdfs:range xsd:boolean ;
-                 rdfs:label "areDamsAffected"@en .
+                 rdfs:label "are dams affected"@en .
 
 
 ###  https://sakuna.ph/cancelledDateTime
@@ -465,7 +467,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                              )
                                ] ;
                    rdfs:range xsd:dateTime ;
-                   rdfs:label "cancelledDateTime"@en .
+                   rdfs:label "cancelled datetime"@en .
 
 
 ###  https://sakuna.ph/casualties
@@ -481,7 +483,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain :Class ;
                 rdfs:range xsd:string ;
-                rdfs:label "classLevelFrom"@en .
+                rdfs:label "from class level"@en .
 
 
 ###  https://sakuna.ph/classLevelTo
@@ -489,14 +491,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
               rdfs:domain :Class ;
               rdfs:range xsd:string ;
-              rdfs:label "classLevelTo"@en .
+              rdfs:label "to class level"@en .
 
 
 ###  https://sakuna.ph/commercialDamageAmount
 :commercialDamageAmount rdf:type owl:DatatypeProperty ;
                         rdfs:domain :Infrastructure ;
                         rdfs:range xsd:decimal ;
-                        rdfs:label "commercialDamageAmount"@en .
+                        rdfs:label "commercial damage amount"@en .
 
 
 ###  https://sakuna.ph/communicationStatus
@@ -504,7 +506,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                      rdfs:subPropertyOf owl:topDataProperty ;
                      rdfs:domain :CommunicationLines ;
                      rdfs:range xsd:string ;
-                     rdfs:label "communicationStatus"@en .
+                     rdfs:label "communication status"@en .
 
 
 ###  https://sakuna.ph/contributionAID
@@ -512,7 +514,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdfs:domain :Assistance ;
                  rdfs:range xsd:decimal ;
-                 rdfs:label "contributionAID"@en .
+                 rdfs:label "AID contribution"@en .
 
 
 ###  https://sakuna.ph/cpi
@@ -526,7 +528,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :damsAffected rdf:type owl:DatatypeProperty ;
               rdfs:domain :WaterDisruption ;
               rdfs:range xsd:string ;
-              rdfs:label "damsAffected"@en .
+              rdfs:label "dams affected"@en .
 
 
 ###  https://sakuna.ph/dead
@@ -542,21 +544,23 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdfs:domain :DeclarationOfCalamity ;
                  rdfs:range xsd:string ;
-                 rdfs:label "declarationType"@en .
+                 rdfs:label "declaration of state of calamity type"@en .
 
 
 ###  https://sakuna.ph/displacedFamilies
 :displacedFamilies rdf:type owl:DatatypeProperty ;
                    rdfs:domain :AffectedPopulation ;
                    rdfs:range xsd:integer ;
-                   rdfs:label "displacedFamilies"@en .
+                   rdfs:comment "Synonymous with evacuated families (in or out of centers)" ;
+                   rdfs:label "displaced families"@en .
 
 
 ###  https://sakuna.ph/displacedPersons
 :displacedPersons rdf:type owl:DatatypeProperty ;
                   rdfs:domain :AffectedPopulation ;
                   rdfs:range xsd:integer ;
-                  rdfs:label "displacedPersons"@en .
+                  rdfs:comment "Synonymous with evacuated persons (in or out of centers)" ;
+                  rdfs:label "displaced persons"@en .
 
 
 ###  https://sakuna.ph/disruptedType
@@ -568,7 +572,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                          )
                            ] ;
                rdfs:range xsd:string ;
-               rdfs:label "disruptedType"@en .
+               rdfs:label "disruption type"@en .
 
 
 ###  https://sakuna.ph/district
@@ -583,7 +587,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
          rdfs:subPropertyOf owl:topDataProperty ;
          rdfs:domain :DisasterEvent ;
          rdfs:range xsd:dateTime ;
-         rdfs:label "endDate"@en .
+         rdfs:label "end date"@en .
 
 
 ###  https://sakuna.ph/entryDate
@@ -591,21 +595,21 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:domain :DisasterEvent ;
            rdfs:range xsd:dateTime ;
-           rdfs:label "entryDate"@en .
+           rdfs:label "data entry date"@en .
 
 
 ###  https://sakuna.ph/evacuationCenters
 :evacuationCenters rdf:type owl:DatatypeProperty ;
                    rdfs:domain :PreemptiveEvacuation ;
                    rdfs:range xsd:integer ;
-                   rdfs:label "evacuationCenters"@en .
+                   rdfs:label "no. of evacuation centers"@en .
 
 
 ###  https://sakuna.ph/evacuationPlan
 :evacuationPlan rdf:type owl:DatatypeProperty ;
                 rdfs:domain :PreemptiveEvacuation ;
                 rdfs:range xsd:string ;
-                rdfs:label "evacuationPlan" .
+                rdfs:label "evacuation plan" .
 
 
 ###  https://sakuna.ph/eventName
@@ -613,35 +617,35 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:domain :DisasterEvent ;
            rdfs:range xsd:string ;
-           rdfs:label "eventName"@en .
+           rdfs:label "event name"@en .
 
 
 ###  https://sakuna.ph/farmerFisherfolkAffected
 :farmerFisherfolkAffected rdf:type owl:DatatypeProperty ;
                           rdfs:domain :Agriculture ;
                           rdfs:range xsd:integer ;
-                          rdfs:label "farmerFisherfolkAffected"@en .
+                          rdfs:label "no. of farmer and fisherfolks affected"@en .
 
 
 ###  https://sakuna.ph/flightNo
 :flightNo rdf:type owl:DatatypeProperty ;
           rdfs:domain :Airports ;
           rdfs:range xsd:string ;
-          rdfs:label "flightNo"@en .
+          rdfs:label "flight no."@en .
 
 
 ###  https://sakuna.ph/flightRoute
 :flightRoute rdf:type owl:DatatypeProperty ;
              rdfs:domain :Airports ;
              rdfs:range xsd:string ;
-             rdfs:label "flightRoute"@en .
+             rdfs:label "flight route"@en .
 
 
 ###  https://sakuna.ph/generalTotalDamage
 :generalTotalDamage rdf:type owl:DatatypeProperty ;
                     rdfs:domain :DamageGeneral ;
                     rdfs:range xsd:decimal ;
-                    rdfs:label "generalTotalDamage"@en .
+                    rdfs:label "general total damage"@en .
 
 
 ###  https://sakuna.ph/housingDamageAmount
@@ -649,77 +653,77 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                      rdfs:domain :Housing ;
                      rdfs:range xsd:decimal ;
                      rdfs:comment "In monetary value" ;
-                     rdfs:label "housingDamageAmount"@en .
+                     rdfs:label "housing damage amount"@en .
 
 
 ###  https://sakuna.ph/incidentActionsTaken
 :incidentActionsTaken rdf:type owl:DatatypeProperty ;
                       rdfs:domain :Incident ;
                       rdfs:range xsd:string ;
-                      rdfs:label "incidentActionsTaken"@en .
+                      rdfs:label "incident actions taken"@en .
 
 
 ###  https://sakuna.ph/incidentCause
 :incidentCause rdf:type owl:DatatypeProperty ;
                rdfs:domain :Incident ;
                rdfs:range xsd:string ;
-               rdfs:label "incidentCause"@en .
+               rdfs:label "incident cause"@en .
 
 
 ###  https://sakuna.ph/incidentDescription
 :incidentDescription rdf:type owl:DatatypeProperty ;
                      rdfs:domain :Incident ;
                      rdfs:range xsd:string ;
-                     rdfs:label "incidentDescription"@en .
+                     rdfs:label "incident description"@en .
 
 
 ###  https://sakuna.ph/infraDamageAmount
 :infraDamageAmount rdf:type owl:DatatypeProperty ;
                    rdfs:domain :Infrastructure ;
                    rdfs:range xsd:decimal ;
-                   rdfs:label "infraDamageAmount"@en .
+                   rdfs:label "infrastructure damage amount"@en .
 
 
 ###  https://sakuna.ph/infraDamageClassification
 :infraDamageClassification rdf:type owl:DatatypeProperty ;
                            rdfs:domain :Infrastructure ;
                            rdfs:range xsd:string ;
-                           rdfs:label "infraDamageClassification"@en .
+                           rdfs:label "infrastructure damage classification"@en .
 
 
 ###  https://sakuna.ph/infraDamageCost
 :infraDamageCost rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Infrastructure ;
                  rdfs:range xsd:decimal ;
-                 rdfs:label "infraDamageCost"@en .
+                 rdfs:label "infrastructure damage cost"@en .
 
 
 ###  https://sakuna.ph/infraDamageType
 :infraDamageType rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Infrastructure ;
                  rdfs:range xsd:string ;
-                 rdfs:label "infraDamageType"@en .
+                 rdfs:label "infrastructure damage type"@en .
 
 
 ###  https://sakuna.ph/infraName
 :infraName rdf:type owl:DatatypeProperty ;
            rdfs:domain :Infrastructure ;
            rdfs:range xsd:string ;
-           rdfs:label "infraName"@en .
+           rdfs:label "infrastructure name"@en .
 
 
 ###  https://sakuna.ph/infraQtyDamaged
 :infraQtyDamaged rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Infrastructure ;
                  rdfs:range xsd:integer ;
-                 rdfs:label "infraQtyDamaged"@en .
+                 rdfs:label "quantity of infrastructure damaged"@en .
 
 
 ###  https://sakuna.ph/infraUnitDamaged
 :infraUnitDamaged rdf:type owl:DatatypeProperty ;
                   rdfs:domain :Infrastructure ;
                   rdfs:range xsd:string ;
-                  rdfs:label "infraUnitDamaged"@en .
+                  rdfs:label "units of infrastruture damage"@en .
 
 
 ###  https://sakuna.ph/injured
@@ -734,7 +738,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :insuredDamage rdf:type owl:DatatypeProperty ;
                rdfs:domain :DamageGeneral ;
                rdfs:range xsd:decimal ;
-               rdfs:label "insuredDamage"@en .
+               rdfs:label "insured damage"@en .
 
 
 ###  https://sakuna.ph/internationalOrgsPresent
@@ -742,7 +746,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                           rdfs:subPropertyOf owl:topDataProperty ;
                           rdfs:domain :Assistance ;
                           rdfs:range xsd:string ;
-                          rdfs:label "internationalOrgsPresent"@en .
+                          rdfs:label "international organizations present"@en .
 
 
 ###  https://sakuna.ph/interruptionDateTime
@@ -755,14 +759,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                                 )
                                   ] ;
                       rdfs:range xsd:dateTime ;
-                      rdfs:label "interruptionDateTime"@en .
+                      rdfs:label "interruption datetime"@en .
 
 
 ###  https://sakuna.ph/isTapAffected
 :isTapAffected rdf:type owl:DatatypeProperty ;
                rdfs:domain :WaterDisruption ;
                rdfs:range xsd:boolean ;
-               rdfs:label "isTapAffected"@en .
+               rdfs:label "is tap water affected"@en .
 
 
 ###  https://sakuna.ph/itemCostPerUnit
@@ -770,7 +774,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdfs:domain :Assistance ;
                  rdfs:range xsd:decimal ;
-                 rdfs:label "itemCostPerUnit"@en .
+                 rdfs:label "item cost per unit"@en .
 
 
 ###  https://sakuna.ph/itemQty
@@ -778,7 +782,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
          rdfs:subPropertyOf owl:topDataProperty ;
          rdfs:domain :Assistance ;
          rdfs:range xsd:integer ;
-         rdfs:label "itemQty"@en .
+         rdfs:label "item quantity"@en .
 
 
 ###  https://sakuna.ph/itemTypeOrNeeds
@@ -786,7 +790,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdfs:domain :Assistance ;
                  rdfs:range xsd:string ;
-                 rdfs:label "itemTypeOrNeeds"@en .
+                 rdfs:label "item type or needs"@en .
 
 
 ###  https://sakuna.ph/itemUnit
@@ -794,7 +798,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
           rdfs:domain :Assistance ;
           rdfs:range xsd:decimal ;
-          rdfs:label "itemUnit"@en .
+          rdfs:label "item unit"@en .
 
 
 ###  https://sakuna.ph/lastUpdateDate
@@ -802,7 +806,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain :Source ;
                 rdfs:range xsd:dateTime ;
-                rdfs:label "lastUpdateDate"@en .
+                rdfs:label "last update date"@en .
 
 
 ###  https://sakuna.ph/latitude
@@ -841,7 +845,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :motorBanca rdf:type owl:DatatypeProperty ;
             rdfs:domain :Stranded ;
             rdfs:range xsd:integer ;
-            rdfs:label "motorBanca"@en .
+            rdfs:label "motor banca"@en .
 
 
 ###  https://sakuna.ph/noFamiliesAssisted
@@ -849,7 +853,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                     rdfs:subPropertyOf owl:topDataProperty ;
                     rdfs:domain :Assistance ;
                     rdfs:range xsd:integer ;
-                    rdfs:label "noFamiliesAssisted"@en .
+                    rdfs:label "no. of families assisted"@en .
 
 
 ###  https://sakuna.ph/noFamiliesNeedingAssistance
@@ -857,21 +861,21 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                              rdfs:subPropertyOf owl:topDataProperty ;
                              rdfs:domain :Assistance ;
                              rdfs:range xsd:integer ;
-                             rdfs:label "noFamiliesNeedingAssistance"@en .
+                             rdfs:label "no. of families needing assistance"@en .
 
 
 ###  https://sakuna.ph/notPassableDateTime
 :notPassableDateTime rdf:type owl:DatatypeProperty ;
                      rdfs:domain :RoadAndBridges ;
                      rdfs:range xsd:dateTime ;
-                     rdfs:label "notPassableDateTime"@en .
+                     rdfs:label "not passable datetime"@en .
 
 
 ###  https://sakuna.ph/numberDamaged
 :numberDamaged rdf:type owl:DatatypeProperty ;
                rdfs:domain :Infrastructure ;
                rdfs:range xsd:integer ;
-               rdfs:label "numberDamaged"@en .
+               rdfs:label "no. of damaged infrastructure"@en .
 
 
 ###  https://sakuna.ph/obtainedDate
@@ -879,35 +883,35 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
               rdfs:domain :Source ;
               rdfs:range xsd:dateTime ;
-              rdfs:label "obtainedDate"@en .
+              rdfs:label "obtained date"@en .
 
 
 ###  https://sakuna.ph/partiallyDamagedCropArea
 :partiallyDamagedCropArea rdf:type owl:DatatypeProperty ;
                           rdfs:domain :Agriculture ;
                           rdfs:range xsd:decimal ;
-                          rdfs:label "partiallyDamagedCropArea"@en .
+                          rdfs:label "partially damaged crop area"@en .
 
 
 ###  https://sakuna.ph/partiallyDamagedHouses
 :partiallyDamagedHouses rdf:type owl:DatatypeProperty ;
                         rdfs:domain :Housing ;
                         rdfs:range xsd:integer ;
-                        rdfs:label "partiallyDamagedHouses"@en .
+                        rdfs:label "partially damaged houses"@en .
 
 
 ###  https://sakuna.ph/partiallyDamagedInfrastructure
 :partiallyDamagedInfrastructure rdf:type owl:DatatypeProperty ;
                                 rdfs:domain :Agriculture ;
                                 rdfs:range xsd:integer ;
-                                rdfs:label "partiallyDamagedInfrastructure"@en .
+                                rdfs:label "partially damaged infrastructure"@en .
 
 
 ###  https://sakuna.ph/passableDateTime
 :passableDateTime rdf:type owl:DatatypeProperty ;
                   rdfs:domain :RoadAndBridges ;
                   rdfs:range xsd:dateTime ;
-                  rdfs:label "passableDateTime"@en .
+                  rdfs:label "passable datetime"@en .
 
 
 ###  https://sakuna.ph/passengers
@@ -921,7 +925,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :policyChanges rdf:type owl:DatatypeProperty ;
                rdfs:domain :Aftermath ;
                rdfs:range xsd:string ;
-               rdfs:label "policyChanges" .
+               rdfs:label "policy changes" .
 
 
 ###  https://sakuna.ph/portName
@@ -932,14 +936,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                     )
                       ] ;
           rdfs:range xsd:string ;
-          rdfs:label "portName"@en .
+          rdfs:label "port name"@en .
 
 
 ###  https://sakuna.ph/portOrTerminal
 :portOrTerminal rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Stranded ;
                 rdfs:range xsd:string ;
-                rdfs:label "portOrTerminal"@en .
+                rdfs:label "port or terminal"@en .
 
 
 ###  https://sakuna.ph/portStatus
@@ -950,7 +954,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                       )
                         ] ;
             rdfs:range xsd:string ;
-            rdfs:label "portStatus"@en .
+            rdfs:label "port status"@en .
 
 
 ###  https://sakuna.ph/postStructureCost
@@ -958,14 +962,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                    rdfs:domain :Aftermath ;
                    rdfs:range xsd:decimal ;
                    rdfs:comment "Cost of Structure Built post-disaster" ;
-                   rdfs:label "postStructureCost" .
+                   rdfs:label "post-disaster structure cost" .
 
 
 ###  https://sakuna.ph/postTraining
 :postTraining rdf:type owl:DatatypeProperty ;
               rdfs:domain :Aftermath ;
               rdfs:range xsd:string ;
-              rdfs:label "postTraining" .
+              rdfs:label "post-disaster training cost" .
 
 
 ###  https://sakuna.ph/preemptFamilies
@@ -973,37 +977,44 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdfs:domain :PreemptiveEvacuation ;
                  rdfs:range xsd:integer ;
-                 rdfs:label "preemptFamilies"@en .
+                 rdfs:label "preempt families"@en .
 
 
 ###  https://sakuna.ph/preemptFemales
 :preemptFemales rdf:type owl:DatatypeProperty ;
-                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:subPropertyOf :preemptPersons ;
                 rdfs:domain :PreemptiveEvacuation ;
                 rdfs:range xsd:integer ;
-                rdfs:label "preemptFemales"@en .
+                rdfs:label "preempt females"@en .
 
 
 ###  https://sakuna.ph/preemptMales
 :preemptMales rdf:type owl:DatatypeProperty ;
-              rdfs:subPropertyOf owl:topDataProperty ;
+              rdfs:subPropertyOf :preemptPersons ;
               rdfs:domain :PreemptiveEvacuation ;
               rdfs:range xsd:integer ;
-              rdfs:label "preemptMales"@en .
+              rdfs:label "preempt males"@en .
+
+
+###  https://sakuna.ph/preemptPersons
+:preemptPersons rdf:type owl:DatatypeProperty ;
+                rdfs:domain :PreemptiveEvacuation ;
+                rdfs:range xsd:integer ;
+                rdfs:label "preempt persons" .
 
 
 ###  https://sakuna.ph/productionLossCost
 :productionLossCost rdf:type owl:DatatypeProperty ;
                     rdfs:domain :Agriculture ;
                     rdfs:range xsd:decimal ;
-                    rdfs:label "productionLossCost"@en .
+                    rdfs:label "production loss cost"@en .
 
 
 ###  https://sakuna.ph/productionLossVolume
 :productionLossVolume rdf:type owl:DatatypeProperty ;
                       rdfs:domain :Agriculture ;
                       rdfs:range xsd:decimal ;
-                      rdfs:label "productionLossVolume"@en .
+                      rdfs:label "production loss volume"@en .
 
 
 ###  https://sakuna.ph/psgc
@@ -1016,7 +1027,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :reconstructionCost rdf:type owl:DatatypeProperty ;
                     rdfs:domain :DamageGeneral ;
                     rdfs:range xsd:decimal ;
-                    rdfs:label "reconstructionCost"@en .
+                    rdfs:label "reconstruction cost"@en .
 
 
 ###  https://sakuna.ph/recordedBy
@@ -1024,7 +1035,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:subPropertyOf owl:topDataProperty ;
             rdfs:domain :Source ;
             rdfs:range xsd:string ;
-            rdfs:label "recordedBy"@en .
+            rdfs:label "recorded by"@en .
 
 
 ###  https://sakuna.ph/reference
@@ -1055,7 +1066,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:subPropertyOf owl:topDataProperty ;
             rdfs:domain :Source ;
             rdfs:range xsd:string ;
-            rdfs:label "reportLink"@en .
+            rdfs:label "report link"@en .
 
 
 ###  https://sakuna.ph/reportName
@@ -1063,21 +1074,21 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:subPropertyOf owl:topDataProperty ;
             rdfs:domain :Source ;
             rdfs:range xsd:string ;
-            rdfs:label "reportName"@en .
+            rdfs:label "report name"@en .
 
 
 ###  https://sakuna.ph/rescueEquipment
 :rescueEquipment rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Rescue ;
                  rdfs:range xsd:string ;
-                 rdfs:label "rescueEquipment" .
+                 rdfs:label "rescue equipment" .
 
 
 ###  https://sakuna.ph/rescueUnit
 :rescueUnit rdf:type owl:DatatypeProperty ;
             rdfs:domain :Rescue ;
             rdfs:range xsd:string ;
-            rdfs:label "rescueUnit" .
+            rdfs:label "rescue unit" .
 
 
 ###  https://sakuna.ph/resolutionDate
@@ -1085,7 +1096,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain :DeclarationOfCalamity ;
                 rdfs:range xsd:dateTime ;
-                rdfs:label "resolutionDate"@en .
+                rdfs:label "resolution date"@en .
 
 
 ###  https://sakuna.ph/resolutionNo
@@ -1093,7 +1104,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
               rdfs:domain :DeclarationOfCalamity ;
               rdfs:range xsd:string ;
-              rdfs:label "resolutionNo"@en .
+              rdfs:label "resolution no."@en .
 
 
 ###  https://sakuna.ph/restorationDateTime
@@ -1106,7 +1117,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                                )
                                  ] ;
                      rdfs:range xsd:dateTime ;
-                     rdfs:label "restorationDateTime"@en .
+                     rdfs:label "restoration datetime"@en .
 
 
 ###  https://sakuna.ph/resumedDateTime
@@ -1120,50 +1131,42 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                            )
                              ] ;
                  rdfs:range xsd:dateTime ;
-                 rdfs:label "resumedDateTime"@en .
+                 rdfs:label "resumed datetime"@en .
 
 
 ###  https://sakuna.ph/roadBridgeClassification
 :roadBridgeClassification rdf:type owl:DatatypeProperty ;
                           rdfs:domain :RoadAndBridges ;
                           rdfs:range xsd:string ;
-                          rdfs:label "roadBridgeClassification"@en .
+                          rdfs:label "road or bridge classification"@en .
 
 
 ###  https://sakuna.ph/roadBridgeName
 :roadBridgeName rdf:type owl:DatatypeProperty ;
                 rdfs:domain :RoadAndBridges ;
                 rdfs:range xsd:string ;
-                rdfs:label "roadBridgeName"@en .
+                rdfs:label "road or bridge name"@en .
 
 
 ###  https://sakuna.ph/roadBridgeStatus
 :roadBridgeStatus rdf:type owl:DatatypeProperty ;
                   rdfs:domain :RoadAndBridges ;
                   rdfs:range xsd:string ;
-                  rdfs:label "roadBridgeStatus"@en .
+                  rdfs:label "road or bridge status"@en .
 
 
 ###  https://sakuna.ph/roadBridgeType
 :roadBridgeType rdf:type owl:DatatypeProperty ;
                 rdfs:domain :RoadAndBridges ;
                 rdfs:range xsd:string ;
-                rdfs:label "roadBridgeType"@en .
+                rdfs:label "road or bridge type"@en .
 
 
 ###  https://sakuna.ph/rollingCargoes
 :rollingCargoes rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Stranded ;
                 rdfs:range xsd:integer ;
-                rdfs:label "rollingCargoes"@en .
-
-
-###  https://sakuna.ph/searchRescueRetrievalDone
-:searchRescueRetrievalDone rdf:type owl:DatatypeProperty ;
-                           rdfs:domain :Aftermath ;
-                           rdfs:range xsd:boolean ;
-                           rdfs:comment "was search, rescue, and retrieval done?" ;
-                           rdfs:label "srrDone" .
+                rdfs:label "rolling cargoes"@en .
 
 
 ###  https://sakuna.ph/serviceProvider
@@ -1175,7 +1178,15 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                            )
                              ] ;
                  rdfs:range xsd:string ;
-                 rdfs:label "serviceProvider"@en .
+                 rdfs:label "service provider"@en .
+
+
+###  https://sakuna.ph/srrDone
+:srrDone rdf:type owl:DatatypeProperty ;
+         rdfs:domain :Aftermath ;
+         rdfs:range xsd:boolean ;
+         rdfs:comment "was search, rescue, and retrieval done?" ;
+         rdfs:label "was search rescue and retrieval done" .
 
 
 ###  https://sakuna.ph/startDate
@@ -1183,7 +1194,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:domain :DisasterEvent ;
            rdfs:range xsd:dateTime ;
-           rdfs:label "startDate"@en .
+           rdfs:label "start date"@en .
 
 
 ###  https://sakuna.ph/station
@@ -1209,7 +1220,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                           )
                             ] ;
                 rdfs:range xsd:string ;
-                rdfs:label "suspensionType"@en .
+                rdfs:label "suspension type"@en .
 
 
 ###  https://sakuna.ph/telecompany
@@ -1224,21 +1235,21 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :totallyDamagedCropArea rdf:type owl:DatatypeProperty ;
                         rdfs:domain :Agriculture ;
                         rdfs:range xsd:decimal ;
-                        rdfs:label "totallyDamagedCropArea"@en .
+                        rdfs:label "totally damaged crop area"@en .
 
 
 ###  https://sakuna.ph/totallyDamagedHouses
 :totallyDamagedHouses rdf:type owl:DatatypeProperty ;
                       rdfs:domain :Housing ;
                       rdfs:range xsd:integer ;
-                      rdfs:label "totallyDamagedHouses"@en .
+                      rdfs:label "totally damaged houses"@en .
 
 
 ###  https://sakuna.ph/totallyDamagedInfrastructure
 :totallyDamagedInfrastructure rdf:type owl:DatatypeProperty ;
                               rdfs:domain :Agriculture ;
                               rdfs:range xsd:integer ;
-                              rdfs:label "totallyDamagedInfrastructure"@en .
+                              rdfs:label "totally damaged infrastructure"@en .
 
 
 ###  https://sakuna.ph/vessels
@@ -1344,7 +1355,7 @@ geo:Geometry rdf:type owl:Class ;
                              owl:someValuesFrom xsd:string
                            ] ,
                            [ rdf:type owl:Restriction ;
-                             owl:onProperty :searchRescueRetrievalDone ;
+                             owl:onProperty :srrDone ;
                              owl:someValuesFrom xsd:boolean
                            ] .
 
