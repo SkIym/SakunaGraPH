@@ -397,7 +397,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd
 <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd> rdf:type owl:DatatypeProperty ;
-                                                                                                    rdfs:domain <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisaster> ;
+                                                                                                    owl:equivalentProperty :endDate ;
+                                                                                                    rdfs:domain :DisasterEvent ;
                                                                                                     rdfs:range xsd:dateTime ;
                                                                                                     rdfs:label "has disaster end" ;
                                                                                                     <http://www.w3.org/2004/02/skos/core#definition> "Indicates the end of the disaster." .
@@ -405,7 +406,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterStart
 <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterStart> rdf:type owl:DatatypeProperty ;
-                                                                                                      rdfs:domain <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisaster> ;
+                                                                                                      owl:equivalentProperty :startDate ;
+                                                                                                      rdfs:domain :DisasterEvent ;
                                                                                                       rdfs:range xsd:dateTime ;
                                                                                                       rdfs:label "has disaster start" ;
                                                                                                       <http://www.w3.org/2004/02/skos/core#definition> "Indicates the start of the disaster." .
