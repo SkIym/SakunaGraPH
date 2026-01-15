@@ -262,7 +262,6 @@
     <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact -->
 
     <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact">
-        <owl:inverseOf rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isImpactOfIncident"/>
         <rdfs:domain rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident"/>
         <rdfs:range rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact"/>
         <rdfs:label>has incident impact</rdfs:label>
@@ -286,7 +285,6 @@
     <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentOccurrence -->
 
     <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentOccurrence">
-        <owl:inverseOf rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfIncidentType"/>
         <rdfs:domain rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#IncidentType"/>
         <rdfs:range rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident"/>
         <rdfs:label>has incident occurrence</rdfs:label>
@@ -434,17 +432,6 @@
     
 
 
-    <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isImpactOfIncident -->
-
-    <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isImpactOfIncident">
-        <rdfs:domain rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact"/>
-        <rdfs:range rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident"/>
-        <rdfs:label>is impact of incident</rdfs:label>
-        <skos:definition>Links an impact to an incident.</skos:definition>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isImpactedBy -->
 
     <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isImpactedBy">
@@ -551,17 +538,6 @@
         <rdfs:range rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#ImpactType"/>
         <rdfs:label>is of impact type</rdfs:label>
         <skos:definition>Links an impact to an impact type.</skos:definition>
-    </owl:ObjectProperty>
-    
-
-
-    <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfIncidentType -->
-
-    <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfIncidentType">
-        <rdfs:domain rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident"/>
-        <rdfs:range rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#IncidentType"/>
-        <rdfs:label>is of incident type</rdfs:label>
-        <skos:definition>Links an incident to an incident type.</skos:definition>
     </owl:ObjectProperty>
     
 

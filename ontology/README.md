@@ -1,8 +1,8 @@
 - Latest: sakunagraph
 
 TO DO:
-- find existing disaster domain ontology to extend using current
 - determine ways to store multiple paired values and attributes (itemCost, itemQty, )
+- align with PROV-O
 
 DONE:
 - rename IRIs
@@ -13,3 +13,4 @@ DONE:
         - Major Events and Incidents
     - fix multiple domain issue and make it union
     - refactor inverse property relationships 
+- find existing disaster domain ontology to extend using current

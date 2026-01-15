@@ -39,14 +39,7 @@ geo:geoJSONLiteral rdf:type rdfs:Datatype ;
 
 
 ###  http://www.opengis.net/ont/geosparql#gmlLiteral
-geo:gmlLiteral rdf:type rdfs:Datatype ;
-               rdfs:isDefinedBy geo: ,
-                                <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/gml-literal> ,
-                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/gml-literal> ;
-               rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=20509> ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A GML serialization of a Geometry object."@en ;
-               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-               <http://www.w3.org/2004/02/skos/core#prefLabel> "GML Literal"@en .
+geo:gmlLiteral rdf:type rdfs:Datatype .
 
 
 ###  http://www.opengis.net/ont/geosparql#kmlLiteral
@@ -60,14 +53,7 @@ geo:kmlLiteral rdf:type rdfs:Datatype ;
 
 
 ###  http://www.opengis.net/ont/geosparql#wktLiteral
-geo:wktLiteral rdf:type rdfs:Datatype ;
-               rdfs:isDefinedBy geo: ,
-                                <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/wkt-literal> ,
-                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/wkt-literal> ;
-               rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=25355> ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A Well-known Text serialization of a Geometry object."@en ;
-               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.2> ;
-               <http://www.w3.org/2004/02/skos/core#prefLabel> "Well-known Text Literal"@en .
+geo:wktLiteral rdf:type rdfs:Datatype .
 
 
 #################################################################
@@ -83,7 +69,8 @@ geo:asDGGS rdf:type owl:ObjectProperty ;
 ###  http://www.opengis.net/ont/geosparql#asGML
 geo:asGML rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf geo:hasSerialization ;
-          rdfs:domain geo:Geometry .
+          rdfs:domain geo:Geometry ;
+          rdfs:range geo:gmlLiteral .
 
 
 ###  http://www.opengis.net/ont/geosparql#asGeoJSON
@@ -101,7 +88,8 @@ geo:asKML rdf:type owl:ObjectProperty ;
 ###  http://www.opengis.net/ont/geosparql#asWKT
 geo:asWKT rdf:type owl:ObjectProperty ;
           rdfs:subPropertyOf geo:hasSerialization ;
-          rdfs:domain geo:Geometry .
+          rdfs:domain geo:Geometry ;
+          rdfs:range geo:wktLiteral .
 
 
 ###  http://www.opengis.net/ont/geosparql#defaultGeometry
@@ -434,32 +422,25 @@ geo:hasSerialization rdf:type owl:ObjectProperty ;
 
 ###  http://www.opengis.net/ont/geosparql#asDGGS
 geo:asDGGS rdf:type owl:DatatypeProperty ;
-           rdfs:domain geo:Geometry ;
            rdfs:range geo:dggsLiteral .
 
 
 ###  http://www.opengis.net/ont/geosparql#asGML
-geo:asGML rdf:type owl:DatatypeProperty ;
-          rdfs:domain geo:Geometry ;
-          rdfs:range geo:gmlLiteral .
+geo:asGML rdf:type owl:DatatypeProperty .
 
 
 ###  http://www.opengis.net/ont/geosparql#asGeoJSON
 geo:asGeoJSON rdf:type owl:DatatypeProperty ;
-              rdfs:domain geo:Geometry ;
               rdfs:range geo:geoJSONLiteral .
 
 
 ###  http://www.opengis.net/ont/geosparql#asKML
 geo:asKML rdf:type owl:DatatypeProperty ;
-          rdfs:domain geo:Geometry ;
           rdfs:range geo:kmlLiteral .
 
 
 ###  http://www.opengis.net/ont/geosparql#asWKT
-geo:asWKT rdf:type owl:DatatypeProperty ;
-          rdfs:domain geo:Geometry ;
-          rdfs:range geo:wktLiteral .
+geo:asWKT rdf:type owl:DatatypeProperty .
 
 
 ###  http://www.opengis.net/ont/geosparql#hasSerialization
@@ -1530,7 +1511,8 @@ geo:SpatialObject rdf:type owl:Class .
                                       owl:onProperty :displacedPersons ;
                                       owl:someValuesFrom xsd:integer
                                     ] ;
-                    rdfs:label "Affected Population"@en .
+                    rdfs:label "Affected Population"@en ;
+                    <http://www.w3.org/2004/02/skos/core#definition> "Represents affected and displaced persons or families." .
 
 
 ###  https://sakuna.ph/Aftermath
@@ -1551,7 +1533,9 @@ geo:SpatialObject rdf:type owl:Class .
                            [ rdf:type owl:Restriction ;
                              owl:onProperty :srrDone ;
                              owl:someValuesFrom xsd:boolean
-                           ] .
+                           ] ;
+           rdfs:label "Aftermath" ;
+           <http://www.w3.org/2004/02/skos/core#definition> "Represents civic repercussions and changes made after the disaster event." .
 
 
 ###  https://sakuna.ph/Agriculture
@@ -1597,7 +1581,8 @@ geo:SpatialObject rdf:type owl:Class .
                                owl:onProperty :totallyDamagedInfrastructure ;
                                owl:someValuesFrom xsd:integer
                              ] ;
-             rdfs:label "Agriculture"@en .
+             rdfs:label "Agriculture"@en ;
+             <http://www.w3.org/2004/02/skos/core#definition> "Represents damage on agriculture, farmers, fisherfolks, and crops." .
 
 
 ###  https://sakuna.ph/Air
@@ -1641,7 +1626,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:onProperty :resumedDateTime ;
                             owl:someValuesFrom xsd:dateTime
                           ] ;
-          rdfs:label "Airports" .
+          rdfs:label "Airports" ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Represents disruptions on airports." .
 
 
 ###  https://sakuna.ph/AnimalAccident
@@ -1725,7 +1711,8 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:onProperty :noFamiliesNeedingAssistance ;
                               owl:someValuesFrom xsd:integer
                             ] ;
-            rdfs:label "Assistance"@en .
+            rdfs:label "Assistance"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "Represents the assistance provided during or after a disaster event." .
 
 
 ###  https://sakuna.ph/Avalance
@@ -1787,7 +1774,8 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:onProperty :missing ;
                               owl:someValuesFrom xsd:integer
                             ] ;
-            rdfs:label "Casualties"@en .
+            rdfs:label "Casualties"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "Represents the number of deaths, injured, and missing due to a disaster." .
 
 
 ###  https://sakuna.ph/ChemicalSpill
@@ -1819,7 +1807,8 @@ geo:SpatialObject rdf:type owl:Class .
                          owl:onProperty :suspensionType ;
                          owl:someValuesFrom xsd:string
                        ] ;
-       rdfs:label "Class"@en .
+       rdfs:label "Class"@en ;
+       <http://www.w3.org/2004/02/skos/core#definition> "Represents education operational disruptions." .
 
 
 ###  https://sakuna.ph/Climatological
@@ -1871,7 +1860,8 @@ geo:SpatialObject rdf:type owl:Class .
                                       owl:onProperty :telecompany ;
                                       owl:someValuesFrom xsd:string
                                     ] ;
-                    rdfs:label "Communication Lines"@en .
+                    rdfs:label "Communication Lines"@en ;
+                    <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on communication lines." .
 
 
 ###  https://sakuna.ph/DamageGeneral
@@ -1893,7 +1883,8 @@ geo:SpatialObject rdf:type owl:Class .
                                  owl:onProperty :reconstructionCost ;
                                  owl:someValuesFrom xsd:decimal
                                ] ;
-               rdfs:label "Damage (General)"@en .
+               rdfs:label "Damage (General)"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "Represents general damage that does not fall under any sibling classes." .
 
 
 ###  https://sakuna.ph/DeclarationOfCalamity
@@ -1911,7 +1902,8 @@ geo:SpatialObject rdf:type owl:Class .
                                          owl:onProperty :resolutionNo ;
                                          owl:someValuesFrom xsd:string
                                        ] ;
-                       rdfs:label "Declaration of Calamity"@en .
+                       rdfs:label "Declaration of Calamity"@en ;
+                       <http://www.w3.org/2004/02/skos/core#definition> "Represents events of state of calamity declaration." .
 
 
 ###  https://sakuna.ph/Derecho
@@ -1986,12 +1978,14 @@ geo:SpatialObject rdf:type owl:Class .
                                  owl:onProperty :startDate ;
                                  owl:someValuesFrom xsd:dateTime
                                ] ;
-               rdfs:label "Disaster Event"@en .
+               rdfs:label "Disaster Event"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "Any event that has dealt notable impact to the population, infrastructure, or has disrupted operations and services." .
 
 
 ###  https://sakuna.ph/DisasterType
 :DisasterType rdf:type owl:Class ;
-              rdfs:label "Disaster Type" .
+              rdfs:label "Disaster Type" ;
+              <http://www.w3.org/2004/02/skos/core#definition> "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
 
 
 ###  https://sakuna.ph/Drought
@@ -2159,7 +2153,8 @@ geo:SpatialObject rdf:type owl:Class .
                            owl:onProperty :totallyDamagedHouses ;
                            owl:someValuesFrom xsd:integer
                          ] ;
-         rdfs:label "Housing"@en .
+         rdfs:label "Housing"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on housing." .
 
 
 ###  https://sakuna.ph/Hydrological
@@ -2204,7 +2199,8 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:onProperty :remarks ;
                           owl:someValuesFrom xsd:string
                         ] ;
-        rdfs:label "Impact"@en .
+        rdfs:label "Impact"@en ;
+        <http://www.w3.org/2004/02/skos/core#definition> "Represents the impact of major or incident disasters." .
 
 
 ###  https://sakuna.ph/Incident
@@ -2227,8 +2223,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom xsd:string
                           ] ;
           owl:disjointWith :MajorEvent ;
-          rdfs:comment "A localized or small-scale disaster event, often reported at the municipal or barangay level." ;
-          rdfs:label "Incident"@en .
+          rdfs:label "Incident"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "A localized or small-scale disaster event, often reported at the municipal or barangay level." .
 
 
 ###  https://sakuna.ph/IndustrialAccident
@@ -2300,7 +2296,8 @@ geo:SpatialObject rdf:type owl:Class .
                                   owl:onProperty :numberDamaged ;
                                   owl:someValuesFrom xsd:integer
                                 ] ;
-                rdfs:label "Infrastructure"@en .
+                rdfs:label "Infrastructure"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on infrastructure." .
 
 
 ###  https://sakuna.ph/Lahar
@@ -2352,8 +2349,8 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:onProperty :hasRelatedIncident ;
                               owl:someValuesFrom :Incident
                             ] ;
-            rdfs:comment "A large-scale or aggregated event spanning days that may encompass multiple locations and related incidents." ;
-            rdfs:label "Major"@en .
+            rdfs:label "Major"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "A large-scale or aggregated event spanning days that may encompass multiple locations and related incidents." .
 
 
 ###  https://sakuna.ph/MassMovementDry
@@ -2406,7 +2403,8 @@ geo:SpatialObject rdf:type owl:Class .
 :Natural rdf:type owl:Class ;
          rdfs:subClassOf :DisasterType ;
          owl:disjointWith :Technological ;
-         rdfs:label "Natural"@en .
+         rdfs:label "Natural"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "Naturally occurring disastroues events" .
 
 
 ###  https://sakuna.ph/OilSpill
@@ -2446,7 +2444,8 @@ geo:SpatialObject rdf:type owl:Class .
                          owl:onProperty :serviceProvider ;
                          owl:someValuesFrom xsd:string
                        ] ;
-       rdfs:label "Power"@en .
+       rdfs:label "Power"@en ;
+       <http://www.w3.org/2004/02/skos/core#definition> "Represents power disruptions." .
 
 
 ###  https://sakuna.ph/PreemptiveEvacuation
@@ -2472,7 +2471,8 @@ geo:SpatialObject rdf:type owl:Class .
                                         owl:onProperty :preemptMales ;
                                         owl:someValuesFrom xsd:integer
                                       ] ;
-                      rdfs:label "Preemptive Evacuation"@en .
+                      rdfs:label "Preemptive Evacuation"@en ;
+                      <http://www.w3.org/2004/02/skos/core#definition> "Represents information on evacuation centers and preemptively evacuated individuals." .
 
 
 ###  https://sakuna.ph/Preparedness
@@ -2505,7 +2505,8 @@ geo:SpatialObject rdf:type owl:Class .
                                 owl:onProperty :remarks ;
                                 owl:someValuesFrom xsd:string
                               ] ;
-              rdfs:label "Preparedness" .
+              rdfs:label "Preparedness" ;
+              <http://www.w3.org/2004/02/skos/core#definition> "Represents preparations done by government or non-government units before a disaster event." .
 
 
 ###  https://sakuna.ph/PrionDisease
@@ -2559,7 +2560,8 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:onProperty :rescueUnit ;
                           owl:someValuesFrom xsd:string
                         ] ;
-        rdfs:label "Rescue" .
+        rdfs:label "Rescue" ;
+        <http://www.w3.org/2004/02/skos/core#definition> "Represents information on rescue materials prepared." .
 
 
 ###  https://sakuna.ph/Response
@@ -2592,7 +2594,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:onProperty :remarks ;
                             owl:someValuesFrom xsd:string
                           ] ;
-          rdfs:label "Response"@en .
+          rdfs:label "Response"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Represents the responses taken to a disaster." .
 
 
 ###  https://sakuna.ph/RiverineFlood
@@ -2634,7 +2637,8 @@ geo:SpatialObject rdf:type owl:Class .
                                   owl:onProperty :roadBridgeType ;
                                   owl:someValuesFrom xsd:string
                                 ] ;
-                rdfs:label "Road and Bridges"@en .
+                rdfs:label "Road and Bridges"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "Represents land transportation disruptions." .
 
 
 ###  https://sakuna.ph/RockfallDry
@@ -2680,7 +2684,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:onProperty :resumedDateTime ;
                             owl:someValuesFrom xsd:dateTime
                           ] ;
-          rdfs:label "Seaports" .
+          rdfs:label "Seaports" ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Represents seaport disruptions." .
 
 
 ###  https://sakuna.ph/Seiche
@@ -2723,7 +2728,8 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:onProperty :reportName ;
                           owl:someValuesFrom xsd:string
                         ] ;
-        rdfs:label "Source" .
+        rdfs:label "Source" ;
+        <http://www.w3.org/2004/02/skos/core#definition> "Represents the source that provided the disaster data." .
 
 
 ###  https://sakuna.ph/SpaceImpact
@@ -2791,7 +2797,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:onProperty :vessels ;
                             owl:someValuesFrom xsd:integer
                           ] ;
-          rdfs:label "Stranded" .
+          rdfs:label "Stranded" ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Represents stranded mode of transportations." .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceDry
@@ -2809,7 +2816,9 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Technological
 :Technological rdf:type owl:Class ;
                rdfs:subClassOf :DisasterType ;
-               rdfs:label "Technological"@en .
+               rdfs:label "Technological"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "Man-made events causing impact." ;
+               <http://www.w3.org/2004/02/skos/core#example> "Armed conflict, chemical spill, or industrial fires." .
 
 
 ###  https://sakuna.ph/Thunderstorms
@@ -2897,7 +2906,8 @@ geo:SpatialObject rdf:type owl:Class .
                                    owl:onProperty :serviceProvider ;
                                    owl:someValuesFrom xsd:string
                                  ] ;
-                 rdfs:label "Water (Disruption)"@en .
+                 rdfs:label "Water (Disruption)"@en ;
+                 <http://www.w3.org/2004/02/skos/core#definition> "Represents clean water disruptions." .
 
 
 ###  https://sakuna.ph/WaveAction
@@ -2933,7 +2943,8 @@ geo:SpatialObject rdf:type owl:Class .
                         owl:onProperty :suspensionType ;
                         owl:someValuesFrom xsd:string
                       ] ;
-      rdfs:label "Work"@en .
+      rdfs:label "Work"@en ;
+      <http://www.w3.org/2004/02/skos/core#definition> "Represents work operational disruptions." .
 
 
 ###  https://sakuna.ph/WormsInfestation
@@ -2996,12 +3007,30 @@ geo:asWKT rdfs:isDefinedBy geo: ,
           <http://www.w3.org/2004/02/skos/core#prefLabel> "as WKT"@en .
 
 
+geo:gmlLiteral rdfs:isDefinedBy geo: ,
+                                <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/gml-literal> ,
+                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/gml-literal> ;
+               rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=20509> ;
+               <http://www.w3.org/2004/02/skos/core#definition> "A GML serialization of a Geometry object."@en ;
+               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+               <http://www.w3.org/2004/02/skos/core#prefLabel> "GML Literal"@en .
+
+
 geo:hasSerialization rdfs:isDefinedBy geo: ,
                                       <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-properties> ,
                                       <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-properties> ;
                      <http://www.w3.org/2004/02/skos/core#definition> "Connects a Geometry object with its text-based serialization."@en ;
                      <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ;
                      <http://www.w3.org/2004/02/skos/core#prefLabel> "has serialization"@en .
+
+
+geo:wktLiteral rdfs:isDefinedBy geo: ,
+                                <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/wkt-literal> ,
+                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/wkt-literal> ;
+               rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=25355> ;
+               <http://www.w3.org/2004/02/skos/core#definition> "A Well-known Text serialization of a Geometry object."@en ;
+               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.2> ;
+               <http://www.w3.org/2004/02/skos/core#prefLabel> "Well-known Text Literal"@en .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
