@@ -262,7 +262,7 @@ df = df.rename(columns=COLUMN_MAPPING)
 df = df[list(COLUMN_MAPPING.values())]
 df = df.dropna(how='all')
 df = df.dropna(axis=1, how='all')
-df = df.dropna(subset=['date'])
+df = df.dropna(subset=['date', 'hasLocation'])
 df = df.replace("-", "")
 df = df.replace("Not applicable", "")
 df = df.replace("n.a.", "")
