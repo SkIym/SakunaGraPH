@@ -1,7 +1,12 @@
+@prefix : <https://sakuna.ph/> .
+@prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
+@prefix fno: <https://w3id.org/function/ontology#> .
+@prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
 @prefix ql: <http://www.w3.org/2004/ql#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
-@prefix : <https://sakuna.ph/> .
+
 
 <#LogicalSource>
     a rml:LogicalSource;
@@ -10,22 +15,40 @@
 
 <#MyTriplesMap>
     a rr:TriplesMap;
+
     rml:logicalSource <#LogicalSource>;
     
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}"
+        rr:template "https://sakuna.ph/{id}";
+        rr:class :DisasterEvent;
     ];
 
     rr:predicateObjectMap [
         rr:predicate :eventName;
         rr:objectMap [
-            rml:reference "hasEventName";
+            rml:reference "eventName";
         ];
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasType;
+        rr:predicate :hasType ;
         rr:objectMap [
-            rml:reference "hasType";
-        ];
-    ].
+            fnml:functionValue [
+                fno:executes <https://sakuna.ph/toTypeIRI> ;
+                fnml:input [
+                    fno:predicate grel:valueParam ;
+                    rml:reference "hasType" ;
+                ]
+            ] ;
+        ] ;
+    ] .
+
+
+# <#Execution>
+#     rml:function <https://sakuna.ph/toTypeIRI>;
+#     rml:input [
+#         rml:parameter grel:valueParam;
+#         rml:valueMap [
+#             rml:reference "hasType";
+#         ];
+#     ].
