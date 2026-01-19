@@ -3,11 +3,10 @@
 
 To clean:
 - Fix location granularity
-- Time
-
+- 
 
 DONE:
-- Date
+- Date / Time
 - Disaster Type / Subtype
 - Location
 

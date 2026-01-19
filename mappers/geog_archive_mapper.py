@@ -263,6 +263,10 @@ df = df[list(COLUMN_MAPPING.values())]
 df = df.dropna(how='all')
 df = df.dropna(axis=1, how='all')
 df = df.dropna(subset=['date'])
+df = df.replace("-", "")
+df = df.replace("Not applicable", "")
+df = df.replace("n.a.", "")
+
 
 if "date" in df.columns:
     df[["startDate", "endDate"]] = df["date"].apply(lambda v: pd.Series(clean_date_range(v)))
