@@ -1,1 +1,2 @@
-# cs-198-199
+# SakunaGraPH
+## A knowledge graph for Philippine Disaster Data Integration based on an ontology

@@ -5,3 +5,4 @@ pandas
 geopandas
 rdflib
 openpyxl
+morph-kgc
