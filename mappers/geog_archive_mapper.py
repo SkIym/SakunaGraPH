@@ -1,6 +1,7 @@
 import re
 import pandas as pd
 from dateutil.parser import parse
+import uuid
 
 COLUMN_MAPPING = {
     "Main Event Disaster Type": "hasType",
@@ -273,4 +274,6 @@ if "date" in df.columns:
 
 df = df.dropna(subset=['startDate'])
 
-df.to_csv('gda.csv')
+df["id"] = [uuid.uuid4().hex for _ in range(len(df))]
+
+df.to_csv('./data/gda.csv')
