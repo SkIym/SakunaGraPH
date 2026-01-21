@@ -34,6 +34,7 @@
         rr:predicate :hasType ;
         rr:objectMap [
             rml:functionExecution <#TypeExecution>;
+            rml:termType rml:IRI;
         ] ;
     ] .
 

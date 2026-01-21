@@ -1,3 +1,5 @@
+base = "https://sakuna.ph/"
+
 @udf(
     fun_id="https://sakuna.ph/toTypeIRI",
     hasType="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParam"
@@ -11,4 +13,4 @@ def to_type_iri(hasType: str):
                .replace("Flashflood", "FlashFlood")
                .replace("Earthquake", "")
     )
-    return fixedIRI
+    return f"{base}{fixedIRI}"
