@@ -26,7 +26,7 @@
     rr:predicateObjectMap [
         rr:predicate :eventName;
         rr:objectMap [
-            rml:reference "eventName";
+            rml:functionExecution <#NameExecution> ;
         ];
     ];
 
@@ -36,7 +36,23 @@
             rml:functionExecution <#TypeExecution>;
             rml:termType rml:IRI;
         ] ;
-    ] .
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :startDate ;
+        rr:objectMap [
+            rml:reference "startDate" ;
+        ];
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :endDate ;
+        rr:objectMap [
+            rml:reference "endDate" ;
+        ];
+    ]
+
+    .
 
 
 <#TypeExecution>
@@ -47,3 +63,13 @@
             rml:reference "hasType";
         ];
     ].
+
+<#NameExecution>
+    rml:function :cleanName;
+    rml:input [
+        rml:parameter grel:valueParam;
+        rml:inputValueMap [
+            rml:reference "eventName";
+        ];
+    ].
+

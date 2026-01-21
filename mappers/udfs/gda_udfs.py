@@ -14,3 +14,15 @@ def to_type_iri(hasType: str):
                .replace("Earthquake", "")
     )
     return f"{base}{fixedIRI}"
+
+
+@udf(
+    fun_id="https://sakuna.ph/cleanName",
+    eventName="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParam"
+)
+def clean_event_name(eventName: str):
+    fixedStr = (
+        eventName.replace("\"", "")
+
+    )
+    return fixedStr
