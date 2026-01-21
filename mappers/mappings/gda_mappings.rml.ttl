@@ -1,12 +1,12 @@
 @prefix : <https://sakuna.ph/> .
 @prefix fnml: <http://semweb.mmlab.be/ns/fnml#> .
 @prefix fno: <https://w3id.org/function/ontology#> .
+@prefix greal: <> .
 @prefix grel: <http://users.ugent.be/~bjdmeest/function/grel.ttl#> .
 @prefix ql: <http://www.w3.org/2004/ql#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
-
 
 <#LogicalSource>
     a rml:LogicalSource;
@@ -50,7 +50,29 @@
         rr:objectMap [
             rml:reference "endDate" ;
         ];
-    ]
+    ] ;
+
+    # rr:predicateObjectMap [
+    #     rr:predicate :latitude ;
+    #     rr:objectMap [
+    #         rml:reference "latitude" ;
+    #     ];
+    # ] ;
+
+    # rr:predicateObjectMap [
+    #     rr:predicate :longitude ;
+    #     rr:objectMap [
+    #         rml:reference "longitude" ;
+    #     ];
+    # ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :hasLocation ;
+        rr:objectMap [
+            rml:functionExecution <#LocationExecution>;
+            # rml:termType rml:IRI;
+        ] ;
+    ] ;
 
     .
 
@@ -58,7 +80,7 @@
 <#TypeExecution>
     rml:function :toTypeIRI;
     rml:input [
-        rml:parameter grel:valueParam;
+        rml:parameter grel:valueParameter;
         rml:inputValueMap [
             rml:reference "hasType";
         ];
@@ -67,9 +89,22 @@
 <#NameExecution>
     rml:function :cleanName;
     rml:input [
-        rml:parameter grel:valueParam;
+        rml:parameter grel:valueParameter;
         rml:inputValueMap [
             rml:reference "eventName";
         ];
     ].
 
+<#LocationExecution>
+    rml:function :matchLocationsToIRI;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "hasLocation";
+            
+        ];
+        # rml:parameter grel:p_string_sep;
+        # rml:inputValueMap [
+        #     rr:constant ",";
+        # ];
+    ].
