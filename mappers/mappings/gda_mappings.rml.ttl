@@ -13,7 +13,7 @@
     rml:source "data/gda.csv";
     rml:referenceFormulation ql:CSV .
 
-<#MyTriplesMap>
+<#EventMapping>
     a rr:TriplesMap;
 
     rml:logicalSource <#LogicalSource>;
@@ -33,22 +33,16 @@
     rr:predicateObjectMap [
         rr:predicate :hasType ;
         rr:objectMap [
-            fnml:functionValue [
-                fno:executes <https://sakuna.ph/toTypeIRI> ;
-                fnml:input [
-                    fno:predicate grel:valueParam ;
-                    rml:reference "hasType" ;
-                ]
-            ] ;
+            rml:functionExecution <#TypeExecution>;
         ] ;
     ] .
 
 
-# <#Execution>
-#     rml:function <https://sakuna.ph/toTypeIRI>;
-#     rml:input [
-#         rml:parameter grel:valueParam;
-#         rml:valueMap [
-#             rml:reference "hasType";
-#         ];
-#     ].
+<#TypeExecution>
+    rml:function :toTypeIRI;
+    rml:input [
+        rml:parameter grel:valueParam;
+        rml:inputValueMap [
+            rml:reference "hasType";
+        ];
+    ].

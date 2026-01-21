@@ -1,14 +1,14 @@
-raise RuntimeError
-
 @udf(
     fun_id="https://sakuna.ph/toTypeIRI",
-    text="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParam"
+    hasType="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParam"
 )
 def to_type_iri(hasType: str):
-    local = (
+    fixedIRI = (
         hasType.replace(" ", "")
                .replace("(", "")
                .replace(")", "")
                .replace("Misc", "Miscellaneous")
+               .replace("Flashflood", "FlashFlood")
+               .replace("Earthquake", "")
     )
-    return f"https://sakuna.ph/{local}"
+    return fixedIRI
