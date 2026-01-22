@@ -134,9 +134,27 @@ for _, row in gdf_municities.iterrows():
 
 
 # Pelepens
-ph_uri = uri = URIRef(SKG["Philippines"])
-g.add((uri, RDF.type, SKG["Location"]))
-g.add((uri, RDFS.label, Literal("Philippines")))
-g.add((uri, URIRef(SKG["admLevel"]), Literal("Country")))
+ph_uri = URIRef(SKG["Philippines"])
+g.add((ph_uri, RDF.type, SKG["Location"]))
+g.add((ph_uri, RDFS.label, Literal("Philippines")))
+g.add((ph_uri, URIRef(SKG["admLevel"]), Literal("Country")))
+
+# 3 group of islands
+luz_uri = URIRef(SKG["Luzon"])
+g.add((luz_uri, RDF.type, SKG["IslandGroup"]))
+g.add((luz_uri, RDFS.label, Literal("Luzon")))
+g.add((luz_uri, URIRef(SKG["admLevel"]), Literal("Island Group")))
+
+
+vis_uri = URIRef(SKG["Visayas"])
+g.add((vis_uri, RDF.type, SKG["IslandGroup"]))
+g.add((vis_uri, RDFS.label, Literal("Visayas")))
+g.add((vis_uri, URIRef(SKG["admLevel"]), Literal("Island Group")))
+
+
+minda_uri = URIRef(SKG["Mindanao"])
+g.add((minda_uri, RDF.type, SKG["IslandGroup"]))
+g.add((minda_uri, RDFS.label, Literal("Mindanao")))
+g.add((minda_uri, URIRef(SKG["admLevel"]), Literal("Island Group")))
 
 g.serialize(destination='./triples/psgc_rdf.ttl')
