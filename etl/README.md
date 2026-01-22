@@ -28,7 +28,11 @@ DONE:
 ***PSGC***
 
 To do:
+
 - Add Philippines, Luzon, Visayas, Mindanao IRIs
+- Fuzzy match City of Makati == Makati City
+
+
 - Add isPartOf relations to regions and island groups
 - Fix isPartOf relations with Cotabato clusters
 - just link to the external geoJSON URI since WKT literals bloat the data
