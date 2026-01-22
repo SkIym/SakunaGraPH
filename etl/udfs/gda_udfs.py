@@ -1,15 +1,12 @@
 from rdflib import Graph, RDF, Namespace, URIRef
 
+
 SKG = Namespace("https://sakuna.ph/")
 base = "https://sakuna.ph/"
-
 
 # For matching location IRIs
 lg = Graph()
 lg.parse("triples/psgc_rdf.ttl")
-
-for s, p, o in lg.triples((None, RDF.type, URIRef(SKG["Region"]))):
-    print(f"{s} is a region")
 
 
 
@@ -47,10 +44,156 @@ def clean_event_name(eventName: str):
 )
 def match_locs_to_IRI(locations: str):
     locs =  [l.strip() for l in locations.split("|")]
-
-    # for loc in locs:
-        
+    loc_IRIs: list[str] = []   
 
 
-    return locs
+    for loc in locs:
+        if loc == "": continue
 
+        region_IRI = region_map.get(loc.strip())
+
+        if region_IRI:
+            text = base + region_IRI
+            loc_IRIs.append(text)
+        else:
+            loc_IRIs.append(loc)
+
+
+    
+    # for s, p, o in lg.triples((None, RDF.type, URIRef(SKG["Province"]))):
+    #     print(f"{s} is a region")
+
+
+
+    return loc_IRIs
+
+region_map = {
+    # Region I – Ilocos Region
+    "I": "Region_I",
+    "1": "Region_I",
+    "Region I": "Region_I",
+    "Region 1": "Region_I",
+    "Ilocos": "Region_I",
+    "Ilocos Region": "Region_I",
+
+    # Region II – Cagayan Valley
+    "II": "Region_II",
+    "2": "Region_II",
+    "Region II": "Region_II",
+    "Region 2": "Region_II",
+    "Cagayan Valley": "Region_II",
+
+    # Region III – Central Luzon
+    "III": "Region_III",
+    "3": "Region_III",
+    "Region III": "Region_III",
+    "Region 3": "Region_III",
+    "Central Luzon": "Region_III",
+
+    # Region IV-A – CALABARZON
+    "IV-A": "Region_IV-A",
+    "4A": "Region_IV-A",
+    "IVA": "Region_IV-A",
+    "4-A": "Region_IV-A",
+    "Region IV-A": "Region_IV-A",
+    "Region 4A": "Region_IV-A",
+    "Region IVA": "Region_IV-A",
+    "Region 4-A": "Region_IV-A",
+    "CALABARZON": "Region_IV-A",
+    "Calabarzon": "Region_IV-A",
+
+    # Region IV-B – MIMAROPA
+    "IV-B": "Region_IV-B",
+    "4B": "Region_IV-B",
+    "IVB": "Region_IV-B",
+    "4-B": "Region_IV-B",
+    "Region IV-B": "Region_IV-B",
+    "Region 4B": "Region_IV-B",
+    "Region IVB": "Region_IV-B",
+    "Region 4-B": "Region_IV-B",
+    "MIMAROPA": "Region_IV-B",
+    "Mimaropa": "Region_IV-B",
+
+    # Region V – Bicol Region
+    "V": "Region_V",
+    "5": "Region_V",
+    "Region V": "Region_V",
+    "Region 5": "Region_V",
+    "Bicol": "Region_V",
+    "Bicol Region": "Region_V",
+
+    # Region VI – Western Visayas
+    "VI": "Region_VI",
+    "6": "Region_VI",
+    "Region VI": "Region_VI",
+    "Region 6": "Region_VI",
+    "Western Visayas": "Region_VI",
+
+    # Region VII – Central Visayas
+    "VII": "Region_VII",
+    "7": "Region_VII",
+    "Region VII": "Region_VII",
+    "Region 7": "Region_VII",
+    "Central Visayas": "Region_VII",
+
+    # Region VIII – Eastern Visayas
+    "VIII": "Region_VIII",
+    "8": "Region_VIII",
+    "Region VIII": "Region_VIII",
+    "Region 8": "Region_VIII",
+    "Eastern Visayas": "Region_VIII",
+
+    # Region IX – Zamboanga Peninsula
+    "IX": "Region_IX",
+    "9": "Region_IX",
+    "Region IX": "Region_IX",
+    "Region 9": "Region_IX",
+    "Zamboanga Peninsula": "Region_IX",
+
+    # Region X – Northern Mindanao
+    "X": "Region_X",
+    "10": "Region_X",
+    "Region X": "Region_X",
+    "Region 10": "Region_X",
+    "Northern Mindanao": "Region_X",
+
+    # Region XI – Davao Region
+    "XI": "Region_XI",
+    "11": "Region_XI",
+    "Region XI": "Region_XI",
+    "Region 11": "Region_XI",
+    "Davao": "Region_XI",
+    "Davao Region": "Region_XI",
+
+    # Region XII – SOCCSKSARGEN
+    "XII": "Region_XII",
+    "12": "Region_XII",
+    "Region XII": "Region_XII",
+    "Region 12": "Region_XII",
+    "SOCCSKSARGEN": "Region_XII",
+    "Soccsksargen": "Region_XII",
+
+    # Region XIII – Caraga
+    "XIII": "Region_XIII",
+    "13": "Region_XIII",
+    "Region XIII": "Region_XIII",
+    "Region 13": "Region_XIII",
+    "Caraga": "Region_XIII",
+    "CARAGA": "Region_XIII",
+
+    # NCR – National Capital Region
+    "NCR": "National_Capital_Region",
+    "National Capital Region": "National_Capital_Region",
+    "Metro Manila": "National_Capital_Region",
+
+    # CAR – Cordillera Administrative Region
+    "CAR": "Cordillera_Administrative_Region",
+    "Cordillera": "Cordillera_Administrative_Region",
+    "Cordillera Administrative Region": "Cordillera_Administrative_Region",
+
+    # BARMM – Bangsamoro
+    "BARMM": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
+    "ARMM": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
+    "Bangsamoro": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
+    "Bangsamoro Autonomous Region in Muslim Mindanao": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao"
+}
