@@ -614,7 +614,8 @@ _:genid8 rdf:type owl:Class ;
                                     )
                       ] ;
           rdfs:range [ rdf:type owl:Class ;
-                       owl:unionOf ( :Municipality
+                       owl:unionOf ( :IslandGroup
+                                     :Municipality
                                      :Province
                                      :Region
                                    )
@@ -2895,7 +2896,11 @@ geo:SpatialObject rdf:type owl:Class .
 
 ###  https://sakuna.ph/Region
 :Region rdf:type owl:Class ;
-        rdfs:subClassOf :Location ;
+        rdfs:subClassOf :Location ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :isPartOf ;
+                          owl:someValuesFrom :IslandGroup
+                        ] ;
         rdfs:label "Region"@en .
 
 
