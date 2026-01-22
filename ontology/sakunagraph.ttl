@@ -610,6 +610,7 @@ _:genid8 rdf:type owl:Class ;
                         owl:unionOf ( :Barangay
                                       :Municipality
                                       :Province
+                                      :Region
                                     )
                       ] ;
           rdfs:range [ rdf:type owl:Class ;
@@ -2637,6 +2638,12 @@ geo:SpatialObject rdf:type owl:Class .
                                 ] ;
                 rdfs:label "Infrastructure"@en ;
                 <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on infrastructure." .
+
+
+###  https://sakuna.ph/IslandGroup
+:IslandGroup rdf:type owl:Class ;
+             rdfs:subClassOf :Location ;
+             rdfs:label "Island Group" .
 
 
 ###  https://sakuna.ph/Lahar
