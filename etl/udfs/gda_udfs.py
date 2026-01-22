@@ -1,5 +1,5 @@
-from rdflib import Graph, RDF, Namespace, URIRef
-
+from rdflib import Graph, RDF, Namespace, URIRef, RDFS, Node
+import re
 
 SKG = Namespace("https://sakuna.ph/")
 base = "https://sakuna.ph/"
@@ -7,6 +7,27 @@ base = "https://sakuna.ph/"
 # For matching location IRIs
 lg = Graph()
 lg.parse("triples/psgc_rdf.ttl")
+
+# IRI : label
+municities: dict[str, str] = {}
+municities_parent: dict[str, str] = {}
+# municities_IRI: list[str | None] = []
+
+
+# Label : IRI
+provinces: dict[str, str] = {}
+# provinces_IRI: list[str | None] = []
+
+for s, p, o in lg.triples((None, RDF.type ,URIRef(SKG["Municipality"]))):
+
+    lbl = str(lg.value(subject=s, predicate=RDFS.label))
+
+    municities[str(s)] = lbl
+    municities_parent[str(s)] = str(lg.value(subject=s, predicate=URIRef(SKG["isPartOf"])))
+
+for s, p, o in lg.triples((None, RDF.type , URIRef(SKG["Province"]))):
+
+    provinces[str(lg.value(subject=s, predicate=RDFS.label))] = str(s)
 
 
 
@@ -50,20 +71,42 @@ def match_locs_to_IRI(locations: str):
     for loc in locs:
         if loc == "": continue
 
+        # match if region
         region_IRI = region_map.get(loc.strip())
 
         if region_IRI:
             text = base + region_IRI
             loc_IRIs.append(text)
+
+        # get province or municipality, prioritize lower adm level (mun/cities)
         else:
-            loc_IRIs.append(loc)
+            levels = loc.split(",")
+            loc_IRI = ""
 
 
-    
-    # for s, p, o in lg.triples((None, RDF.type, URIRef(SKG["Province"]))):
-    #     print(f"{s} is a region")
+            # get the highest adm level location then remove leading/termination ws 
+            highest_level = (levels.pop()).strip()
+
+            if highest_level in provinces:
+                loc_IRI = provinces.get(highest_level)
+
+                # Catch if levels is empty or municipality has been found then terminate
+                if len(levels) > 0:
+                    new_IRI = ""
+                    highest_level = (levels.pop()).strip()
 
 
+                    temp_IRIs  = [k for k, v in municities.items() if v == highest_level]
+                    for i in temp_IRIs:
+                        if municities_parent[i] == loc_IRI:
+                            new_IRI = i
+                            break
+                    
+                    if new_IRI: loc_IRI = new_IRI
+                    
+
+            if loc_IRI:
+                loc_IRIs.append(loc_IRI)
 
     return loc_IRIs
 
