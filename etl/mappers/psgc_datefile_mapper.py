@@ -132,4 +132,11 @@ for _, row in gdf_municities.iterrows():
     g.add((uri, URIRef(SKG["psgc"]), Literal(psgc)))
     g.add((uri, URIRef(SKG["admLevel"]), Literal(admLevel)))
 
+
+# Pelepens
+ph_uri = uri = URIRef(SKG["Philippines"])
+g.add((uri, RDF.type, SKG["Location"]))
+g.add((uri, RDFS.label, Literal("Philippines")))
+g.add((uri, URIRef(SKG["admLevel"]), Literal("Country")))
+
 g.serialize(destination='./triples/psgc_rdf.ttl')
