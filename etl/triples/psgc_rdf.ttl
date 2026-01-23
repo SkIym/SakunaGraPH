@@ -2,6 +2,26 @@
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
+
+:Philippines a :Location ;
+    rdfs:label "Philippines" ;
+    :admLevel "Country" .
+
+:Luzon a :IslandGroup ;
+    rdfs:label "Luzon" ;
+    :isPartOf :Philippines ; 
+    :admLevel "Island Group" .
+
+:Visayas a :IslandGroup ;
+    rdfs:label "Visayas" ;
+    :isPartOf :Philippines ;
+    :admLevel "Island Group" .
+
+:Mindanao a :IslandGroup ;
+    rdfs:label "Mindanao" ;
+    :isPartOf :Philippines ;
+    :admLevel "Island Group" .
+
 :Aborlan a :Municipality ;
     rdfs:label "Aborlan" ;
     :admLevel "Municipality" ;
@@ -9878,6 +9898,7 @@
 :Region_I a :Region ;
     rdfs:label "Region I (Ilocos Region)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 100000000 .
 
 :Camiguin a :Province ;
@@ -9901,21 +9922,25 @@
 :Region_II a :Region ;
     rdfs:label "Region II (Cagayan Valley)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 200000000 .
 
 :Region_IX a :Region ;
     rdfs:label "Region IX (Zamboanga Peninsula)" ;
     :admLevel "Region" ;
+    :isPartOf :Mindanao ; 
     :psgc 900000000 .
 
 :Region_XII a :Region ;
     rdfs:label "Region XII (SOCCSKSARGEN)" ;
     :admLevel "Region" ;
+    :isPartOf :Mindanao ; 
     :psgc 1200000000 .
 
 :Bangsamoro_Autonomous_Region_In_Muslim_Mindanao a :Region ;
     rdfs:label "Bangsamoro Autonomous Region In Muslim Mindanao (BARMM)" ;
     :admLevel "Region" ;
+    :isPartOf :Mindanao ; 
     :psgc 1900000000 .
 
 :Batanes a :Province ;
@@ -9927,6 +9952,7 @@
 :MIMAROPA_Region a :Region ;
     rdfs:label "MIMAROPA Region" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 1700000000 .
 
 :Marinduque a :Province ;
@@ -9944,21 +9970,25 @@
 :Region_IV-A a :Region ;
     rdfs:label "Region IV-A (CALABARZON)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 400000000 .
 
 :Region_V a :Region ;
     rdfs:label "Region V (Bicol Region)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 500000000 .
 
 :Region_XI a :Region ;
     rdfs:label "Region XI (Davao Region)" ;
     :admLevel "Region" ;
+    :isPartOf :Mindanao ; 
     :psgc 1100000000 .
 
 :Region_XIII a :Region ;
     rdfs:label "Region XIII (Caraga)" ;
     :admLevel "Region" ;
+    :isPartOf :Mindanao ; 
     :psgc 1600000000 .
 
 :Siquijor a :Province ;
@@ -9976,6 +10006,7 @@
 :Cordillera_Administrative_Region a :Region ;
     rdfs:label "Cordillera Administrative Region (CAR)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 1400000000 .
 
 :Dinagat_Islands a :Province ;
@@ -9987,16 +10018,19 @@
 :Region_VII a :Region ;
     rdfs:label "Region VII (Central Visayas)" ;
     :admLevel "Region" ;
+    :isPartOf :Visayas ; 
     :psgc 700000000 .
 
 :Region_VIII a :Region ;
     rdfs:label "Region VIII (Eastern Visayas)" ;
     :admLevel "Region" ;
+    :isPartOf :Visayas ; 
     :psgc 800000000 .
 
 :Region_X a :Region ;
     rdfs:label "Region X (Northern Mindanao)" ;
     :admLevel "Region" ;
+    :isPartOf :Mindanao ; 
     :psgc 1000000000 .
 
 :Sarangani a :Province ;
@@ -10026,11 +10060,13 @@
 :Region_VI a :Region ;
     rdfs:label "Region VI (Western Visayas)" ;
     :admLevel "Region" ;
+    :isPartOf :Visayas ; 
     :psgc 600000000 .
 
 :Region_III a :Region ;
     rdfs:label "Region III (Central Luzon)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 300000000 .
 
 :Davao_del_Sur a :Province ;
@@ -10252,6 +10288,7 @@
 :National_Capital_Region a :Region ;
     rdfs:label "National Capital Region (NCR)" ;
     :admLevel "Region" ;
+    :isPartOf :Luzon ; 
     :psgc 1300000000 .
 
 :Masbate a :Province ;
