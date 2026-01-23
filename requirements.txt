@@ -6,3 +6,4 @@ geopandas
 rdflib
 openpyxl
 morph-kgc
+thefuzz

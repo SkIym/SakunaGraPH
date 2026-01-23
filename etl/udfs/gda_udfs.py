@@ -1,5 +1,5 @@
-from rdflib import Graph, RDF, Namespace, URIRef, RDFS, Node
-import re
+from rdflib import Graph, RDF, Namespace, URIRef, RDFS
+import thefuzz as fuzz
 
 SKG = Namespace("https://sakuna.ph/")
 base = "https://sakuna.ph/"
@@ -12,7 +12,6 @@ lg.parse("triples/psgc_rdf.ttl")
 municities: dict[str, str] = {}
 municities_parent: dict[str, str] = {}
 # municities_IRI: list[str | None] = []
-
 
 # Label : IRI
 provinces: dict[str, str] = {}
@@ -29,7 +28,8 @@ for s, p, o in lg.triples((None, RDF.type , URIRef(SKG["Province"]))):
 
     provinces[str(lg.value(subject=s, predicate=RDFS.label))] = str(s)
 
-
+# Label : IRI
+municities_rev = dict([(value, key) for key, value in municities.items()])
 
 @udf(
     fun_id="https://sakuna.ph/toTypeIRI",
@@ -71,12 +71,20 @@ def match_locs_to_IRI(locations: str):
     for loc in locs:
         if loc == "": continue
 
+        goddamn_reg4 = loc.strip() in ["4", "Region 4", "IIII", 4]
+        if goddamn_reg4:
+            text = base + "Region_IV-A"
+            text2 = base + "Region_IV-B"
+            loc_IRIs.extend([text, text2])
+            continue
+        
         # match if region
         region_IRI = region_map.get(loc.strip())
 
         if region_IRI:
             text = base + region_IRI
             loc_IRIs.append(text)
+
 
         # get province or municipality, prioritize lower adm level (mun/cities)
         else:
@@ -87,8 +95,12 @@ def match_locs_to_IRI(locations: str):
             # get the highest adm level location then remove leading/termination ws 
             highest_level = (levels.pop()).strip()
 
-            if highest_level in provinces:
+            if highest_level in ["Philippines", "Luzon", "Visayas", "Mindanao"]:
+                loc_IRI = base + highest_level
+
+            elif highest_level in provinces:
                 loc_IRI = provinces.get(highest_level)
+
 
                 # Catch if levels is empty or municipality has been found then terminate
                 if len(levels) > 0:
@@ -103,11 +115,29 @@ def match_locs_to_IRI(locations: str):
                             break
                     
                     if new_IRI: loc_IRI = new_IRI
+            
+            # If highest level is a municipality / city
+            else:
+                
+                loc_IRI = municities_rev.get(highest_level)    
+
+                if not loc_IRI:
+                    
+                    official_name = highest_level[:-5]
+                    off_highest_level = f"City of {official_name}"
+                    loc_IRI = municities_rev.get(off_highest_level)    
                     
 
             if loc_IRI:
                 loc_IRIs.append(loc_IRI)
 
+           
+            else:
+                 # For debugging
+                print(highest_level, municities_rev.get(highest_level), region_IRI,loc)
+                loc_IRIs.append(highest_level)
+
+    
     return loc_IRIs
 
 region_map = {
@@ -226,11 +256,14 @@ region_map = {
 
     # NCR – National Capital Region
     "NCR": "National_Capital_Region",
+    "Region NCR": "National_Capital_Region",
     "National Capital Region": "National_Capital_Region",
+    "National Capital Region (NCR)": "National_Capital_Region",
     "Metro Manila": "National_Capital_Region",
 
     # CAR – Cordillera Administrative Region
     "CAR": "Cordillera_Administrative_Region",
+    "Region CAR": "Cordillera_Administrative_Region",
     "Cordillera": "Cordillera_Administrative_Region",
     "Cordillera Administrative Region": "Cordillera_Administrative_Region",
 
