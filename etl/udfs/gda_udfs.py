@@ -71,71 +71,73 @@ def match_locs_to_IRI(locations: str):
     for loc in locs:
         if loc == "": continue
 
-        goddamn_reg4 = loc.strip() in ["4", "Region 4", "IIII", 4]
-        if goddamn_reg4:
+        # get province or municipality, prioritize lower adm level (mun/cities)
+        
+        levels = loc.split(",")
+        loc_IRI = ""
+
+        # get the highest adm level location then remove leading/termination ws 
+        highest_level = (levels.pop()).strip()
+
+        if highest_level in ["Philippines", "Luzon", "Visayas", "Mindanao"]:
+            loc_IRI = base + highest_level
+            loc_IRIs.append(loc_IRI)
+            continue
+
+        if highest_level in ["4", "Region 4", "IIII", 4]:
             text = base + "Region_IV-A"
             text2 = base + "Region_IV-B"
             loc_IRIs.extend([text, text2])
             continue
         
-        # match if region
-        region_IRI = region_map.get(loc.strip())
+        # If region
+        region_IRI = region_map.get(highest_level)
 
         if region_IRI:
             text = base + region_IRI
-            loc_IRIs.append(text)
 
-
-        # get province or municipality, prioritize lower adm level (mun/cities)
-        else:
-            levels = loc.split(",")
-            loc_IRI = ""
-
-
-            # get the highest adm level location then remove leading/termination ws 
-            highest_level = (levels.pop()).strip()
-
-            if highest_level in ["Philippines", "Luzon", "Visayas", "Mindanao"]:
-                loc_IRI = base + highest_level
-
-            elif highest_level in provinces:
-                loc_IRI = provinces.get(highest_level)
-
-
-                # Catch if levels is empty or municipality has been found then terminate
-                if len(levels) > 0:
-                    new_IRI = ""
-                    highest_level = (levels.pop()).strip()
-
-
-                    temp_IRIs  = [k for k, v in municities.items() if v == highest_level]
-                    for i in temp_IRIs:
-                        if municities_parent[i] == loc_IRI:
-                            new_IRI = i
-                            break
-                    
-                    if new_IRI: loc_IRI = new_IRI
-            
-            # If highest level is a municipality / city
+            if len(levels) == 0:
+                loc_IRIs.append(text)
+                continue
             else:
+                highest_level = (levels.pop()).strip()
+
+        # If next highest level is a province
+        if highest_level in provinces:
+            loc_IRI = provinces.get(highest_level)
+
+            # Catch if levels is empty or municipality has been found then terminate
+            if len(levels) > 0:
+                new_IRI = ""
+                highest_level = (levels.pop()).strip()
+
+
+                temp_IRIs  = [k for k, v in municities.items() if v == highest_level]
+                for i in temp_IRIs:
+                    if municities_parent[i] == loc_IRI:
+                        new_IRI = i
+                        break
                 
-                loc_IRI = municities_rev.get(highest_level)    
+                if new_IRI: loc_IRI = new_IRI
 
-                if not loc_IRI:
-                    
-                    official_name = highest_level[:-5]
-                    off_highest_level = f"City of {official_name}"
-                    loc_IRI = municities_rev.get(off_highest_level)    
-                    
+        # If enxt highest level is a municipality / city
+        else:
+            loc_IRI = municities_rev.get(highest_level)    
 
-            if loc_IRI:
-                loc_IRIs.append(loc_IRI)
+            if not loc_IRI:
+                # Reformat "____ City" to official "City of ____"
+                official_name = highest_level[:-5]
+                off_highest_level = f"City of {official_name}"
+                loc_IRI = municities_rev.get(off_highest_level)    
+                
 
-           
-            else:
-                 # For debugging
-                print(highest_level, municities_rev.get(highest_level), region_IRI,loc)
-                loc_IRIs.append(highest_level)
+        if loc_IRI:
+            loc_IRIs.append(loc_IRI)
+
+        else:
+                # For debugging
+            print(loc_IRIs, highest_level, provinces.get(highest_level),loc)
+            loc_IRIs.append(highest_level)
 
     
     return loc_IRIs

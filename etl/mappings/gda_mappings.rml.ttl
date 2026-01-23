@@ -69,7 +69,7 @@
         rr:predicate :hasLocation ;
         rr:objectMap [
             rml:functionExecution <#LocationExecution>;
-            # rml:termType rml:IRI;
+            rml:termType rml:IRI;
         ] ;
     ] ;
 
