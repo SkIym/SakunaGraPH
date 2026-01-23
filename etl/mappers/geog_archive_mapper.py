@@ -4,6 +4,7 @@ from dateutil.parser import parse
 import uuid
 
 COLUMN_MAPPING = {
+    "M or I": "eventClass",
     "Main Event Disaster Type": "hasType",
     "Disaster Name": "eventName",
     "Date/Period": "date",

@@ -286,3 +286,11 @@ region_map = {
     "Bangsamoro": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
     "Bangsamoro Autonomous Region in Muslim Mindanao": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao"
 }
+
+@udf(
+    fun_id="https://sakuna.ph/toMajorIncident",
+    clss="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
+)
+def to_major_incident_class(clss: str):
+    return f"{base}Major" if clss == "M" else f"{base}Incident"
+

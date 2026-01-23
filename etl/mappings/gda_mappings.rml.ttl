@@ -19,7 +19,14 @@
     
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}";
-        rr:class :DisasterEvent;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate rdf:type ;
+        rr:objectMap [
+            rml:functionExecution <#EventExecution> ;
+            rml:termType rml:IRI;
+        ];
     ];
 
     rr:predicateObjectMap [
@@ -73,8 +80,24 @@
         ] ;
     ] ;
 
+    rr:predicateObjectMap [
+        rr:predicate :hasSubtype ;
+        rr:objectMap [
+            rml:functionExecution <#SubtypeExecution>;
+            rml:termType rml:IRI;
+        ] ;
+    ] ;
+
     .
 
+<#EventExecution>
+    rml:function :toMajorIncident ;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "eventClass" ;
+        ];
+    ].
 
 <#TypeExecution>
     rml:function :toTypeIRI;
@@ -82,6 +105,15 @@
         rml:parameter grel:valueParameter;
         rml:inputValueMap [
             rml:reference "hasType";
+        ];
+    ].
+
+<#SubtypeExecution>
+    rml:function :toTypeIRI;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "hasSubtype";
         ];
     ].
 
@@ -102,8 +134,4 @@
             rml:reference "hasLocation";
             
         ];
-        # rml:parameter grel:p_string_sep;
-        # rml:inputValueMap [
-        #     rr:constant ",";
-        # ];
     ].
