@@ -608,13 +608,15 @@ _:genid8 rdf:type owl:Class ;
           rdf:type owl:TransitiveProperty ;
           rdfs:domain [ rdf:type owl:Class ;
                         owl:unionOf ( :Barangay
+                                      :IslandGroup
                                       :Municipality
                                       :Province
                                       :Region
                                     )
                       ] ;
           rdfs:range [ rdf:type owl:Class ;
-                       owl:unionOf ( :IslandGroup
+                       owl:unionOf ( :Country
+                                     :IslandGroup
                                      :Municipality
                                      :Province
                                      :Region
@@ -2203,6 +2205,11 @@ geo:SpatialObject rdf:type owl:Class .
                                     ] ;
                     rdfs:label "Communication Lines"@en ;
                     <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on communication lines." .
+
+
+###  https://sakuna.ph/Country
+:Country rdf:type owl:Class ;
+         rdfs:subClassOf :Location .
 
 
 ###  https://sakuna.ph/DamageGeneral
