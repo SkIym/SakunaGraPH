@@ -33,18 +33,29 @@ municities_rev = dict([(value, key) for key, value in municities.items()])
 
 @udf(
     fun_id="https://sakuna.ph/toTypeIRI",
-    hasType="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
+    dtype="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
 )
-def to_type_iri(hasType: str):
-    fixedIRI = (
-        hasType.replace(" ", "")
-               .replace("(", "")
-               .replace(")", "")
-               .replace("Misc", "Miscellaneous")
-               .replace("Flashflood", "FlashFlood")
-               .replace("Earthquake", "")
-    )
-    return f"{base}{fixedIRI}"
+def to_type_iri(dtype: str):
+
+
+    types = dtype.split("|")
+
+    cleanedIRIs: list[str] = []
+
+    for t in types:
+        
+        fixedIRI = (
+            t.strip()
+                .replace(" ", "")
+                .replace("(", "")
+                .replace(")", "")
+                .replace("Misc", "Miscellaneous")
+                .replace("Flashflood", "FlashFlood")
+                .replace("Earthquake", "")
+        )
+        cleanedIRIs.append(base + fixedIRI)
+
+    return cleanedIRIs
 
 
 @udf(
