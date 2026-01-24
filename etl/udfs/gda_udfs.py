@@ -37,6 +37,8 @@ municities_rev = dict([(value, key) for key, value in municities.items()])
 )
 def to_type_iri(dtype: str):
 
+    # Ignore related incident subtypes (already handled by Pandas)
+    if "[" in dtype: return
 
     types = dtype.split("|")
 

@@ -7,18 +7,23 @@
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 
-<#LogicalSource>
+<#MainLogicalSource>
     a rml:LogicalSource;
     rml:source "data/gda.csv";
+    rml:referenceFormulation ql:CSV .
+
+<#InciLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_incidents.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#EventMapping>
     a rr:TriplesMap;
 
-    rml:logicalSource <#LogicalSource>;
+    rml:logicalSource <#MainLogicalSource>;
     
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{eventName}/{startDate}/{hasLocation}";
+        rr:template "https://sakuna.ph/{id}";
     ];
 
     rr:predicateObjectMap [
@@ -88,6 +93,17 @@
         ] ;
     ] ;
 
+    rr:predicateObjectMap [
+        rr:predicate :hasRelatedIncident ;
+        rr:objectMap [
+            rr:parentTriplesMap <#IncidentsMapping> ;
+            rr:joinCondition [
+                rr:child "id" ;
+                rr:parent "id" ;
+            ];
+        ];
+    ];
+
     .
 
 <#EventExecution>
@@ -128,19 +144,29 @@
     ].
 
 
-# <#IncidentsMapping>
-#     a rr:TriplesMap ;
-#     rml:logicalSource <#LogicalSource> ;
+<#IncidentsMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#InciLogicalSource> ;
 
-#     rr:subjectMap [
-#         rr:template "https://sakuna.ph/{id}";
-#         rr:class :Incident ;
-#     ];
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/related_incident/{sub_id}";
+        rr:class :Incident ;
+    ];
 
-#     rr:predicateObjectMap [
-#         rr:predicate rdf:type ;
-#         rr:objectMap [
-#             rml:functionExecution <#EventExecution> ;
-#             rml:termType rml:IRI;
-#         ];
-#     ].
+    rr:predicateObjectMap [
+        rr:predicate :hasLocation ;
+        rr:objectMap [
+            rml:functionExecution <#LocationExecution>;
+            rml:termType rml:IRI;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :hasType ;
+        rr:objectMap [
+            rml:functionExecution <#TypeExecution>;
+            rml:termType rml:IRI;
+        ] ;
+    ] ;
+
+    .

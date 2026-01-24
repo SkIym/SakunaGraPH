@@ -276,18 +276,35 @@ if "date" in df.columns:
 df = df.dropna(subset=['startDate'])
 df['eventName'] = df['eventName'].str.replace('\"', "") 
 
+df['id'] = [uuid.uuid4().hex for _ in range(len(df))]
 
-# create IRIs for other entities (e.g. Impact, Preparedness, Response)
-# for i, row in df.iterrows():
-#     event_id = uuid.uuid4().hex
+incidents: dict[str, list[str | int]] = {
+    "id": [],
+    "hasLocation": [],
+    "hasType": [],
+    "sub_id": []
+}
+
+# explode subtype incidents
+
+for i, row in df.iterrows():
     
-#     if "[" in row['hasSubtype']:
-
-
+    subtypes: str = row['hasSubtype']
+    cnt = 0
+    if type(subtypes) == str and "[" in subtypes:
+        instances = subtypes.split(";")
+        for instance in instances:
+            cnt += 1
+            [hasType, hasLocation] = instance.strip().replace("[", '').replace("]", '').split(":")
+            # print(hasType, hasLocation)
+            incidents["id"].append(row["id"])
+            incidents["hasType"].append(hasType)
+            incidents["hasLocation"].append(hasLocation)
+            incidents["sub_id"].append(cnt)
 
 # explode resulting incidents
 
 
-
-
+inci_df = pd.DataFrame(incidents)
+inci_df.to_csv("./data/gda_incidents.csv")
 df.to_csv('./data/gda.csv')
