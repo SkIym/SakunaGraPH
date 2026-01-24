@@ -104,6 +104,17 @@
         ];
     ];
 
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+            rr:parentTriplesMap <#PreparednessMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ]
+        ]
+    ]
+
     .
 
 <#EventExecution>
@@ -166,6 +177,24 @@
         rr:objectMap [
             rml:functionExecution <#TypeExecution>;
             rml:termType rml:IRI;
+        ] ;
+    ] ;
+
+    .
+
+<#PreparednessMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#MainLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/preparedness";
+        rr:class :Preparedness ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :agencyLGUsPresent ;
+        rr:objectMap [
+            rml:reference "agencyLGUsPresentPreparedness"
         ] ;
     ] ;
 
