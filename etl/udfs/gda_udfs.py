@@ -57,19 +57,6 @@ def to_type_iri(dtype: str):
 
     return cleanedIRIs
 
-
-@udf(
-    fun_id="https://sakuna.ph/cleanName",
-    eventName="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
-)
-def clean_event_name(eventName: str):
-    fixedStr = (
-        eventName.replace("\"", "")
-
-    )
-    return fixedStr
-
-
 @udf(
     fun_id="https://sakuna.ph/matchLocationsToIRI",
     locations="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"

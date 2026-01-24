@@ -18,7 +18,7 @@
     rml:logicalSource <#LogicalSource>;
     
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}";
+        rr:template "https://sakuna.ph/{eventName}/{startDate}/{hasLocation}";
     ];
 
     rr:predicateObjectMap [
@@ -32,7 +32,7 @@
     rr:predicateObjectMap [
         rr:predicate :eventName;
         rr:objectMap [
-            rml:functionExecution <#NameExecution> ;
+            rml:reference "eventName" ;
         ];
     ];
 
@@ -117,15 +117,6 @@
         ];
     ].
 
-<#NameExecution>
-    rml:function :cleanName;
-    rml:input [
-        rml:parameter grel:valueParameter;
-        rml:inputValueMap [
-            rml:reference "eventName";
-        ];
-    ].
-
 <#LocationExecution>
     rml:function :matchLocationsToIRI;
     rml:input [
@@ -135,3 +126,21 @@
             
         ];
     ].
+
+
+# <#IncidentsMapping>
+#     a rr:TriplesMap ;
+#     rml:logicalSource <#LogicalSource> ;
+
+#     rr:subjectMap [
+#         rr:template "https://sakuna.ph/{id}";
+#         rr:class :Incident ;
+#     ];
+
+#     rr:predicateObjectMap [
+#         rr:predicate rdf:type ;
+#         rr:objectMap [
+#             rml:functionExecution <#EventExecution> ;
+#             rml:termType rml:IRI;
+#         ];
+#     ].

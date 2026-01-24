@@ -274,7 +274,20 @@ if "date" in df.columns:
     df[["startDate", "endDate"]] = df["date"].apply(lambda v: pd.Series(clean_date_range(v)))
 
 df = df.dropna(subset=['startDate'])
+df['eventName'] = df['eventName'].str.replace('\"', "") 
 
-df["id"] = [uuid.uuid4().hex for _ in range(len(df))]
+
+# create IRIs for other entities (e.g. Impact, Preparedness, Response)
+# for i, row in df.iterrows():
+#     event_id = uuid.uuid4().hex
+    
+#     if "[" in row['hasSubtype']:
+
+
+
+# explode resulting incidents
+
+
+
 
 df.to_csv('./data/gda.csv')
