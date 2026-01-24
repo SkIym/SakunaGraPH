@@ -2,6 +2,7 @@ import re
 import pandas as pd
 from dateutil.parser import parse
 import uuid
+import numpy as np
 
 COLUMN_MAPPING = {
     "M or I": "eventClass",
@@ -265,9 +266,9 @@ df = df[list(COLUMN_MAPPING.values())]
 df = df.dropna(how='all')
 df = df.dropna(axis=1, how='all')
 df = df.dropna(subset=['date', 'hasLocation'])
-df = df.replace("-", "")
-df = df.replace("Not applicable", "")
-df = df.replace("n.a.", "")
+df = df.replace("-", np.nan)
+df = df.replace("Not applicable", np.nan)
+df = df.replace("n.a.", np.nan)
 
 
 if "date" in df.columns:
@@ -302,9 +303,29 @@ for i, row in df.iterrows():
             incidents["hasLocation"].append(hasLocation)
             incidents["sub_id"].append(cnt)
 
-# explode resulting incidents
+evacuation: dict[str, list[str | int]] = {
+    "id": [],
+    "hasLocation": [],
+    "hasType": [],
+    "sub_id": []
+}
+
+rescue: dict[str, list[str | int]] = {
+    "id": [],
+    "hasLocation": [],
+    "hasType": [],
+    "sub_id": []
+}
+
+
+
 
 
 inci_df = pd.DataFrame(incidents)
 inci_df.to_csv("./data/gda_incidents.csv")
+
+preparedness_df = df[['id', 'agencyLGUsPresentPreparedness']]
+preparedness_df = preparedness_df.dropna(subset="agencyLGUsPresentPreparedness")
+preparedness_df.to_csv('./data/gda_prep.csv')
+
 df.to_csv('./data/gda.csv')

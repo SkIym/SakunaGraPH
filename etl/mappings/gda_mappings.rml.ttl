@@ -17,6 +17,11 @@
     rml:source "data/gda_incidents.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#PrepLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_prep.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 <#EventMapping>
     a rr:TriplesMap;
 
@@ -117,7 +122,7 @@
     ] ;
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasPreparedness ;
         rr:objectMap [
 
             rr:parentTriplesMap <#EvacuationMapping> ;
@@ -197,12 +202,11 @@
 
 <#PreparednessMapping>
     a rr:TriplesMap ;
-    rml:logicalSource <#MainLogicalSource> ;
+    rml:logicalSource <#PrepLogicalSource> ;
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/preparedness";
         rr:class :Preparedness ;
-
     ];
 
     rr:predicateObjectMap [
