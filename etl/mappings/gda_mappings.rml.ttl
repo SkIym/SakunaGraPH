@@ -105,15 +105,28 @@
     ];
 
     rr:predicateObjectMap [
+        rr:predicate :hasPreparedness    ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#PreparednessMapping> ;
+            rr:joinCondition [
+                rr:child "id" ;
+                rr:parent "id" ;
+            ] ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
         rr:predicate :hasImpact ;
         rr:objectMap [
-            rr:parentTriplesMap <#PreparednessMapping> ;
+
+            rr:parentTriplesMap <#EvacuationMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
-            ]
-        ]
-    ]
+            ];
+        ];
+    ];
 
     .
 
@@ -189,6 +202,7 @@
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/preparedness";
         rr:class :Preparedness ;
+
     ];
 
     rr:predicateObjectMap [
@@ -199,3 +213,45 @@
     ] ;
 
     .
+
+<#EvacuationMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#MainLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/evacuation";
+        rr:class :PreemptiveEvacuation ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :evacuationPlan ;
+        rr:objectMap [
+            rml:reference "evacuationPlan"
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :evacuationCenters ;
+        rr:objectMap [
+            rml:reference "evacuationCenters"
+        ] ;
+    ] ;
+
+    .
+# <#RescuenMapping>
+#     a rr:TriplesMap ;
+#     rml:logicalSource <#MainLogicalSource> ;
+
+#     rr:subjectMap [
+#         rr:template "https://sakuna.ph/{id}/rescue";
+#         rr:class :Preparedness ;
+#     ];
+
+#     rr:predicateObjectMap [
+#         rr:predicate :agencyLGUsPresent ;
+#         rr:objectMap [
+#             rml:reference "agencyLGUsPresentPreparedness"
+#         ] ;
+#     ] ;
+
+#     .
