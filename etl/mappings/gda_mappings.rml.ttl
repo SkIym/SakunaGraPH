@@ -80,6 +80,7 @@
         rr:predicate :startDate ;
         rr:objectMap [
             rml:reference "startDate" ;
+            rml:datatype xsd:dateTime ;
         ];
     ] ;
 
@@ -87,6 +88,7 @@
         rr:predicate :endDate ;
         rr:objectMap [
             rml:reference "endDate" ;
+            rml:datatype xsd:dateTime ;
         ];
     ] ;
 
@@ -180,7 +182,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasImpact ;
         rr:objectMap [
 
             rr:parentTriplesMap <#AffPopMapping> ;
@@ -295,7 +297,8 @@
     rr:predicateObjectMap [
         rr:predicate :evacuationCenters ;
         rr:objectMap [
-            rml:reference "evacuationCenters"
+            rml:reference "evacuationCenters" ;
+            rml:datatype xsd:int ;
         ] ;
     ] ;
 
