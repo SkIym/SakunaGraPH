@@ -6,6 +6,7 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 
 <#MainLogicalSource>
     a rml:LogicalSource;
@@ -36,6 +37,12 @@
     a rml:LogicalSource;
     rml:source "data/gda_calamity.csv" ;
     rml:referenceFormulation ql:CSV .
+
+<#AffPopLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_aff_pop.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 
 <#EventMapping>
     a rr:TriplesMap;
@@ -165,6 +172,18 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#CalamMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasResponse ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#AffPopMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -319,6 +338,57 @@
         rr:predicate :declarationType ;
         rr:objectMap [
             rml:reference "declarationOfCalamity" ;
+        ] ;
+    ] ;
+
+    .
+
+<#AffPopMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#AffPopLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/affected_population";
+        rr:class :AffectedPopulation ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedBarangays ;
+        rr:objectMap [
+            rml:reference "affectedBarangays" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedFamilies ;
+        rr:objectMap [
+            rml:reference "affectedFamilies" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedPersons ;
+        rr:objectMap [
+            rml:reference "affectedPersons" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :displacedFamilies ;
+        rr:objectMap [
+            rml:reference "displacedFamilies" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :displacedPersons ;
+        rr:objectMap [
+            rml:reference "displacedPersons" ;
+            rml:datatype xsd:int ;
         ] ;
     ] ;
 

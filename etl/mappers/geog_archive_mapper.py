@@ -346,4 +346,8 @@ calamity_df = calamity_df.dropna(subset='declarationOfCalamity')
 calamity_df = calamity_df[calamity_df['declarationOfCalamity'].str.contains("Calamity", case=False)]
 calamity_df.to_csv('./data/gda_calamity.csv')
 
+aff_pop_df = df[['id', 'affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons']]
+aff_pop_df = aff_pop_df.dropna(subset=['affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons'], how="all")
+aff_pop_df.to_csv('./data/gda_aff_pop.csv')
+
 df.to_csv('./data/gda.csv')
