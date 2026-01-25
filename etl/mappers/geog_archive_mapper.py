@@ -350,4 +350,8 @@ aff_pop_df = df[['id', 'affectedBarangays', 'affectedFamilies', 'affectedPersons
 aff_pop_df = aff_pop_df.dropna(subset=['affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons'], how="all")
 aff_pop_df.to_csv('./data/gda_aff_pop.csv')
 
+casualties_df = df[['id', 'dead', 'injured', 'missing']]
+casualties_df = casualties_df.dropna(subset=['dead', 'injured', 'missing'], how="all")
+casualties_df.to_csv('./data/gda_casualties.csv')
+
 df.to_csv('./data/gda.csv')

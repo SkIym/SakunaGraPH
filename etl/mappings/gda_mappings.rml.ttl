@@ -43,6 +43,11 @@
     rml:source "data/gda_aff_pop.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#CasualtiesLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_casualties.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 
 <#EventMapping>
     a rr:TriplesMap;
@@ -186,6 +191,18 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#AffPopMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#CasualtiesMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -391,6 +408,41 @@
         rr:predicate :displacedPersons ;
         rr:objectMap [
             rml:reference "displacedPersons" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    .
+
+<#CasualtiesMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#CasualtiesLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/casualties";
+        rr:class :Casualties ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :dead ;
+        rr:objectMap [
+            rml:reference "dead" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :injured ;
+        rr:objectMap [
+            rml:reference "injured" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :missing ;
+        rr:objectMap [
+            rml:reference "missing" ;
             rml:datatype xsd:int ;
         ] ;
     ] ;
