@@ -27,6 +27,12 @@
     rml:source "data/gda_evac.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#RescueLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_rescue.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+
 <#EventMapping>
     a rr:TriplesMap;
 
@@ -138,6 +144,18 @@
         ];
     ];
 
+    rr:predicateObjectMap [
+        rr:predicate :hasPreparedness ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#RescueMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
     .
 
 <#EventExecution>
@@ -211,7 +229,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/preparedness";
-        rr:class :Preparedness ;
+        rr:class :Rescue ;
     ];
 
     rr:predicateObjectMap [
@@ -247,20 +265,27 @@
     ] ;
 
     .
-# <#RescuenMapping>
-#     a rr:TriplesMap ;
-#     rml:logicalSource <#MainLogicalSource> ;
+<#RescueMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#RescueLogicalSource> ;
 
-#     rr:subjectMap [
-#         rr:template "https://sakuna.ph/{id}/rescue";
-#         rr:class :Preparedness ;
-#     ];
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/rescue";
+        rr:class :Preparedness ;
+    ];
 
-#     rr:predicateObjectMap [
-#         rr:predicate :agencyLGUsPresent ;
-#         rr:objectMap [
-#             rml:reference "agencyLGUsPresentPreparedness"
-#         ] ;
-#     ] ;
+    rr:predicateObjectMap [
+        rr:predicate :agencyLGUsPresent ;
+        rr:objectMap [
+            rml:reference "rescueEquipment" ;
+        ] ;
+    ] ;
 
-#     .
+    rr:predicateObjectMap [
+        rr:predicate :agencyLGUsPresent ;
+        rr:objectMap [
+            rml:reference "rescueUnit" ;
+        ] ;
+    ] ;
+
+    .

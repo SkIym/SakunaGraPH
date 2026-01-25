@@ -337,4 +337,10 @@ evacuation_df.loc[:, "evacuationCenters"] = (
 )
 evacuation_df.to_csv('./data/gda_evac.csv')
 
+rescue_df = df[['id', 'rescueEquipment', 'rescueUnit']]
+rescue_df = rescue_df.dropna(subset=['rescueEquipment', 'rescueUnit'], how="all")
+rescue_df.to_csv('./data/gda_rescue.csv')
+
+
+
 df.to_csv('./data/gda.csv')
