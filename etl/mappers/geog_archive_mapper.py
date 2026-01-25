@@ -341,6 +341,9 @@ rescue_df = df[['id', 'rescueEquipment', 'rescueUnit']]
 rescue_df = rescue_df.dropna(subset=['rescueEquipment', 'rescueUnit'], how="all")
 rescue_df.to_csv('./data/gda_rescue.csv')
 
-
+calamity_df = df[['id','declarationOfCalamity']]
+calamity_df = calamity_df.dropna(subset='declarationOfCalamity')
+calamity_df = calamity_df[calamity_df['declarationOfCalamity'].str.contains("Calamity", case=False)]
+calamity_df.to_csv('./data/gda_calamity.csv')
 
 df.to_csv('./data/gda.csv')

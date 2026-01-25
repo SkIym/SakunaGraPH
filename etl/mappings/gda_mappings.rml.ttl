@@ -32,6 +32,10 @@
     rml:source "data/gda_rescue.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#CalamLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_calamity.csv" ;
+    rml:referenceFormulation ql:CSV .
 
 <#EventMapping>
     a rr:TriplesMap;
@@ -149,6 +153,18 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#RescueMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasResponse ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#CalamMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -285,6 +301,24 @@
         rr:predicate :agencyLGUsPresent ;
         rr:objectMap [
             rml:reference "rescueUnit" ;
+        ] ;
+    ] ;
+
+    .
+
+<#CalamMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#CalamLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/declaration_of_calamity";
+        rr:class :DeclarationOfCalamity ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :declarationType ;
+        rr:objectMap [
+            rml:reference "declarationOfCalamity" ;
         ] ;
     ] ;
 

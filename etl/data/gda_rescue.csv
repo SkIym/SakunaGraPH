@@ -1,59 +1,59 @@
 ,id,rescueEquipment,rescueUnit
-5,3f069fbf00df4172985c19bae33aef87,,NDCC
-7,8eef0dfb8caa4d32a958e48bcf89f328,,Philippine Navy and Coast Guard
-10,b993731711534531bdf9cf8f4abf2b2c,,SOLCOM
-45,5db71919fd1d41b8b0a8d25798aaee29,,AFP
-52,1f579b92b8074fb7bc99a28422c92bba,,SAR - PN
-55,d9a06c62b6bb41dc9327d959b7e2951c,,602 PCG Auxiliary Squadron
-56,4b8dab7a56394553b33471f9e3cd5287,"PCG: AE-891. PCTs fast patrol craft; PN: LC-551, PS-19, PG-35, PG-392, PG-393, Helicopter; PAF Helicopter","AE891, PS35, PS19, LCC551, FB Marigold, FB Villaflor, Marine Base Ternate, CGS Corregidor, PNP Maragondon"
-57,cd1ad2369c9d453bb93639ed8afe8096,"Military: Nomad aircraft, Bell 205 2 UH-1H, Islander, 1 helicopter PCG; Civilian: MV Dexter, MV Kerr, MV Idago, MV Saint Peter the Apostle, MV Zenaida, MV Indonesia other motorized banca and fishing boat","3ID; 303 Bde and Task Force Panay; 5052nd SAR Group, PAF; 560th CTW, Bantay Dagat civic volunteer group"
-58,29b2f6f68ddb47d6964aaefc8789255e,,AFP - PN and PM; DOTC - PCG; RDCC - ARMM; 100 fishermen
-59,9c75797765064d59b5fc7d33647f91f3,,"34th IB Rescue Team, MDCC"
-63,688eda99b77841bab6f2e989c3afedb2,,Residents
-67,bad7ff1a172e4a8688c629c5d99ef83e,,PCG
-141,da02219b05db46c2a2cc7c7a764a6ff1,,PCG
-145,ffcc687488cb42d1806f72c839f3cd54,"11 BFP firetrucks, 1 EMS van of BFRP","BFP, Volunteer Fire groups"
-146,4ccf9ceaaf6147e085804ff563bf27c5,,BFP
-148,a4b0d1ed70fb4fbfbda141830f4e28af,,"BFP, CIDAG"
-149,bdb913b0ebfc4692913a2639d12090e6,,BFP
-150,c1a868ba211f40b0b74f112cdd25f8da,,BFP
-151,a622acd1165a42d4b1325375946ef970,,BFP
-152,3f82f3bb79824ed4852a89ea831f7d50,,BFP
-153,2f87a9f52ec44509b343143c81a6072b,,BFP
-155,dd884a777def49f29d541eebdfe171ee,19 fire trucks,
-156,48f8f016d9d1413cb07f263cd3dbb5a0,,Cebu City Fire Station
-169,e8c0e8a42a634f8abf1ef1e710ea09ed,,"Makati SWAT, PNP, BFP"
-180,f437ce43e80c4391a8f148c59311ba6a,PDCC Pangasinan: 1 rubber boat,"AFPDRTF, Local DCC, PDCC Pangasinan"
-263,7b2e52e7c1b04b28a808786f7712e5d3,,"NDCC, WESCOM HQ"
-264,8d8758202e9b4bf1b4988558e49d2bbd,,"NDCC, VISCOM"
-266,f39993a7d918479d906b4cd98d38637b,,NDCC
-327,0f8b19d50ed643cbb4cdbf1805f79ad8,Local motorboats of fishermen,
-347,20f3bfbe9a9c479a8ec420c91ff02625,,Provincial Validating Team of Surigao del sur
-355,bf04003b98904f9396e3d54c8eed5260,"aircrafts, fishing bancas and other shipping vessels, choppers","Philippine Navy, US NAvy, Philippine Air Force, Philippine Coast Guard Zamboanga, Private Maritime Group, PNP, COMMEL"
-375,49a2e62dbea94a26b58ff9e29d51f2a5,"1) 2 C-130 PAF plane, 5 M-35 trucks, 5 UH IH Helicopters, 2 Bell-412 Presidential Plane, Rubber boats; 
+5,7c47c2601095453694df93d89c0aa694,,NDCC
+7,da8d2c569fb247469216e983f271ba07,,Philippine Navy and Coast Guard
+10,65ec479294ea4d4a99718725a9e4d3fc,,SOLCOM
+45,b3e7fc9016d7456293756a2b25582e91,,AFP
+52,123dc4bfbd5f478caf7cf23e6697f23a,,SAR - PN
+55,fa5531dc59984d6da81e96ad71260bcf,,602 PCG Auxiliary Squadron
+56,cd5dc6d53428450eb40b713b3a3a1a4d,"PCG: AE-891. PCTs fast patrol craft; PN: LC-551, PS-19, PG-35, PG-392, PG-393, Helicopter; PAF Helicopter","AE891, PS35, PS19, LCC551, FB Marigold, FB Villaflor, Marine Base Ternate, CGS Corregidor, PNP Maragondon"
+57,7aa9cae80737495fa51a41e96ff3c131,"Military: Nomad aircraft, Bell 205 2 UH-1H, Islander, 1 helicopter PCG; Civilian: MV Dexter, MV Kerr, MV Idago, MV Saint Peter the Apostle, MV Zenaida, MV Indonesia other motorized banca and fishing boat","3ID; 303 Bde and Task Force Panay; 5052nd SAR Group, PAF; 560th CTW, Bantay Dagat civic volunteer group"
+58,7609c2ce412a4af6b6ec04d1154f6080,,AFP - PN and PM; DOTC - PCG; RDCC - ARMM; 100 fishermen
+59,8ef269df5bcd4974bd21b50e3fff5efd,,"34th IB Rescue Team, MDCC"
+63,9129b1c027bc4c69bcdc181210f1da1b,,Residents
+67,ceb6df6a71904842a638427083c43206,,PCG
+141,6e9318376e22411d8100df0e4152b8e4,,PCG
+145,647b76f56a114141abf5a9268b23b84e,"11 BFP firetrucks, 1 EMS van of BFRP","BFP, Volunteer Fire groups"
+146,7390f7ef16fa4bf39c25f74ee9e96203,,BFP
+148,f078b9675b894f47871e081c5592d401,,"BFP, CIDAG"
+149,1951ef9776b44141b078aae1a4da99f4,,BFP
+150,66d4fb72590d4a31ae56d010e93a55dd,,BFP
+151,4180959d554844939554b9f471eac80f,,BFP
+152,241f834f6d434a98bbea8234aae80842,,BFP
+153,08997dc45d2442d39018d3cced756c25,,BFP
+155,e7329f8d8e2b43fc941f8186620cafb9,19 fire trucks,
+156,144211a0ed0b453e99c73777bc18090e,,Cebu City Fire Station
+169,9def079b9b0548baa0c35df67240f26a,,"Makati SWAT, PNP, BFP"
+180,7208f8493583478497f2b0834c8ba6bb,PDCC Pangasinan: 1 rubber boat,"AFPDRTF, Local DCC, PDCC Pangasinan"
+263,e2766cf2b2d34d34a678a8677a9e6041,,"NDCC, WESCOM HQ"
+264,e773512e39f14aac922828e1f6791f6b,,"NDCC, VISCOM"
+266,def25c2404a84b69a762237c95e1b47b,,NDCC
+327,2aab7b1138fc4f1484478578644f5e1c,Local motorboats of fishermen,
+347,53286b04a28142b8bf0cea18524a4135,,Provincial Validating Team of Surigao del sur
+355,86ce31e504b84d2bb4dadd6860f5c494,"aircrafts, fishing bancas and other shipping vessels, choppers","Philippine Navy, US NAvy, Philippine Air Force, Philippine Coast Guard Zamboanga, Private Maritime Group, PNP, COMMEL"
+375,d10bfa45411f42c68b1c0242095b6b02,"1) 2 C-130 PAF plane, 5 M-35 trucks, 5 UH IH Helicopters, 2 Bell-412 Presidential Plane, Rubber boats; 
 2) 6 units portable generators, 102 units wet cell battery, 47 hand held radio, 200 pieces hard hat, 600m rope, 70 pieces snap links, 170 pieces life vests, 200 pieces flashlights; 
 3) PNP: 6 units truck, 304 units jeep, 6 units motor boat;
 4) AFP: 8 units truck, 5 units jeep, 2 units helicopter","1) Armed Forces of the Philippines Disaster Response Task Force;
 2) Regional Disaster Coordinating Councils"
-378,cbc0b93750204a1e8f72be7cf78d2253,rescue trucks,AFP Emergency Response
-381,534689cb8a0d437c942fceea40d296a5,,AFP
-387,87aa06946a0d44869e69bad8830d21f9,,"PCG, PDCC Palawan"
-398,52fdfc21c6e8456cb044acab32a0edb4,,"PDCC Bukidnon, MDCC Bukidnon, 1004th PMG, 403rd Infantry Bde, 4ID, PA, 9th Infantry Bn, PA, 5th SF COY"
-433,403b4c8f65be40afbcdc20849e30c453,"rubber boats, 1 M35 truck, search lights","NAVRESCOM, 51st Engineering Brigade, MMDA, AFPRESCOM-NCR"
-442,c1a6f387af234eae80e5cb339ef5c446,"Rubber boats, M35 trucks, 10-wheeler army trucks, amphibian trucks/vehicles, choppers, pay loader / dump trucks, 6x6 trucks, UH-IH helicopters, CMC jeep, weapon carrier, Heli 205th PAF, ambulances","NOLCOM, 7th ID PAF | PDCC DART Olangpo City, 69th IB, PDCC DART Tarlac, PDCCs Cavite, Quezon, Navotas, Pampanga, Bulacan, Batangas City | Pampanga Rescue 21 | NFA Rescue Team | Naval Forces North | Coast Guard District Rescue Team | Tuba Fire Station, PNP Tuba, BB PICAG, BDCC Rescue Team | PNP Regional Mobile Group | CDCC Olonggapo Rescue Team | NCRCOM, 51st EBDE, MMDA, NAVRESCOM, PCG, 505th PAF | Clab Rescue Group, 51st Engineering Brigade, Rescue 161"
-463,beddd086de47458f92f46c3702c7682b,Helicopter,AFP-JOC
-464,add7e8eeab294ce9acee1342213a904f,"rubber boats, patrol craft; buses; M-35 trucks; 1 tonner dump truck; elf truck, mini cruiser, chain saw",AFP; DOTC; PCG; 
-465,9b417d57bdce446193ed9c69f043cddd,Helicopter; M-35 Trucks,RDCC; LDCC; AFP-PAF
-466,7e3c98ac8f704abdaf77aff1f876ca6e,,"AFP, LGU"
-467,ff59bdf6b80841ddabb88e4f0a4d1082,Rubber boats and M-35 trucks,"AFP, LGU"
-468,f79b2b6e93fb4f03ae066e78651ed2ab,dump trucks,LGUs; PCG;PDCC
-511,f37c7df418614ff4adf4a7cf24a154b5,rubber boat and outboard motor,NAVFORSOL 
-523,53f1100dc740468687a7bbfca4042812,"31 Helicopters, 23 130PAF Plane, 24 35Trucks, 6 6x6 Trucks, 3 Rubber Boats, 13 teams with 214 personnel, 15 rubber boats, 20 M-35 trucks, 8 OBM, COMMO VAN, Jepps, and Hammer Trucks","Armed Forces of the Philippines Disaster Response Task Force, NOLCOM, SOLCOM"
-525,c692b65984ae4d6e83e7a5f8199b865d,"4 M 35 trucks, 1 M35 truck with 7 enlisted personnel, 2 M35 trucks by October 16, 1999, 2 M35 trucks by October 18. 1999",
-526,601f60bce0d6431d9f0fa87c8b110d63,"REGION 1: M35 Truck, 1 helicopter, 1 rubber boat and 1 M-35 truck from PNART, 1 MARU rubber boat and 1 M35 truck, 2 PNARTs, 2 rubber boats, 2 M-35 trucks, and 1 SWG team with 1 rubber boat from NAVFORNORTH. REGION 2 - 5 dump trucks, 5 teams from PDCC, Rescue 29. CAR - CDRCC assests 1 pick-up and 1 generator from DOTC, IVHF radio from PNP","PNART, PHILFLT, PMAR, NAVFORNORTH"
-528,6857bc8ca30a471abc32af0c838a8234,DPWH: 6x6 truck to haul DSWD relief goods from Region III to CAR. DOTC 5 vehicles on standby.,"NDCC-OCD: All rescue units are on standby for resuce and evacuation. AFPDRTF of Northern Luzon are on standby for emergency response as well. CAR: DENR rescue team with 20 personnel. NFA stationed 4 rolling stores with 38,000 bags of rice.  DSWD pre-positioned food stuff to all provinces. "
-529,73beff17a7e14c549cf0e4c15a8892b2,"AFP MSUT LOGCOM(NOLCOM) - 2 M35 trucks, BFP - 1 rescue boat with outboard motor, 21 Man Rescue Team, Ambulance with paramedic, RDCC 3 - 6 rescue boats with outboard motor, 3 wooden boats with outboard motor, 3 Teams of 7-Man Rescue Team, NIA - Stake Truck, Dump Truck , DPWH - Crane Truck and Dump Truck, 600TH ABW PAF - 2 M35 Truck, Rescue Team, CSAF3 PAF - UH-IH Helicopter, ARMY SUPPORT COMMAND PA - 2 M35 trucks, 1 rescue team, 69TH 7ID PA - 2 teams of 10 man rescue team, PNRC PAMPANGA CHAPTER - 1 rescue team, NFA - 3 rubber boats, 3 teams of 7-man rescue team","AFP MSUT LOGCOM(NOLCOM), BFP, RDCC 3, NIA, DPWH, 600TH ABW PAF, CSAF3 PAF, ARMY SUPPORT COMMAND PA, 69TH 7ID PA, PNRC PAMPANGA CHAPTER, NFA"
-540,8c30c84b94ed43f9970ba0cbd65bdf93,Not specified,Yes
-541,62fc54f92c8749e0bf63f3ee07490a12,Various,Yes
-542,a8381d699a984d21b936183b44722af6,Various,Yes
-543,95806ebf73544e50b972d210150880b0,Various,Yes
+378,d6e248589b494fe1a8155bf11fb71142,rescue trucks,AFP Emergency Response
+381,12cffda94fb3401a85efe87af3b30cc8,,AFP
+387,0f3ff38c60fc4ab0bf1cce02b03f3a3e,,"PCG, PDCC Palawan"
+398,243d6e62578849f8a640a399bd7da72a,,"PDCC Bukidnon, MDCC Bukidnon, 1004th PMG, 403rd Infantry Bde, 4ID, PA, 9th Infantry Bn, PA, 5th SF COY"
+433,b16431c82052462bb308534ff0de2676,"rubber boats, 1 M35 truck, search lights","NAVRESCOM, 51st Engineering Brigade, MMDA, AFPRESCOM-NCR"
+442,83a453a36f184cda94a59fb87db32e15,"Rubber boats, M35 trucks, 10-wheeler army trucks, amphibian trucks/vehicles, choppers, pay loader / dump trucks, 6x6 trucks, UH-IH helicopters, CMC jeep, weapon carrier, Heli 205th PAF, ambulances","NOLCOM, 7th ID PAF | PDCC DART Olangpo City, 69th IB, PDCC DART Tarlac, PDCCs Cavite, Quezon, Navotas, Pampanga, Bulacan, Batangas City | Pampanga Rescue 21 | NFA Rescue Team | Naval Forces North | Coast Guard District Rescue Team | Tuba Fire Station, PNP Tuba, BB PICAG, BDCC Rescue Team | PNP Regional Mobile Group | CDCC Olonggapo Rescue Team | NCRCOM, 51st EBDE, MMDA, NAVRESCOM, PCG, 505th PAF | Clab Rescue Group, 51st Engineering Brigade, Rescue 161"
+463,b528de9e446a40ee931acb37492a124f,Helicopter,AFP-JOC
+464,c4b54f01e53543bf8b6eb66984d1235b,"rubber boats, patrol craft; buses; M-35 trucks; 1 tonner dump truck; elf truck, mini cruiser, chain saw",AFP; DOTC; PCG; 
+465,ab35136619ea4bd98981ce5d4bf5af2a,Helicopter; M-35 Trucks,RDCC; LDCC; AFP-PAF
+466,053e74ce1a8b4ddfb27f1ca6f4354945,,"AFP, LGU"
+467,cef9e8e2656c48169ede51a73cf712e5,Rubber boats and M-35 trucks,"AFP, LGU"
+468,0087e83c8a2b4fb285210f4c46c833ae,dump trucks,LGUs; PCG;PDCC
+511,08768f7a597a4956a4fce7582d7f7daa,rubber boat and outboard motor,NAVFORSOL 
+523,31d225b703c7488ebff73142b13584cc,"31 Helicopters, 23 130PAF Plane, 24 35Trucks, 6 6x6 Trucks, 3 Rubber Boats, 13 teams with 214 personnel, 15 rubber boats, 20 M-35 trucks, 8 OBM, COMMO VAN, Jepps, and Hammer Trucks","Armed Forces of the Philippines Disaster Response Task Force, NOLCOM, SOLCOM"
+525,51eaab0decd54c49be839278816a7a2f,"4 M 35 trucks, 1 M35 truck with 7 enlisted personnel, 2 M35 trucks by October 16, 1999, 2 M35 trucks by October 18. 1999",
+526,b0025292796b4133a08f00946f8b715c,"REGION 1: M35 Truck, 1 helicopter, 1 rubber boat and 1 M-35 truck from PNART, 1 MARU rubber boat and 1 M35 truck, 2 PNARTs, 2 rubber boats, 2 M-35 trucks, and 1 SWG team with 1 rubber boat from NAVFORNORTH. REGION 2 - 5 dump trucks, 5 teams from PDCC, Rescue 29. CAR - CDRCC assests 1 pick-up and 1 generator from DOTC, IVHF radio from PNP","PNART, PHILFLT, PMAR, NAVFORNORTH"
+528,c1dea7c18bfc4f6db59fd8ee6a823598,DPWH: 6x6 truck to haul DSWD relief goods from Region III to CAR. DOTC 5 vehicles on standby.,"NDCC-OCD: All rescue units are on standby for resuce and evacuation. AFPDRTF of Northern Luzon are on standby for emergency response as well. CAR: DENR rescue team with 20 personnel. NFA stationed 4 rolling stores with 38,000 bags of rice.  DSWD pre-positioned food stuff to all provinces. "
+529,acad0d7f47444a57b1d3fa5b32e5b1b9,"AFP MSUT LOGCOM(NOLCOM) - 2 M35 trucks, BFP - 1 rescue boat with outboard motor, 21 Man Rescue Team, Ambulance with paramedic, RDCC 3 - 6 rescue boats with outboard motor, 3 wooden boats with outboard motor, 3 Teams of 7-Man Rescue Team, NIA - Stake Truck, Dump Truck , DPWH - Crane Truck and Dump Truck, 600TH ABW PAF - 2 M35 Truck, Rescue Team, CSAF3 PAF - UH-IH Helicopter, ARMY SUPPORT COMMAND PA - 2 M35 trucks, 1 rescue team, 69TH 7ID PA - 2 teams of 10 man rescue team, PNRC PAMPANGA CHAPTER - 1 rescue team, NFA - 3 rubber boats, 3 teams of 7-man rescue team","AFP MSUT LOGCOM(NOLCOM), BFP, RDCC 3, NIA, DPWH, 600TH ABW PAF, CSAF3 PAF, ARMY SUPPORT COMMAND PA, 69TH 7ID PA, PNRC PAMPANGA CHAPTER, NFA"
+540,8adef0609f594e71bd7ef1fa3a02aec6,Not specified,Yes
+541,e973ff27c8f14580b6f03238e4135bed,Various,Yes
+542,e55bf234f4684518af50e3373ef0e3bb,Various,Yes
+543,26efc83a4bd94591a3052fad55c729ae,Various,Yes
