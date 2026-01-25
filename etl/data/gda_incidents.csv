@@ -1,11 +1,11 @@
 ,id,hasLocation,hasType,sub_id
-0,cb48238d7df2457eb21e37e496b6e9d2," San Pedro,Laguna|Antipolo City|Rizal|Makati City",Landslide (Wet),1
-1,faa14a6bfc914fc883e174961a4da4c3, Gigmoto|Catanduanes,Storm Surge,1
-2,faa14a6bfc914fc883e174961a4da4c3, Guimba|Nueva Ecija,Tornado,2
-3,faa14a6bfc914fc883e174961a4da4c3, Aurora|Region 3,Water,3
-4,faa14a6bfc914fc883e174961a4da4c3," Poro, Cebu|Pilar, Cebu|San Francisco, Cebu",Water,4
-5,faa14a6bfc914fc883e174961a4da4c3, Cebu City| Camarines Sur| Camarines Norte| Albay,Landslide (Wet),5
-6,f61fbd9103b0403499b9453fa4d78944, Sagay|Camiguin,Flashflood,1
-7,f61fbd9103b0403499b9453fa4d78944, Guinsiliban|Camiguin,Landslide (Wet),2
-8,e723467b8a654afba3e03f5223551f73," Ilog, Negros Occidental|Sipalay,Negros Occidental",Flashflood,1
-9,65536e7625c44dd198de5de67eb6d41d," Bakun, Benguet",Landslide (Wet),1
+0,8e3bb3deb3f2401d9d71bbd258a6785b," San Pedro,Laguna|Antipolo City|Rizal|Makati City",Landslide (Wet),1
+1,f91a9ed6515f46d6b24d0d7f29f4a736, Gigmoto|Catanduanes,Storm Surge,1
+2,f91a9ed6515f46d6b24d0d7f29f4a736, Guimba|Nueva Ecija,Tornado,2
+3,f91a9ed6515f46d6b24d0d7f29f4a736, Aurora|Region 3,Water,3
+4,f91a9ed6515f46d6b24d0d7f29f4a736," Poro, Cebu|Pilar, Cebu|San Francisco, Cebu",Water,4
+5,f91a9ed6515f46d6b24d0d7f29f4a736, Cebu City| Camarines Sur| Camarines Norte| Albay,Landslide (Wet),5
+6,b1e505eb72d0486ca5a5aaa392c6e4dc, Sagay|Camiguin,Flashflood,1
+7,b1e505eb72d0486ca5a5aaa392c6e4dc, Guinsiliban|Camiguin,Landslide (Wet),2
+8,a24443f361b54a84b161b51337a7f465," Ilog, Negros Occidental|Sipalay,Negros Occidental",Flashflood,1
+9,e6a22253028a4fc2b19328b28a9b664d," Bakun, Benguet",Landslide (Wet),1

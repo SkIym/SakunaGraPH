@@ -3,6 +3,7 @@ import pandas as pd
 from dateutil.parser import parse
 import uuid
 import numpy as np
+pd.set_option('future.no_silent_downcasting', True)
 
 COLUMN_MAPPING = {
     "M or I": "eventClass",
@@ -62,6 +63,7 @@ COLUMN_MAPPING = {
     "Detailed Description of Disaster Event": "otherDescription"
 
 }
+
 
 COLUMNS_TO_CLEAN = {
     "date": "normalize_date",
@@ -266,9 +268,9 @@ df = df[list(COLUMN_MAPPING.values())]
 df = df.dropna(how='all')
 df = df.dropna(axis=1, how='all')
 df = df.dropna(subset=['date', 'hasLocation'])
-df = df.replace("-", np.nan)
-df = df.replace("Not applicable", np.nan)
-df = df.replace("n.a.", np.nan)
+df = df.replace("-", np.nan).infer_objects(copy=False)
+df = df.replace("Not applicable", np.nan).infer_objects(copy=False)
+df = df.replace("n.a.", np.nan).infer_objects(copy=False)
 
 
 if "date" in df.columns:
@@ -327,5 +329,12 @@ inci_df.to_csv("./data/gda_incidents.csv")
 preparedness_df = df[['id', 'agencyLGUsPresentPreparedness']]
 preparedness_df = preparedness_df.dropna(subset="agencyLGUsPresentPreparedness")
 preparedness_df.to_csv('./data/gda_prep.csv')
+
+evacuation_df = df[['id', 'evacuationPlan', 'evacuationCenters']]
+evacuation_df = evacuation_df.dropna(subset=['evacuationPlan', 'evacuationCenters'], how="all")
+evacuation_df.loc[:, "evacuationCenters"] = (
+    (evacuation_df["evacuationCenters"]).astype("Int64")
+)
+evacuation_df.to_csv('./data/gda_evac.csv')
 
 df.to_csv('./data/gda.csv')

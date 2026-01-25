@@ -22,6 +22,11 @@
     rml:source "data/gda_prep.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#EvacLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_evac.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 <#EventMapping>
     a rr:TriplesMap;
 
@@ -220,7 +225,7 @@
 
 <#EvacuationMapping>
     a rr:TriplesMap ;
-    rml:logicalSource <#MainLogicalSource> ;
+    rml:logicalSource <#EvacLogicalSource> ;
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/evacuation";
