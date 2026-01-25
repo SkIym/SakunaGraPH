@@ -863,6 +863,12 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:label "amount from other GOs"@en .
 
 
+###  https://sakuna.ph/announcementsReleased
+:announcementsReleased rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :Preparedness ;
+                       rdfs:range xsd:string .
+
+
 ###  https://sakuna.ph/areDamsAffected
 :areDamsAffected rdf:type owl:DatatypeProperty ;
                  rdfs:domain :WaterDisruption ;
@@ -2833,6 +2839,10 @@ geo:SpatialObject rdf:type owl:Class .
 :Preparedness rdf:type owl:Class ;
               owl:equivalentClass [ rdf:type owl:Restriction ;
                                     owl:onProperty :agencyLGUsPresent ;
+                                    owl:someValuesFrom xsd:string
+                                  ] ,
+                                  [ rdf:type owl:Restriction ;
+                                    owl:onProperty :announcementsReleased ;
                                     owl:someValuesFrom xsd:string
                                   ] ;
               rdfs:subClassOf [ rdf:type owl:Restriction ;

@@ -21,6 +21,8 @@
 **ABOUT DATA**
 
 ***GEOG ARCHIVE***
+TO do:
+- Also map announcements released
 
 DONE:
 - Date / Time
@@ -31,8 +33,6 @@ DONE:
 ***PSGC***
 
 To do:
-
-- Fuzzy match City of Makati == Makati City
 
 - Fix isPartOf relations with Cotabato clusters
 - just link to the external geoJSON URI since WKT literals bloat the data
