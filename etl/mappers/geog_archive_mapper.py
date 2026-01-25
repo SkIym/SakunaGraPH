@@ -335,7 +335,7 @@ evacuation_df = evacuation_df.dropna(subset=['evacuationPlan', 'evacuationCenter
 evacuation_df.loc[:, "evacuationCenters"] = (
     (evacuation_df["evacuationCenters"]).astype("Int64")
 )
-evacuation_df.to_csv('./data/gda_evac.csv')
+evacuation_df.to_csv('./data/gda_evac.csv', float_format="%.0f")
 
 rescue_df = df[['id', 'rescueEquipment', 'rescueUnit']]
 rescue_df = rescue_df.dropna(subset=['rescueEquipment', 'rescueUnit'], how="all")
@@ -348,10 +348,13 @@ calamity_df.to_csv('./data/gda_calamity.csv')
 
 aff_pop_df = df[['id', 'affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons']]
 aff_pop_df = aff_pop_df.dropna(subset=['affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons'], how="all")
-aff_pop_df.to_csv('./data/gda_aff_pop.csv')
+evacuation_df.loc[:, "evacuationCenters"] = (
+    (evacuation_df["evacuationCenters"]).astype("Int64")
+)
+aff_pop_df.to_csv('./data/gda_aff_pop.csv', float_format="%.0f")
 
 casualties_df = df[['id', 'dead', 'injured', 'missing']]
 casualties_df = casualties_df.dropna(subset=['dead', 'injured', 'missing'], how="all")
-casualties_df.to_csv('./data/gda_casualties.csv')
+casualties_df.to_csv('./data/gda_casualties.csv', float_format="%.0f")
 
 df.to_csv('./data/gda.csv')

@@ -281,7 +281,7 @@ region_map = {
     clss="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
 )
 def to_major_incident_class(clss: str):
-    return f"{base}Major" if clss == "M" else f"{base}Incident"
+    return f"{base}MajorEvent" if clss == "M" else f"{base}Incident"
 
 @udf(
     fun_id="https://sakuna.ph/isNotNull",
