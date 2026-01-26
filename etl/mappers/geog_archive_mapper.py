@@ -70,6 +70,91 @@ COLUMNS_TO_CLEAN = {
     "location": "resolve_location",
 }
 
+EXPORT_SPECS = {
+    "gda_prep.csv": {
+        "cols": ["id", "agencyLGUsPresentPreparedness", "declarationOfCalamity"],
+        "dropna": {
+            "subset": ["agencyLGUsPresentPreparedness", "declarationOfCalamity"],
+            "how": "all"
+        },
+        "contains": {
+            "column": "declarationOfCalamity",
+            "pattern": "Calamity",
+            "case": False,
+            "exclude": True
+        },
+        "rename": {
+            "declarationOfCalamity" : "announcementsReleased"
+        }
+    },
+
+    "gda_evac.csv": {
+        "cols": ["id", "evacuationPlan", "evacuationCenters"],
+        "dropna": {
+            "subset": ["evacuationPlan", "evacuationCenters"],
+            "how": "all"
+        },
+        "astype": {
+            "evacuationCenters": "Int64"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_rescue.csv": {
+        "cols": ["id", "rescueEquipment", "rescueUnit"],
+        "dropna": {
+            "subset": ["rescueEquipment", "rescueUnit"],
+            "how": "all"
+        }
+    },
+
+    "gda_calamity.csv": {
+        "cols": ["id", "declarationOfCalamity"],
+        "dropna": {
+            "subset": ["declarationOfCalamity"],
+            "how": "any"
+        },
+        "contains": {
+            "column": "declarationOfCalamity",
+            "pattern": "Calamity",
+            "case": False,
+            "exclude": False
+        }
+    },
+
+    "gda_aff_pop.csv": {
+        "cols": [
+            "id",
+            "affectedBarangays",
+            "affectedFamilies",
+            "affectedPersons",
+            "displacedFamilies",
+            "displacedPersons",
+        ],
+        "dropna": {
+            "subset": [
+                "affectedBarangays",
+                "affectedFamilies",
+                "affectedPersons",
+                "displacedFamilies",
+                "displacedPersons",
+            ],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_casualties.csv": {
+        "cols": ["id", "dead", "injured", "missing"],
+        "dropna": {
+            "subset": ["dead", "injured", "missing"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
+}
+
+
 DASH = r"[-–—]"   # hyphen, en dash, em dash
 
 def normalize_one_date(text):
@@ -230,6 +315,46 @@ def clean_date_range(value):
 
     return (None, None)
 
+def export_slices(df, specs, out_dir="./data"):
+    for filename, spec in specs.items():
+        tmp = df[spec["cols"]].copy()
+
+        # dropna handling
+        if "dropna" in spec:
+            tmp = tmp.dropna(
+                subset=spec["dropna"]["subset"],
+                how=spec["dropna"].get("how", "any"),
+            )
+
+        # string contains filter
+        if "contains" in spec:
+            c = spec["contains"]
+            mask = tmp[c["column"]].str.contains(
+                c["pattern"],
+                case=c.get("case", True),
+                na=False,
+            )
+
+            if c.get("exclude", False):
+                mask = ~mask
+
+            tmp = tmp[mask]
+        
+        if "rename" in spec:
+            r: dict[str, str] = spec["rename"]
+            tmp.rename(columns=r, inplace=True)
+
+
+        # astype conversions
+        for col, dtype in spec.get("astype", {}).items():
+            tmp.loc[:, col] = tmp[col].astype(dtype)
+
+        # write CSV
+        tmp.to_csv(
+            f"{out_dir}/{filename}",
+            index=False,
+            float_format=spec.get("float_format"),
+        )
 
 def load_with_tiered_headers(path):
     """
@@ -305,56 +430,42 @@ for i, row in df.iterrows():
             incidents["hasLocation"].append(hasLocation)
             incidents["sub_id"].append(cnt)
 
-evacuation: dict[str, list[str | int]] = {
-    "id": [],
-    "hasLocation": [],
-    "hasType": [],
-    "sub_id": []
-}
-
-rescue: dict[str, list[str | int]] = {
-    "id": [],
-    "hasLocation": [],
-    "hasType": [],
-    "sub_id": []
-}
-
-
-
-
 
 inci_df = pd.DataFrame(incidents)
 inci_df.to_csv("./data/gda_incidents.csv")
 
-preparedness_df = df[['id', 'agencyLGUsPresentPreparedness']]
-preparedness_df = preparedness_df.dropna(subset="agencyLGUsPresentPreparedness")
-preparedness_df.to_csv('./data/gda_prep.csv')
 
-evacuation_df = df[['id', 'evacuationPlan', 'evacuationCenters']]
-evacuation_df = evacuation_df.dropna(subset=['evacuationPlan', 'evacuationCenters'], how="all")
-evacuation_df.loc[:, "evacuationCenters"] = (
-    (evacuation_df["evacuationCenters"]).astype("Int64")
-)
-evacuation_df.to_csv('./data/gda_evac.csv', float_format="%.0f")
 
-rescue_df = df[['id', 'rescueEquipment', 'rescueUnit']]
-rescue_df = rescue_df.dropna(subset=['rescueEquipment', 'rescueUnit'], how="all")
-rescue_df.to_csv('./data/gda_rescue.csv')
+# preparedness_df = df[['id', 'agencyLGUsPresentPreparedness']]
+# preparedness_df = preparedness_df.dropna(subset="agencyLGUsPresentPreparedness")
+# preparedness_df.to_csv('./data/gda_prep.csv')
 
-calamity_df = df[['id','declarationOfCalamity']]
-calamity_df = calamity_df.dropna(subset='declarationOfCalamity')
-calamity_df = calamity_df[calamity_df['declarationOfCalamity'].str.contains("Calamity", case=False)]
-calamity_df.to_csv('./data/gda_calamity.csv')
+# evacuation_df = df[['id', 'evacuationPlan', 'evacuationCenters']]
+# evacuation_df = evacuation_df.dropna(subset=['evacuationPlan', 'evacuationCenters'], how="all")
+# evacuation_df.loc[:, "evacuationCenters"] = (
+#     (evacuation_df["evacuationCenters"]).astype("Int64")
+# )
+# evacuation_df.to_csv('./data/gda_evac.csv', float_format="%.0f")
 
-aff_pop_df = df[['id', 'affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons']]
-aff_pop_df = aff_pop_df.dropna(subset=['affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons'], how="all")
-evacuation_df.loc[:, "evacuationCenters"] = (
-    (evacuation_df["evacuationCenters"]).astype("Int64")
-)
-aff_pop_df.to_csv('./data/gda_aff_pop.csv', float_format="%.0f")
+# rescue_df = df[['id', 'rescueEquipment', 'rescueUnit']]
+# rescue_df = rescue_df.dropna(subset=['rescueEquipment', 'rescueUnit'], how="all")
+# rescue_df.to_csv('./data/gda_rescue.csv')
 
-casualties_df = df[['id', 'dead', 'injured', 'missing']]
-casualties_df = casualties_df.dropna(subset=['dead', 'injured', 'missing'], how="all")
-casualties_df.to_csv('./data/gda_casualties.csv', float_format="%.0f")
+# calamity_df = df[['id','declarationOfCalamity']]
+# calamity_df = calamity_df.dropna(subset='declarationOfCalamity')
+# calamity_df = calamity_df[calamity_df['declarationOfCalamity'].str.contains("Calamity", case=False)]
+# calamity_df.to_csv('./data/gda_calamity.csv')
+
+# aff_pop_df = df[['id', 'affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons']]
+# aff_pop_df = aff_pop_df.dropna(subset=['affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons'], how="all")
+# evacuation_df.loc[:, "evacuationCenters"] = (
+#     (evacuation_df["evacuationCenters"]).astype("Int64")
+# )
+# aff_pop_df.to_csv('./data/gda_aff_pop.csv', float_format="%.0f")
+
+# casualties_df = df[['id', 'dead', 'injured', 'missing']]
+# casualties_df = casualties_df.dropna(subset=['dead', 'injured', 'missing'], how="all")
+# casualties_df.to_csv('./data/gda_casualties.csv', float_format="%.0f")
+export_slices(df, EXPORT_SPECS)
 
 df.to_csv('./data/gda.csv')
