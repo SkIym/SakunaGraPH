@@ -21,8 +21,6 @@
 **ABOUT DATA**
 
 ***GEOG ARCHIVE***
-TO do:
-- Also map announcements released
 
 DONE:
 - Date / Time

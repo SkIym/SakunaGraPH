@@ -283,13 +283,20 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/preparedness";
-        rr:class :Rescue ;
+        rr:class :Preparedness ;
     ];
 
     rr:predicateObjectMap [
         rr:predicate :agencyLGUsPresent ;
         rr:objectMap [
             rml:reference "agencyLGUsPresentPreparedness"
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :announcementsReleased ;
+        rr:objectMap [
+            rml:reference "announcementsReleased"
         ] ;
     ] ;
 
@@ -326,7 +333,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/rescue";
-        rr:class :Preparedness ;
+        rr:class :Rescue ;
     ];
 
     rr:predicateObjectMap [
