@@ -152,6 +152,15 @@ EXPORT_SPECS = {
         },
         "float_format": "%.0f"
     },
+
+    "gda_housing.csv": {
+        "cols": ["id", "totallyDamagedHouses", "partiallyDamagedHouses"],
+        "dropna": {
+            "subset": ["totallyDamagedHouses", "partiallyDamagedHouses"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
 }
 
 
@@ -434,38 +443,7 @@ for i, row in df.iterrows():
 inci_df = pd.DataFrame(incidents)
 inci_df.to_csv("./data/gda_incidents.csv")
 
-
-
-# preparedness_df = df[['id', 'agencyLGUsPresentPreparedness']]
-# preparedness_df = preparedness_df.dropna(subset="agencyLGUsPresentPreparedness")
-# preparedness_df.to_csv('./data/gda_prep.csv')
-
-# evacuation_df = df[['id', 'evacuationPlan', 'evacuationCenters']]
-# evacuation_df = evacuation_df.dropna(subset=['evacuationPlan', 'evacuationCenters'], how="all")
-# evacuation_df.loc[:, "evacuationCenters"] = (
-#     (evacuation_df["evacuationCenters"]).astype("Int64")
-# )
-# evacuation_df.to_csv('./data/gda_evac.csv', float_format="%.0f")
-
-# rescue_df = df[['id', 'rescueEquipment', 'rescueUnit']]
-# rescue_df = rescue_df.dropna(subset=['rescueEquipment', 'rescueUnit'], how="all")
-# rescue_df.to_csv('./data/gda_rescue.csv')
-
-# calamity_df = df[['id','declarationOfCalamity']]
-# calamity_df = calamity_df.dropna(subset='declarationOfCalamity')
-# calamity_df = calamity_df[calamity_df['declarationOfCalamity'].str.contains("Calamity", case=False)]
-# calamity_df.to_csv('./data/gda_calamity.csv')
-
-# aff_pop_df = df[['id', 'affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons']]
-# aff_pop_df = aff_pop_df.dropna(subset=['affectedBarangays', 'affectedFamilies', 'affectedPersons', 'displacedFamilies', 'displacedPersons'], how="all")
-# evacuation_df.loc[:, "evacuationCenters"] = (
-#     (evacuation_df["evacuationCenters"]).astype("Int64")
-# )
-# aff_pop_df.to_csv('./data/gda_aff_pop.csv', float_format="%.0f")
-
-# casualties_df = df[['id', 'dead', 'injured', 'missing']]
-# casualties_df = casualties_df.dropna(subset=['dead', 'injured', 'missing'], how="all")
-# casualties_df.to_csv('./data/gda_casualties.csv', float_format="%.0f")
+# export csv slices for subject mapping
 export_slices(df, EXPORT_SPECS)
 
 df.to_csv('./data/gda.csv')

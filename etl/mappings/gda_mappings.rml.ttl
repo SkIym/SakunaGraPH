@@ -48,6 +48,11 @@
     rml:source "data/gda_casualties.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#HousingLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_housing.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 
 <#EventMapping>
     a rr:TriplesMap;
@@ -203,6 +208,18 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#CasualtiesMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#HousingMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -450,6 +467,33 @@
         rr:predicate :missing ;
         rr:objectMap [
             rml:reference "missing" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    .
+
+<#HousingMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#HousingLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/housing";
+        rr:class :Housing ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :totallyDamagedHouses ;
+        rr:objectMap [
+            rml:reference "totallyDamagedHouses" ;
+            rml:datatype xsd:int ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :partiallyDamagedHouses ;
+        rr:objectMap [
+            rml:reference "partiallyDamagedHouses" ;
             rml:datatype xsd:int ;
         ] ;
     ] ;
