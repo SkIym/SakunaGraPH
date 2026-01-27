@@ -866,7 +866,9 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/announcementsReleased
 :announcementsReleased rdf:type owl:DatatypeProperty ;
                        rdfs:domain :Preparedness ;
-                       rdfs:range xsd:string .
+                       rdfs:range xsd:string ;
+                       rdfs:label "announcements released" ;
+                       <http://www.w3.org/2004/02/skos/core#definition> "Announcements released during preparation for a disaster." .
 
 
 ###  https://sakuna.ph/areDamsAffected
@@ -1833,7 +1835,7 @@ geo:SpatialObject rdf:type owl:Class .
 <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType> rdf:type owl:Class ;
                                                                                                          owl:equivalentClass :Natural ;
                                                                                                          rdfs:label "Natural Disaster Type" ;
-                                                                                                         <http://www.w3.org/2004/02/skos/core#definition> "Represents the various types of disasters." ;
+                                                                                                         <http://www.w3.org/2004/02/skos/core#definition> "Represents the various types of natural disasters." ;
                                                                                                          <http://www.w3.org/2004/02/skos/core#example> "Floods, forest fires, storms or earthquakes etc." .
 
 
@@ -1937,7 +1939,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Air
 :Air rdf:type owl:Class ;
      rdfs:subClassOf :Transport ;
-     rdfs:label "Air"@en .
+     rdfs:label "Air"@en ;
+     <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving airplanes, helicopters, airships, and balloons." .
 
 
 ###  https://sakuna.ph/Airports
@@ -1982,7 +1985,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/AnimalAccident
 :AnimalAccident rdf:type owl:Class ;
                 rdfs:subClassOf :Biological ;
-                rdfs:label "Animal Accident"@en .
+                rdfs:label "Animal Accident"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "Human encounters with dangerous or exotic animals in both urban and rural environments." .
 
 
 ###  https://sakuna.ph/ArmedConflict
@@ -1994,7 +1998,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Ashfall
 :Ashfall rdf:type owl:Class ;
          rdfs:subClassOf :VolcanicActivity ;
-         rdfs:label "Ashfall"@en .
+         rdfs:label "Ashfall"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." .
 
 
 ###  https://sakuna.ph/Assistance
@@ -2064,22 +2069,25 @@ geo:SpatialObject rdf:type owl:Class .
             <http://www.w3.org/2004/02/skos/core#definition> "Represents the assistance provided during or after a disaster event." .
 
 
-###  https://sakuna.ph/Avalance
-:Avalance rdf:type owl:Class ;
-          rdfs:subClassOf :MassMovementDry ;
-          rdfs:label "Avalanche"@en .
+###  https://sakuna.ph/AvalancheDry
+:AvalancheDry rdf:type owl:Class ;
+              rdfs:subClassOf :MassMovementDry ;
+              rdfs:label "Avalanche (Dry)"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Debris Avalanche: The sudden and very rapid downslope movement of a mixed mass of rock and soil. There are two general types of debris avalanches. A cold debris avalanche usually results from an unstable slope suddenly collapsing whereas a hot debris avalanche results from volcanic activity leading to slope instability and collapse." .
 
 
 ###  https://sakuna.ph/AvalancheWet
 :AvalancheWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
-              rdfs:label "Avalanche (Wet)"@en .
+              rdfs:label "Avalanche (Wet)"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Snow Avalanche: Rapid downslope movement of a mix of snow and ice." .
 
 
 ###  https://sakuna.ph/BacterialDisease
 :BacterialDisease rdf:type owl:Class ;
                   rdfs:subClassOf :Epidemic ;
-                  rdfs:label "Bacterial Disease"@en .
+                  rdfs:label "Bacterial Disease"@en ;
+                  <http://www.w3.org/2004/02/skos/core#definition> "An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), and cholera, among others." .
 
 
 ###  https://sakuna.ph/Barangay
@@ -2095,13 +2103,15 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Biological
 :Biological rdf:type owl:Class ;
             rdfs:subClassOf :Natural ;
-            rdfs:label "Biological"@en .
+            rdfs:label "Biological"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by exposure to living organisms and/or their toxic substances (e.g., venom, or mold) or vector-borne diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, algae blooms, and mosquitoes carrying agents that causes disease such as parasites, bacteria, or viruses (e.g., malaria)." .
 
 
 ###  https://sakuna.ph/BlizzardStorm
 :BlizzardStorm rdf:type owl:Class ;
                rdfs:subClassOf :Storm ;
-               rdfs:label "Blizzard Storm"@en .
+               rdfs:label "Blizzard Storm"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "A low-pressure system in winter months with significant accumulations of snow, freezing rain, sleet, or ice. A blizzard is a severe snowstorm with winds exceeding 35 mph (56 km/h) for three or more hours, producing reduced visibility (less than 0.25 miles (400 m))." .
 
 
 ###  https://sakuna.ph/Casualties
@@ -2130,7 +2140,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/ChemicalSpill
 :ChemicalSpill rdf:type owl:Class ;
                rdfs:subClassOf :IndustrialAccident ;
-               rdfs:label "Chemical Spill"@en .
+               rdfs:label "Chemical Spill"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "Accident release occurring during the production, transportation, or handling of hazardous chemical substances." .
 
 
 ###  https://sakuna.ph/Class
@@ -2163,25 +2174,29 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Climatological
 :Climatological rdf:type owl:Class ;
                 rdfs:subClassOf :Natural ;
-                rdfs:label "Climatological"@en .
+                rdfs:label "Climatological"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to multi-decadal climate variability." .
 
 
 ###  https://sakuna.ph/CoastalFlood
 :CoastalFlood rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
-              rdfs:label "Coastal Flood"@en .
+              rdfs:label "Coastal Flood"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "Higher-than-normal water levels along the coast caused by tidal changes or thunderstorms that result in flooding, which can last from days to weeks." .
 
 
 ###  https://sakuna.ph/ColdWave
 :ColdWave rdf:type owl:Class ;
           rdfs:subClassOf :ExtremeTemperature ;
-          rdfs:label "Cold Wave"@en .
+          rdfs:label "Cold Wave"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "A period of abnormally cold weather. Typically, a cold wave lasts for two or more days and may be aggravated by high winds. The exact temperature criteria for what constitutes a cold wave may vary by location." .
 
 
 ###  https://sakuna.ph/CollapseIndustrial
 :CollapseIndustrial rdf:type owl:Class ;
                     rdfs:subClassOf :IndustrialAccident ;
-                    rdfs:label "Collapse (Industrial)"@en .
+                    rdfs:label "Collapse (Industrial)"@en ;
+                    <http://www.w3.org/2004/02/skos/core#definition> "Accident involving the collapse of a building or structure. Can either involve industrial structures or domestic/non-industrial structures." .
 
 
 ###  https://sakuna.ph/CollapseMiscellaneous
@@ -2263,7 +2278,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Derecho
 :Derecho rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
-         rdfs:label "Derecho"@en .
+         rdfs:label "Derecho"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "Widespread and usually fast-moving windstorms associated with a convection/convective storm. Derechos include downburst and straight-line winds. The damage from derechos is often confused with the damage from tornadoes." .
 
 
 ###  https://sakuna.ph/DisasterEvent
@@ -2345,7 +2361,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Drought
 :Drought rdf:type owl:Class ;
          rdfs:subClassOf :Climatological ;
-         rdfs:label "Drought"@en .
+         rdfs:label "Drought"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." .
 
 
 ###  https://sakuna.ph/Earthquake
@@ -2363,19 +2380,22 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:onProperty :magnitude ;
                               owl:someValuesFrom xsd:decimal
                             ] ;
-            rdfs:label "Earthquake"@en .
+            rdfs:label "Earthquake"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "Sudden movement of a block of the Earth’s crust along a geological fault and associated ground shaking." .
 
 
 ###  https://sakuna.ph/Epidemic
 :Epidemic rdf:type owl:Class ;
           rdfs:subClassOf :Biological ;
-          rdfs:label "Epidemic"@en .
+          rdfs:label "Epidemic"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
 
 
 ###  https://sakuna.ph/ExplosionIndustrial
 :ExplosionIndustrial rdf:type owl:Class ;
                      rdfs:subClassOf :IndustrialAccident ;
-                     rdfs:label "Explosion (Industrial)"@en .
+                     rdfs:label "Explosion (Industrial)"@en ;
+                     <http://www.w3.org/2004/02/skos/core#definition> "Explosions involving buildings or structures. Can involve industrial structures." .
 
 
 ###  https://sakuna.ph/ExplosionMiscellaneous
@@ -2387,25 +2407,29 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Extraterrestrial
 :Extraterrestrial rdf:type owl:Class ;
                   rdfs:subClassOf :Natural ;
-                  rdfs:label "Extraterrestrial"@en .
+                  rdfs:label "Extraterrestrial"@en ;
+                  <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by asteroids, meteoroids, and comets as they pass near to the Earth, enter the Earth’s atmosphere, and/or strike the Earth, and by changes in interplanetary conditions that effect the Earth’s magnetosphere, ionosphere, and thermosphere." .
 
 
 ###  https://sakuna.ph/ExtratropicalStorm
 :ExtratropicalStorm rdf:type owl:Class ;
                     rdfs:subClassOf :Storm ;
-                    rdfs:label "Extratropical Storm"@en .
+                    rdfs:label "Extratropical Storm"@en ;
+                    <http://www.w3.org/2004/02/skos/core#definition> "A type of low-pressure cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor’easter)." .
 
 
 ###  https://sakuna.ph/ExtremeTemperature
 :ExtremeTemperature rdf:type owl:Class ;
                     rdfs:subClassOf :Meteorological ;
-                    rdfs:label "Extreme Temperature"@en .
+                    rdfs:label "Extreme Temperature"@en ;
+                    <http://www.w3.org/2004/02/skos/core#definition> "A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions." .
 
 
 ###  https://sakuna.ph/FireIndustrial
 :FireIndustrial rdf:type owl:Class ;
                 rdfs:subClassOf :IndustrialAccident ;
-                rdfs:label "Fire (Industrial)"@en .
+                rdfs:label "Fire (Industrial)"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "Urban fire involving buildings or structures. Can involve industrial structures." .
 
 
 ###  https://sakuna.ph/FireMiscellaneous
@@ -2417,79 +2441,92 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/FlashFlood
 :FlashFlood rdf:type owl:Class ;
             rdfs:subClassOf :Flood ;
-            rdfs:label "Flash Flood"@en .
+            rdfs:label "Flash Flood"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall." .
 
 
 ###  https://sakuna.ph/Flood
 :Flood rdf:type owl:Class ;
        rdfs:subClassOf :Hydrological ;
-       rdfs:label "Flood"@en .
+       rdfs:label "Flood"@en ;
+       <http://www.w3.org/2004/02/skos/core#definition> "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
 
 
 ###  https://sakuna.ph/FloodGeneral
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
-              rdfs:label "Flood (General)"@en .
+              rdfs:label "Flood (General)"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
 
 
 ###  https://sakuna.ph/Fog
 :Fog rdf:type owl:Class ;
      rdfs:subClassOf :Meteorological ;
-     rdfs:label "Fog"@en .
+     rdfs:label "Fog"@en ;
+     <http://www.w3.org/2004/02/skos/core#definition> "Water droplets that are suspended in the air near the Earth’s surface. Fog is, in fact, simply a cloud that is in contact with the ground." .
 
 
 ###  https://sakuna.ph/ForestFire
 :ForestFire rdf:type owl:Class ;
             rdfs:subClassOf :Wildfire ;
-            rdfs:label "Forest Fire"@en .
+            rdfs:label "Forest Fire"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "A type of wildfire in a wooded area." .
 
 
 ###  https://sakuna.ph/FungalDisase
 :FungalDisase rdf:type owl:Class ;
               rdfs:subClassOf :Epidemic ;
-              rdfs:label "Fungal Disease" .
+              rdfs:label "Fungal Disease" ;
+              <http://www.w3.org/2004/02/skos/core#definition> "An unusual increase in the number of cases caused by exposure to fungi either through skin contact, ingestion, or inhalation of spores. Examples are fungal pneumonia, fungal meningitis, etc." .
 
 
 ###  https://sakuna.ph/GasLeak
 :GasLeak rdf:type owl:Class ;
          rdfs:subClassOf :IndustrialAccident ;
-         rdfs:label "Gas Leak"@en .
+         rdfs:label "Gas Leak"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "Gas leak incidents." .
 
 
 ###  https://sakuna.ph/Geophysical
 :Geophysical rdf:type owl:Class ;
              rdfs:subClassOf :Natural ;
-             rdfs:label "Geophysical"@en .
+             rdfs:label "Geophysical"@en ;
+             <http://www.w3.org/2004/02/skos/core#definition> "A hazard originating from solid earth. This term is used interchangeably with the term geological hazard." .
 
 
 ###  https://sakuna.ph/Glacial
 :Glacial rdf:type owl:Class ;
          rdfs:subClassOf :Climatological ;
-         rdfs:label "Glacial"@en .
+         rdfs:label "Glacial"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "These floods occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." .
 
 
 ###  https://sakuna.ph/GrasshopperInfestation
 :GrasshopperInfestation rdf:type owl:Class ;
                         rdfs:subClassOf :Infestation ;
-                        rdfs:label "Grasshopper Infestation"@en .
+                        rdfs:label "Grasshopper Infestation"@en ;
+                        <http://www.w3.org/2004/02/skos/core#definition> "Infestation of grasshoppers (insects)." .
 
 
 ###  https://sakuna.ph/GroundMovement
 :GroundMovement rdf:type owl:Class ;
                 rdfs:subClassOf :Earthquake ;
-                rdfs:label "Ground Movement"@en .
+                rdfs:label "Ground Movement"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions." .
 
 
 ###  https://sakuna.ph/Hail
 :Hail rdf:type owl:Class ;
       rdfs:subClassOf :Storm ;
-      rdfs:label "Hail"@en .
+      rdfs:label "Hail"@en ;
+      <http://www.w3.org/2004/02/skos/core#definition> "Solid precipitation in the form of irregular pellets or balls of ice more than 5 mm in diameter." .
 
 
 ###  https://sakuna.ph/HeatWave
 :HeatWave rdf:type owl:Class ;
           rdfs:subClassOf :ExtremeTemperature ;
-          rdfs:label "Heat Wave"@en .
+          rdfs:label "Heat Wave"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "A period of abnormally hot and/or unusually humid weather. Typically, a heat wave lasts for two or more days. The exact temperature criteria for what constitutes a heat wave may vary by location." .
 
 
 ###  https://sakuna.ph/Housing
@@ -2514,13 +2551,15 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Hydrological
 :Hydrological rdf:type owl:Class ;
               rdfs:subClassOf :Natural ;
-              rdfs:label "Hydrological"@en .
+              rdfs:label "Hydrological"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater." .
 
 
 ###  https://sakuna.ph/IceJamFlood
 :IceJamFlood rdf:type owl:Class ;
              rdfs:subClassOf :Flood ;
-             rdfs:label "Ice Jam Flood"@en .
+             rdfs:label "Ice Jam Flood"@en ;
+             <http://www.w3.org/2004/02/skos/core#definition> "The accumulation of floating ice restricting or blocking a river’s flow and drainage. Ice jams tend to develop near river bends and obstructions (e.g., bridges)." .
 
 
 ###  https://sakuna.ph/Impact
@@ -2584,25 +2623,29 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/IndustrialAccident
 :IndustrialAccident rdf:type owl:Class ;
                     rdfs:subClassOf :Technological ;
-                    rdfs:label "Industrial Accident"@en .
+                    rdfs:label "Industrial Accident"@en ;
+                    <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
 
 
 ###  https://sakuna.ph/IndustrialAccidentGeneral
 :IndustrialAccidentGeneral rdf:type owl:Class ;
                            rdfs:subClassOf :IndustrialAccident ;
-                           rdfs:label "Industrial Accident (General)"@en .
+                           rdfs:label "Industrial Accident (General)"@en ;
+                           <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
 
 
 ###  https://sakuna.ph/InfectiousDiseaseGeneral
 :InfectiousDiseaseGeneral rdf:type owl:Class ;
                           rdfs:subClassOf :Epidemic ;
-                          rdfs:label "Infectious Disease (General)"@en .
+                          rdfs:label "Infectious Disease (General)"@en ;
+                          <http://www.w3.org/2004/02/skos/core#definition> "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
 
 
 ###  https://sakuna.ph/Infestation
 :Infestation rdf:type owl:Class ;
              rdfs:subClassOf :Biological ;
-             rdfs:label "Infestation"@en .
+             rdfs:label "Infestation"@en ;
+             <http://www.w3.org/2004/02/skos/core#definition> "The pervasive influx, swarming and/or hatching of insects, worms, or other animals affecting humans, animals, crops, and perishable goods." .
 
 
 ###  https://sakuna.ph/InfestationGeneral
@@ -2663,31 +2706,36 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Lahar
 :Lahar rdf:type owl:Class ;
        rdfs:subClassOf :VolcanicActivity ;
-       rdfs:label "Lahar"@en .
+       rdfs:label "Lahar"@en ;
+       <http://www.w3.org/2004/02/skos/core#definition> "Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." .
 
 
 ###  https://sakuna.ph/LandFire
 :LandFire rdf:type owl:Class ;
           rdfs:subClassOf :Wildfire ;
-          rdfs:label "Land Fire"@en .
+          rdfs:label "Land Fire"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment." .
 
 
 ###  https://sakuna.ph/LandslideDry
 :LandslideDry rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementDry ;
-              rdfs:label "Landslide (Dry)"@en .
+              rdfs:label "Landslide (Dry)"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
 
 
 ###  https://sakuna.ph/LandslideWet
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
-              rdfs:label "Landslide (Wet)"@en .
+              rdfs:label "Landslide (Wet)"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
 
 
 ###  https://sakuna.ph/LavaFlow
 :LavaFlow rdf:type owl:Class ;
           rdfs:subClassOf :VolcanicActivity ;
-          rdfs:label "Lava Flow"@en .
+          rdfs:label "Lava Flow"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." .
 
 
 ###  https://sakuna.ph/Location
@@ -2699,7 +2747,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/LocustInfestation
 :LocustInfestation rdf:type owl:Class ;
                    rdfs:subClassOf :Infestation ;
-                   rdfs:label "Locust Infestation"@en .
+                   rdfs:label "Locust Infestation"@en ;
+                   <http://www.w3.org/2004/02/skos/core#definition> "Infestation of locusts (insects)." .
 
 
 ###  https://sakuna.ph/MajorEvent
@@ -2716,25 +2765,29 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/MassMovementDry
 :MassMovementDry rdf:type owl:Class ;
                  rdfs:subClassOf :Geophysical ;
-                 rdfs:label "Mass Movement (Dry)"@en .
+                 rdfs:label "Mass Movement (Dry)"@en ;
+                 <http://www.w3.org/2004/02/skos/core#definition> "Any type of downslope movement of earth materials under hydrological dry conditions." .
 
 
 ###  https://sakuna.ph/MassMovementWet
 :MassMovementWet rdf:type owl:Class ;
                  rdfs:subClassOf :Hydrological ;
-                 rdfs:label "Mass Movement (Wet)"@en .
+                 rdfs:label "Mass Movement (Wet)"@en ;
+                 <http://www.w3.org/2004/02/skos/core#definition> "Types of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces." .
 
 
 ###  https://sakuna.ph/Meteorological
 :Meteorological rdf:type owl:Class ;
                 rdfs:subClassOf :Natural ;
-                rdfs:label "Meteorological"@en .
+                rdfs:label "Meteorological"@en ;
+                <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from minutes to days." .
 
 
 ###  https://sakuna.ph/MiscellaneousAccident
 :MiscellaneousAccident rdf:type owl:Class ;
                        rdfs:subClassOf :Technological ;
-                       rdfs:label "Miscellaneous Accident"@en .
+                       rdfs:label "Miscellaneous Accident"@en ;
+                       <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." .
 
 
 ###  https://sakuna.ph/MiscellaneousAccidentGeneral
@@ -2764,25 +2817,28 @@ geo:SpatialObject rdf:type owl:Class .
          rdfs:subClassOf :DisasterType ;
          owl:disjointWith :Technological ;
          rdfs:label "Natural"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "Naturally occurring disastroues events" .
+         <http://www.w3.org/2004/02/skos/core#definition> "Naturally occurring disastrous events" .
 
 
 ###  https://sakuna.ph/OilSpill
 :OilSpill rdf:type owl:Class ;
           rdfs:subClassOf :IndustrialAccident ;
-          rdfs:label "Oil Spill"@en .
+          rdfs:label "Oil Spill"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Accident release occurring during the production, transportation, or handling of oil." .
 
 
 ###  https://sakuna.ph/ParasiticDisease
 :ParasiticDisease rdf:type owl:Class ;
                   rdfs:subClassOf :Epidemic ;
-                  rdfs:label "Parasitic Disease"@en .
+                  rdfs:label "Parasitic Disease"@en ;
+                  <http://www.w3.org/2004/02/skos/core#definition> "An unusual increase in the number of cases caused by exposure to a parasite, i.e., an organism living on or in a host. Exposure to parasites occurs mostly through contaminated water, food, or contact with insects, animals, etc. Examples are malaria, Chagas disease, giardiasis, and Trichinellosis." .
 
 
 ###  https://sakuna.ph/Poisoning
 :Poisoning rdf:type owl:Class ;
            rdfs:subClassOf :IndustrialAccident ;
-           rdfs:label "Poisoning"@en .
+           rdfs:label "Poisoning"@en ;
+           <http://www.w3.org/2004/02/skos/core#definition> "Poisoning of atmosphere or water courses due to industrial sources of contamination." .
 
 
 ###  https://sakuna.ph/Power
@@ -2880,7 +2936,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/PrionDisease
 :PrionDisease rdf:type owl:Class ;
               rdfs:subClassOf :Epidemic ;
-              rdfs:label "Prion Disease"@en .
+              rdfs:label "Prion Disease"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "A type of biological hazard caused by prion proteins. Prion diseases or transmissible spongiform encephalopathies (TSEs) are a family of rare progressive neurodegenerative disorders that affect both humans and animals. They are characterized by long incubation periods and neural loss. Examples are Bovine Spongiform Encephalopathy (BSE), Creutzfeldt-Jakob Disease (CJD), Kuru, etc." .
 
 
 ###  https://sakuna.ph/Province
@@ -2896,19 +2953,22 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/PyroclasticFlow
 :PyroclasticFlow rdf:type owl:Class ;
                  rdfs:subClassOf :VolcanicActivity ;
-                 rdfs:label "Pyroclastic Flow"@en .
+                 rdfs:label "Pyroclastic Flow"@en ;
+                 <http://www.w3.org/2004/02/skos/core#definition> "Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." .
 
 
 ###  https://sakuna.ph/Radiation
 :Radiation rdf:type owl:Class ;
            rdfs:subClassOf :IndustrialAccident ;
-           rdfs:label "Radiation"@en .
+           rdfs:label "Radiation"@en ;
+           <http://www.w3.org/2004/02/skos/core#definition> "Exposure to harmful radiation or reactive substances." .
 
 
 ###  https://sakuna.ph/Rail
 :Rail rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
-      rdfs:label "Rail"@en .
+      rdfs:label "Rail"@en ;
+      <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving trains." .
 
 
 ###  https://sakuna.ph/Region
@@ -2973,13 +3033,15 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/RiverineFlood
 :RiverineFlood rdf:type owl:Class ;
                rdfs:subClassOf :Flood ;
-               rdfs:label "Riverine Flood"@en .
+               rdfs:label "Riverine Flood"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "A type of flooding resulting from the overflow of water from a stream or river channel onto normally dry land in the floodplain adjacent to the channel." .
 
 
 ###  https://sakuna.ph/Road
 :Road rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
-      rdfs:label "Road"@en .
+      rdfs:label "Road"@en ;
+      <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving motor vehicles on roads and tracks." .
 
 
 ###  https://sakuna.ph/RoadAndBridges
@@ -3028,13 +3090,15 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/RogueWave
 :RogueWave rdf:type owl:Class ;
            rdfs:subClassOf :WaveAction ;
-           rdfs:label "Rogue Wave"@en .
+           rdfs:label "Rogue Wave"@en ;
+           <http://www.w3.org/2004/02/skos/core#definition> "An unusual single crest of an ocean wave far out at sea that is much higher and/or steeper than other waves in the prevailing swell system." .
 
 
 ###  https://sakuna.ph/SandStorm
 :SandStorm rdf:type owl:Class ;
            rdfs:subClassOf :Storm ;
-           rdfs:label "Sand Storm"@en .
+           rdfs:label "Sand Storm"@en ;
+           <http://www.w3.org/2004/02/skos/core#definition> "Strong winds carrying particles of sand aloft, but generally confined to less than 50 feet (15 m), especially common in arid and semi-arid environments. A dust storm is also characterized by strong winds but carries smaller particles of dust rather than sand over an extensive area." .
 
 
 ###  https://sakuna.ph/Seaports
@@ -3063,7 +3127,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Seiche
 :Seiche rdf:type owl:Class ;
         rdfs:subClassOf :WaveAction ;
-        rdfs:label "Seiche"@en .
+        rdfs:label "Seiche"@en ;
+        <http://www.w3.org/2004/02/skos/core#definition> "A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." .
 
 
 ###  https://sakuna.ph/SevereWeather
@@ -3075,7 +3140,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/SevereWinterConditions
 :SevereWinterConditions rdf:type owl:Class ;
                         rdfs:subClassOf :ExtremeTemperature ;
-                        rdfs:label "Severe Winter Conditions"@en .
+                        rdfs:label "Severe Winter Conditions"@en ;
+                        <http://www.w3.org/2004/02/skos/core#definition> "Damage caused by snow and ice. Winter damage refers to damage to buildings, infrastructure, traffic (esp. navigation) inflicted by snow and ice in the form of snow pressure, freezing rain, frozen waterways etc." .
 
 
 ###  https://sakuna.ph/Source
@@ -3104,13 +3170,15 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/SpaceImpact
 :SpaceImpact rdf:type owl:Class ;
              rdfs:subClassOf :Extraterrestrial ;
-             rdfs:label "Space Impact"@en .
+             rdfs:label "Space Impact"@en ;
+             <http://www.w3.org/2004/02/skos/core#definition> "A type of extra-terrestrial hazard caused by the collision a meteoroid, asteroid, or comet with the Earth." .
 
 
 ###  https://sakuna.ph/SpaceWeather
 :SpaceWeather rdf:type owl:Class ;
               rdfs:subClassOf :Extraterrestrial ;
-              rdfs:label "Space Weather"@en .
+              rdfs:label "Space Weather"@en ;
+              <http://www.w3.org/2004/02/skos/core#definition> "A general term for extra-terrestrial weather conditions driven by solar eruptions such as geomagnetic storms, radio disturbances, and solar energetic particles." .
 
 
 ###  https://sakuna.ph/Storm
@@ -3128,7 +3196,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/StormSurge
 :StormSurge rdf:type owl:Class ;
             rdfs:subClassOf :Storm ;
-            rdfs:label "Storm Surge"@en .
+            rdfs:label "Storm Surge"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "An abnormal rise in sea level generated by a tropical cyclone or other intense types of storm." .
 
 
 ###  https://sakuna.ph/Stranded
@@ -3173,13 +3242,15 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/SuddenSubsidenceDry
 :SuddenSubsidenceDry rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementDry ;
-                     rdfs:label "Sudden Subsidence (Dry)"@en .
+                     rdfs:label "Sudden Subsidence (Dry)"@en ;
+                     <http://www.w3.org/2004/02/skos/core#definition> "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger." .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceWet
 :SuddenSubsidenceWet rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementWet ;
-                     rdfs:label "Sudden Subsidence (Wet)"@en .
+                     rdfs:label "Sudden Subsidence (Wet)"@en ;
+                     <http://www.w3.org/2004/02/skos/core#definition> "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain)." .
 
 
 ###  https://sakuna.ph/Technological
@@ -3193,31 +3264,37 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Thunderstorms
 :Thunderstorms rdf:type owl:Class ;
                rdfs:subClassOf :Storm ;
-               rdfs:label "Thunderstorms"@en .
+               rdfs:label "Thunderstorms"@en ;
+               <http://www.w3.org/2004/02/skos/core#definition> "A high-voltage, visible electrical discharge produced by a thunderstorm and followed by the sound of thunder." ;
+               <http://www.w3.org/ns/prov#sharesDefinitionWith> "Lightning" .
 
 
 ###  https://sakuna.ph/Tornado
 :Tornado rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
-         rdfs:label "Tornado"@en .
+         rdfs:label "Tornado"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "A violently rotating column of air that reaches the ground or open water (waterspout)." .
 
 
 ###  https://sakuna.ph/Transport
 :Transport rdf:type owl:Class ;
            rdfs:subClassOf :Technological ;
-           rdfs:label "Transport"@en .
+           rdfs:label "Transport"@en ;
+           <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used to describe technological transport accidents involving mechanized modes of transport. It comprises four disaster subtypes (i.e., Air, Water, Rail, and Road)." .
 
 
 ###  https://sakuna.ph/TropicalCyclone
 :TropicalCyclone rdf:type owl:Class ;
                  rdfs:subClassOf :Storm ;
-                 rdfs:label "Tropical Cyclone"@en .
+                 rdfs:label "Tropical Cyclone"@en ;
+                 <http://www.w3.org/2004/02/skos/core#definition> "A tropical cyclone originates over tropical or subtropical waters. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean)." .
 
 
 ###  https://sakuna.ph/Tsunami
 :Tsunami rdf:type owl:Class ;
          rdfs:subClassOf :Earthquake ;
-         rdfs:label "Tsunami"@en .
+         rdfs:label "Tsunami"@en ;
+         <http://www.w3.org/2004/02/skos/core#definition> "A series of waves (with long wavelengths when traveling across the deep ocean) that are generated by a displacement of massive amounts of water through underwater earthquakes, volcanic eruptions, or landslides. Tsunami waves travel at very high speed across the ocean, but as they begin to reach shallow water they slow down, and the wave grows steeper." .
 
 
 ###  https://sakuna.ph/ViralDisease
@@ -3229,19 +3306,22 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/VolcanicActivity
 :VolcanicActivity rdf:type owl:Class ;
                   rdfs:subClassOf :Geophysical ;
-                  rdfs:label "Volcanic Activity"@en .
+                  rdfs:label "Volcanic Activity"@en ;
+                  <http://www.w3.org/2004/02/skos/core#definition> "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
 
 
 ###  https://sakuna.ph/VolcanicActivityGeneral
 :VolcanicActivityGeneral rdf:type owl:Class ;
                          rdfs:subClassOf :VolcanicActivity ;
-                         rdfs:label "Volcanic Activity (General)"@en .
+                         rdfs:label "Volcanic Activity (General)"@en ;
+                         <http://www.w3.org/2004/02/skos/core#definition> "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
 
 
 ###  https://sakuna.ph/Water
 :Water rdf:type owl:Class ;
        rdfs:subClassOf :Transport ;
-       rdfs:label "Water" .
+       rdfs:label "Water" ;
+       <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving sailing boats, ferries, cruise ships, and other vessels." .
 
 
 ###  https://sakuna.ph/WaterDisruption
@@ -3282,19 +3362,22 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/WaveAction
 :WaveAction rdf:type owl:Class ;
             rdfs:subClassOf :Hydrological ;
-            rdfs:label "Wave Action"@en .
+            rdfs:label "Wave Action"@en ;
+            <http://www.w3.org/2004/02/skos/core#definition> "Wind-generated surface waves that can occur on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
 
 
 ###  https://sakuna.ph/Wildfire
 :Wildfire rdf:type owl:Class ;
           rdfs:subClassOf :Climatological ;
-          rdfs:label "Wildfire"@en .
+          rdfs:label "Wildfire"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
 
 
 ###  https://sakuna.ph/WildfireGeneral
 :WildfireGeneral rdf:type owl:Class ;
                  rdfs:subClassOf :Wildfire ;
-                 rdfs:label "Wildfire (General)"@en .
+                 rdfs:label "Wildfire (General)"@en ;
+                 <http://www.w3.org/2004/02/skos/core#definition> "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
 
 
 ###  https://sakuna.ph/Work
@@ -3319,7 +3402,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/WormsInfestation
 :WormsInfestation rdf:type owl:Class ;
                   rdfs:subClassOf :Infestation ;
-                  rdfs:label "Worms Infestation"@en .
+                  rdfs:label "Worms Infestation"@en ;
+                  <http://www.w3.org/2004/02/skos/core#definition> "Infestation of worms." .
 
 
 #################################################################
