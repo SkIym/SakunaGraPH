@@ -1445,13 +1445,6 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
       rdfs:range xsd:int .
 
 
-###  https://sakuna.ph/reconstructionCost
-:reconstructionCost rdf:type owl:DatatypeProperty ;
-                    rdfs:domain :DamageGeneral ;
-                    rdfs:range xsd:decimal ;
-                    rdfs:label "reconstruction cost"@en .
-
-
 ###  https://sakuna.ph/reference
 :reference rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
@@ -2246,10 +2239,6 @@ geo:SpatialObject rdf:type owl:Class .
                                ] ,
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :insuredDamage ;
-                                 owl:someValuesFrom xsd:decimal
-                               ] ,
-                               [ rdf:type owl:Restriction ;
-                                 owl:onProperty :reconstructionCost ;
                                  owl:someValuesFrom xsd:decimal
                                ] ;
                rdfs:label "Damage (General)"@en ;
