@@ -1588,6 +1588,13 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                  rdfs:label "service provider"@en .
 
 
+###  https://sakuna.ph/socialDamageAmount
+:socialDamageAmount rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :Infrastructure ;
+                    rdfs:range xsd:decimal ;
+                    rdfs:label "social damage amount" .
+
+
 ###  https://sakuna.ph/srrDone
 :srrDone rdf:type owl:DatatypeProperty ;
          rdfs:domain :Aftermath ;
@@ -2681,6 +2688,10 @@ geo:SpatialObject rdf:type owl:Class .
                                 [ rdf:type owl:Restriction ;
                                   owl:onProperty :numberDamaged ;
                                   owl:someValuesFrom xsd:integer
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :socialDamageAmount ;
+                                  owl:someValuesFrom xsd:decimal
                                 ] ;
                 rdfs:label "Infrastructure"@en ;
                 <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on infrastructure." .
