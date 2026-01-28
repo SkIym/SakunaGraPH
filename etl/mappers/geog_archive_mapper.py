@@ -33,6 +33,9 @@ COLUMN_MAPPING = {
     "IMPACT_Damages to Properties_Infrastructure (in Millions)": "infraDamageAmount",
     "IMPACT_Damages to Properties_Agriculture (in Millions)": "agricultureDamageAmount",
     "IMPACT_Damages to Properties_Private/Commercial (in Millions)": "commercialDamageAmount",
+    "IMPACT_Damages to Properties_Social (in Millions)": "socialDamageAmount",
+    "IMPACT_Damages to Properties_Cross sectoral (in Millions)": "crossSectoralDamageAmount",
+    "IMPACT_Damages to Properties_Total cost (in Millions)": "generalDamageAmount",
     "IMPACT_Status of Lifelines_Electricity or Power Supply": "powerAffected",
     "IMPACT_Status of Lifelines_Communication Lines": "communicationAffected",
     "IMPACT_Status of Lifelines_Transportation_Roads and Bridges": "roadAndBridgesAffected",
@@ -161,6 +164,23 @@ EXPORT_SPECS = {
         },
         "float_format": "%.0f"
     },
+
+    "gda_infra.csv": {
+        "cols": ["id", "infraDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"],
+        "dropna": {
+            "subset": ["infraDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"],
+            "how": "all"
+        }
+    },
+
+    "gda_dmg_general.csv": {
+        "cols": ["id", "generalDamageAmount"],
+        "dropna": {
+            "subset": ["generalDamageAmount"],
+            "how": "any"
+        },
+        "onlyIfMissing": ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
+    }
 }
 
 
@@ -327,6 +347,11 @@ def clean_date_range(value):
 def export_slices(df, specs, out_dir="./data"):
     for filename, spec in specs.items():
         tmp = df[spec["cols"]].copy()
+
+
+        if "onlyIfMissing" in spec:
+            tmp = df[df[spec["onlyIfMissing"]].isna().all(axis=1)]
+            tmp = df[spec["cols"]].copy()
 
         # dropna handling
         if "dropna" in spec:
