@@ -790,7 +790,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :agricultureDamageAmount rdf:type owl:DatatypeProperty ;
                          rdfs:domain :Agriculture ;
                          rdfs:range xsd:decimal ;
-                         rdfs:comment "From Department of Geography digitized archives" ;
+                         rdfs:comment "From Department of Geography digitized archives" ,
+                                      "In M PHP" ;
                          rdfs:label "agriculture damage amount"@en .
 
 
@@ -920,7 +921,9 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :commercialDamageAmount rdf:type owl:DatatypeProperty ;
                         rdfs:domain :Infrastructure ;
                         rdfs:range xsd:decimal ;
-                        rdfs:label "commercial damage amount"@en .
+                        rdfs:comment "In M PHP" ;
+                        rdfs:label "commercial damage amount"@en ;
+                        <http://www.w3.org/2004/02/skos/core#altLabel> "private damage amount" .
 
 
 ###  https://sakuna.ph/communicationStatus
@@ -950,6 +953,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :crossSectoralDamageAmount rdf:type owl:DatatypeProperty ;
                            rdfs:domain :Infrastructure ;
                            rdfs:range xsd:decimal ;
+                           rdfs:comment "In M PHP" ;
                            rdfs:label "cross sectoral damage amount" ;
                            <http://www.w3.org/2004/02/skos/core#example> "health government, transmission lines" .
 
@@ -1075,6 +1079,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :generalDamageAmount rdf:type owl:DatatypeProperty ;
                      rdfs:domain :DamageGeneral ;
                      rdfs:range xsd:decimal ;
+                     rdfs:comment "In M PHP" ;
                      rdfs:label "general total damage amount"@en .
 
 
@@ -1082,7 +1087,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :housingDamageAmount rdf:type owl:DatatypeProperty ;
                      rdfs:domain :Housing ;
                      rdfs:range xsd:decimal ;
-                     rdfs:comment "In monetary value" ;
+                     rdfs:comment "In M PHP" ,
+                                  "In monetary value" ;
                      rdfs:label "housing damage amount"@en .
 
 
@@ -1111,6 +1117,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :infraDamageAmount rdf:type owl:DatatypeProperty ;
                    rdfs:domain :Infrastructure ;
                    rdfs:range xsd:decimal ;
+                   rdfs:comment "In M PHP" ;
                    rdfs:label "infrastructure damage amount"@en .
 
 
