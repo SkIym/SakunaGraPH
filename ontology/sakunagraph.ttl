@@ -946,6 +946,14 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
      rdfs:label "cpi"@en .
 
 
+###  https://sakuna.ph/crossSectoralDamageAmount
+:crossSectoralDamageAmount rdf:type owl:DatatypeProperty ;
+                           rdfs:domain :Infrastructure ;
+                           rdfs:range xsd:decimal ;
+                           rdfs:label "cross sectoral damage amount" ;
+                           <http://www.w3.org/2004/02/skos/core#example> "health government, transmission lines" .
+
+
 ###  https://sakuna.ph/damsAffected
 :damsAffected rdf:type owl:DatatypeProperty ;
               rdfs:domain :WaterDisruption ;
@@ -1063,11 +1071,11 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
              rdfs:label "flight route"@en .
 
 
-###  https://sakuna.ph/generalTotalDamage
-:generalTotalDamage rdf:type owl:DatatypeProperty ;
-                    rdfs:domain :DamageGeneral ;
-                    rdfs:range xsd:decimal ;
-                    rdfs:label "general total damage"@en .
+###  https://sakuna.ph/generalDamageAmount
+:generalDamageAmount rdf:type owl:DatatypeProperty ;
+                     rdfs:domain :DamageGeneral ;
+                     rdfs:range xsd:decimal ;
+                     rdfs:label "general total damage amount"@en .
 
 
 ###  https://sakuna.ph/housingDamageAmount
@@ -2241,7 +2249,7 @@ geo:SpatialObject rdf:type owl:Class .
                                  owl:someValuesFrom xsd:decimal
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :generalTotalDamage ;
+                                 owl:onProperty :generalDamageAmount ;
                                  owl:someValuesFrom xsd:decimal
                                ] ,
                                [ rdf:type owl:Restriction ;
@@ -2655,6 +2663,10 @@ geo:SpatialObject rdf:type owl:Class .
                 rdfs:subClassOf :Impact ,
                                 [ rdf:type owl:Restriction ;
                                   owl:onProperty :commercialDamageAmount ;
+                                  owl:someValuesFrom xsd:decimal
+                                ] ,
+                                [ rdf:type owl:Restriction ;
+                                  owl:onProperty :crossSectoralDamageAmount ;
                                   owl:someValuesFrom xsd:decimal
                                 ] ,
                                 [ rdf:type owl:Restriction ;
