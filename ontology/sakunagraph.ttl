@@ -753,6 +753,23 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                    rdfs:label "affected barangays"@en .
 
 
+###  https://sakuna.ph/affectedDescription
+:affectedDescription rdf:type owl:DatatypeProperty ;
+                     rdfs:domain [ rdf:type owl:Class ;
+                                   owl:unionOf ( :Airports
+                                                 :Class
+                                                 :CommunicationLines
+                                                 :Power
+                                                 :RoadAndBridges
+                                                 :Seaports
+                                                 :WaterDisruption
+                                                 :Work
+                                               )
+                                 ] ;
+                     rdfs:range xsd:string ;
+                     rdfs:label "affected description" .
+
+
 ###  https://sakuna.ph/affectedFamilies
 :affectedFamilies rdf:type owl:DatatypeProperty ;
                   rdfs:domain :AffectedPopulation ;
@@ -872,13 +889,6 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                        <http://www.w3.org/2004/02/skos/core#definition> "Announcements released during preparation for a disaster." .
 
 
-###  https://sakuna.ph/areDamsAffected
-:areDamsAffected rdf:type owl:DatatypeProperty ;
-                 rdfs:domain :WaterDisruption ;
-                 rdfs:range xsd:boolean ;
-                 rdfs:label "are dams affected"@en .
-
-
 ###  https://sakuna.ph/cancelledDateTime
 :cancelledDateTime rdf:type owl:DatatypeProperty ;
                    rdfs:subPropertyOf owl:topDataProperty ;
@@ -956,13 +966,6 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                            rdfs:comment "In M PHP" ;
                            rdfs:label "cross sectoral damage amount" ;
                            <http://www.w3.org/2004/02/skos/core#example> "health government, transmission lines" .
-
-
-###  https://sakuna.ph/damsAffected
-:damsAffected rdf:type owl:DatatypeProperty ;
-              rdfs:domain :WaterDisruption ;
-              rdfs:range xsd:string ;
-              rdfs:label "dams affected"@en .
 
 
 ###  https://sakuna.ph/dead
@@ -1197,13 +1200,6 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                   ] ;
                       rdfs:range xsd:dateTime ;
                       rdfs:label "interruption datetime"@en .
-
-
-###  https://sakuna.ph/isTapAffected
-:isTapAffected rdf:type owl:DatatypeProperty ;
-               rdfs:domain :WaterDisruption ;
-               rdfs:range xsd:boolean ;
-               rdfs:label "is tap water affected"@en .
 
 
 ###  https://sakuna.ph/itemCostPerUnit
@@ -1962,6 +1958,10 @@ geo:SpatialObject rdf:type owl:Class .
 :Airports rdf:type owl:Class ;
           rdfs:subClassOf :Impact ,
                           [ rdf:type owl:Restriction ;
+                            owl:onProperty :affectedDescription ;
+                            owl:someValuesFrom xsd:string
+                          ] ,
+                          [ rdf:type owl:Restriction ;
                             owl:onProperty :airline ;
                             owl:someValuesFrom xsd:string
                           ] ,
@@ -2163,6 +2163,10 @@ geo:SpatialObject rdf:type owl:Class .
 :Class rdf:type owl:Class ;
        rdfs:subClassOf :Impact ,
                        [ rdf:type owl:Restriction ;
+                         owl:onProperty :affectedDescription ;
+                         owl:someValuesFrom xsd:string
+                       ] ,
+                       [ rdf:type owl:Restriction ;
                          owl:onProperty :cancelledDateTime ;
                          owl:someValuesFrom xsd:dateTime
                        ] ,
@@ -2223,6 +2227,10 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/CommunicationLines
 :CommunicationLines rdf:type owl:Class ;
                     rdfs:subClassOf :Impact ,
+                                    [ rdf:type owl:Restriction ;
+                                      owl:onProperty :affectedDescription ;
+                                      owl:someValuesFrom xsd:string
+                                    ] ,
                                     [ rdf:type owl:Restriction ;
                                       owl:onProperty :communicationStatus ;
                                       owl:someValuesFrom xsd:string
@@ -2864,6 +2872,10 @@ geo:SpatialObject rdf:type owl:Class .
 :Power rdf:type owl:Class ;
        rdfs:subClassOf :Impact ,
                        [ rdf:type owl:Restriction ;
+                         owl:onProperty :affectedDescription ;
+                         owl:someValuesFrom xsd:string
+                       ] ,
+                       [ rdf:type owl:Restriction ;
                          owl:onProperty :disruptedType ;
                          owl:someValuesFrom xsd:string
                        ] ,
@@ -3067,6 +3079,10 @@ geo:SpatialObject rdf:type owl:Class .
 :RoadAndBridges rdf:type owl:Class ;
                 rdfs:subClassOf :Impact ,
                                 [ rdf:type owl:Restriction ;
+                                  owl:onProperty :affectedDescription ;
+                                  owl:someValuesFrom xsd:string
+                                ] ,
+                                [ rdf:type owl:Restriction ;
                                   owl:onProperty :notPassableDateTime ;
                                   owl:someValuesFrom xsd:dateTime
                                 ] ,
@@ -3123,6 +3139,10 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Seaports
 :Seaports rdf:type owl:Class ;
           rdfs:subClassOf :Impact ,
+                          [ rdf:type owl:Restriction ;
+                            owl:onProperty :affectedDescription ;
+                            owl:someValuesFrom xsd:string
+                          ] ,
                           [ rdf:type owl:Restriction ;
                             owl:onProperty :cancelledDateTime ;
                             owl:someValuesFrom xsd:dateTime
@@ -3347,11 +3367,7 @@ geo:SpatialObject rdf:type owl:Class .
 :WaterDisruption rdf:type owl:Class ;
                  rdfs:subClassOf :Impact ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :areDamsAffected ;
-                                   owl:someValuesFrom xsd:boolean
-                                 ] ,
-                                 [ rdf:type owl:Restriction ;
-                                   owl:onProperty :damsAffected ;
+                                   owl:onProperty :affectedDescription ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;
@@ -3361,10 +3377,6 @@ geo:SpatialObject rdf:type owl:Class .
                                  [ rdf:type owl:Restriction ;
                                    owl:onProperty :interruptionDateTime ;
                                    owl:someValuesFrom xsd:dateTime
-                                 ] ,
-                                 [ rdf:type owl:Restriction ;
-                                   owl:onProperty :isTapAffected ;
-                                   owl:someValuesFrom xsd:boolean
                                  ] ,
                                  [ rdf:type owl:Restriction ;
                                    owl:onProperty :restorationDateTime ;
@@ -3402,6 +3414,10 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Work
 :Work rdf:type owl:Class ;
       rdfs:subClassOf :Impact ,
+                      [ rdf:type owl:Restriction ;
+                        owl:onProperty :affectedDescription ;
+                        owl:someValuesFrom xsd:string
+                      ] ,
                       [ rdf:type owl:Restriction ;
                         owl:onProperty :cancelledDateTime ;
                         owl:someValuesFrom xsd:dateTime
