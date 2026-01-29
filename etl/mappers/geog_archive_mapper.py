@@ -38,7 +38,7 @@ COLUMN_MAPPING = {
     "IMPACT_Damages to Properties_Total cost (in Millions)": "generalDamageAmount",
     "IMPACT_Status of Lifelines_Electricity or Power Supply": "powerAffected",
     "IMPACT_Status of Lifelines_Communication Lines": "communicationAffected",
-    "IMPACT_Status of Lifelines_Transportation_Roads and Bridges": "roadAndBridgesAffected",
+    "IMPACT_Status of Lifelines_Transportation_Roads and Bridges": "roadBridgeAffected",
     "IMPACT_Status of Lifelines_Transportation_Seaports": "seaportsAffected",
     "IMPACT_Status of Lifelines_Transportation_Airports": "airportsAffected",
     "IMPACT_Status of Lifelines_Water_Dams and other Reservoirs": "areDamsAffected",
@@ -180,7 +180,57 @@ EXPORT_SPECS = {
             "how": "any"
         },
         "onlyIfMissing": ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
-    }
+    },
+
+    "gda_power.csv": {
+        "cols": ["id", "powerAffected"],
+        "dropna": {
+            "subset": ["powerAffected"],
+            "how": "any"
+        }
+    },
+
+    "gda_comms.csv": {
+        "cols": ["id", "communicationAffected"],
+        "dropna": {
+            "subset": ["communicationAffected"],
+            "how": "any"
+        }
+    },
+
+    "gda_rnb.csv": {
+        "cols": ["id", "roadBridgeAffected"],
+        "dropna": {
+            "subset": ["roadBridgeAffected"],
+            "how": "any"
+        }
+    },
+
+    "gda_seaports.csv": {
+        "cols": ["id", "seaportsAffected"],
+        "dropna": {
+            "subset": ["seaportsAffected"],
+            "how": "any"
+        }
+    },
+
+    "gda_airports.csv": {
+        "cols": ["id", "airportsAffected"],
+        "dropna": {
+            "subset": ["airportsAffected"],
+            "how": "any"
+        }
+    },
+
+    "gda_water.csv": {
+        "cols": ["id", "areDamsAffected", "isTapAffected"],
+        "dropna": {
+            "subset": ["areDamsAffected", "isTapAffected"],
+            "how": "all"
+        }
+    },
+
+
 }
 
 
@@ -430,6 +480,7 @@ df = df.dropna(subset=['date', 'hasLocation'])
 df = df.replace("-", np.nan).infer_objects(copy=False)
 df = df.replace("Not applicable", np.nan).infer_objects(copy=False)
 df = df.replace("n.a.", np.nan).infer_objects(copy=False)
+df = df.replace("Not indicated", np.nan).infer_objects(copy=False)
 
 
 if "date" in df.columns:

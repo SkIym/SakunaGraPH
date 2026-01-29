@@ -63,6 +63,35 @@
     rml:source "data/gda_dmg_general.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#PowerLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_power.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+<#CommsLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_comms.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+<#RNBLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_rnb.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+<#SeaportLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_seaports.csv" ;
+    rml:referenceFormulation ql:CSV .
+
+# <#AirportLogicalSource>
+#     a rml:LogicalSource;
+#     rml:source "data/gda_airports.csv" ;
+#     rml:referenceFormulation ql:CSV .
+
+<#WaterLogicalSource>
+    a rml:LogicalSource;
+    rml:source "data/gda_water.csv" ;
+    rml:referenceFormulation ql:CSV .
 
 <#EventMapping>
     a rr:TriplesMap;
@@ -254,6 +283,66 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#GenDmgMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#PowerMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#CommsMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#RNBMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#SeaportMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasImpact ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#WaterMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -595,3 +684,121 @@
     ] ;
 
     .
+
+<#PowerMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#PowerLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/power";
+        rr:class :Power ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedDescription ;
+        rr:objectMap [
+            rml:reference "powerAffected" ;
+        ] ;
+    ] ;
+
+    .
+
+<#CommsMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#CommsLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/communication_lines";
+        rr:class :CommunicationLines ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedDescription ;
+        rr:objectMap [
+            rml:reference "communicationAffected" ;
+        ] ;
+    ] ;
+
+    .
+
+
+<#RNBMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#RNBLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/road_and_bridges";
+        rr:class :RoadAndBridges ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedDescription ;
+        rr:objectMap [
+            rml:reference "roadBridgeAffected" ;
+        ] ;
+    ] ;
+
+    .
+
+<#SeaportMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#SeaportLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/seaports";
+        rr:class :Seaports ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedDescription ;
+        rr:objectMap [
+            rml:reference "seaportsAffected" ;
+        ] ;
+    ] ;
+
+    .
+
+<#WaterMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#WaterLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/water";
+        rr:class :WaterDisruption ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedDescription ;
+        rr:objectMap [
+            rml:functionExecution <#DamExecution> ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :affectedDescription ;
+        rr:objectMap [
+            rml:functionExecution <#TapExecution> ;
+        ] ;
+    ] ;
+
+    .
+
+<#DamExecution>
+    rml:function :augmentWaterSource;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "areDamsAffected" ;
+            rr:constant "Dam" ;
+        ];
+    ].
+
+<#TapExecution>
+    rml:function :augmentWaterSource;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "isTapAffected" ;
+            rr:constant "Tap" ;
+        ] ;
+    ].

@@ -284,18 +284,12 @@ def to_major_incident_class(clss: str):
     return f"{base}MajorEvent" if clss == "M" else f"{base}Incident"
 
 @udf(
-    fun_id="https://sakuna.ph/isNotNull",
-    entry="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
+    fun_id="https://sakuna.ph/augmentWaterSource",
+    txt="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
 )
-def is_not_null(entry: str):
-    print(f"true: {entry}" if type(entry) == str else "false")
-    return True if entry else False 
+def augment_water_source(txt: list[str]):
+    return f"{txt[1]}: {txt[0]}"
 
-@udf(
-    fun_id="https://sakuna.ph/IF",
-    boolParam="http://users.ugent.be/~bjdmeest/function/grel.ttl#boolParam"
-)
-def if_condition(boolParam: bool):
-    return True if boolParam else None 
+
 
 
