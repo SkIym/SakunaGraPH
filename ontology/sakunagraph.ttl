@@ -767,7 +767,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                                )
                                  ] ;
                      rdfs:range xsd:string ;
-                     rdfs:label "affected description" .
+                     rdfs:label "affected description" ;
+                     <http://www.w3.org/2004/02/skos/core#definition> "General (unprocessed) information about the affected entity." .
 
 
 ###  https://sakuna.ph/affectedFamilies
