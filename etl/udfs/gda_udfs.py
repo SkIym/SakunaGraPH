@@ -291,5 +291,18 @@ def augment_water_source(txt: list[str]):
     return f"{txt[1]}: {txt[0]}"
 
 
+@udf(
+    fun_id="https://sakuna.ph/toMillions",
+    val="http://users.ugent.be/~bjdmeest/function/grel.ttl#valueParameter"
+)
+def to_millions(val: str):
 
+    fl_val = float(val)
+    if fl_val == 0: return fl_val
+
+    conv = val
+    if fl_val > 1000: 
+        conv = fl_val / 1000000
+
+    return conv
 

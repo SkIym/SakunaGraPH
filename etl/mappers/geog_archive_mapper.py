@@ -46,7 +46,7 @@ COLUMN_MAPPING = {
     "RESPONSE AND RECOVERY_Allocated Funds for the Affected Area/s": "allocatedFunds",
     "RESPONSE AND RECOVERY_NGO-LGU Support Units Present": "agencyLGUsPresentAssistance",
     "RESPONSE AND RECOVERY_International Organizations Present": "internationalOrgsPresent",
-    "RESPONSE AND RECOVERY_Amount of Donation from International Organizations (including local NGOs)": "amoungNGOs",
+    "RESPONSE AND RECOVERY_Amount of Donation from International Organizations (including local NGOs)": "amountNGOs",
     "RESPONSE AND RECOVERY_Supply of Relief Goods_Canned Goods, Rice, etc._Cost": "itemCostGoods",    # itemTypeOrNeeds: Canned Goods, Rice
     "RESPONSE AND RECOVERY_Supply of Relief Goods_Canned Goods, Rice, etc._Quantity": "itemQtyGoods", # itemTypeOrNeeds: Canned Goods, Rice
     "RESPONSE AND RECOVERY_Supply of Relief Goods_Water_Cost": "itemCostWater",    # itemTypeOrNeeds: Water
@@ -229,6 +229,15 @@ EXPORT_SPECS = {
             "how": "all"
         }
     },
+
+    "gda_assistance.csv": {
+        "cols": ["id", "allocatedFunds", "agencyLGUsPresentAssistance", "internationalOrgsPresent", "amountNGOs"],
+        "dropna": {
+            "subset": ["allocatedFunds", "agencyLGUsPresentAssistance", "internationalOrgsPresent", "amountNGOs"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    }
 
 
 }

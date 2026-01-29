@@ -88,6 +88,11 @@
 #     rml:source "data/gda_airports.csv" ;
 #     rml:referenceFormulation ql:CSV .
 
+<#AssistanceLogicalSource>
+    a rml:LogicalSource ; 
+    rml:source "data/gda_assistance.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 <#WaterLogicalSource>
     a rml:LogicalSource;
     rml:source "data/gda_water.csv" ;
@@ -182,6 +187,8 @@
         ];
     ];
 
+    # Preparedness
+
     rr:predicateObjectMap [
         rr:predicate :hasPreparedness    ;
         rr:objectMap [
@@ -229,6 +236,8 @@
             ];
         ];
     ];
+
+    # Impact
 
     rr:predicateObjectMap [
         rr:predicate :hasImpact ;
@@ -343,6 +352,20 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#WaterMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    # Response
+
+    rr:predicateObjectMap [
+        rr:predicate :hasResponse ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#AssistanceMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -755,7 +778,6 @@
             rml:reference "seaportsAffected" ;
         ] ;
     ] ;
-
     .
 
 <#WaterMapping>
@@ -800,5 +822,64 @@
         rml:inputValueMap [
             rml:reference "isTapAffected" ;
             rr:constant "Tap" ;
+        ] ;
+    ].
+
+<#AssistanceMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#AssistanceLogicalSource> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/assistance";
+        rr:class :Assistance ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :allocatedFunds ;
+        rr:objectMap [
+            rml:functionExecution <#MoneyExecution> ;
+            rml:datatype xsd:decimal ;
+        ] ;
+    ] ;     
+
+    rr:predicateObjectMap [
+        rr:predicate :agencyLGUsPresent ;
+        rr:objectMap [
+            rml:reference "agencyLGUsPresentAssistance" ;
+        ] ;
+    ] ;   
+
+    rr:predicateObjectMap [
+        rr:predicate :internationalOrgsPresent ;
+        rr:objectMap [
+            rml:reference "internationalOrgsPresent" ;
+        ] ;
+    ] ;
+
+    rr:predicateObjectMap [
+        rr:predicate :amountNGOs ;
+        rr:objectMap [
+            rml:functionExecution <#Money2Execution> ;
+            rml:datatype xsd:decimal ;
+        ] ;
+    ] ;
+
+    .
+
+<#MoneyExecution>
+    rml:function :toMillions;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "allocatedFunds" ;
+        ] ;
+    ].
+
+<#Money2Execution>
+    rml:function :toMillions;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "amountNGOs" ;
         ] ;
     ].
