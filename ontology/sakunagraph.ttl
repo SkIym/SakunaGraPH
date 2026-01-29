@@ -863,7 +863,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
             rdfs:subPropertyOf owl:topDataProperty ;
             rdfs:domain :Assistance ;
             rdfs:range xsd:decimal ;
-            rdfs:label "amount from NGOs"@en .
+            rdfs:label "amount from NGOs and/or international orgs"@en .
 
 
 ###  https://sakuna.ph/amountOCD
