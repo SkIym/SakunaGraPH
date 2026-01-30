@@ -1414,7 +1414,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :postTraining rdf:type owl:DatatypeProperty ;
               rdfs:domain :Recovery ;
               rdfs:range xsd:string ;
-              rdfs:label "post-disaster training cost" .
+              rdfs:label "post-disaster training" .
 
 
 ###  https://sakuna.ph/preemptFamilies
@@ -1621,9 +1621,9 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/srrDone
 :srrDone rdf:type owl:DatatypeProperty ;
          rdfs:domain :Recovery ;
-         rdfs:range xsd:boolean ;
-         rdfs:comment "was search, rescue, and retrieval done?" ;
-         rdfs:label "was search rescue and retrieval done" .
+         rdfs:range xsd:string ;
+         rdfs:comment "Description of the search, rescue, and retrieval done after the event." ;
+         rdfs:label "search rescue and retrieval done" .
 
 
 ###  https://sakuna.ph/startDate
