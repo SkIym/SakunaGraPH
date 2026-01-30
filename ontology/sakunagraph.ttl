@@ -2999,7 +2999,23 @@ geo:SpatialObject rdf:type owl:Class .
 
 ###  https://sakuna.ph/Relief
 :Relief rdf:type owl:Class ;
-        rdfs:subClassOf :Response ;
+        rdfs:subClassOf :Response ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :itemCostPerUnit ;
+                          owl:someValuesFrom xsd:decimal
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :itemQty ;
+                          owl:someValuesFrom xsd:int
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :itemTypeOrNeeds ;
+                          owl:someValuesFrom xsd:string
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :itemUnit ;
+                          owl:someValuesFrom xsd:decimal
+                        ] ;
         rdfs:label "Relief" ;
         <http://www.w3.org/2004/02/skos/core#definition> "Represents the relief goods provided after a disaster event." .
 
