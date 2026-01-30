@@ -2085,7 +2085,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:onProperty :isPartOf ;
                             owl:someValuesFrom :Municipality
                           ] ;
-          rdfs:label "Barangay"@en .
+          rdfs:label "Barangay"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "adm level 4" .
 
 
 ###  https://sakuna.ph/Biological
@@ -2226,7 +2227,9 @@ geo:SpatialObject rdf:type owl:Class .
 
 ###  https://sakuna.ph/Country
 :Country rdf:type owl:Class ;
-         rdfs:subClassOf :Location .
+         rdfs:subClassOf :Location ;
+         rdfs:label "Country" ;
+         <http://www.w3.org/2004/02/skos/core#definition> "adm level 0" .
 
 
 ###  https://sakuna.ph/DamageGeneral
@@ -2741,7 +2744,8 @@ geo:SpatialObject rdf:type owl:Class .
 ###  https://sakuna.ph/Location
 :Location rdf:type owl:Class ;
           rdfs:subClassOf geo:Feature ;
-          rdfs:label "Location"@en .
+          rdfs:label "Location"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "Represents tiered locations (administrative levels) in the Philippines." .
 
 
 ###  https://sakuna.ph/LocustInfestation
@@ -2809,7 +2813,9 @@ geo:SpatialObject rdf:type owl:Class .
                                 owl:onProperty :isPartOf ;
                                 owl:someValuesFrom :Province
                               ] ;
-              rdfs:label "Municipality"@en .
+              rdfs:label "Municipality"@en ;
+              <http://www.w3.org/2004/02/skos/core#altLabel> "City" ;
+              <http://www.w3.org/2004/02/skos/core#definition> "adm level 3" .
 
 
 ###  https://sakuna.ph/Natural
@@ -2951,7 +2957,8 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:onProperty :isPartOf ;
                             owl:someValuesFrom :Region
                           ] ;
-          rdfs:label "Province"@en .
+          rdfs:label "Province"@en ;
+          <http://www.w3.org/2004/02/skos/core#definition> "adm level 2" .
 
 
 ###  https://sakuna.ph/PyroclasticFlow
@@ -3005,7 +3012,8 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:onProperty :isPartOf ;
                           owl:someValuesFrom :IslandGroup
                         ] ;
-        rdfs:label "Region"@en .
+        rdfs:label "Region"@en ;
+        <http://www.w3.org/2004/02/skos/core#definition> "adm level 1" .
 
 
 ###  https://sakuna.ph/Relief
@@ -3032,7 +3040,7 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom xsd:decimal
                         ] ;
         rdfs:label "Relief" ;
-        <http://www.w3.org/2004/02/skos/core#definition> "Represents the relief provided after a disaster event." .
+        <http://www.w3.org/2004/02/skos/core#definition> "Represents the relief items provided after a disaster event." .
 
 
 ###  https://sakuna.ph/Rescue
