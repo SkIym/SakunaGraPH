@@ -839,7 +839,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain :Assistance ;
                 rdfs:range xsd:decimal ;
-                rdfs:label "allocated funds"@en .
+                rdfs:label "allocated funds"@en ;
+                <http://www.w3.org/2004/02/skos/core#note> "In M Php" .
 
 
 ###  https://sakuna.ph/amountDSWD
@@ -1203,6 +1204,15 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                       rdfs:label "interruption datetime"@en .
 
 
+###  https://sakuna.ph/itemCost
+:itemCost rdf:type owl:DatatypeProperty ;
+          rdfs:subPropertyOf owl:topDataProperty ;
+          rdfs:domain :Relief ;
+          rdfs:range xsd:decimal ;
+          rdfs:label "item cost" ;
+          <http://www.w3.org/2004/02/skos/core#note> "In M Php" .
+
+
 ###  https://sakuna.ph/itemCostPerUnit
 :itemCostPerUnit rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
@@ -1215,7 +1225,8 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 :itemQty rdf:type owl:DatatypeProperty ;
          rdfs:subPropertyOf owl:topDataProperty ;
          rdfs:domain :Relief ;
-         rdfs:range xsd:int ;
+         rdfs:range xsd:int ,
+                    xsd:string ;
          rdfs:label "item quantity"@en .
 
 
@@ -3001,6 +3012,10 @@ geo:SpatialObject rdf:type owl:Class .
 :Relief rdf:type owl:Class ;
         rdfs:subClassOf :Response ,
                         [ rdf:type owl:Restriction ;
+                          owl:onProperty :itemCost ;
+                          owl:someValuesFrom xsd:decimal
+                        ] ,
+                        [ rdf:type owl:Restriction ;
                           owl:onProperty :itemCostPerUnit ;
                           owl:someValuesFrom xsd:decimal
                         ] ,
@@ -3017,7 +3032,7 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom xsd:decimal
                         ] ;
         rdfs:label "Relief" ;
-        <http://www.w3.org/2004/02/skos/core#definition> "Represents the relief goods provided after a disaster event." .
+        <http://www.w3.org/2004/02/skos/core#definition> "Represents the relief provided after a disaster event." .
 
 
 ###  https://sakuna.ph/Rescue
