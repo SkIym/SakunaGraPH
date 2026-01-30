@@ -487,6 +487,36 @@
         ];
     ];
 
+    # metadata
+
+    rr:predicateObjectMap [
+        rr:predicate :reference ;
+        rr:objectMap [
+            rml:reference "reference";
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :remarks ;
+        rr:objectMap [
+            rml:reference "remarks";
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :remarks ;
+        rr:objectMap [
+            rml:reference "otherDescription";
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :fromSource ;
+        rr:objectMap [
+            rr:constant :GDA;
+        ];
+    ];
+
     .
 
 <#EventExecution>

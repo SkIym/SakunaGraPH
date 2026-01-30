@@ -1,10 +1,13 @@
 @prefix : <https://sakuna.ph/> .
+@prefix baw: <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#> .
 @prefix geo: <http://www.opengis.net/ont/geosparql#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
 @base <https://sakuna.ph/> .
 
 <https://sakuna.ph/> rdf:type owl:Ontology ;
@@ -22,11 +25,11 @@ geo:dggsLiteral rdf:type rdfs:Datatype ;
                 rdfs:isDefinedBy geo: ,
                                  <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/dggs-literal> ;
                 rdfs:seeAlso <http://www.opengis.net/doc/AS/dggs/2.0> ;
-                <http://www.w3.org/2004/02/skos/core#definition> "A textual serialization of a Discrete Global Grid (DGGS) Geometry object."@en ;
-                <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ,
-                                                              " \"<https://w3id.org/dggs/auspix> OrdinateList (R3234)\"^^<http://www.opengis.net/ont/geosparql#dggsLiteral>" ;
-                <http://www.w3.org/2004/02/skos/core#prefLabel> "DGGS Literal"@en ;
-                <http://www.w3.org/2004/02/skos/core#scopeNote> "This datatype is not expected to be used directly but to serve as an abstract datatype for a series of specific DGGS literal types, for specific DGGS implementations"@en .
+                skos:definition "A textual serialization of a Discrete Global Grid (DGGS) Geometry object."@en ;
+                skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ,
+                             " \"<https://w3id.org/dggs/auspix> OrdinateList (R3234)\"^^<http://www.opengis.net/ont/geosparql#dggsLiteral>" ;
+                skos:prefLabel "DGGS Literal"@en ;
+                skos:scopeNote "This datatype is not expected to be used directly but to serve as an abstract datatype for a series of specific DGGS literal types, for specific DGGS implementations"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#geoJSONLiteral
@@ -34,9 +37,9 @@ geo:geoJSONLiteral rdf:type rdfs:Datatype ;
                    rdfs:isDefinedBy geo: ,
                                     <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geojson-literal> ;
                    rdfs:seeAlso <https://tools.ietf.org/html/rfc7946> ;
-                   <http://www.w3.org/2004/02/skos/core#definition> "A GeoJSON serialization of a Geometry object."@en ;
-                   <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-                   <http://www.w3.org/2004/02/skos/core#prefLabel> "GeoJSON Literal"@en .
+                   skos:definition "A GeoJSON serialization of a Geometry object."@en ;
+                   skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+                   skos:prefLabel "GeoJSON Literal"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#gmlLiteral
@@ -48,9 +51,9 @@ geo:kmlLiteral rdf:type rdfs:Datatype ;
                rdfs:isDefinedBy geo: ,
                                 <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/kml-literal> ;
                rdfs:seeAlso <https://www.ogc.org/standards/kml/> ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A KML serialization of a Geometry object."@en ;
-               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-               <http://www.w3.org/2004/02/skos/core#prefLabel> "KML Literal"@en .
+               skos:definition "A KML serialization of a Geometry object."@en ;
+               skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+               skos:prefLabel "KML Literal"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#wktLiteral
@@ -101,11 +104,11 @@ geo:defaultGeometry rdf:type owl:ObjectProperty ;
                     rdfs:range geo:Geometry ;
                     rdfs:isDefinedBy geo: ,
                                      <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "The default Geometry to be used in spatial calculations. It is usually the most detailed Geometry."@en ;
-                    <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                                                                  <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.1> ;
-                    <http://www.w3.org/2004/02/skos/core#note> "Duplicate properties defaultGeometry and hasDefaultGeometry exist because of an inconsistency between ontology and documentation in GeoSPARQL 1.0. Only hasDefaultGeometry is described in the documention."@en ;
-                    <http://www.w3.org/2004/02/skos/core#prefLabel> "default geometry"@en .
+                    skos:definition "The default Geometry to be used in spatial calculations. It is usually the most detailed Geometry."@en ;
+                    skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
+                                 <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.1> ;
+                    skos:note "Duplicate properties defaultGeometry and hasDefaultGeometry exist because of an inconsistency between ontology and documentation in GeoSPARQL 1.0. Only hasDefaultGeometry is described in the documention."@en ;
+                    skos:prefLabel "default geometry"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#ehInside
@@ -116,8 +119,8 @@ geo:ehInside rdf:type owl:ObjectProperty ;
                               <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/eh-spatial-relations> ,
                               <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/eh-spatial-relations> ;
              rdfs:seeAlso <http://dbpedia.org/resource/DE-9IM> ;
-             <http://www.w3.org/2004/02/skos/core#definition> "States that the subject SpatialObject is spatially inside the object SpatialObject. DE-9IM: TFF*FFT**"@en ;
-             <http://www.w3.org/2004/02/skos/core#prefLabel> "inside"@en .
+             skos:definition "States that the subject SpatialObject is spatially inside the object SpatialObject. DE-9IM: TFF*FFT**"@en ;
+             skos:prefLabel "inside"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#hasBoundingBox
@@ -127,10 +130,10 @@ geo:hasBoundingBox rdf:type owl:ObjectProperty ;
                    rdfs:range geo:Geometry ;
                    rdfs:isDefinedBy geo: ,
                                     <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                   <http://www.w3.org/2004/02/skos/core#definition> "The minimum or smallest bounding or enclosing box of a given Feature."@en ;
-                   <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ;
-                   <http://www.w3.org/2004/02/skos/core#prefLabel> "has bounding box"@en ;
-                   <http://www.w3.org/2004/02/skos/core#scopeNote> "The target is a Geometry that defines a rectilinear region whose edges are aligned with the axes of the coordinate reference system, which exactly contains the Feature, for example an instance of http://www.opengis.net/ont/sf#envelope."@en .
+                   skos:definition "The minimum or smallest bounding or enclosing box of a given Feature."@en ;
+                   skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ;
+                   skos:prefLabel "has bounding box"@en ;
+                   skos:scopeNote "The target is a Geometry that defines a rectilinear region whose edges are aligned with the axes of the coordinate reference system, which exactly contains the Feature, for example an instance of http://www.opengis.net/ont/sf#envelope."@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#hasCentroid
@@ -140,10 +143,10 @@ geo:hasCentroid rdf:type owl:ObjectProperty ;
                 rdfs:range geo:Geometry ;
                 rdfs:isDefinedBy geo: ,
                                  <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                <http://www.w3.org/2004/02/skos/core#definition> "The arithmetic mean position of all the Geometry points of a given Feature."@en ;
-                <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ;
-                <http://www.w3.org/2004/02/skos/core#prefLabel> "has centroid"@en ;
-                <http://www.w3.org/2004/02/skos/core#scopeNote> "The target Geometry shall describe a point, for example an instance of http://www.opengis.net/ont/sf#Point."@en .
+                skos:definition "The arithmetic mean position of all the Geometry points of a given Feature."@en ;
+                skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ;
+                skos:prefLabel "has centroid"@en ;
+                skos:scopeNote "The target Geometry shall describe a point, for example an instance of http://www.opengis.net/ont/sf#Point."@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#hasDefaultGeometry
@@ -154,9 +157,9 @@ geo:hasDefaultGeometry rdf:type owl:ObjectProperty ;
                        rdfs:isDefinedBy geo: ,
                                         <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/feature-properties> ,
                                         <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                       <http://www.w3.org/2004/02/skos/core#definition> "The default Geometry to be used in spatial calculations. It is usually the most detailed Geometry."@en ;
-                       <http://www.w3.org/2004/02/skos/core#note> "Duplicate properties defaultGeometry and hasDefaultGeometry exist because of an inconsistency between ontology and documentation in GeoSPARQL 1.0. Only hasDefaultGeometry is described in the documention."@en ;
-                       <http://www.w3.org/2004/02/skos/core#prefLabel> "has default geometry"@en .
+                       skos:definition "The default Geometry to be used in spatial calculations. It is usually the most detailed Geometry."@en ;
+                       skos:note "Duplicate properties defaultGeometry and hasDefaultGeometry exist because of an inconsistency between ontology and documentation in GeoSPARQL 1.0. Only hasDefaultGeometry is described in the documention."@en ;
+                       skos:prefLabel "has default geometry"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#hasGeometry
@@ -166,20 +169,20 @@ geo:hasGeometry rdf:type owl:ObjectProperty ;
                 rdfs:isDefinedBy geo: ,
                                  <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/feature-properties> ,
                                  <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                <http://www.w3.org/2004/02/skos/core#definition> "A spatial representation for a given Feature."@en ;
-                <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ,
-                                                              <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2> ;
-                <http://www.w3.org/2004/02/skos/core#prefLabel> "has geometry"@en .
+                skos:definition "A spatial representation for a given Feature."@en ;
+                skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ,
+                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2> ;
+                skos:prefLabel "has geometry"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#hasSerialization
@@ -188,285 +191,285 @@ geo:hasSerialization rdf:type owl:ObjectProperty ;
 
 
 ###  http://www.w3.org/ns/prov#actedOnBehalfOf
-<http://www.w3.org/ns/prov#actedOnBehalfOf> rdf:type owl:ObjectProperty ;
-                                            rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                            rdfs:domain <http://www.w3.org/ns/prov#Agent> ;
-                                            rdfs:range <http://www.w3.org/ns/prov#Agent> ;
-                                            rdfs:comment "An object property to express the accountability of an agent towards another agent. The subordinate agent acted on behalf of the responsible agent in an actual activity. "@en ;
-                                            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                            rdfs:label "actedOnBehalfOf" ;
-                                            <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                            <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                            <http://www.w3.org/ns/prov#inverse> "hadDelegate" ;
-                                            <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Delegation> ,
-                                                                                      <http://www.w3.org/ns/prov#qualifiedDelegation> .
+prov:actedOnBehalfOf rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf prov:wasInfluencedBy ;
+                     rdfs:domain prov:Agent ;
+                     rdfs:range prov:Agent ;
+                     rdfs:comment "An object property to express the accountability of an agent towards another agent. The subordinate agent acted on behalf of the responsible agent in an actual activity. "@en ;
+                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                     rdfs:label "actedOnBehalfOf" ;
+                     prov:category "starting-point" ;
+                     prov:component "agents-responsibility" ;
+                     prov:inverse "hadDelegate" ;
+                     prov:qualifiedForm prov:Delegation ,
+                                        prov:qualifiedDelegation .
 
 
 ###  http://www.w3.org/ns/prov#generated
-<http://www.w3.org/ns/prov#generated> owl:inverseOf <http://www.w3.org/ns/prov#wasGeneratedBy> .
+prov:generated owl:inverseOf prov:wasGeneratedBy .
 
 
 ###  http://www.w3.org/ns/prov#influenced
-<http://www.w3.org/ns/prov#influenced> owl:inverseOf <http://www.w3.org/ns/prov#wasInfluencedBy> .
+prov:influenced owl:inverseOf prov:wasInfluencedBy .
 
 
 ###  http://www.w3.org/ns/prov#invalidated
-<http://www.w3.org/ns/prov#invalidated> owl:inverseOf <http://www.w3.org/ns/prov#wasInvalidatedBy> .
+prov:invalidated owl:inverseOf prov:wasInvalidatedBy .
 
 
 ###  http://www.w3.org/ns/prov#wasAssociatedWith
-<http://www.w3.org/ns/prov#wasAssociatedWith> rdf:type owl:ObjectProperty ;
-                                              rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                              rdfs:domain <http://www.w3.org/ns/prov#Activity> ;
-                                              rdfs:range <http://www.w3.org/ns/prov#Agent> ;
-                                              rdfs:comment "An prov:Agent that had some (unspecified) responsibility for the occurrence of this prov:Activity."@en ;
-                                              rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                              rdfs:label "wasAssociatedWith" ;
-                                              <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                              <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                              <http://www.w3.org/ns/prov#inverse> "wasAssociateFor" ;
-                                              <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Association> ,
-                                                                                        <http://www.w3.org/ns/prov#qualifiedAssociation> .
+prov:wasAssociatedWith rdf:type owl:ObjectProperty ;
+                       rdfs:subPropertyOf prov:wasInfluencedBy ;
+                       rdfs:domain prov:Activity ;
+                       rdfs:range prov:Agent ;
+                       rdfs:comment "An prov:Agent that had some (unspecified) responsibility for the occurrence of this prov:Activity."@en ;
+                       rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                       rdfs:label "wasAssociatedWith" ;
+                       prov:category "starting-point" ;
+                       prov:component "agents-responsibility" ;
+                       prov:inverse "wasAssociateFor" ;
+                       prov:qualifiedForm prov:Association ,
+                                          prov:qualifiedAssociation .
 
 
 ###  http://www.w3.org/ns/prov#wasAttributedTo
-<http://www.w3.org/ns/prov#wasAttributedTo> rdf:type owl:ObjectProperty ;
-                                            rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                            rdfs:domain <http://www.w3.org/ns/prov#Entity> ;
-                                            rdfs:range <http://www.w3.org/ns/prov#Agent> ;
-                                            rdfs:comment "Attribution is the ascribing of an entity to an agent."@en ;
-                                            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                            rdfs:label "wasAttributedTo" ;
-                                            <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                            <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                            <http://www.w3.org/ns/prov#definition> "Attribution is the ascribing of an entity to an agent."@en ;
-                                            <http://www.w3.org/ns/prov#inverse> "contributed" ;
-                                            <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Attribution> ,
-                                                                                      <http://www.w3.org/ns/prov#qualifiedAttribution> .
+prov:wasAttributedTo rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf prov:wasInfluencedBy ;
+                     rdfs:domain prov:Entity ;
+                     rdfs:range prov:Agent ;
+                     rdfs:comment "Attribution is the ascribing of an entity to an agent."@en ;
+                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                     rdfs:label "wasAttributedTo" ;
+                     prov:category "starting-point" ;
+                     prov:component "agents-responsibility" ;
+                     prov:definition "Attribution is the ascribing of an entity to an agent."@en ;
+                     prov:inverse "contributed" ;
+                     prov:qualifiedForm prov:Attribution ,
+                                        prov:qualifiedAttribution .
 
 [ rdf:type owl:Axiom ;
-   owl:annotatedSource <http://www.w3.org/ns/prov#wasAttributedTo> ;
+   owl:annotatedSource prov:wasAttributedTo ;
    owl:annotatedProperty rdfs:subPropertyOf ;
-   owl:annotatedTarget <http://www.w3.org/ns/prov#wasInfluencedBy> ;
+   owl:annotatedTarget prov:wasInfluencedBy ;
    rdfs:comment "Attribution is a particular case of trace (see http://www.w3.org/TR/prov-dm/#concept-trace), in the sense that it links an entity to the agent that ascribed it." ;
-   <http://www.w3.org/ns/prov#definition> "IF wasAttributedTo(e2,ag1,aAttr) holds, THEN wasInfluencedBy(e2,ag1) also holds. "
+   prov:definition "IF wasAttributedTo(e2,ag1,aAttr) holds, THEN wasInfluencedBy(e2,ag1) also holds. "
  ] .
 
 
 ###  http://www.w3.org/ns/prov#wasDerivedFrom
-<http://www.w3.org/ns/prov#wasDerivedFrom> rdf:type owl:ObjectProperty ;
-                                           rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                           rdfs:domain <http://www.w3.org/ns/prov#Entity> ;
-                                           rdfs:range <http://www.w3.org/ns/prov#Entity> ;
-                                           rdfs:comment "The more specific subproperties of prov:wasDerivedFrom (i.e., prov:wasQuotedFrom, prov:wasRevisionOf, prov:hadPrimarySource) should be used when applicable."@en ;
-                                           rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                           rdfs:label "wasDerivedFrom" ;
-                                           <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                           <http://www.w3.org/ns/prov#component> "derivations" ;
-                                           <http://www.w3.org/ns/prov#definition> "A derivation is a transformation of an entity into another, an update of an entity resulting in a new one, or the construction of a new entity based on a pre-existing entity."@en ;
-                                           <http://www.w3.org/ns/prov#inverse> "hadDerivation" ;
-                                           <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Derivation> ,
-                                                                                     <http://www.w3.org/ns/prov#qualifiedDerivation> .
+prov:wasDerivedFrom rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf prov:wasInfluencedBy ;
+                    rdfs:domain prov:Entity ;
+                    rdfs:range prov:Entity ;
+                    rdfs:comment "The more specific subproperties of prov:wasDerivedFrom (i.e., prov:wasQuotedFrom, prov:wasRevisionOf, prov:hadPrimarySource) should be used when applicable."@en ;
+                    rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                    rdfs:label "wasDerivedFrom" ;
+                    prov:category "starting-point" ;
+                    prov:component "derivations" ;
+                    prov:definition "A derivation is a transformation of an entity into another, an update of an entity resulting in a new one, or the construction of a new entity based on a pre-existing entity."@en ;
+                    prov:inverse "hadDerivation" ;
+                    prov:qualifiedForm prov:Derivation ,
+                                       prov:qualifiedDerivation .
 
 [ rdf:type owl:Axiom ;
-   owl:annotatedSource <http://www.w3.org/ns/prov#wasDerivedFrom> ;
+   owl:annotatedSource prov:wasDerivedFrom ;
    owl:annotatedProperty rdfs:subPropertyOf ;
-   owl:annotatedTarget <http://www.w3.org/ns/prov#wasInfluencedBy> ;
+   owl:annotatedTarget prov:wasInfluencedBy ;
    rdfs:comment "Derivation is a particular case of trace (see http://www.w3.org/TR/prov-dm/#term-trace), since it links an entity to another entity that contributed to its existence."
  ] .
 
 
 ###  http://www.w3.org/ns/prov#wasEndedBy
-<http://www.w3.org/ns/prov#wasEndedBy> rdf:type owl:ObjectProperty ;
-                                       rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                       rdfs:domain <http://www.w3.org/ns/prov#Activity> ;
-                                       rdfs:range <http://www.w3.org/ns/prov#Entity> ;
-                                       rdfs:comment "End is when an activity is deemed to have ended. An end may refer to an entity, known as trigger, that terminated the activity."@en ;
-                                       rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                       rdfs:label "wasEndedBy" ;
-                                       <http://www.w3.org/ns/prov#category> "expanded" ;
-                                       <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                       <http://www.w3.org/ns/prov#inverse> "ended" ;
-                                       <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#End> ,
-                                                                                 <http://www.w3.org/ns/prov#qualifiedEnd> .
+prov:wasEndedBy rdf:type owl:ObjectProperty ;
+                rdfs:subPropertyOf prov:wasInfluencedBy ;
+                rdfs:domain prov:Activity ;
+                rdfs:range prov:Entity ;
+                rdfs:comment "End is when an activity is deemed to have ended. An end may refer to an entity, known as trigger, that terminated the activity."@en ;
+                rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                rdfs:label "wasEndedBy" ;
+                prov:category "expanded" ;
+                prov:component "entities-activities" ;
+                prov:inverse "ended" ;
+                prov:qualifiedForm prov:End ,
+                                   prov:qualifiedEnd .
 
 
 ###  http://www.w3.org/ns/prov#wasGeneratedBy
-<http://www.w3.org/ns/prov#wasGeneratedBy> rdf:type owl:ObjectProperty ;
-                                           rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                           rdfs:domain <http://www.w3.org/ns/prov#Entity> ;
-                                           rdfs:range <http://www.w3.org/ns/prov#Activity> ;
-                                           rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                           rdfs:label "wasGeneratedBy" ;
-                                           <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                           <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                           <http://www.w3.org/ns/prov#inverse> "generated" ;
-                                           <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Generation> ,
-                                                                                     <http://www.w3.org/ns/prov#qualifiedGeneration> .
+prov:wasGeneratedBy rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf prov:wasInfluencedBy ;
+                    rdfs:domain prov:Entity ;
+                    rdfs:range prov:Activity ;
+                    rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                    rdfs:label "wasGeneratedBy" ;
+                    prov:category "starting-point" ;
+                    prov:component "entities-activities" ;
+                    prov:inverse "generated" ;
+                    prov:qualifiedForm prov:Generation ,
+                                       prov:qualifiedGeneration .
 
 
 ###  http://www.w3.org/ns/prov#wasInfluencedBy
-<http://www.w3.org/ns/prov#wasInfluencedBy> rdf:type owl:ObjectProperty ;
-                                            rdfs:domain _:genid3 ;
-                                            rdfs:range _:genid8 ;
-                                            rdfs:comment "Because prov:wasInfluencedBy is a broad relation, its more specific subproperties (e.g. prov:wasInformedBy, prov:actedOnBehalfOf, prov:wasEndedBy, etc.) should be used when applicable."@en ,
-                                                         "This property has multiple RDFS domains to suit multiple OWL Profiles. See <a href=\"#owl-profile\">PROV-O OWL Profile</a>." ;
-                                            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                            rdfs:label "wasInfluencedBy" ;
-                                            <http://www.w3.org/ns/prov#category> "qualified" ;
-                                            <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                            <http://www.w3.org/ns/prov#editorialNote> """The sub-properties of prov:wasInfluencedBy can be elaborated in more detail using the Qualification Pattern. For example, the binary relation :baking prov:used :spoon can be qualified by asserting :baking prov:qualifiedUsage [ a prov:Usage; prov:entity :spoon; prov:atLocation :kitchen ] .
+prov:wasInfluencedBy rdf:type owl:ObjectProperty ;
+                     rdfs:domain _:genid3 ;
+                     rdfs:range _:genid8 ;
+                     rdfs:comment "Because prov:wasInfluencedBy is a broad relation, its more specific subproperties (e.g. prov:wasInformedBy, prov:actedOnBehalfOf, prov:wasEndedBy, etc.) should be used when applicable."@en ,
+                                  "This property has multiple RDFS domains to suit multiple OWL Profiles. See <a href=\"#owl-profile\">PROV-O OWL Profile</a>." ;
+                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                     rdfs:label "wasInfluencedBy" ;
+                     prov:category "qualified" ;
+                     prov:component "agents-responsibility" ;
+                     prov:editorialNote """The sub-properties of prov:wasInfluencedBy can be elaborated in more detail using the Qualification Pattern. For example, the binary relation :baking prov:used :spoon can be qualified by asserting :baking prov:qualifiedUsage [ a prov:Usage; prov:entity :spoon; prov:atLocation :kitchen ] .
 
 Subproperties of prov:wasInfluencedBy may also be asserted directly without being qualified.
 
 prov:wasInfluencedBy should not be used without also using one of its subproperties. 
 """@en ;
-                                            <http://www.w3.org/ns/prov#inverse> "influenced" ;
-                                            <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Influence> ,
-                                                                                      <http://www.w3.org/ns/prov#qualifiedInfluence> ;
-                                            <http://www.w3.org/ns/prov#sharesDefinitionWith> <http://www.w3.org/ns/prov#Influence> .
+                     prov:inverse "influenced" ;
+                     prov:qualifiedForm prov:Influence ,
+                                        prov:qualifiedInfluence ;
+                     prov:sharesDefinitionWith prov:Influence .
 
 _:genid3 rdf:type owl:Class ;
-          owl:unionOf ( <http://www.w3.org/ns/prov#Activity>
-                        <http://www.w3.org/ns/prov#Agent>
-                        <http://www.w3.org/ns/prov#Entity>
+          owl:unionOf ( prov:Activity
+                        prov:Agent
+                        prov:Entity
                       ) .
 
 _:genid8 rdf:type owl:Class ;
-          owl:unionOf ( <http://www.w3.org/ns/prov#Activity>
-                        <http://www.w3.org/ns/prov#Agent>
-                        <http://www.w3.org/ns/prov#Entity>
+          owl:unionOf ( prov:Activity
+                        prov:Agent
+                        prov:Entity
                       ) .
 
 [ rdf:type owl:Axiom ;
-   owl:annotatedSource <http://www.w3.org/ns/prov#wasInfluencedBy> ;
+   owl:annotatedSource prov:wasInfluencedBy ;
    owl:annotatedProperty rdfs:range ;
    owl:annotatedTarget _:genid8 ;
-   <http://www.w3.org/ns/prov#definition> "influencer: an identifier (o1) for an ancestor entity, activity, or agent that the former depends on;" ;
-   <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-influence"
+   prov:definition "influencer: an identifier (o1) for an ancestor entity, activity, or agent that the former depends on;" ;
+   prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-influence"
  ] .
 
 [ rdf:type owl:Axiom ;
-   owl:annotatedSource <http://www.w3.org/ns/prov#wasInfluencedBy> ;
+   owl:annotatedSource prov:wasInfluencedBy ;
    owl:annotatedProperty rdfs:domain ;
    owl:annotatedTarget _:genid3 ;
-   <http://www.w3.org/ns/prov#definition> "influencee: an identifier (o2) for an entity, activity, or agent; " ;
-   <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-influence"
+   prov:definition "influencee: an identifier (o2) for an entity, activity, or agent; " ;
+   prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-influence"
  ] .
 
 
 ###  http://www.w3.org/ns/prov#wasInformedBy
-<http://www.w3.org/ns/prov#wasInformedBy> rdf:type owl:ObjectProperty ;
-                                          rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                          rdfs:domain <http://www.w3.org/ns/prov#Activity> ;
-                                          rdfs:range <http://www.w3.org/ns/prov#Activity> ;
-                                          rdfs:comment "An activity a2 is dependent on or informed by another activity a1, by way of some unspecified entity that is generated by a1 and used by a2."@en ;
-                                          rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                          rdfs:label "wasInformedBy" ;
-                                          <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                          <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                          <http://www.w3.org/ns/prov#inverse> "informed" ;
-                                          <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Communication> ,
-                                                                                    <http://www.w3.org/ns/prov#qualifiedCommunication> .
+prov:wasInformedBy rdf:type owl:ObjectProperty ;
+                   rdfs:subPropertyOf prov:wasInfluencedBy ;
+                   rdfs:domain prov:Activity ;
+                   rdfs:range prov:Activity ;
+                   rdfs:comment "An activity a2 is dependent on or informed by another activity a1, by way of some unspecified entity that is generated by a1 and used by a2."@en ;
+                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                   rdfs:label "wasInformedBy" ;
+                   prov:category "starting-point" ;
+                   prov:component "entities-activities" ;
+                   prov:inverse "informed" ;
+                   prov:qualifiedForm prov:Communication ,
+                                      prov:qualifiedCommunication .
 
 
 ###  http://www.w3.org/ns/prov#wasInvalidatedBy
-<http://www.w3.org/ns/prov#wasInvalidatedBy> rdf:type owl:ObjectProperty ;
-                                             rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                             rdfs:domain <http://www.w3.org/ns/prov#Entity> ;
-                                             rdfs:range <http://www.w3.org/ns/prov#Activity> ;
-                                             rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                             rdfs:label "wasInvalidatedBy" ;
-                                             <http://www.w3.org/ns/prov#category> "expanded" ;
-                                             <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                             <http://www.w3.org/ns/prov#inverse> "invalidated" ;
-                                             <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Invalidation> ,
-                                                                                       <http://www.w3.org/ns/prov#qualifiedInvalidation> .
+prov:wasInvalidatedBy rdf:type owl:ObjectProperty ;
+                      rdfs:subPropertyOf prov:wasInfluencedBy ;
+                      rdfs:domain prov:Entity ;
+                      rdfs:range prov:Activity ;
+                      rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                      rdfs:label "wasInvalidatedBy" ;
+                      prov:category "expanded" ;
+                      prov:component "entities-activities" ;
+                      prov:inverse "invalidated" ;
+                      prov:qualifiedForm prov:Invalidation ,
+                                         prov:qualifiedInvalidation .
 
 
 ###  http://www.w3.org/ns/prov#wasStartedBy
-<http://www.w3.org/ns/prov#wasStartedBy> rdf:type owl:ObjectProperty ;
-                                         rdfs:subPropertyOf <http://www.w3.org/ns/prov#wasInfluencedBy> ;
-                                         rdfs:domain <http://www.w3.org/ns/prov#Activity> ;
-                                         rdfs:range <http://www.w3.org/ns/prov#Entity> ;
-                                         rdfs:comment "Start is when an activity is deemed to have started. A start may refer to an entity, known as trigger, that initiated the activity."@en ;
-                                         rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                         rdfs:label "wasStartedBy" ;
-                                         <http://www.w3.org/ns/prov#category> "expanded" ;
-                                         <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                         <http://www.w3.org/ns/prov#inverse> "started" ;
-                                         <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Start> ,
-                                                                                   <http://www.w3.org/ns/prov#qualifiedStart> .
+prov:wasStartedBy rdf:type owl:ObjectProperty ;
+                  rdfs:subPropertyOf prov:wasInfluencedBy ;
+                  rdfs:domain prov:Activity ;
+                  rdfs:range prov:Entity ;
+                  rdfs:comment "Start is when an activity is deemed to have started. A start may refer to an entity, known as trigger, that initiated the activity."@en ;
+                  rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                  rdfs:label "wasStartedBy" ;
+                  prov:category "expanded" ;
+                  prov:component "entities-activities" ;
+                  prov:inverse "started" ;
+                  prov:qualifiedForm prov:Start ,
+                                     prov:qualifiedStart .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterLocation
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterLocation> rdf:type owl:ObjectProperty ;
-                                                                                                         owl:inverseOf <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfDisaster> ;
-                                                                                                         rdfs:domain :DisasterEvent ;
-                                                                                                         rdfs:range <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location> ;
-                                                                                                         rdfs:label "has disaster location" ;
-                                                                                                         <http://www.w3.org/2004/02/skos/core#definition> "Represents the location where a natural disaster takes place." .
+baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
+                        owl:inverseOf baw:isLocationOfDisaster ;
+                        rdfs:domain :DisasterEvent ;
+                        rdfs:range baw:Location ;
+                        rdfs:label "has disaster location" ;
+                        skos:definition "Represents the location where a natural disaster takes place." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterOccurrence
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterOccurrence> rdf:type owl:ObjectProperty ;
-                                                                                                           owl:inverseOf <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType> ,
-                                                                                                                         :hasType ;
-                                                                                                           rdfs:domain :DisasterType ;
-                                                                                                           rdfs:range :DisasterEvent ;
-                                                                                                           rdfs:label "has disaster occurrence" ;
-                                                                                                           <http://www.w3.org/2004/02/skos/core#definition> "Links a natural disaster type to a natural disaster." .
+baw:hasDisasterOccurrence rdf:type owl:ObjectProperty ;
+                          owl:inverseOf baw:isOfDisasterType ,
+                                        :hasType ;
+                          rdfs:domain :DisasterType ;
+                          rdfs:range :DisasterEvent ;
+                          rdfs:label "has disaster occurrence" ;
+                          skos:definition "Links a natural disaster type to a natural disaster." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact> rdf:type owl:ObjectProperty ;
-                                                                                                       rdfs:subPropertyOf :hasImpact ;
-                                                                                                       rdfs:domain <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident> ;
-                                                                                                       rdfs:range <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact> ;
-                                                                                                       rdfs:label "has incident impact" ;
-                                                                                                       <http://www.w3.org/2004/02/skos/core#definition> "Indicates the impact of the specific incident." .
+baw:hasIncidentImpact rdf:type owl:ObjectProperty ;
+                      rdfs:subPropertyOf :hasImpact ;
+                      rdfs:domain baw:Incident ;
+                      rdfs:range baw:Impact ;
+                      rdfs:label "has incident impact" ;
+                      skos:definition "Indicates the impact of the specific incident." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentLocation
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentLocation> rdf:type owl:ObjectProperty ;
-                                                                                                         rdfs:subPropertyOf <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterLocation> ;
-                                                                                                         owl:inverseOf <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfIncident> ;
-                                                                                                         rdfs:domain <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident> ;
-                                                                                                         rdfs:range <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location> ;
-                                                                                                         rdfs:label "has incident location" ;
-                                                                                                         <http://www.w3.org/2004/02/skos/core#definition> "Represents the location where an incident occurs." .
+baw:hasIncidentLocation rdf:type owl:ObjectProperty ;
+                        rdfs:subPropertyOf baw:hasDisasterLocation ;
+                        owl:inverseOf baw:isLocationOfIncident ;
+                        rdfs:domain baw:Incident ;
+                        rdfs:range baw:Location ;
+                        rdfs:label "has incident location" ;
+                        skos:definition "Represents the location where an incident occurs." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentOccurrence
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentOccurrence> rdf:type owl:ObjectProperty ;
-                                                                                                           rdfs:subPropertyOf <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterOccurrence> ;
-                                                                                                           rdfs:domain :DisasterType ;
-                                                                                                           rdfs:range <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident> ;
-                                                                                                           rdfs:label "has incident occurrence" ;
-                                                                                                           <http://www.w3.org/2004/02/skos/core#definition> "Links an incident type to an incident." .
+baw:hasIncidentOccurrence rdf:type owl:ObjectProperty ;
+                          rdfs:subPropertyOf baw:hasDisasterOccurrence ;
+                          rdfs:domain :DisasterType ;
+                          rdfs:range baw:Incident ;
+                          rdfs:label "has incident occurrence" ;
+                          skos:definition "Links an incident type to an incident." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfDisaster
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfDisaster> rdf:type owl:ObjectProperty ;
-                                                                                                          rdfs:domain <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location> ;
-                                                                                                          rdfs:range :DisasterEvent ;
-                                                                                                          rdfs:label "is location of disaster" ;
-                                                                                                          <http://www.w3.org/2004/02/skos/core#definition> "Links a location to a natural disaster occurrence." .
+baw:isLocationOfDisaster rdf:type owl:ObjectProperty ;
+                         rdfs:domain baw:Location ;
+                         rdfs:range :DisasterEvent ;
+                         rdfs:label "is location of disaster" ;
+                         skos:definition "Links a location to a natural disaster occurrence." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfIncident
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfIncident> rdf:type owl:ObjectProperty ;
-                                                                                                          rdfs:subPropertyOf <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfDisaster> ;
-                                                                                                          rdfs:domain <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location> ;
-                                                                                                          rdfs:range <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident> ;
-                                                                                                          rdfs:label "is location of incident" ;
-                                                                                                          <http://www.w3.org/2004/02/skos/core#definition> "Links a location to an incident occurrence." .
+baw:isLocationOfIncident rdf:type owl:ObjectProperty ;
+                         rdfs:subPropertyOf baw:isLocationOfDisaster ;
+                         rdfs:domain baw:Location ;
+                         rdfs:range baw:Incident ;
+                         rdfs:label "is location of incident" ;
+                         skos:definition "Links a location to an incident occurrence." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType> rdf:type owl:ObjectProperty ;
-                                                                                                      owl:equivalentProperty :hasType ;
-                                                                                                      rdfs:label "is of disaster type" .
+baw:isOfDisasterType rdf:type owl:ObjectProperty ;
+                     owl:equivalentProperty :hasType ;
+                     rdfs:label "is of disaster type" .
 
 
 ###  https://sakuna.ph/fromSource
@@ -666,77 +669,77 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
 
 
 ###  http://www.w3.org/ns/prov#endedAtTime
-<http://www.w3.org/ns/prov#endedAtTime> rdf:type owl:DatatypeProperty ;
-                                        rdfs:domain <http://www.w3.org/ns/prov#Activity> ;
-                                        rdfs:range xsd:dateTime ;
-                                        rdfs:comment "The time at which an activity ended. See also prov:startedAtTime."@en ;
-                                        rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                        rdfs:label "endedAtTime" ;
-                                        <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                        <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                        <http://www.w3.org/ns/prov#editorialNote> "It is the intent that the property chain holds: (prov:qualifiedEnd o prov:atTime) rdfs:subPropertyOf prov:endedAtTime."@en ;
-                                        <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#End> ,
-                                                                                  <http://www.w3.org/ns/prov#atTime> .
+prov:endedAtTime rdf:type owl:DatatypeProperty ;
+                 rdfs:domain prov:Activity ;
+                 rdfs:range xsd:dateTime ;
+                 rdfs:comment "The time at which an activity ended. See also prov:startedAtTime."@en ;
+                 rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                 rdfs:label "endedAtTime" ;
+                 prov:category "starting-point" ;
+                 prov:component "entities-activities" ;
+                 prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedEnd o prov:atTime) rdfs:subPropertyOf prov:endedAtTime."@en ;
+                 prov:qualifiedForm prov:End ,
+                                    prov:atTime .
 
 
 ###  http://www.w3.org/ns/prov#generatedAtTime
-<http://www.w3.org/ns/prov#generatedAtTime> rdf:type owl:DatatypeProperty ;
-                                            rdfs:domain <http://www.w3.org/ns/prov#Entity> ;
-                                            rdfs:range xsd:dateTime ;
-                                            rdfs:comment "The time at which an entity was completely created and is available for use."@en ;
-                                            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                            rdfs:label "generatedAtTime" ;
-                                            <http://www.w3.org/ns/prov#category> "expanded" ;
-                                            <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                            <http://www.w3.org/ns/prov#editorialNote> "It is the intent that the property chain holds: (prov:qualifiedGeneration o prov:atTime) rdfs:subPropertyOf prov:generatedAtTime."@en ;
-                                            <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Generation> ,
-                                                                                      <http://www.w3.org/ns/prov#atTime> .
+prov:generatedAtTime rdf:type owl:DatatypeProperty ;
+                     rdfs:domain prov:Entity ;
+                     rdfs:range xsd:dateTime ;
+                     rdfs:comment "The time at which an entity was completely created and is available for use."@en ;
+                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                     rdfs:label "generatedAtTime" ;
+                     prov:category "expanded" ;
+                     prov:component "entities-activities" ;
+                     prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedGeneration o prov:atTime) rdfs:subPropertyOf prov:generatedAtTime."@en ;
+                     prov:qualifiedForm prov:Generation ,
+                                        prov:atTime .
 
 
 ###  http://www.w3.org/ns/prov#invalidatedAtTime
-<http://www.w3.org/ns/prov#invalidatedAtTime> rdf:type owl:DatatypeProperty ;
-                                              rdfs:domain <http://www.w3.org/ns/prov#Entity> ;
-                                              rdfs:range xsd:dateTime ;
-                                              rdfs:comment "The time at which an entity was invalidated (i.e., no longer usable)."@en ;
-                                              rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                              rdfs:label "invalidatedAtTime" ;
-                                              <http://www.w3.org/ns/prov#category> "expanded" ;
-                                              <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                              <http://www.w3.org/ns/prov#editorialNote> "It is the intent that the property chain holds: (prov:qualifiedInvalidation o prov:atTime) rdfs:subPropertyOf prov:invalidatedAtTime."@en ;
-                                              <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Invalidation> ,
-                                                                                        <http://www.w3.org/ns/prov#atTime> .
+prov:invalidatedAtTime rdf:type owl:DatatypeProperty ;
+                       rdfs:domain prov:Entity ;
+                       rdfs:range xsd:dateTime ;
+                       rdfs:comment "The time at which an entity was invalidated (i.e., no longer usable)."@en ;
+                       rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                       rdfs:label "invalidatedAtTime" ;
+                       prov:category "expanded" ;
+                       prov:component "entities-activities" ;
+                       prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedInvalidation o prov:atTime) rdfs:subPropertyOf prov:invalidatedAtTime."@en ;
+                       prov:qualifiedForm prov:Invalidation ,
+                                          prov:atTime .
 
 
 ###  http://www.w3.org/ns/prov#startedAtTime
-<http://www.w3.org/ns/prov#startedAtTime> rdf:type owl:DatatypeProperty ;
-                                          rdfs:domain <http://www.w3.org/ns/prov#Activity> ;
-                                          rdfs:range xsd:dateTime ;
-                                          rdfs:comment "The time at which an activity started. See also prov:endedAtTime."@en ;
-                                          rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                          rdfs:label "startedAtTime" ;
-                                          <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                          <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                          <http://www.w3.org/ns/prov#editorialNote> "It is the intent that the property chain holds: (prov:qualifiedStart o prov:atTime) rdfs:subPropertyOf prov:startedAtTime."@en ;
-                                          <http://www.w3.org/ns/prov#qualifiedForm> <http://www.w3.org/ns/prov#Start> ,
-                                                                                    <http://www.w3.org/ns/prov#atTime> .
+prov:startedAtTime rdf:type owl:DatatypeProperty ;
+                   rdfs:domain prov:Activity ;
+                   rdfs:range xsd:dateTime ;
+                   rdfs:comment "The time at which an activity started. See also prov:endedAtTime."@en ;
+                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                   rdfs:label "startedAtTime" ;
+                   prov:category "starting-point" ;
+                   prov:component "entities-activities" ;
+                   prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedStart o prov:atTime) rdfs:subPropertyOf prov:startedAtTime."@en ;
+                   prov:qualifiedForm prov:Start ,
+                                      prov:atTime .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd> rdf:type owl:DatatypeProperty ;
-                                                                                                    owl:equivalentProperty :endDate ;
-                                                                                                    rdfs:domain :DisasterEvent ;
-                                                                                                    rdfs:range xsd:dateTime ;
-                                                                                                    rdfs:label "has disaster end" ;
-                                                                                                    <http://www.w3.org/2004/02/skos/core#definition> "Indicates the end of the disaster." .
+baw:hasDisasterEnd rdf:type owl:DatatypeProperty ;
+                   owl:equivalentProperty :endDate ;
+                   rdfs:domain :DisasterEvent ;
+                   rdfs:range xsd:dateTime ;
+                   rdfs:label "has disaster end" ;
+                   skos:definition "Indicates the end of the disaster." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterStart
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterStart> rdf:type owl:DatatypeProperty ;
-                                                                                                      owl:equivalentProperty :startDate ;
-                                                                                                      rdfs:domain :DisasterEvent ;
-                                                                                                      rdfs:range xsd:dateTime ;
-                                                                                                      rdfs:label "has disaster start" ;
-                                                                                                      <http://www.w3.org/2004/02/skos/core#definition> "Indicates the start of the disaster." .
+baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
+                     owl:equivalentProperty :startDate ;
+                     rdfs:domain :DisasterEvent ;
+                     rdfs:range xsd:dateTime ;
+                     rdfs:label "has disaster start" ;
+                     skos:definition "Indicates the start of the disaster." .
 
 
 ###  https://sakuna.ph/admLevel
@@ -768,7 +771,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                                  ] ;
                      rdfs:range xsd:string ;
                      rdfs:label "affected description" ;
-                     <http://www.w3.org/2004/02/skos/core#definition> "General (unprocessed) information about the affected entity." .
+                     skos:definition "General (unprocessed) information about the affected entity." .
 
 
 ###  https://sakuna.ph/affectedFamilies
@@ -840,7 +843,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                 rdfs:domain :Assistance ;
                 rdfs:range xsd:decimal ;
                 rdfs:label "allocated funds"@en ;
-                <http://www.w3.org/2004/02/skos/core#note> "In M Php" .
+                skos:note "In M Php" .
 
 
 ###  https://sakuna.ph/amountDSWD
@@ -888,7 +891,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                        rdfs:domain :Preparedness ;
                        rdfs:range xsd:string ;
                        rdfs:label "announcements released" ;
-                       <http://www.w3.org/2004/02/skos/core#definition> "Announcements released during preparation for a disaster." .
+                       skos:definition "Announcements released during preparation for a disaster." .
 
 
 ###  https://sakuna.ph/cancelledDateTime
@@ -935,7 +938,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                         rdfs:range xsd:decimal ;
                         rdfs:comment "In M PHP" ;
                         rdfs:label "commercial damage amount"@en ;
-                        <http://www.w3.org/2004/02/skos/core#altLabel> "private damage amount" .
+                        skos:altLabel "private damage amount" .
 
 
 ###  https://sakuna.ph/communicationStatus
@@ -967,7 +970,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
                            rdfs:range xsd:decimal ;
                            rdfs:comment "In M PHP" ;
                            rdfs:label "cross sectoral damage amount" ;
-                           <http://www.w3.org/2004/02/skos/core#example> "health government, transmission lines" .
+                           skos:example "health government, transmission lines" .
 
 
 ###  https://sakuna.ph/dead
@@ -1210,7 +1213,7 @@ geo:hasSerialization rdf:type owl:DatatypeProperty ;
           rdfs:domain :Relief ;
           rdfs:range xsd:decimal ;
           rdfs:label "item cost" ;
-          <http://www.w3.org/2004/02/skos/core#note> "In M Php" .
+          skos:note "In M Php" .
 
 
 ###  https://sakuna.ph/itemCostPerUnit
@@ -1707,23 +1710,23 @@ geo:Feature rdf:type owl:Class ;
             rdfs:isDefinedBy geo: ,
                              <http://www.opengis.net/spec/geosparql/1.0/req/core/feature-class> ,
                              <http://www.opengis.net/spec/geosparql/1.1/req/core/feature-class> ;
-            <http://www.w3.org/2004/02/skos/core#definition> "A discrete spatial phenomenon in a universe of discourse."@en ;
-            <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.1> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.7> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.9> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
-                                                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-            <http://www.w3.org/2004/02/skos/core#note> "A Feature represents a uniquely identifiable phenomenon, for example a river or an apple. While such phenomena (and therefore the Features used to represent them) are bounded, their boundaries may be crisp (e.g., the declared boundaries of a state), vague (e.g., the delineation of a valley versus its neighboring mountains), and change with time (e.g., a storm front). While discrete in nature, Features may be created from continuous observations, such as an isochrone that determines the region that can be reached by ambulance within 5 minutes."@en ;
-            <http://www.w3.org/2004/02/skos/core#prefLabel> "Feature"@en .
+            skos:definition "A discrete spatial phenomenon in a universe of discourse."@en ;
+            skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.1> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.7> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.9> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
+                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+            skos:note "A Feature represents a uniquely identifiable phenomenon, for example a river or an apple. While such phenomena (and therefore the Features used to represent them) are bounded, their boundaries may be crisp (e.g., the declared boundaries of a state), vague (e.g., the delineation of a valley versus its neighboring mountains), and change with time (e.g., a storm front). While discrete in nature, Features may be created from continuous observations, such as an isochrone that determines the region that can be reached by ambulance within 5 minutes."@en ;
+            skos:prefLabel "Feature"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#Geometry
@@ -1732,21 +1735,21 @@ geo:Geometry rdf:type owl:Class ;
              rdfs:isDefinedBy geo: ,
                               <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-class> ,
                               <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-class> ;
-             <http://www.w3.org/2004/02/skos/core#definition> "A coherent set of direct positions in space. The positions are held within a Spatial Reference System (SRS)."@en ;
-             <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.1> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
-                                                           <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-             <http://www.w3.org/2004/02/skos/core#note> "Geometry can be used as a representation of the shape, extent or location of a Feature and may exist as a self-contained entity."@en ;
-             <http://www.w3.org/2004/02/skos/core#prefLabel> "Geometry"@en .
+             skos:definition "A coherent set of direct positions in space. The positions are held within a Spatial Reference System (SRS)."@en ;
+             skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.1> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
+                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+             skos:note "Geometry can be used as a representation of the shape, extent or location of a Feature and may exist as a self-contained entity."@en ;
+             skos:prefLabel "Geometry"@en .
 
 
 ###  http://www.opengis.net/ont/geosparql#SpatialObject
@@ -1754,112 +1757,112 @@ geo:SpatialObject rdf:type owl:Class .
 
 
 ###  http://www.w3.org/ns/prov#Activity
-<http://www.w3.org/ns/prov#Activity> rdf:type owl:Class ;
-                                     owl:disjointWith <http://www.w3.org/ns/prov#Entity> ;
-                                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                     rdfs:label "Activity" ;
-                                     <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                     <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                     <http://www.w3.org/ns/prov#constraints> "http://www.w3.org/TR/2013/REC-prov-constraints-20130430/#prov-dm-constraints-fig"^^xsd:anyURI ;
-                                     <http://www.w3.org/ns/prov#definition> "An activity is something that occurs over a period of time and acts upon or with entities; it may include consuming, processing, transforming, modifying, relocating, using, or generating entities." ;
-                                     <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-Activity"^^xsd:anyURI ;
-                                     <http://www.w3.org/ns/prov#n> "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Activity"^^xsd:anyURI .
+prov:Activity rdf:type owl:Class ;
+              owl:disjointWith prov:Entity ;
+              rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+              rdfs:label "Activity" ;
+              prov:category "starting-point" ;
+              prov:component "entities-activities" ;
+              prov:constraints "http://www.w3.org/TR/2013/REC-prov-constraints-20130430/#prov-dm-constraints-fig"^^xsd:anyURI ;
+              prov:definition "An activity is something that occurs over a period of time and acts upon or with entities; it may include consuming, processing, transforming, modifying, relocating, using, or generating entities." ;
+              prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-Activity"^^xsd:anyURI ;
+              prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Activity"^^xsd:anyURI .
 
 
 ###  http://www.w3.org/ns/prov#Agent
-<http://www.w3.org/ns/prov#Agent> rdf:type owl:Class ;
-                                  owl:disjointWith <http://www.w3.org/ns/prov#InstantaneousEvent> ;
-                                  rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                  rdfs:label "Agent" ;
-                                  <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                  <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                  <http://www.w3.org/ns/prov#definition> "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity. "@en ;
-                                  <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-                                  <http://www.w3.org/ns/prov#n> "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Agent"^^xsd:anyURI .
+prov:Agent rdf:type owl:Class ;
+           owl:disjointWith prov:InstantaneousEvent ;
+           rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+           rdfs:label "Agent" ;
+           prov:category "starting-point" ;
+           prov:component "agents-responsibility" ;
+           prov:definition "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity. "@en ;
+           prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
+           prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Agent"^^xsd:anyURI .
 
 
 ###  http://www.w3.org/ns/prov#Entity
-<http://www.w3.org/ns/prov#Entity> rdf:type owl:Class ;
-                                   owl:disjointWith <http://www.w3.org/ns/prov#InstantaneousEvent> ;
-                                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                   rdfs:label "Entity" ;
-                                   <http://www.w3.org/ns/prov#category> "starting-point" ;
-                                   <http://www.w3.org/ns/prov#component> "entities-activities" ;
-                                   <http://www.w3.org/ns/prov#constraints> "http://www.w3.org/TR/2013/REC-prov-constraints-20130430/#prov-dm-constraints-fig"^^xsd:anyURI ;
-                                   <http://www.w3.org/ns/prov#definition> "An entity is a physical, digital, conceptual, or other kind of thing with some fixed aspects; entities may be real or imaginary. "@en ;
-                                   <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-entity"^^xsd:anyURI ;
-                                   <http://www.w3.org/ns/prov#n> "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Entity"^^xsd:anyURI .
+prov:Entity rdf:type owl:Class ;
+            owl:disjointWith prov:InstantaneousEvent ;
+            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+            rdfs:label "Entity" ;
+            prov:category "starting-point" ;
+            prov:component "entities-activities" ;
+            prov:constraints "http://www.w3.org/TR/2013/REC-prov-constraints-20130430/#prov-dm-constraints-fig"^^xsd:anyURI ;
+            prov:definition "An entity is a physical, digital, conceptual, or other kind of thing with some fixed aspects; entities may be real or imaginary. "@en ;
+            prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-entity"^^xsd:anyURI ;
+            prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Entity"^^xsd:anyURI .
 
 
 ###  http://www.w3.org/ns/prov#Organization
-<http://www.w3.org/ns/prov#Organization> rdf:type owl:Class ;
-                                         rdfs:subClassOf <http://www.w3.org/ns/prov#Agent> ;
-                                         rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                         rdfs:label "Organization" ;
-                                         <http://www.w3.org/ns/prov#category> "expanded" ;
-                                         <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                         <http://www.w3.org/ns/prov#definition> "An organization is a social or legal institution such as a company, society, etc." ;
-                                         <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-                                         <http://www.w3.org/ns/prov#n> "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
+prov:Organization rdf:type owl:Class ;
+                  rdfs:subClassOf prov:Agent ;
+                  rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                  rdfs:label "Organization" ;
+                  prov:category "expanded" ;
+                  prov:component "agents-responsibility" ;
+                  prov:definition "An organization is a social or legal institution such as a company, society, etc." ;
+                  prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
+                  prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
 
 
 ###  http://www.w3.org/ns/prov#Person
-<http://www.w3.org/ns/prov#Person> rdf:type owl:Class ;
-                                   rdfs:subClassOf <http://www.w3.org/ns/prov#Agent> ;
-                                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                   rdfs:label "Person" ;
-                                   <http://www.w3.org/ns/prov#category> "expanded" ;
-                                   <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                   <http://www.w3.org/ns/prov#definition> "Person agents are people."@en ;
-                                   <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-                                   <http://www.w3.org/ns/prov#n> "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
+prov:Person rdf:type owl:Class ;
+            rdfs:subClassOf prov:Agent ;
+            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+            rdfs:label "Person" ;
+            prov:category "expanded" ;
+            prov:component "agents-responsibility" ;
+            prov:definition "Person agents are people."@en ;
+            prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
+            prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
 
 
 ###  http://www.w3.org/ns/prov#SoftwareAgent
-<http://www.w3.org/ns/prov#SoftwareAgent> rdf:type owl:Class ;
-                                          rdfs:subClassOf <http://www.w3.org/ns/prov#Agent> ;
-                                          rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                                          rdfs:label "SoftwareAgent" ;
-                                          <http://www.w3.org/ns/prov#category> "expanded" ;
-                                          <http://www.w3.org/ns/prov#component> "agents-responsibility" ;
-                                          <http://www.w3.org/ns/prov#definition> "A software agent is running software."@en ;
-                                          <http://www.w3.org/ns/prov#dm> "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-                                          <http://www.w3.org/ns/prov#n> "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
+prov:SoftwareAgent rdf:type owl:Class ;
+                   rdfs:subClassOf prov:Agent ;
+                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
+                   rdfs:label "SoftwareAgent" ;
+                   prov:category "expanded" ;
+                   prov:component "agents-responsibility" ;
+                   prov:definition "A software agent is running software."@en ;
+                   prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
+                   prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact> rdf:type owl:Class ;
-                                                                                            owl:equivalentClass :Impact ;
-                                                                                            rdfs:label "Impact" ;
-                                                                                            <http://www.w3.org/2004/02/skos/core#definition> "Represents the impact of natural disasters and incidents." .
+baw:Impact rdf:type owl:Class ;
+           owl:equivalentClass :Impact ;
+           rdfs:label "Impact" ;
+           skos:definition "Represents the impact of natural disasters and incidents." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident> rdf:type owl:Class ;
-                                                                                              owl:equivalentClass :Incident ;
-                                                                                              rdfs:label "Incident" ;
-                                                                                              <http://www.w3.org/2004/02/skos/core#definition> "Represents the various incidents taking place during a natural disaster." .
+baw:Incident rdf:type owl:Class ;
+             owl:equivalentClass :Incident ;
+             rdfs:label "Incident" ;
+             skos:definition "Represents the various incidents taking place during a natural disaster." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location> rdf:type owl:Class ;
-                                                                                              owl:equivalentClass :Location .
+baw:Location rdf:type owl:Class ;
+             owl:equivalentClass :Location .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisaster
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisaster> rdf:type owl:Class ;
-                                                                                                     owl:equivalentClass :MajorEvent ;
-                                                                                                     rdfs:subClassOf :DisasterEvent ;
-                                                                                                     rdfs:label "Natural Disaster" ;
-                                                                                                     <http://www.w3.org/2004/02/skos/core#definition> "Represents the actual manifestation of a natural disaster type. An instance of a natural disaster has specific climate conditions with specific values (e.g. temperature = 45) plus some other properties (e.g. start/end time)." .
+baw:NaturalDisaster rdf:type owl:Class ;
+                    owl:equivalentClass :MajorEvent ;
+                    rdfs:subClassOf :DisasterEvent ;
+                    rdfs:label "Natural Disaster" ;
+                    skos:definition "Represents the actual manifestation of a natural disaster type. An instance of a natural disaster has specific climate conditions with specific values (e.g. temperature = 45) plus some other properties (e.g. start/end time)." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType
-<https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType> rdf:type owl:Class ;
-                                                                                                         owl:equivalentClass :Natural ;
-                                                                                                         rdfs:label "Natural Disaster Type" ;
-                                                                                                         <http://www.w3.org/2004/02/skos/core#definition> "Represents the various types of natural disasters." ;
-                                                                                                         <http://www.w3.org/2004/02/skos/core#example> "Floods, forest fires, storms or earthquakes etc." .
+baw:NaturalDisasterType rdf:type owl:Class ;
+                        owl:equivalentClass :Natural ;
+                        rdfs:label "Natural Disaster Type" ;
+                        skos:definition "Represents the various types of natural disasters." ;
+                        skos:example "Floods, forest fires, storms or earthquakes etc." .
 
 
 ###  https://sakuna.ph/AffectedPopulation
@@ -1886,7 +1889,7 @@ geo:SpatialObject rdf:type owl:Class .
                                       owl:someValuesFrom xsd:integer
                                     ] ;
                     rdfs:label "Affected Population"@en ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "Represents affected and displaced persons or families." .
+                    skos:definition "Represents affected and displaced persons or families." .
 
 
 ###  https://sakuna.ph/Agriculture
@@ -1933,14 +1936,14 @@ geo:SpatialObject rdf:type owl:Class .
                                owl:someValuesFrom xsd:integer
                              ] ;
              rdfs:label "Agriculture"@en ;
-             <http://www.w3.org/2004/02/skos/core#definition> "Represents damage on agriculture, farmers, fisherfolks, and crops." .
+             skos:definition "Represents damage on agriculture, farmers, fisherfolks, and crops." .
 
 
 ###  https://sakuna.ph/Air
 :Air rdf:type owl:Class ;
      rdfs:subClassOf :Transport ;
      rdfs:label "Air"@en ;
-     <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving airplanes, helicopters, airships, and balloons." .
+     skos:definition "Transport accidents involving airplanes, helicopters, airships, and balloons." .
 
 
 ###  https://sakuna.ph/Airports
@@ -1983,14 +1986,14 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom xsd:dateTime
                           ] ;
           rdfs:label "Airports" ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Represents disruptions on airports." .
+          skos:definition "Represents disruptions on airports." .
 
 
 ###  https://sakuna.ph/AnimalAccident
 :AnimalAccident rdf:type owl:Class ;
                 rdfs:subClassOf :Biological ;
                 rdfs:label "Animal Accident"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "Human encounters with dangerous or exotic animals in both urban and rural environments." .
+                skos:definition "Human encounters with dangerous or exotic animals in both urban and rural environments." .
 
 
 ###  https://sakuna.ph/ArmedConflict
@@ -2003,7 +2006,7 @@ geo:SpatialObject rdf:type owl:Class .
 :Ashfall rdf:type owl:Class ;
          rdfs:subClassOf :VolcanicActivity ;
          rdfs:label "Ashfall"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." .
+         skos:definition "Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." .
 
 
 ###  https://sakuna.ph/Assistance
@@ -2054,28 +2057,28 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:someValuesFrom xsd:integer
                             ] ;
             rdfs:label "Assistance"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "Represents the assistance provided during or after a disaster event." .
+            skos:definition "Represents the assistance provided during or after a disaster event." .
 
 
 ###  https://sakuna.ph/AvalancheDry
 :AvalancheDry rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementDry ;
               rdfs:label "Avalanche (Dry)"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Debris Avalanche: The sudden and very rapid downslope movement of a mixed mass of rock and soil. There are two general types of debris avalanches. A cold debris avalanche usually results from an unstable slope suddenly collapsing whereas a hot debris avalanche results from volcanic activity leading to slope instability and collapse." .
+              skos:definition "A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Debris Avalanche: The sudden and very rapid downslope movement of a mixed mass of rock and soil. There are two general types of debris avalanches. A cold debris avalanche usually results from an unstable slope suddenly collapsing whereas a hot debris avalanche results from volcanic activity leading to slope instability and collapse." .
 
 
 ###  https://sakuna.ph/AvalancheWet
 :AvalancheWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Avalanche (Wet)"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Snow Avalanche: Rapid downslope movement of a mix of snow and ice." .
+              skos:definition "A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Snow Avalanche: Rapid downslope movement of a mix of snow and ice." .
 
 
 ###  https://sakuna.ph/BacterialDisease
 :BacterialDisease rdf:type owl:Class ;
                   rdfs:subClassOf :Epidemic ;
                   rdfs:label "Bacterial Disease"@en ;
-                  <http://www.w3.org/2004/02/skos/core#definition> "An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), and cholera, among others." .
+                  skos:definition "An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), and cholera, among others." .
 
 
 ###  https://sakuna.ph/Barangay
@@ -2086,21 +2089,21 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom :Municipality
                           ] ;
           rdfs:label "Barangay"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "adm level 4" .
+          skos:definition "adm level 4" .
 
 
 ###  https://sakuna.ph/Biological
 :Biological rdf:type owl:Class ;
             rdfs:subClassOf :Natural ;
             rdfs:label "Biological"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by exposure to living organisms and/or their toxic substances (e.g., venom, or mold) or vector-borne diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, algae blooms, and mosquitoes carrying agents that causes disease such as parasites, bacteria, or viruses (e.g., malaria)." .
+            skos:definition "A hazard caused by exposure to living organisms and/or their toxic substances (e.g., venom, or mold) or vector-borne diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, algae blooms, and mosquitoes carrying agents that causes disease such as parasites, bacteria, or viruses (e.g., malaria)." .
 
 
 ###  https://sakuna.ph/BlizzardStorm
 :BlizzardStorm rdf:type owl:Class ;
                rdfs:subClassOf :Storm ;
                rdfs:label "Blizzard Storm"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A low-pressure system in winter months with significant accumulations of snow, freezing rain, sleet, or ice. A blizzard is a severe snowstorm with winds exceeding 35 mph (56 km/h) for three or more hours, producing reduced visibility (less than 0.25 miles (400 m))." .
+               skos:definition "A low-pressure system in winter months with significant accumulations of snow, freezing rain, sleet, or ice. A blizzard is a severe snowstorm with winds exceeding 35 mph (56 km/h) for three or more hours, producing reduced visibility (less than 0.25 miles (400 m))." .
 
 
 ###  https://sakuna.ph/Casualties
@@ -2123,14 +2126,14 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:someValuesFrom xsd:integer
                             ] ;
             rdfs:label "Casualties"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "Represents the number of deaths, injured, and missing due to a disaster." .
+            skos:definition "Represents the number of deaths, injured, and missing due to a disaster." .
 
 
 ###  https://sakuna.ph/ChemicalSpill
 :ChemicalSpill rdf:type owl:Class ;
                rdfs:subClassOf :IndustrialAccident ;
                rdfs:label "Chemical Spill"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "Accident release occurring during the production, transportation, or handling of hazardous chemical substances." .
+               skos:definition "Accident release occurring during the production, transportation, or handling of hazardous chemical substances." .
 
 
 ###  https://sakuna.ph/Class
@@ -2161,35 +2164,35 @@ geo:SpatialObject rdf:type owl:Class .
                          owl:someValuesFrom xsd:string
                        ] ;
        rdfs:label "Class"@en ;
-       <http://www.w3.org/2004/02/skos/core#definition> "Represents education operational disruptions." .
+       skos:definition "Represents education operational disruptions." .
 
 
 ###  https://sakuna.ph/Climatological
 :Climatological rdf:type owl:Class ;
                 rdfs:subClassOf :Natural ;
                 rdfs:label "Climatological"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to multi-decadal climate variability." .
+                skos:definition "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to multi-decadal climate variability." .
 
 
 ###  https://sakuna.ph/CoastalFlood
 :CoastalFlood rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Coastal Flood"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "Higher-than-normal water levels along the coast caused by tidal changes or thunderstorms that result in flooding, which can last from days to weeks." .
+              skos:definition "Higher-than-normal water levels along the coast caused by tidal changes or thunderstorms that result in flooding, which can last from days to weeks." .
 
 
 ###  https://sakuna.ph/ColdWave
 :ColdWave rdf:type owl:Class ;
           rdfs:subClassOf :ExtremeTemperature ;
           rdfs:label "Cold Wave"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "A period of abnormally cold weather. Typically, a cold wave lasts for two or more days and may be aggravated by high winds. The exact temperature criteria for what constitutes a cold wave may vary by location." .
+          skos:definition "A period of abnormally cold weather. Typically, a cold wave lasts for two or more days and may be aggravated by high winds. The exact temperature criteria for what constitutes a cold wave may vary by location." .
 
 
 ###  https://sakuna.ph/CollapseIndustrial
 :CollapseIndustrial rdf:type owl:Class ;
                     rdfs:subClassOf :IndustrialAccident ;
                     rdfs:label "Collapse (Industrial)"@en ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "Accident involving the collapse of a building or structure. Can either involve industrial structures or domestic/non-industrial structures." .
+                    skos:definition "Accident involving the collapse of a building or structure. Can either involve industrial structures or domestic/non-industrial structures." .
 
 
 ###  https://sakuna.ph/CollapseMiscellaneous
@@ -2222,14 +2225,14 @@ geo:SpatialObject rdf:type owl:Class .
                                       owl:someValuesFrom xsd:string
                                     ] ;
                     rdfs:label "Communication Lines"@en ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on communication lines." .
+                    skos:definition "Represents impact on communication lines." .
 
 
 ###  https://sakuna.ph/Country
 :Country rdf:type owl:Class ;
          rdfs:subClassOf :Location ;
          rdfs:label "Country" ;
-         <http://www.w3.org/2004/02/skos/core#definition> "adm level 0" .
+         skos:definition "adm level 0" .
 
 
 ###  https://sakuna.ph/DamageGeneral
@@ -2248,7 +2251,7 @@ geo:SpatialObject rdf:type owl:Class .
                                  owl:someValuesFrom xsd:decimal
                                ] ;
                rdfs:label "Damage (General)"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "Represents general damage that does not fall under any sibling classes." .
+               skos:definition "Represents general damage that does not fall under any sibling classes." .
 
 
 ###  https://sakuna.ph/DeclarationOfCalamity
@@ -2267,14 +2270,14 @@ geo:SpatialObject rdf:type owl:Class .
                                          owl:someValuesFrom xsd:string
                                        ] ;
                        rdfs:label "Declaration of Calamity"@en ;
-                       <http://www.w3.org/2004/02/skos/core#definition> "Represents events of state of calamity declaration." .
+                       skos:definition "Represents events of state of calamity declaration." .
 
 
 ###  https://sakuna.ph/Derecho
 :Derecho rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
          rdfs:label "Derecho"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "Widespread and usually fast-moving windstorms associated with a convection/convective storm. Derechos include downburst and straight-line winds. The damage from derechos is often confused with the damage from tornadoes." .
+         skos:definition "Widespread and usually fast-moving windstorms associated with a convection/convective storm. Derechos include downburst and straight-line winds. The damage from derechos is often confused with the damage from tornadoes." .
 
 
 ###  https://sakuna.ph/DisasterEvent
@@ -2344,20 +2347,20 @@ geo:SpatialObject rdf:type owl:Class .
                                  owl:someValuesFrom xsd:dateTime
                                ] ;
                rdfs:label "Disaster Event"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "Any event that has dealt notable impact to the population, infrastructure, or has disrupted operations and services." .
+               skos:definition "Any event that has dealt notable impact to the population, infrastructure, or has disrupted operations and services." .
 
 
 ###  https://sakuna.ph/DisasterType
 :DisasterType rdf:type owl:Class ;
               rdfs:label "Disaster Type" ;
-              <http://www.w3.org/2004/02/skos/core#definition> "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
+              skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
 
 
 ###  https://sakuna.ph/Drought
 :Drought rdf:type owl:Class ;
          rdfs:subClassOf :Climatological ;
          rdfs:label "Drought"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." .
+         skos:definition "An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." .
 
 
 ###  https://sakuna.ph/Earthquake
@@ -2376,21 +2379,21 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:someValuesFrom xsd:decimal
                             ] ;
             rdfs:label "Earthquake"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "Sudden movement of a block of the Earth’s crust along a geological fault and associated ground shaking." .
+            skos:definition "Sudden movement of a block of the Earth’s crust along a geological fault and associated ground shaking." .
 
 
 ###  https://sakuna.ph/Epidemic
 :Epidemic rdf:type owl:Class ;
           rdfs:subClassOf :Biological ;
           rdfs:label "Epidemic"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
+          skos:definition "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
 
 
 ###  https://sakuna.ph/ExplosionIndustrial
 :ExplosionIndustrial rdf:type owl:Class ;
                      rdfs:subClassOf :IndustrialAccident ;
                      rdfs:label "Explosion (Industrial)"@en ;
-                     <http://www.w3.org/2004/02/skos/core#definition> "Explosions involving buildings or structures. Can involve industrial structures." .
+                     skos:definition "Explosions involving buildings or structures. Can involve industrial structures." .
 
 
 ###  https://sakuna.ph/ExplosionMiscellaneous
@@ -2403,28 +2406,28 @@ geo:SpatialObject rdf:type owl:Class .
 :Extraterrestrial rdf:type owl:Class ;
                   rdfs:subClassOf :Natural ;
                   rdfs:label "Extraterrestrial"@en ;
-                  <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by asteroids, meteoroids, and comets as they pass near to the Earth, enter the Earth’s atmosphere, and/or strike the Earth, and by changes in interplanetary conditions that effect the Earth’s magnetosphere, ionosphere, and thermosphere." .
+                  skos:definition "A hazard caused by asteroids, meteoroids, and comets as they pass near to the Earth, enter the Earth’s atmosphere, and/or strike the Earth, and by changes in interplanetary conditions that effect the Earth’s magnetosphere, ionosphere, and thermosphere." .
 
 
 ###  https://sakuna.ph/ExtratropicalStorm
 :ExtratropicalStorm rdf:type owl:Class ;
                     rdfs:subClassOf :Storm ;
                     rdfs:label "Extratropical Storm"@en ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "A type of low-pressure cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor’easter)." .
+                    skos:definition "A type of low-pressure cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor’easter)." .
 
 
 ###  https://sakuna.ph/ExtremeTemperature
 :ExtremeTemperature rdf:type owl:Class ;
                     rdfs:subClassOf :Meteorological ;
                     rdfs:label "Extreme Temperature"@en ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions." .
+                    skos:definition "A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions." .
 
 
 ###  https://sakuna.ph/FireIndustrial
 :FireIndustrial rdf:type owl:Class ;
                 rdfs:subClassOf :IndustrialAccident ;
                 rdfs:label "Fire (Industrial)"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "Urban fire involving buildings or structures. Can involve industrial structures." .
+                skos:definition "Urban fire involving buildings or structures. Can involve industrial structures." .
 
 
 ###  https://sakuna.ph/FireMiscellaneous
@@ -2437,91 +2440,91 @@ geo:SpatialObject rdf:type owl:Class .
 :FlashFlood rdf:type owl:Class ;
             rdfs:subClassOf :Flood ;
             rdfs:label "Flash Flood"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall." .
+            skos:definition "Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall." .
 
 
 ###  https://sakuna.ph/Flood
 :Flood rdf:type owl:Class ;
        rdfs:subClassOf :Hydrological ;
        rdfs:label "Flood"@en ;
-       <http://www.w3.org/2004/02/skos/core#definition> "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
+       skos:definition "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
 
 
 ###  https://sakuna.ph/FloodGeneral
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
+              skos:definition "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
 
 
 ###  https://sakuna.ph/Fog
 :Fog rdf:type owl:Class ;
      rdfs:subClassOf :Meteorological ;
      rdfs:label "Fog"@en ;
-     <http://www.w3.org/2004/02/skos/core#definition> "Water droplets that are suspended in the air near the Earth’s surface. Fog is, in fact, simply a cloud that is in contact with the ground." .
+     skos:definition "Water droplets that are suspended in the air near the Earth’s surface. Fog is, in fact, simply a cloud that is in contact with the ground." .
 
 
 ###  https://sakuna.ph/ForestFire
 :ForestFire rdf:type owl:Class ;
             rdfs:subClassOf :Wildfire ;
             rdfs:label "Forest Fire"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "A type of wildfire in a wooded area." .
+            skos:definition "A type of wildfire in a wooded area." .
 
 
 ###  https://sakuna.ph/FungalDisase
 :FungalDisase rdf:type owl:Class ;
               rdfs:subClassOf :Epidemic ;
               rdfs:label "Fungal Disease" ;
-              <http://www.w3.org/2004/02/skos/core#definition> "An unusual increase in the number of cases caused by exposure to fungi either through skin contact, ingestion, or inhalation of spores. Examples are fungal pneumonia, fungal meningitis, etc." .
+              skos:definition "An unusual increase in the number of cases caused by exposure to fungi either through skin contact, ingestion, or inhalation of spores. Examples are fungal pneumonia, fungal meningitis, etc." .
 
 
 ###  https://sakuna.ph/GasLeak
 :GasLeak rdf:type owl:Class ;
          rdfs:subClassOf :IndustrialAccident ;
          rdfs:label "Gas Leak"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "Gas leak incidents." .
+         skos:definition "Gas leak incidents." .
 
 
 ###  https://sakuna.ph/Geophysical
 :Geophysical rdf:type owl:Class ;
              rdfs:subClassOf :Natural ;
              rdfs:label "Geophysical"@en ;
-             <http://www.w3.org/2004/02/skos/core#definition> "A hazard originating from solid earth. This term is used interchangeably with the term geological hazard." .
+             skos:definition "A hazard originating from solid earth. This term is used interchangeably with the term geological hazard." .
 
 
 ###  https://sakuna.ph/Glacial
 :Glacial rdf:type owl:Class ;
          rdfs:subClassOf :Climatological ;
          rdfs:label "Glacial"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "These floods occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." .
+         skos:definition "These floods occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." .
 
 
 ###  https://sakuna.ph/GrasshopperInfestation
 :GrasshopperInfestation rdf:type owl:Class ;
                         rdfs:subClassOf :Infestation ;
                         rdfs:label "Grasshopper Infestation"@en ;
-                        <http://www.w3.org/2004/02/skos/core#definition> "Infestation of grasshoppers (insects)." .
+                        skos:definition "Infestation of grasshoppers (insects)." .
 
 
 ###  https://sakuna.ph/GroundMovement
 :GroundMovement rdf:type owl:Class ;
                 rdfs:subClassOf :Earthquake ;
                 rdfs:label "Ground Movement"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions." .
+                skos:definition "Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions." .
 
 
 ###  https://sakuna.ph/Hail
 :Hail rdf:type owl:Class ;
       rdfs:subClassOf :Storm ;
       rdfs:label "Hail"@en ;
-      <http://www.w3.org/2004/02/skos/core#definition> "Solid precipitation in the form of irregular pellets or balls of ice more than 5 mm in diameter." .
+      skos:definition "Solid precipitation in the form of irregular pellets or balls of ice more than 5 mm in diameter." .
 
 
 ###  https://sakuna.ph/HeatWave
 :HeatWave rdf:type owl:Class ;
           rdfs:subClassOf :ExtremeTemperature ;
           rdfs:label "Heat Wave"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "A period of abnormally hot and/or unusually humid weather. Typically, a heat wave lasts for two or more days. The exact temperature criteria for what constitutes a heat wave may vary by location." .
+          skos:definition "A period of abnormally hot and/or unusually humid weather. Typically, a heat wave lasts for two or more days. The exact temperature criteria for what constitutes a heat wave may vary by location." .
 
 
 ###  https://sakuna.ph/Housing
@@ -2540,21 +2543,21 @@ geo:SpatialObject rdf:type owl:Class .
                            owl:someValuesFrom xsd:integer
                          ] ;
          rdfs:label "Housing"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on housing." .
+         skos:definition "Represents impact on housing." .
 
 
 ###  https://sakuna.ph/Hydrological
 :Hydrological rdf:type owl:Class ;
               rdfs:subClassOf :Natural ;
               rdfs:label "Hydrological"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater." .
+              skos:definition "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater." .
 
 
 ###  https://sakuna.ph/IceJamFlood
 :IceJamFlood rdf:type owl:Class ;
              rdfs:subClassOf :Flood ;
              rdfs:label "Ice Jam Flood"@en ;
-             <http://www.w3.org/2004/02/skos/core#definition> "The accumulation of floating ice restricting or blocking a river’s flow and drainage. Ice jams tend to develop near river bends and obstructions (e.g., bridges)." .
+             skos:definition "The accumulation of floating ice restricting or blocking a river’s flow and drainage. Ice jams tend to develop near river bends and obstructions (e.g., bridges)." .
 
 
 ###  https://sakuna.ph/Impact
@@ -2588,7 +2591,7 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom xsd:string
                         ] ;
         rdfs:label "Impact"@en ;
-        <http://www.w3.org/2004/02/skos/core#definition> "Represents the impact of major or incident disasters." .
+        skos:definition "Represents the impact of major or incident disasters." .
 
 
 ###  https://sakuna.ph/Incident
@@ -2612,35 +2615,35 @@ geo:SpatialObject rdf:type owl:Class .
                           ] ;
           owl:disjointWith :MajorEvent ;
           rdfs:label "Incident"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "A localized or small-scale disaster event, often reported at the municipal or barangay level." .
+          skos:definition "A localized or small-scale disaster event, often reported at the municipal or barangay level." .
 
 
 ###  https://sakuna.ph/IndustrialAccident
 :IndustrialAccident rdf:type owl:Class ;
                     rdfs:subClassOf :Technological ;
                     rdfs:label "Industrial Accident"@en ;
-                    <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
+                    skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
 
 
 ###  https://sakuna.ph/IndustrialAccidentGeneral
 :IndustrialAccidentGeneral rdf:type owl:Class ;
                            rdfs:subClassOf :IndustrialAccident ;
                            rdfs:label "Industrial Accident (General)"@en ;
-                           <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
+                           skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
 
 
 ###  https://sakuna.ph/InfectiousDiseaseGeneral
 :InfectiousDiseaseGeneral rdf:type owl:Class ;
                           rdfs:subClassOf :Epidemic ;
                           rdfs:label "Infectious Disease (General)"@en ;
-                          <http://www.w3.org/2004/02/skos/core#definition> "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
+                          skos:definition "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
 
 
 ###  https://sakuna.ph/Infestation
 :Infestation rdf:type owl:Class ;
              rdfs:subClassOf :Biological ;
              rdfs:label "Infestation"@en ;
-             <http://www.w3.org/2004/02/skos/core#definition> "The pervasive influx, swarming and/or hatching of insects, worms, or other animals affecting humans, animals, crops, and perishable goods." .
+             skos:definition "The pervasive influx, swarming and/or hatching of insects, worms, or other animals affecting humans, animals, crops, and perishable goods." .
 
 
 ###  https://sakuna.ph/InfestationGeneral
@@ -2697,7 +2700,7 @@ geo:SpatialObject rdf:type owl:Class .
                                   owl:someValuesFrom xsd:decimal
                                 ] ;
                 rdfs:label "Infrastructure"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "Represents impact on infrastructure." .
+                skos:definition "Represents impact on infrastructure." .
 
 
 ###  https://sakuna.ph/IslandGroup
@@ -2710,49 +2713,49 @@ geo:SpatialObject rdf:type owl:Class .
 :Lahar rdf:type owl:Class ;
        rdfs:subClassOf :VolcanicActivity ;
        rdfs:label "Lahar"@en ;
-       <http://www.w3.org/2004/02/skos/core#definition> "Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." .
+       skos:definition "Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." .
 
 
 ###  https://sakuna.ph/LandFire
 :LandFire rdf:type owl:Class ;
           rdfs:subClassOf :Wildfire ;
           rdfs:label "Land Fire"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment." .
+          skos:definition "A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment." .
 
 
 ###  https://sakuna.ph/LandslideDry
 :LandslideDry rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementDry ;
               rdfs:label "Landslide (Dry)"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
+              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
 
 
 ###  https://sakuna.ph/LandslideWet
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
+              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
 
 
 ###  https://sakuna.ph/LavaFlow
 :LavaFlow rdf:type owl:Class ;
           rdfs:subClassOf :VolcanicActivity ;
           rdfs:label "Lava Flow"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." .
+          skos:definition "The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." .
 
 
 ###  https://sakuna.ph/Location
 :Location rdf:type owl:Class ;
           rdfs:subClassOf geo:Feature ;
           rdfs:label "Location"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Represents tiered locations (administrative levels) in the Philippines." .
+          skos:definition "Represents tiered locations (administrative levels) in the Philippines." .
 
 
 ###  https://sakuna.ph/LocustInfestation
 :LocustInfestation rdf:type owl:Class ;
                    rdfs:subClassOf :Infestation ;
                    rdfs:label "Locust Infestation"@en ;
-                   <http://www.w3.org/2004/02/skos/core#definition> "Infestation of locusts (insects)." .
+                   skos:definition "Infestation of locusts (insects)." .
 
 
 ###  https://sakuna.ph/MajorEvent
@@ -2763,35 +2766,35 @@ geo:SpatialObject rdf:type owl:Class .
                               owl:someValuesFrom :Incident
                             ] ;
             rdfs:label "Major"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "A large-scale or aggregated event spanning days that may encompass multiple locations and related incidents." .
+            skos:definition "A large-scale or aggregated event spanning days that may encompass multiple locations and related incidents." .
 
 
 ###  https://sakuna.ph/MassMovementDry
 :MassMovementDry rdf:type owl:Class ;
                  rdfs:subClassOf :Geophysical ;
                  rdfs:label "Mass Movement (Dry)"@en ;
-                 <http://www.w3.org/2004/02/skos/core#definition> "Any type of downslope movement of earth materials under hydrological dry conditions." .
+                 skos:definition "Any type of downslope movement of earth materials under hydrological dry conditions." .
 
 
 ###  https://sakuna.ph/MassMovementWet
 :MassMovementWet rdf:type owl:Class ;
                  rdfs:subClassOf :Hydrological ;
                  rdfs:label "Mass Movement (Wet)"@en ;
-                 <http://www.w3.org/2004/02/skos/core#definition> "Types of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces." .
+                 skos:definition "Types of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces." .
 
 
 ###  https://sakuna.ph/Meteorological
 :Meteorological rdf:type owl:Class ;
                 rdfs:subClassOf :Natural ;
                 rdfs:label "Meteorological"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from minutes to days." .
+                skos:definition "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from minutes to days." .
 
 
 ###  https://sakuna.ph/MiscellaneousAccident
 :MiscellaneousAccident rdf:type owl:Class ;
                        rdfs:subClassOf :Technological ;
                        rdfs:label "Miscellaneous Accident"@en ;
-                       <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." .
+                       skos:definition "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." .
 
 
 ###  https://sakuna.ph/MiscellaneousAccidentGeneral
@@ -2814,8 +2817,8 @@ geo:SpatialObject rdf:type owl:Class .
                                 owl:someValuesFrom :Province
                               ] ;
               rdfs:label "Municipality"@en ;
-              <http://www.w3.org/2004/02/skos/core#altLabel> "City" ;
-              <http://www.w3.org/2004/02/skos/core#definition> "adm level 3" .
+              skos:altLabel "City" ;
+              skos:definition "adm level 3" .
 
 
 ###  https://sakuna.ph/Natural
@@ -2823,28 +2826,28 @@ geo:SpatialObject rdf:type owl:Class .
          rdfs:subClassOf :DisasterType ;
          owl:disjointWith :Technological ;
          rdfs:label "Natural"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "Naturally occurring disastrous events" .
+         skos:definition "Naturally occurring disastrous events" .
 
 
 ###  https://sakuna.ph/OilSpill
 :OilSpill rdf:type owl:Class ;
           rdfs:subClassOf :IndustrialAccident ;
           rdfs:label "Oil Spill"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Accident release occurring during the production, transportation, or handling of oil." .
+          skos:definition "Accident release occurring during the production, transportation, or handling of oil." .
 
 
 ###  https://sakuna.ph/ParasiticDisease
 :ParasiticDisease rdf:type owl:Class ;
                   rdfs:subClassOf :Epidemic ;
                   rdfs:label "Parasitic Disease"@en ;
-                  <http://www.w3.org/2004/02/skos/core#definition> "An unusual increase in the number of cases caused by exposure to a parasite, i.e., an organism living on or in a host. Exposure to parasites occurs mostly through contaminated water, food, or contact with insects, animals, etc. Examples are malaria, Chagas disease, giardiasis, and Trichinellosis." .
+                  skos:definition "An unusual increase in the number of cases caused by exposure to a parasite, i.e., an organism living on or in a host. Exposure to parasites occurs mostly through contaminated water, food, or contact with insects, animals, etc. Examples are malaria, Chagas disease, giardiasis, and Trichinellosis." .
 
 
 ###  https://sakuna.ph/Poisoning
 :Poisoning rdf:type owl:Class ;
            rdfs:subClassOf :IndustrialAccident ;
            rdfs:label "Poisoning"@en ;
-           <http://www.w3.org/2004/02/skos/core#definition> "Poisoning of atmosphere or water courses due to industrial sources of contamination." .
+           skos:definition "Poisoning of atmosphere or water courses due to industrial sources of contamination." .
 
 
 ###  https://sakuna.ph/Power
@@ -2871,7 +2874,7 @@ geo:SpatialObject rdf:type owl:Class .
                          owl:someValuesFrom xsd:string
                        ] ;
        rdfs:label "Power"@en ;
-       <http://www.w3.org/2004/02/skos/core#definition> "Represents power disruptions." .
+       skos:definition "Represents power disruptions." .
 
 
 ###  https://sakuna.ph/PreemptiveEvacuation
@@ -2898,7 +2901,7 @@ geo:SpatialObject rdf:type owl:Class .
                                         owl:someValuesFrom xsd:integer
                                       ] ;
                       rdfs:label "Preemptive Evacuation"@en ;
-                      <http://www.w3.org/2004/02/skos/core#definition> "Represents information on evacuation centers and preemptively evacuated individuals." .
+                      skos:definition "Represents information on evacuation centers and preemptively evacuated individuals." .
 
 
 ###  https://sakuna.ph/Preparedness
@@ -2940,14 +2943,14 @@ geo:SpatialObject rdf:type owl:Class .
                                 owl:someValuesFrom xsd:string
                               ] ;
               rdfs:label "Preparedness" ;
-              <http://www.w3.org/2004/02/skos/core#definition> "Represents preparations done by government or non-government units before a disaster event." .
+              skos:definition "Represents preparations done by government or non-government units before a disaster event." .
 
 
 ###  https://sakuna.ph/PrionDisease
 :PrionDisease rdf:type owl:Class ;
               rdfs:subClassOf :Epidemic ;
               rdfs:label "Prion Disease"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "A type of biological hazard caused by prion proteins. Prion diseases or transmissible spongiform encephalopathies (TSEs) are a family of rare progressive neurodegenerative disorders that affect both humans and animals. They are characterized by long incubation periods and neural loss. Examples are Bovine Spongiform Encephalopathy (BSE), Creutzfeldt-Jakob Disease (CJD), Kuru, etc." .
+              skos:definition "A type of biological hazard caused by prion proteins. Prion diseases or transmissible spongiform encephalopathies (TSEs) are a family of rare progressive neurodegenerative disorders that affect both humans and animals. They are characterized by long incubation periods and neural loss. Examples are Bovine Spongiform Encephalopathy (BSE), Creutzfeldt-Jakob Disease (CJD), Kuru, etc." .
 
 
 ###  https://sakuna.ph/Province
@@ -2958,28 +2961,28 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom :Region
                           ] ;
           rdfs:label "Province"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "adm level 2" .
+          skos:definition "adm level 2" .
 
 
 ###  https://sakuna.ph/PyroclasticFlow
 :PyroclasticFlow rdf:type owl:Class ;
                  rdfs:subClassOf :VolcanicActivity ;
                  rdfs:label "Pyroclastic Flow"@en ;
-                 <http://www.w3.org/2004/02/skos/core#definition> "Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." .
+                 skos:definition "Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." .
 
 
 ###  https://sakuna.ph/Radiation
 :Radiation rdf:type owl:Class ;
            rdfs:subClassOf :IndustrialAccident ;
            rdfs:label "Radiation"@en ;
-           <http://www.w3.org/2004/02/skos/core#definition> "Exposure to harmful radiation or reactive substances." .
+           skos:definition "Exposure to harmful radiation or reactive substances." .
 
 
 ###  https://sakuna.ph/Rail
 :Rail rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
       rdfs:label "Rail"@en ;
-      <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving trains." .
+      skos:definition "Transport accidents involving trains." .
 
 
 ###  https://sakuna.ph/Recovery
@@ -3002,7 +3005,7 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom xsd:boolean
                           ] ;
           rdfs:label "Recovery" ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Represents civic repercussions and changes made to recover after the disaster event." .
+          skos:definition "Represents civic repercussions and changes made to recover after the disaster event." .
 
 
 ###  https://sakuna.ph/Region
@@ -3013,7 +3016,7 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom :IslandGroup
                         ] ;
         rdfs:label "Region"@en ;
-        <http://www.w3.org/2004/02/skos/core#definition> "adm level 1" .
+        skos:definition "adm level 1" .
 
 
 ###  https://sakuna.ph/Relief
@@ -3040,7 +3043,7 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom xsd:decimal
                         ] ;
         rdfs:label "Relief" ;
-        <http://www.w3.org/2004/02/skos/core#definition> "Represents the relief items provided after a disaster event." .
+        skos:definition "Represents the relief items provided after a disaster event." .
 
 
 ###  https://sakuna.ph/Rescue
@@ -3055,7 +3058,7 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom xsd:string
                         ] ;
         rdfs:label "Rescue" ;
-        <http://www.w3.org/2004/02/skos/core#definition> "Represents information on rescue materials prepared." .
+        skos:definition "Represents information on rescue materials prepared." .
 
 
 ###  https://sakuna.ph/Response
@@ -3089,21 +3092,21 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom xsd:string
                           ] ;
           rdfs:label "Response"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Represents the responses taken to a disaster." .
+          skos:definition "Represents the responses taken to a disaster." .
 
 
 ###  https://sakuna.ph/RiverineFlood
 :RiverineFlood rdf:type owl:Class ;
                rdfs:subClassOf :Flood ;
                rdfs:label "Riverine Flood"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A type of flooding resulting from the overflow of water from a stream or river channel onto normally dry land in the floodplain adjacent to the channel." .
+               skos:definition "A type of flooding resulting from the overflow of water from a stream or river channel onto normally dry land in the floodplain adjacent to the channel." .
 
 
 ###  https://sakuna.ph/Road
 :Road rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
       rdfs:label "Road"@en ;
-      <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving motor vehicles on roads and tracks." .
+      skos:definition "Transport accidents involving motor vehicles on roads and tracks." .
 
 
 ###  https://sakuna.ph/RoadAndBridges
@@ -3138,7 +3141,7 @@ geo:SpatialObject rdf:type owl:Class .
                                   owl:someValuesFrom xsd:string
                                 ] ;
                 rdfs:label "Road and Bridges"@en ;
-                <http://www.w3.org/2004/02/skos/core#definition> "Represents land transportation disruptions." .
+                skos:definition "Represents land transportation disruptions." .
 
 
 ###  https://sakuna.ph/RockfallDry
@@ -3157,14 +3160,14 @@ geo:SpatialObject rdf:type owl:Class .
 :RogueWave rdf:type owl:Class ;
            rdfs:subClassOf :WaveAction ;
            rdfs:label "Rogue Wave"@en ;
-           <http://www.w3.org/2004/02/skos/core#definition> "An unusual single crest of an ocean wave far out at sea that is much higher and/or steeper than other waves in the prevailing swell system." .
+           skos:definition "An unusual single crest of an ocean wave far out at sea that is much higher and/or steeper than other waves in the prevailing swell system." .
 
 
 ###  https://sakuna.ph/SandStorm
 :SandStorm rdf:type owl:Class ;
            rdfs:subClassOf :Storm ;
            rdfs:label "Sand Storm"@en ;
-           <http://www.w3.org/2004/02/skos/core#definition> "Strong winds carrying particles of sand aloft, but generally confined to less than 50 feet (15 m), especially common in arid and semi-arid environments. A dust storm is also characterized by strong winds but carries smaller particles of dust rather than sand over an extensive area." .
+           skos:definition "Strong winds carrying particles of sand aloft, but generally confined to less than 50 feet (15 m), especially common in arid and semi-arid environments. A dust storm is also characterized by strong winds but carries smaller particles of dust rather than sand over an extensive area." .
 
 
 ###  https://sakuna.ph/Seaports
@@ -3191,14 +3194,14 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom xsd:dateTime
                           ] ;
           rdfs:label "Seaports" ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Represents seaport disruptions." .
+          skos:definition "Represents seaport disruptions." .
 
 
 ###  https://sakuna.ph/Seiche
 :Seiche rdf:type owl:Class ;
         rdfs:subClassOf :WaveAction ;
         rdfs:label "Seiche"@en ;
-        <http://www.w3.org/2004/02/skos/core#definition> "A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." .
+        skos:definition "A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." .
 
 
 ###  https://sakuna.ph/SevereWeather
@@ -3211,12 +3214,12 @@ geo:SpatialObject rdf:type owl:Class .
 :SevereWinterConditions rdf:type owl:Class ;
                         rdfs:subClassOf :ExtremeTemperature ;
                         rdfs:label "Severe Winter Conditions"@en ;
-                        <http://www.w3.org/2004/02/skos/core#definition> "Damage caused by snow and ice. Winter damage refers to damage to buildings, infrastructure, traffic (esp. navigation) inflicted by snow and ice in the form of snow pressure, freezing rain, frozen waterways etc." .
+                        skos:definition "Damage caused by snow and ice. Winter damage refers to damage to buildings, infrastructure, traffic (esp. navigation) inflicted by snow and ice in the form of snow pressure, freezing rain, frozen waterways etc." .
 
 
 ###  https://sakuna.ph/Source
 :Source rdf:type owl:Class ;
-        rdfs:subClassOf <http://www.w3.org/ns/prov#Entity> ,
+        rdfs:subClassOf prov:Entity ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :lastUpdateDate ;
                           owl:someValuesFrom xsd:dateTime
@@ -3234,21 +3237,21 @@ geo:SpatialObject rdf:type owl:Class .
                           owl:someValuesFrom xsd:string
                         ] ;
         rdfs:label "Source" ;
-        <http://www.w3.org/2004/02/skos/core#definition> "Represents the source that provided the disaster data." .
+        skos:definition "Represents the source that provided the disaster data." .
 
 
 ###  https://sakuna.ph/SpaceImpact
 :SpaceImpact rdf:type owl:Class ;
              rdfs:subClassOf :Extraterrestrial ;
              rdfs:label "Space Impact"@en ;
-             <http://www.w3.org/2004/02/skos/core#definition> "A type of extra-terrestrial hazard caused by the collision a meteoroid, asteroid, or comet with the Earth." .
+             skos:definition "A type of extra-terrestrial hazard caused by the collision a meteoroid, asteroid, or comet with the Earth." .
 
 
 ###  https://sakuna.ph/SpaceWeather
 :SpaceWeather rdf:type owl:Class ;
               rdfs:subClassOf :Extraterrestrial ;
               rdfs:label "Space Weather"@en ;
-              <http://www.w3.org/2004/02/skos/core#definition> "A general term for extra-terrestrial weather conditions driven by solar eruptions such as geomagnetic storms, radio disturbances, and solar energetic particles." .
+              skos:definition "A general term for extra-terrestrial weather conditions driven by solar eruptions such as geomagnetic storms, radio disturbances, and solar energetic particles." .
 
 
 ###  https://sakuna.ph/Storm
@@ -3267,7 +3270,7 @@ geo:SpatialObject rdf:type owl:Class .
 :StormSurge rdf:type owl:Class ;
             rdfs:subClassOf :Storm ;
             rdfs:label "Storm Surge"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "An abnormal rise in sea level generated by a tropical cyclone or other intense types of storm." .
+            skos:definition "An abnormal rise in sea level generated by a tropical cyclone or other intense types of storm." .
 
 
 ###  https://sakuna.ph/Stranded
@@ -3306,65 +3309,65 @@ geo:SpatialObject rdf:type owl:Class .
                             owl:someValuesFrom xsd:integer
                           ] ;
           rdfs:label "Stranded" ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Represents stranded mode of transportations." .
+          skos:definition "Represents stranded mode of transportations." .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceDry
 :SuddenSubsidenceDry rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementDry ;
                      rdfs:label "Sudden Subsidence (Dry)"@en ;
-                     <http://www.w3.org/2004/02/skos/core#definition> "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger." .
+                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger." .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceWet
 :SuddenSubsidenceWet rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementWet ;
                      rdfs:label "Sudden Subsidence (Wet)"@en ;
-                     <http://www.w3.org/2004/02/skos/core#definition> "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain)." .
+                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain)." .
 
 
 ###  https://sakuna.ph/Technological
 :Technological rdf:type owl:Class ;
                rdfs:subClassOf :DisasterType ;
                rdfs:label "Technological"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "Man-made events causing impact." ;
-               <http://www.w3.org/2004/02/skos/core#example> "Armed conflict, chemical spill, or industrial fires." .
+               skos:definition "Man-made events causing impact." ;
+               skos:example "Armed conflict, chemical spill, or industrial fires." .
 
 
 ###  https://sakuna.ph/Thunderstorms
 :Thunderstorms rdf:type owl:Class ;
                rdfs:subClassOf :Storm ;
                rdfs:label "Thunderstorms"@en ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A high-voltage, visible electrical discharge produced by a thunderstorm and followed by the sound of thunder." ;
-               <http://www.w3.org/ns/prov#sharesDefinitionWith> "Lightning" .
+               skos:definition "A high-voltage, visible electrical discharge produced by a thunderstorm and followed by the sound of thunder." ;
+               prov:sharesDefinitionWith "Lightning" .
 
 
 ###  https://sakuna.ph/Tornado
 :Tornado rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
          rdfs:label "Tornado"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "A violently rotating column of air that reaches the ground or open water (waterspout)." .
+         skos:definition "A violently rotating column of air that reaches the ground or open water (waterspout)." .
 
 
 ###  https://sakuna.ph/Transport
 :Transport rdf:type owl:Class ;
            rdfs:subClassOf :Technological ;
            rdfs:label "Transport"@en ;
-           <http://www.w3.org/2004/02/skos/core#definition> "Disaster type term used to describe technological transport accidents involving mechanized modes of transport. It comprises four disaster subtypes (i.e., Air, Water, Rail, and Road)." .
+           skos:definition "Disaster type term used to describe technological transport accidents involving mechanized modes of transport. It comprises four disaster subtypes (i.e., Air, Water, Rail, and Road)." .
 
 
 ###  https://sakuna.ph/TropicalCyclone
 :TropicalCyclone rdf:type owl:Class ;
                  rdfs:subClassOf :Storm ;
                  rdfs:label "Tropical Cyclone"@en ;
-                 <http://www.w3.org/2004/02/skos/core#definition> "A tropical cyclone originates over tropical or subtropical waters. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean)." .
+                 skos:definition "A tropical cyclone originates over tropical or subtropical waters. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean)." .
 
 
 ###  https://sakuna.ph/Tsunami
 :Tsunami rdf:type owl:Class ;
          rdfs:subClassOf :Earthquake ;
          rdfs:label "Tsunami"@en ;
-         <http://www.w3.org/2004/02/skos/core#definition> "A series of waves (with long wavelengths when traveling across the deep ocean) that are generated by a displacement of massive amounts of water through underwater earthquakes, volcanic eruptions, or landslides. Tsunami waves travel at very high speed across the ocean, but as they begin to reach shallow water they slow down, and the wave grows steeper." .
+         skos:definition "A series of waves (with long wavelengths when traveling across the deep ocean) that are generated by a displacement of massive amounts of water through underwater earthquakes, volcanic eruptions, or landslides. Tsunami waves travel at very high speed across the ocean, but as they begin to reach shallow water they slow down, and the wave grows steeper." .
 
 
 ###  https://sakuna.ph/ViralDisease
@@ -3377,21 +3380,21 @@ geo:SpatialObject rdf:type owl:Class .
 :VolcanicActivity rdf:type owl:Class ;
                   rdfs:subClassOf :Geophysical ;
                   rdfs:label "Volcanic Activity"@en ;
-                  <http://www.w3.org/2004/02/skos/core#definition> "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
+                  skos:definition "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
 
 
 ###  https://sakuna.ph/VolcanicActivityGeneral
 :VolcanicActivityGeneral rdf:type owl:Class ;
                          rdfs:subClassOf :VolcanicActivity ;
                          rdfs:label "Volcanic Activity (General)"@en ;
-                         <http://www.w3.org/2004/02/skos/core#definition> "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
+                         skos:definition "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
 
 
 ###  https://sakuna.ph/Water
 :Water rdf:type owl:Class ;
        rdfs:subClassOf :Transport ;
        rdfs:label "Water" ;
-       <http://www.w3.org/2004/02/skos/core#definition> "Transport accidents involving sailing boats, ferries, cruise ships, and other vessels." .
+       skos:definition "Transport accidents involving sailing boats, ferries, cruise ships, and other vessels." .
 
 
 ###  https://sakuna.ph/WaterDisruption
@@ -3418,28 +3421,28 @@ geo:SpatialObject rdf:type owl:Class .
                                    owl:someValuesFrom xsd:string
                                  ] ;
                  rdfs:label "Water (Disruption)"@en ;
-                 <http://www.w3.org/2004/02/skos/core#definition> "Represents clean water disruptions." .
+                 skos:definition "Represents clean water disruptions." .
 
 
 ###  https://sakuna.ph/WaveAction
 :WaveAction rdf:type owl:Class ;
             rdfs:subClassOf :Hydrological ;
             rdfs:label "Wave Action"@en ;
-            <http://www.w3.org/2004/02/skos/core#definition> "Wind-generated surface waves that can occur on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
+            skos:definition "Wind-generated surface waves that can occur on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
 
 
 ###  https://sakuna.ph/Wildfire
 :Wildfire rdf:type owl:Class ;
           rdfs:subClassOf :Climatological ;
           rdfs:label "Wildfire"@en ;
-          <http://www.w3.org/2004/02/skos/core#definition> "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
+          skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
 
 
 ###  https://sakuna.ph/WildfireGeneral
 :WildfireGeneral rdf:type owl:Class ;
                  rdfs:subClassOf :Wildfire ;
                  rdfs:label "Wildfire (General)"@en ;
-                 <http://www.w3.org/2004/02/skos/core#definition> "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
+                 skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
 
 
 ###  https://sakuna.ph/Work
@@ -3462,14 +3465,14 @@ geo:SpatialObject rdf:type owl:Class .
                         owl:someValuesFrom xsd:string
                       ] ;
       rdfs:label "Work"@en ;
-      <http://www.w3.org/2004/02/skos/core#definition> "Represents work operational disruptions." .
+      skos:definition "Represents work operational disruptions." .
 
 
 ###  https://sakuna.ph/WormsInfestation
 :WormsInfestation rdf:type owl:Class ;
                   rdfs:subClassOf :Infestation ;
                   rdfs:label "Worms Infestation"@en ;
-                  <http://www.w3.org/2004/02/skos/core#definition> "Infestation of worms." .
+                  skos:definition "Infestation of worms." .
 
 
 #################################################################
@@ -3478,78 +3481,78 @@ geo:SpatialObject rdf:type owl:Class .
 
 geo:asDGGS rdfs:isDefinedBy geo: ,
                             <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-dggs-literal> ;
-           <http://www.w3.org/2004/02/skos/core#definition> "The Discrete Global Grid System (DGGS) serialization of a Geometry"@en ;
-           <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-           <http://www.w3.org/2004/02/skos/core#prefLabel> "as DGGS"@en .
+           skos:definition "The Discrete Global Grid System (DGGS) serialization of a Geometry"@en ;
+           skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+           skos:prefLabel "as DGGS"@en .
 
 
 geo:asGML rdfs:isDefinedBy geo: ,
                            <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-as-gml-literal> ,
                            <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-gml-literal> ;
-          <http://www.w3.org/2004/02/skos/core#definition> "The GML serialization of a Geometry"@en ;
-          <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-          <http://www.w3.org/2004/02/skos/core#prefLabel> "as GML"@en .
+          skos:definition "The GML serialization of a Geometry"@en ;
+          skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+          skos:prefLabel "as GML"@en .
 
 
 geo:asGeoJSON rdfs:isDefinedBy geo: ,
                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-geojson-literal> ;
               rdfs:seeAlso <https://tools.ietf.org/html/rfc7946> ;
-              <http://www.w3.org/2004/02/skos/core#definition> "The GeoJSON serialization of a Geometry"@en ;
-              <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-              <http://www.w3.org/2004/02/skos/core#prefLabel> "as GeoJSON"@en .
+              skos:definition "The GeoJSON serialization of a Geometry"@en ;
+              skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+              skos:prefLabel "as GeoJSON"@en .
 
 
 geo:asKML rdfs:isDefinedBy geo: ,
                            <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-kml-literal> ;
           rdfs:seeAlso <https://www.ogc.org/standards/kml> ;
-          <http://www.w3.org/2004/02/skos/core#definition> "The KML serialization of a Geometry"@en ;
-          <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-          <http://www.w3.org/2004/02/skos/core#prefLabel> "as KML"@en .
+          skos:definition "The KML serialization of a Geometry"@en ;
+          skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+          skos:prefLabel "as KML"@en .
 
 
 geo:asWKT rdfs:isDefinedBy geo: ,
                            <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-as-wkt-literal> ,
                            <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-wkt-literal> ;
-          <http://www.w3.org/2004/02/skos/core#definition> "The WKT serialization of a Geometry"@en ;
-          <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.1> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.1> ,
-                                                        <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.4> ;
-          <http://www.w3.org/2004/02/skos/core#prefLabel> "as WKT"@en .
+          skos:definition "The WKT serialization of a Geometry"@en ;
+          skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.1> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.1> ,
+                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.4> ;
+          skos:prefLabel "as WKT"@en .
 
 
 geo:gmlLiteral rdfs:isDefinedBy geo: ,
                                 <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/gml-literal> ,
                                 <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/gml-literal> ;
                rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=20509> ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A GML serialization of a Geometry object."@en ;
-               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-               <http://www.w3.org/2004/02/skos/core#prefLabel> "GML Literal"@en .
+               skos:definition "A GML serialization of a Geometry object."@en ;
+               skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
+               skos:prefLabel "GML Literal"@en .
 
 
 geo:hasSerialization rdfs:isDefinedBy geo: ,
                                       <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-properties> ,
                                       <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-properties> ;
-                     <http://www.w3.org/2004/02/skos/core#definition> "Connects a Geometry object with its text-based serialization."@en ;
-                     <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ;
-                     <http://www.w3.org/2004/02/skos/core#prefLabel> "has serialization"@en .
+                     skos:definition "Connects a Geometry object with its text-based serialization."@en ;
+                     skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ;
+                     skos:prefLabel "has serialization"@en .
 
 
 geo:wktLiteral rdfs:isDefinedBy geo: ,
                                 <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/wkt-literal> ,
                                 <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/wkt-literal> ;
                rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=25355> ;
-               <http://www.w3.org/2004/02/skos/core#definition> "A Well-known Text serialization of a Geometry object."@en ;
-               <http://www.w3.org/2004/02/skos/core#example> <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.2> ;
-               <http://www.w3.org/2004/02/skos/core#prefLabel> "Well-known Text Literal"@en .
+               skos:definition "A Well-known Text serialization of a Geometry object."@en ;
+               skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.2> ;
+               skos:prefLabel "Well-known Text Literal"@en .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
