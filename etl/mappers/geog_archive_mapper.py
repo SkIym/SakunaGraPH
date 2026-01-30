@@ -237,7 +237,64 @@ EXPORT_SPECS = {
             "how": "all"
         },
         "float_format": "%.0f"
-    }
+    },
+
+    "gda_relief_goods.csv": {
+        "cols": ["id", "itemCostGoods", "itemQtyGoods"],
+        "dropna": {
+            "subset": ["itemCostGoods", "itemQtyGoods"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_relief_water.csv": {
+        "cols": ["id", "itemCostWater", "itemQtyWater"],
+        "dropna": {
+            "subset": ["itemCostWater", "itemQtyWater"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_relief_clothing.csv": {
+        "cols": ["id", "itemCostClothing", "itemQtyClothing"],
+        "dropna": {
+            "subset": ["itemCostClothing", "itemQtyClothing"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_relief_med.csv": {
+        "cols": ["id", "itemCostMedicine", "itemQtyMedicine"],
+        "dropna": {
+            "subset": ["itemCostMedicine", "itemQtyMedicine"],
+            "how": "all"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_relief_unspecified.csv": {
+        "cols": ["id", "itemCostOthers1"],
+        "dropna": {
+            "subset": ["itemCostOthers1"],
+            "how": "any"
+        },
+        "float_format": "%.0f"
+    },
+
+    "gda_relief_general.csv": {
+        "cols": ["id", "itemCostOthers2"],
+        "dropna": {
+            "subset": ["itemCostOthers2"],
+            "how": "any"
+        },
+        "float_format": "%.0f",
+        "onlyIfMissing": ["itemCostOthers1", "itemCostClothing", "itemCostMedicine", "itemCostGoods", "itemCostWater"]
+    },
+
+
 
 
 }
