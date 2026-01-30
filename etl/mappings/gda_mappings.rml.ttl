@@ -123,6 +123,11 @@
     rml:source "data/gda_relief_general.csv" ;
     rml:referenceFormulation ql:CSV .
 
+<#Recovery>
+    a rml:LogicalSource;
+    rml:source "data/gda_recovery.csv" ;
+    rml:referenceFormulation ql:CSV .
+
 <#EventMapping>
     a rr:TriplesMap;
 
@@ -463,6 +468,18 @@
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefGenMapping> ;
+            rr:joinCondition [
+                rr:child "id";
+                rr:parent "id";
+            ];
+        ];
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :hasResponse ;
+        rr:objectMap [
+
+            rr:parentTriplesMap <#RecoveryMapping> ;
             rr:joinCondition [
                 rr:child "id";
                 rr:parent "id";
@@ -1214,5 +1231,54 @@
         rml:parameter grel:valueParameter;
         rml:inputValueMap [
             rml:reference "itemCostOthers2" ;
+        ] ;
+    ].
+
+<#RecoveryMapping>
+    a rr:TriplesMap ;
+    rml:logicalSource <#Recovery> ;
+
+    rr:subjectMap [
+        rr:template "https://sakuna.ph/{id}/recovery";
+        rr:class :Recovery ;
+    ];
+
+    rr:predicateObjectMap [
+        rr:predicate :srrDone ;
+        rr:objectMap [
+            rml:reference "srrDone" ;
+        ] ;
+    ] ;     
+
+    rr:predicateObjectMap [
+        rr:predicate :policyChanges ;
+        rr:objectMap [
+            rml:reference "policyChanges" ;
+        ] ;
+    ] ;     
+
+    rr:predicateObjectMap [
+        rr:predicate :postTraining ;
+        rr:objectMap [
+            rml:reference "postTraining" ;
+        ] ;
+    ] ;     
+
+
+    rr:predicateObjectMap [
+        rr:predicate :postStructureCost ;
+        rr:objectMap [
+            rml:functionExecution <#PostStructExecution> ;
+            rml:datatype xsd:decimal ;
+        ] ;
+    ] ;     
+    .
+
+<#PostStructExecution>
+    rml:function :toMillions;
+    rml:input [
+        rml:parameter grel:valueParameter;
+        rml:inputValueMap [
+            rml:reference "postStructureCost" ;
         ] ;
     ].

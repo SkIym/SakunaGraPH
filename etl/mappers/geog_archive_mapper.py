@@ -63,8 +63,8 @@ COLUMN_MAPPING = {
     "RESPONSE AND RECOVERY_Cost of Structure Built post-disaster": "postStructureCost",
     "RESPONSE AND RECOVERY_Post-Disaster Training": "postTraining",
     "REFERENCES (Authors. Year. Title. Journal/Book/Newspaper. Publisher, Place published. Pages. Website, Date Accessed)": "reference",
-    "Detailed Description of Disaster Event": "otherDescription"
-
+    "Detailed Description of Disaster Event": "otherDescription",
+    "Comments/Notes": "remarks"
 }
 
 
@@ -294,6 +294,14 @@ EXPORT_SPECS = {
         "onlyIfMissing": ["itemCostOthers1", "itemCostClothing", "itemCostMedicine", "itemCostGoods", "itemCostWater"]
     },
 
+    "gda_recovery.csv": {
+        "cols": ["id", "srrDone", "policyChanges", "postStructureCost", "postTraining"],
+        "dropna": {
+            "subset": ["srrDone", "policyChanges", "postStructureCost", "postTraining"],
+            "how": "all"
+        },
+        "float_format": "%.0f",
+    }
 
 
 
