@@ -468,7 +468,7 @@ def clean_date_range(value):
 
     return (None, None)
 
-def export_slices(df, specs, out_dir="./data"):
+def export_slices(df, specs, out_dir="./data/gda"):
     for filename, spec in specs.items():
         tmp = df[spec["cols"]].copy()
 
@@ -591,9 +591,9 @@ for i, row in df.iterrows():
 
 
 inci_df = pd.DataFrame(incidents)
-inci_df.to_csv("./data/gda_incidents.csv")
+inci_df.to_csv("./data/gda/gda_incidents.csv")
 
 # export csv slices for subject mapping
 export_slices(df, EXPORT_SPECS)
 
-df.to_csv('./data/gda.csv')
+df.to_csv('./data/gda/gda.csv')

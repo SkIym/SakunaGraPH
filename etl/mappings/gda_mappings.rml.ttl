@@ -10,122 +10,122 @@
 
 <#MainLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda.csv";
+    rml:source "data/gda/gda.csv";
     rml:referenceFormulation ql:CSV .
 
 <#InciLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_incidents.csv" ;
+    rml:source "data/gda/gda_incidents.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#PrepLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_prep.csv" ;
+    rml:source "data/gda/gda_prep.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#EvacLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_evac.csv" ;
+    rml:source "data/gda/gda_evac.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#RescueLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_rescue.csv" ;
+    rml:source "data/gda/gda_rescue.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#CalamLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_calamity.csv" ;
+    rml:source "data/gda/gda_calamity.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#AffPopLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_aff_pop.csv" ;
+    rml:source "data/gda/gda_aff_pop.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#CasualtiesLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_casualties.csv" ;
+    rml:source "data/gda/gda_casualties.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#HousingLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_housing.csv" ;
+    rml:source "data/gda/gda_housing.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#InfraLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_infra.csv" ;
+    rml:source "data/gda/gda_infra.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#GenDmgLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_dmg_general.csv" ;
+    rml:source "data/gda/gda_dmg_general.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#PowerLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_power.csv" ;
+    rml:source "data/gda/gda_power.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#CommsLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_comms.csv" ;
+    rml:source "data/gda/gda_comms.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#RNBLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_rnb.csv" ;
+    rml:source "data/gda/gda_rnb.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#SeaportLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_seaports.csv" ;
+    rml:source "data/gda/gda_seaports.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#AssistanceLogicalSource>
     a rml:LogicalSource ; 
-    rml:source "data/gda_assistance.csv" ;
+    rml:source "data/gda/gda_assistance.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#WaterLogicalSource>
     a rml:LogicalSource;
-    rml:source "data/gda_water.csv" ;
+    rml:source "data/gda/gda_water.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#ReliefG>
     a rml:LogicalSource;
-    rml:source "data/gda_relief_goods.csv" ;
+    rml:source "data/gda/gda_relief_goods.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#ReliefW>
     a rml:LogicalSource;
-    rml:source "data/gda_relief_water.csv" ;
+    rml:source "data/gda/gda_relief_water.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#ReliefC>
     a rml:LogicalSource;
-    rml:source "data/gda_relief_clothing.csv" ;
+    rml:source "data/gda/gda_relief_clothing.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#ReliefM>
     a rml:LogicalSource;
-    rml:source "data/gda_relief_med.csv" ;
+    rml:source "data/gda/gda_relief_med.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#ReliefU>
     a rml:LogicalSource;
-    rml:source "data/gda_relief_unspecified.csv" ;
+    rml:source "data/gda/gda_relief_unspecified.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#ReliefGen>
     a rml:LogicalSource;
-    rml:source "data/gda_relief_general.csv" ;
+    rml:source "data/gda/gda_relief_general.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#Recovery>
     a rml:LogicalSource;
-    rml:source "data/gda_recovery.csv" ;
+    rml:source "data/gda/gda_recovery.csv" ;
     rml:referenceFormulation ql:CSV .
 
 <#EventMapping>

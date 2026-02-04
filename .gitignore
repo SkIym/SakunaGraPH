@@ -3,3 +3,4 @@ downloads
 *.shp
 typings
 helper.py
+etl/data/
