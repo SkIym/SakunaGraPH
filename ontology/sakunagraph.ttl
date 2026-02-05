@@ -1999,7 +1999,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/ArmedConflict
 :ArmedConflict rdf:type owl:Class ;
                rdfs:subClassOf :Technological ;
-               rdfs:label "Armed Conflict"@en .
+               rdfs:label "Armed Conflict"@en ;
+               skos:definition "Incidens involving shootings, bombings, ambush, civil disturbances, and gun fires or armed scandals." .
 
 
 ###  https://sakuna.ph/Ashfall
