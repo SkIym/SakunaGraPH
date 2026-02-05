@@ -14,15 +14,6 @@ class Event:
     id: str
     remarks: str | None = None
 
-
-@dataclass
-class Provenance:
-    lastUpdateDate: datetime
-    reportName: str
-    obtainedDate: str | None = None
-    reportLink: str | None = None
-
-
 def event_mapping(g: Graph, ev: Event) -> URIRef:
     uri = event_iri(ev.id)
     g.add((
@@ -61,6 +52,13 @@ def event_mapping(g: Graph, ev: Event) -> URIRef:
         ))
     
     return uri
+
+@dataclass
+class Provenance:
+    lastUpdateDate: datetime
+    reportName: str
+    obtainedDate: str | None = None
+    reportLink: str | None = None
 
 def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
     uri = prov_iri(prov.reportName)
@@ -125,3 +123,20 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
         URIRef(SKG["ndrrmc_website_access"])
     ))
 
+@dataclass
+class Incident:
+    incidentActionsTaken: str
+    incidentCause: str
+    incidentDescription: str
+    startDate: datetime
+    endDate: datetime
+    hasLocation: str
+    hasType: str
+    remarks: str
+
+TABLE_COLUMN_MAPPINGS = {
+    "related_incidents": ["Region", "Province", "Municity", "Barangay", "Type of Incident", "Date", "Time", "Description", "Actions Taken", "Remarks", "Status"]
+}
+
+
+# def incident_mapping(g: Graph, inci: Incident, event_iri: URIRef):

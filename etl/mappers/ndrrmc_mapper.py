@@ -6,9 +6,7 @@ from mappings.ndrrmc_mappings import Event, Provenance
 from datetime import datetime
 
 
-TABLE_COLUMN_MAPPINGS = {
-    "related_incidents": ["Region", "Province", "Municity", "Barangay", "Type of Incident", "Date", "Time", "Description", "Actions Taken", "Remarks", "Status"]
-}
+
 
 def load_uuids(folder_path: str):
 
@@ -82,3 +80,5 @@ def load_provenance(event_folder_path: str) -> Provenance | None:
     )
     
     return p
+
+def
