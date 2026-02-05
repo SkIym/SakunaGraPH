@@ -3,7 +3,8 @@ from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
-from .graph import SKG, Graph
+from .graph import SKG, Graph, PROV
+from .iris import event_iri, prov_iri
 
 @dataclass
 class Event:
@@ -14,9 +15,16 @@ class Event:
     remarks: str | None = None
 
 
+@dataclass
+class Provenance:
+    lastUpdateDate: datetime
+    reportName: str
+    obtainedDate: str | None = None
+    reportLink: str | None = None
 
-def event_mapping(g: Graph, ev: Event):
-    uri = URIRef(SKG[ev.id])
+
+def event_mapping(g: Graph, ev: Event) -> URIRef:
+    uri = event_iri(ev.id)
     g.add((
         uri, 
         RDF.type, 
@@ -51,4 +59,69 @@ def event_mapping(g: Graph, ev: Event):
                URIRef(SKG["remarks"]), 
                Literal(ev.remarks)
         ))
+    
+    return uri
+
+def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
+    uri = prov_iri(prov.reportName)
+
+    g.add((
+        uri,
+        RDF.type,
+        URIRef(SKG["Source"])
+    ))
+
+    g.add((
+        event_iri,
+        URIRef(SKG["fromSource"]),
+        uri
+    ))
+
+    g.add((
+        uri,
+        URIRef(SKG["format"]),
+        Literal("pdf")
+    ))
+
+    g.add((
+        uri,
+        URIRef(SKG["lastUpdateDate"]),
+        Literal(prov.lastUpdateDate,
+                datatype=XSD.dateTime)
+    ))
+
+    g.add((
+        uri,
+        URIRef(SKG["reportName"]),
+        Literal(prov.reportName)
+    ))
+
+    if prov.obtainedDate:
+
+        g.add((
+            uri,
+            URIRef(SKG["obtainedDate"]),
+            Literal(prov.obtainedDate,
+                    datatype=XSD.dateTime)
+        ))
+    
+    if prov.reportLink:
+
+        g.add((
+            uri,
+            URIRef(SKG["reportLink"]),
+            Literal(prov.reportLink)
+        ))
+    
+    g.add((
+        uri,
+        URIRef(PROV["wasAttributedTo"]),
+        URIRef(SKG["NDRRMC"])
+    ))
+
+    g.add((
+        uri,
+        URIRef(PROV["wasGeneratedBy"]),
+        URIRef(SKG["ndrrmc_website_access"])
+    ))
 

@@ -1083,6 +1083,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:label "flight route"@en .
 
 
+###  https://sakuna.ph/format
+:format rdf:type owl:DatatypeProperty ;
+        rdfs:domain :Source ;
+        rdfs:range xsd:string ;
+        rdfs:label "format of the source" .
+
+
 ###  https://sakuna.ph/generalDamageAmount
 :generalDamageAmount rdf:type owl:DatatypeProperty ;
                      rdfs:domain :DamageGeneral ;
@@ -3221,6 +3228,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/Source
 :Source rdf:type owl:Class ;
         rdfs:subClassOf prov:Entity ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :format ;
+                          owl:someValuesFrom xsd:string
+                        ] ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :lastUpdateDate ;
                           owl:someValuesFrom xsd:dateTime

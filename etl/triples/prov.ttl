@@ -10,10 +10,11 @@
     :reportName "PH DISASTERS DATABASE" ;
     prov:wasGeneratedBy :email_request_geography ;
     prov:wasAttributedTo :Department_Of_Geography ;
+    :format "xslx" ;
     prov:wasAttributedTo :dr_cadag .
 
 :email_request_geography a prov:Activity ;
-    rdfs:label "The activity of requesting the copy of the historical disaster database from the organization online through email" ;
+    rdfs:label "The activity of requesting the copy of the historical disaster database from the organization online through email." ;
     prov:startedAtTime "2025-09-15" ;
     prov:wasAssociatedWith :dr_cadag .
 
@@ -22,3 +23,10 @@
 
 :Department_Of_Geography a prov:Organization ;
     rdfs:label "University of the Philippines Diliman - Department of Geography" .
+
+:ndrrmc_website_access a prov:Activity ;
+    rdfs:label "The activity of visiting the NDRRMC website and manually downloading the report files." ;
+    prov:startedAtTime "2025-09-14" .
+
+:NDRRMC a prov:Organization ;
+    rdfs:label "National Disaster Risk Reduction and Management Council" .

@@ -2,7 +2,7 @@
 import os
 import uuid
 import json
-from mappings.ndrrmc_mappings import Event
+from mappings.ndrrmc_mappings import Event, Provenance
 from datetime import datetime
 
 
@@ -14,8 +14,6 @@ def load_uuids(folder_path: str):
 
     for folder in next(os.walk(folder_path))[1]:
 
-        # add uuid for iri
-        id = uuid.uuid4().hex
         meta_path = os.path.join(folder_path, folder, "metadata.json")
         try:
             if os.path.exists(meta_path):
@@ -27,13 +25,12 @@ def load_uuids(folder_path: str):
             else:
                 meta = {}
 
-            meta["id"] = id
+            if "id" not in meta:
+                meta["id"] = uuid.uuid4().hex
 
-            os.makedirs(os.path.dirname(meta_path), exist_ok=True)
             with open(meta_path, "w", encoding="utf-8") as f:
                 json.dump(meta, f, ensure_ascii=False, indent=2)
 
-            print(folder)
             print(f"Updated metadata: {meta_path}")
 
         except Exception as e:
@@ -65,4 +62,23 @@ def load_events(folder_path: str) -> list[Event]:
         events.append(ev)
 
     return events
+
+def load_provenance(event_folder_path: str) -> Provenance | None:
+
+    src_path = os.path.join(event_folder_path, "source.json")
+
+    if not os.path.exists(src_path):
+        return None
+
+    with open(src_path, "r", encoding="utf-8") as f:
+        src: dict[str, str] = json.load(f)
+
+    p = Provenance(
+        lastUpdateDate=datetime.fromisoformat(src["lastUpdateDate"]),
+        reportLink=src.get("reportLink"),
+        reportName=src.get("reportName", ""),
+        obtainedDate=src.get("obtainedDate") if src["obtainedDate"] else None,
+
+    )
     
+    return p
