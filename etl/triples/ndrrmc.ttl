@@ -1,0 +1,401 @@
+@prefix : <https://sakuna.ph/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:03b167d5975a47a198e1ac23764f1b50 a :MajorEvent ;
+    :endDate "2022-12-30T00:00:00"^^xsd:dateTime ;
+    :eventName "2022 Year-End Celebration and Monitoring" ;
+    :startDate "2022-12-30T00:00:00"^^xsd:dateTime .
+
+:047f7b01871d4334bf303fb76aa827b9 a :MajorEvent ;
+    :eventName "Observance of Holy Week 2022" .
+
+:0c37055a0c054282a20f6d6d676391c7 a :MajorEvent ;
+    :endDate "2021-07-05T00:00:00"^^xsd:dateTime ;
+    :eventName "Taal Volcano Phreatomagmatic Eruption 2021" ;
+    :startDate "2021-07-01T00:00:00"^^xsd:dateTime .
+
+:0f9ac9bc43b4407fb74fb6080c25fce9 a :MajorEvent ;
+    :endDate "2020-10-15T00:00:00"^^xsd:dateTime ;
+    :eventName "TC OFEL 2020" ;
+    :startDate "2020-10-13T00:00:00"^^xsd:dateTime .
+
+:10a27151075f4af482c44f5ce9623b50 a :MajorEvent ;
+    :endDate "2023-07-20T00:00:00"^^xsd:dateTime ;
+    :eventName "Mayon Volcanic Activity  2023" ;
+    :startDate "2023-06-05T00:00:00"^^xsd:dateTime .
+
+:1264dc3912c149ac8c5c5fa93735d414 a :MajorEvent ;
+    :endDate "2025-09-06T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TC LANNIE 2025" ;
+    :startDate "2025-09-05T00:00:00"^^xsd:dateTime .
+
+:1416df39320d49b2be1240011ab3f769 a :MajorEvent ;
+    :endDate "2021-10-06T00:00:00"^^xsd:dateTime ;
+    :eventName "Tropical Depression LANNIE 2021" ;
+    :startDate "2021-10-04T00:00:00"^^xsd:dateTime .
+
+:16be0ffa07184162a9ca44983e0b6e39 a :MajorEvent ;
+    :endDate "2022-08-22T00:00:00"^^xsd:dateTime ;
+    :eventName "Magnitude 7 0 Earthquake in Tayum Abra 2022" ;
+    :startDate "2022-07-27T00:00:00"^^xsd:dateTime .
+
+:2aa8024716c149c6afe92acaabbdf5d2 a :MajorEvent ;
+    :endDate "2023-11-26T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of Shear Line and LPA LPA" ;
+    :startDate "2023-11-14T00:00:00"^^xsd:dateTime .
+
+:313e7478569a47598ef2c36e156689f1 a :MajorEvent ;
+    :endDate "2024-07-24T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TCs BUTCHOY and CARINA 2024" ;
+    :startDate "2024-07-11T00:00:00"^^xsd:dateTime .
+
+:36f6e5f995f34756aea385b5b3871157 a :MajorEvent ;
+    :endDate "2024-12-24T00:00:00"^^xsd:dateTime ;
+    :eventName "Year-End Celebration and Monitoring 2024" ;
+    :startDate "2024-12-23T00:00:00"^^xsd:dateTime .
+
+:37b0b8b470ac4815bddbb554f852bdd8 a :MajorEvent ;
+    :endDate "2021-01-04T00:00:00"^^xsd:dateTime ;
+    :eventName "Tail-End of a Frontal System in Regions II MIMAROPA V and VI 2020" ;
+    :startDate "2020-12-29T00:00:00"^^xsd:dateTime .
+
+:38143f7c5a224fad8a07f6a454476daa a :MajorEvent ;
+    :endDate "2020-11-01T00:00:00"^^xsd:dateTime ;
+    :eventName "Super TY ROLLY I N  GONI" ;
+    :startDate "2020-10-29T00:00:00"^^xsd:dateTime .
+
+:3b350dc6786d435288d111d72738420d a :MajorEvent ;
+    :endDate "2025-10-04T00:00:00"^^xsd:dateTime ;
+    :eventName "Effects of TC PAOLO 2025" ;
+    :startDate "2025-09-30T00:00:00"^^xsd:dateTime .
+
+:3c57a6ea73184f0198b1b02c0517c0b7 a :MajorEvent ;
+    :endDate "2020-10-25T00:00:00"^^xsd:dateTime ;
+    :eventName "TC QUINTA 2020" ;
+    :startDate "2020-10-23T00:00:00"^^xsd:dateTime .
+
+:3e0343f5cbff47b2b7f6647392ca0243 a :MajorEvent ;
+    :endDate "2021-07-30T00:00:00"^^xsd:dateTime ;
+    :eventName "Magnitude Mw 6 6 Earthquake in Calatagan Batangas 2021-pages-deleted" ;
+    :startDate "2021-07-24T00:00:00"^^xsd:dateTime .
+
+:40415ae1960e493d98f765f550dee80e a :MajorEvent ;
+    :endDate "2022-10-28T00:00:00"^^xsd:dateTime ;
+    :eventName "STS PAENG 2022" ;
+    :startDate "2022-10-25T00:00:00"^^xsd:dateTime .
+
+:434d1bff0ce14b34b742f9caf9590482 a :MajorEvent ;
+    :endDate "2024-09-07T00:00:00"^^xsd:dateTime ;
+    :eventName "Effects of TC ENTENG and SWM 2024  Report" ;
+    :startDate "2024-08-31T00:00:00"^^xsd:dateTime .
+
+:43510957260b4691a8cf31c83294269c a :MajorEvent ;
+    :endDate "2020-02-13T00:00:00"^^xsd:dateTime ;
+    :eventName "Taal Volcano Eruption 2020" ;
+    :startDate "2020-01-12T00:00:00"^^xsd:dateTime .
+
+:47414251ee024e26b6e557ef2755e397 a :MajorEvent ;
+    :endDate "2023-07-16T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM enhanced by TC DODONG 2023" ;
+    :startDate "2023-07-12T00:00:00"^^xsd:dateTime .
+
+:4cda50c601f444229e6622f9a7b28be0 a :MajorEvent ;
+    :endDate "2024-06-03T00:00:00"^^xsd:dateTime ;
+    :eventName "Kanlaon Volcanic Activity 2024" ;
+    :startDate "2024-06-03T00:00:00"^^xsd:dateTime .
+
+:53752f7e99cf4195a7449b538d134cc0 a :MajorEvent ;
+    :endDate "2023-01-08T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of LPAs Norast Monsoon and Shearline 2023" ;
+    :startDate "2023-01-01T00:00:00"^^xsd:dateTime .
+
+:540c72a23a38499685747a7b08ee7e45 a :MajorEvent ;
+    :endDate "2021-09-08T00:00:00"^^xsd:dateTime ;
+    :eventName "TY JOLINA2021" ;
+    :startDate "2021-09-06T00:00:00"^^xsd:dateTime .
+
+:549cdb364de1414ba93c7d90b7e598a6 a :MajorEvent ;
+    :endDate "2024-10-04T00:00:00"^^xsd:dateTime ;
+    :eventName "TC JULIAN 2024" ;
+    :startDate "2024-09-27T00:00:00"^^xsd:dateTime .
+
+:551e025e7aee49a281396c39bc8f83f7 a :MajorEvent ;
+    :endDate "2023-08-30T00:00:00"^^xsd:dateTime ;
+    :eventName "SWM enhanced by TCs GORING, HANNA, and INENG 2023" ;
+    :startDate "2023-08-24T00:00:00"^^xsd:dateTime .
+
+:56c31b787ed44c5c9630e867023716b9 a :MajorEvent ;
+    :endDate "2021-07-21T00:00:00"^^xsd:dateTime ;
+    :eventName "SWM Enhanced by TC Fabian 2021 BT" ;
+    :startDate "2021-07-16T00:00:00"^^xsd:dateTime .
+
+:5e611f384e614cc584e513c5458047e9 a :MajorEvent ;
+    :eventName "TC VICKY 2020" .
+
+:5ec95483495c419eb4594dfab916447f a :MajorEvent ;
+    :endDate "2022-09-24T00:00:00"^^xsd:dateTime ;
+    :eventName "TC KARDING  2022" ;
+    :startDate "2022-09-22T00:00:00"^^xsd:dateTime .
+
+:5eef826e606c42518bd0e5ee12b287f1 a :MajorEvent ;
+    :endDate "2024-07-25T00:00:00"^^xsd:dateTime ;
+    :eventName "Maritime Incident involving MT Terra Nova in Limay Bataan REGION III" ;
+    :startDate "2024-07-24T00:00:00"^^xsd:dateTime .
+
+:63248fc47b74416c8dceb382f3d15d35 a :MajorEvent ;
+    :endDate "2022-04-12T00:00:00"^^xsd:dateTime ;
+    :eventName "TC AGATON 2022" ;
+    :startDate "2022-04-09T00:00:00"^^xsd:dateTime .
+
+:6368e527e5ee4063a70ed1a9cd6b8957 a :MajorEvent ;
+    :endDate "2022-08-22T00:00:00"^^xsd:dateTime ;
+    :eventName "TC FLORIA  2022" ;
+    :startDate "2022-08-21T00:00:00"^^xsd:dateTime .
+
+:6c2660ef43604d1a843c431d35da9c08 a :MajorEvent ;
+    :endDate "2024-02-03T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of Norast Monsoon and Trough of LPA LPA" ;
+    :startDate "2024-01-28T00:00:00"^^xsd:dateTime .
+
+:6d8fb71acdfe4dcf88657e6261d0a352 a :MajorEvent ;
+    :endDate "2022-12-30T00:00:00"^^xsd:dateTime ;
+    :eventName "Effects of Shear Line 2022" ;
+    :startDate "2022-12-18T00:00:00"^^xsd:dateTime .
+
+:7448b8cdae374cbbbbe6081664bf72b5 a :MajorEvent ;
+    :eventName "Effects of LPA  2023" .
+
+:75ee6469647b406abdde05c4f1d0f904 a :MajorEvent ;
+    :endDate "2023-04-02T00:00:00"^^xsd:dateTime ;
+    :eventName "Effects of Oil Spill in CALABARZON MIMAROPA and Region VI" ;
+    :startDate "2023-02-28T00:00:00"^^xsd:dateTime .
+
+:7636fd54aeb14bd9b6670dc85a770404 a :MajorEvent ;
+    :endDate "2020-11-13T00:00:00"^^xsd:dateTime ;
+    :eventName "TC ULYSSES 2020" ;
+    :startDate "2020-11-08T00:00:00"^^xsd:dateTime .
+
+:76731bd8c44f4f41a3d7d790444063ef a :MajorEvent ;
+    :endDate "2022-07-31T00:00:00"^^xsd:dateTime ;
+    :eventName "Effects of TD ESTER 2022" ;
+    :startDate "2022-07-29T00:00:00"^^xsd:dateTime .
+
+:7ce90f74543341abb3631b7cbf67debc a :MajorEvent ;
+    :eventName "TC NENENG  2022" .
+
+:7decdffcbabb43a8a65e436e8cea3422 a :MajorEvent ;
+    :endDate "2022-11-21T00:00:00"^^xsd:dateTime ;
+    :eventName "Magnitude 6 4 Earthquake in Lagayan Abra  2022" ;
+    :startDate "2022-10-25T00:00:00"^^xsd:dateTime .
+
+:8027e87cd60b419586e8c70749e69231 a :MajorEvent ;
+    :endDate "2024-01-01T00:00:00"^^xsd:dateTime ;
+    :eventName "Holiday Season 2023" ;
+    :startDate "2023-12-22T00:00:00"^^xsd:dateTime .
+
+:80f2a11226e94197a15a7b445d9b6a16 a :MajorEvent ;
+    :endDate "2022-05-06T00:00:00"^^xsd:dateTime ;
+    :eventName "2022 National and Local Elections  pdf1" ;
+    :startDate "2022-05-09T00:00:00"^^xsd:dateTime .
+
+:84cf9b1a6218477ea9f4c5871fd21fc0 a :MajorEvent ;
+    :endDate "2022-12-13T00:00:00"^^xsd:dateTime ;
+    :eventName "TS ROSAL 2022" ;
+    :startDate "2022-12-10T00:00:00"^^xsd:dateTime .
+
+:898d4cf7ce7e414b871d85f1f1805c0c a :MajorEvent ;
+    :endDate "2024-05-26T00:00:00"^^xsd:dateTime ;
+    :eventName "TC AGHON" ;
+    :startDate "2024-05-24T00:00:00"^^xsd:dateTime .
+
+:93187dba49e34ce2bc23a450ebc2baa5 a :MajorEvent ;
+    :endDate "2024-03-25T00:00:00"^^xsd:dateTime ;
+    :eventName "Observance of Holy Week Semana Santa 2024" ;
+    :startDate "2024-03-31T00:00:00"^^xsd:dateTime .
+
+:9a1ef789f6fb4461ac8322ac1543f105 a :MajorEvent ;
+    :endDate "2024-11-16T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects TCs NIKA OFEL and PEPITO 2024" ;
+    :startDate "2024-11-09T00:00:00"^^xsd:dateTime .
+
+:9b8adb6cbed64532a23faa15f254011f a :MajorEvent ;
+    :endDate "2021-08-03T00:00:00"^^xsd:dateTime ;
+    :eventName "SWM" ;
+    :startDate "2021-07-28T00:00:00"^^xsd:dateTime .
+
+:a14c3fb0be0e47719d6c6aec9132ca4e a :MajorEvent ;
+    :eventName "Severe TS MARING" .
+
+:a4f5269c88664f5bba3801ed685045bf a :MajorEvent ;
+    :eventName "Preparedness Measure and Effects of TY KIKO 2021" .
+
+:a5647b92420b497b9eab513231c34a77 a :MajorEvent ;
+    :endDate "2020-05-15T00:00:00"^^xsd:dateTime ;
+    :eventName "TY Ambo 2020" ;
+    :startDate "2020-05-10T00:00:00"^^xsd:dateTime .
+
+:a6698da0730f431db99164806da01a3e a :MajorEvent ;
+    :endDate "2023-11-17T00:00:00"^^xsd:dateTime ;
+    :eventName "Magnitude 6 8 Earthquake in Sarangani Davao Occidental" ;
+    :startDate "2023-11-17T00:00:00"^^xsd:dateTime .
+
+:a6c6d3f3faa04c89a7ed3e4804293852 a :MajorEvent ;
+    :eventName "re Severe TS PEPITO" .
+
+:a6f16af97fc34381aafa40f21149582c a :MajorEvent ;
+    :endDate "2022-10-22T00:00:00"^^xsd:dateTime ;
+    :eventName "TC OBET  2022" ;
+    :startDate "2022-10-19T00:00:00"^^xsd:dateTime .
+
+:afdb020607fd4617983330611e6dcaa0 a :MajorEvent ;
+    :endDate "2025-05-12T00:00:00"^^xsd:dateTime ;
+    :eventName "2025 National and Local Elections" ;
+    :startDate "2025-05-12T00:00:00"^^xsd:dateTime .
+
+:b7b72d36573f411e91ae0eeb38f04127 a :MajorEvent ;
+    :eventName "TC AMANG" .
+
+:b7bc1792ab944eec8a54547f714c0d2b a :MajorEvent ;
+    :endDate "2025-09-03T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TC KIKO 2025" ;
+    :startDate "2025-08-29T00:00:00"^^xsd:dateTime .
+
+:b85a27b07d954292829656e78ac9aaa9 a :MajorEvent ;
+    :endDate "2023-12-16T00:00:00"^^xsd:dateTime ;
+    :eventName "Magnitude Mw7 4 and Mw6 8 Earthquakes in Surigao del Sur" ;
+    :startDate "2023-12-02T00:00:00"^^xsd:dateTime .
+
+:b9225e1beb594ad18ee386c4f6b1e59d a :MajorEvent ;
+    :endDate "2025-07-07T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TC BISING 2025" ;
+    :startDate "2025-06-29T00:00:00"^^xsd:dateTime .
+
+:bae3521baf9c46909e45856adf643458 a :MajorEvent ;
+    :endDate "2023-07-30T00:00:00"^^xsd:dateTime ;
+    :eventName "SWM enhanced by TCs EGAY and FALCON 2023" ;
+    :startDate "2023-07-21T00:00:00"^^xsd:dateTime .
+
+:bc9d8ace998f446c8051590c35b36603 a :MajorEvent ;
+    :endDate "2025-04-08T00:00:00"^^xsd:dateTime ;
+    :eventName "Kanlaon Volcano Eruption 2024" ;
+    :startDate "2024-12-09T00:00:00"^^xsd:dateTime .
+
+:be91d2973d1d44f9a3508a197e523dc6 a :MajorEvent ;
+    :endDate "2025-07-31T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TCs CRISING EMONG DANTE Breakdow" ;
+    :startDate "2025-07-15T00:00:00"^^xsd:dateTime .
+
+:c12e4023ec374131b4bcefdcb9e1d749 a :MajorEvent ;
+    :eventName "TS TONYO 2020" .
+
+:c55d6115206748a3a44ced48b21ab8dc a :MajorEvent ;
+    :endDate "2025-09-26T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM TCs MIRASOL NANDO and OPONG 2025" ;
+    :startDate "2025-09-16T00:00:00"^^xsd:dateTime .
+
+:c6ff90d7d28240b89783b5d4b45a0506 a :MajorEvent ;
+    :endDate "2025-06-11T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and LPA LPA 2025" ;
+    :startDate "2025-06-06T00:00:00"^^xsd:dateTime .
+
+:cd8b58f713e8474aa0e16735aa263092 a :MajorEvent ;
+    :endDate "2023-12-20T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of Shear Line and TC KABAYAN  2023" ;
+    :startDate "2023-12-17T00:00:00"^^xsd:dateTime .
+
+:d08f4fe8d0e945949be026c43793659d a :MajorEvent ;
+    :endDate "2020-06-12T00:00:00"^^xsd:dateTime ;
+    :eventName "TS BUTCHOY 2020" ;
+    :startDate "2020-06-08T00:00:00"^^xsd:dateTime .
+
+:d1aa1749cbcb4c9abe0efc9fc5f98a98 a :MajorEvent ;
+    :endDate "2025-08-23T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TC ISANG 2025" ;
+    :startDate "2025-08-19T00:00:00"^^xsd:dateTime .
+
+:d403c75ea58d4d7ba7e1ef5f5dd80afc a :MajorEvent ;
+    :eventName "Increasing Cases of Pertussis 2024" .
+
+:d473a16896c940fb9c789503a296646a a :MajorEvent ;
+    :endDate "2023-10-06T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM and TC JENNY" ;
+    :startDate "2023-09-29T00:00:00"^^xsd:dateTime .
+
+:d554ea4f1af7438291b614e1dfedb31e a :MajorEvent ;
+    :endDate "2024-10-31T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of TCs KRISTINE and LEON 2024  1" ;
+    :startDate "2024-10-21T00:00:00"^^xsd:dateTime .
+
+:d6b3c6d09de2465e9bcb08236f7a2210 a :MajorEvent ;
+    :endDate "2022-09-03T00:00:00"^^xsd:dateTime ;
+    :eventName "forTC Henry  2022" ;
+    :startDate "2022-08-31T00:00:00"^^xsd:dateTime .
+
+:d8670bfbd2b740aea9c91fa67eb58e84 a :MajorEvent ;
+    :endDate "2025-08-28T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of SWM TC JACINTO and LPA 08f 2025" ;
+    :startDate "2025-09-04T00:00:00"^^xsd:dateTime .
+
+:d9357e9de2df40b2a1a503fc960ccff5 a :MajorEvent ;
+    :endDate "2021-12-15T00:00:00"^^xsd:dateTime ;
+    :eventName "TY ODETTE 2021" ;
+    :startDate "2021-12-16T00:00:00"^^xsd:dateTime .
+
+:d9856e76073b4207bbac55d4c0c4fd5a a :MajorEvent ;
+    :endDate "2023-10-27T00:00:00"^^xsd:dateTime ;
+    :eventName "Undas 2023" ;
+    :startDate "2023-10-27T00:00:00"^^xsd:dateTime .
+
+:dac9455250d441bcb0459b1410e2e221 a :MajorEvent ;
+    :endDate "2022-01-02T00:00:00"^^xsd:dateTime ;
+    :eventName "Year-End Celebration 2021" ;
+    :startDate "2021-12-24T00:00:00"^^xsd:dateTime .
+
+:dc48ab5b30a3400db0a24196f88a4dce a :MajorEvent ;
+    :endDate "2024-11-08T00:00:00"^^xsd:dateTime ;
+    :eventName "TC MARCE 2024" ;
+    :startDate "2024-11-04T00:00:00"^^xsd:dateTime .
+
+:e041824b1a254f3581e8c1b5d840d79c a :MajorEvent ;
+    :eventName "re TC Dante" .
+
+:e124c1a58a1b42cab525db51af8d57f3 a :MajorEvent ;
+    :endDate "2022-10-10T00:00:00"^^xsd:dateTime ;
+    :eventName "Tropical Depression MAYMAY 2022" ;
+    :startDate "2022-10-10T00:00:00"^^xsd:dateTime .
+
+:ea61d3f291a141ad947de0c0e57e9ac5 a :MajorEvent ;
+    :endDate "2024-11-02T00:00:00"^^xsd:dateTime ;
+    :eventName "Undas 2024  pdf" ;
+    :startDate "2024-11-02T00:00:00"^^xsd:dateTime .
+
+:ee336a9c5ea046f58b3b5625f8097236 a :MajorEvent ;
+    :endDate "2023-12-06T00:00:00"^^xsd:dateTime ;
+    :eventName "El Nino 2023" ;
+    :startDate "2023-07-04T00:00:00"^^xsd:dateTime .
+
+:f0a1d42458be4c2180a2c6b815188ebf a :MajorEvent ;
+    :endDate "2023-05-28T00:00:00"^^xsd:dateTime ;
+    :eventName "TC BETTY 2023" ;
+    :startDate "2023-05-20T00:00:00"^^xsd:dateTime .
+
+:f0ff50239eea4fbb8a0040f2ac19b90f a :MajorEvent ;
+    :endDate "2024-01-19T00:00:00"^^xsd:dateTime ;
+    :eventName "Effects of Shear Line in Regions XI and Caraga 2024" ;
+    :startDate "2024-01-14T00:00:00"^^xsd:dateTime .
+
+:f2f9779e7f2d4bef9c28eacf16591fff a :MajorEvent ;
+    :endDate "2022-11-01T00:00:00"^^xsd:dateTime ;
+    :eventName "UNDAS  2022" ;
+    :startDate "2022-10-28T00:00:00"^^xsd:dateTime .
+
+:f3a8066822244627a6da82dc2c3e214c a :MajorEvent ;
+    :endDate "2023-10-30T00:00:00"^^xsd:dateTime ;
+    :eventName "Barangay and Sangguniang Kabataan Elections 2023" ;
+    :startDate "2023-10-30T00:00:00"^^xsd:dateTime .
+
+:f4a8ae43ac6c42c2a33ac1fc21beec4a a :MajorEvent ;
+    :endDate "2024-09-18T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024" ;
+    :startDate "2024-09-28T00:00:00"^^xsd:dateTime .
+
