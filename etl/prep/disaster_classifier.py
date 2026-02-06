@@ -11,6 +11,7 @@ class DisasterClassifier:
         # with open(classes_path, "r", encoding="utf-8") as f:
         #     self.classes: dict[str, str] = json.load(f)
 
+        # Load classes
         SKG = Namespace("https://sakuna.ph/")
         g = Graph()
         g.parse("../ontology/sakunagraph.ttl")

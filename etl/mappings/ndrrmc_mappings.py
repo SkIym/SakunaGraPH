@@ -134,8 +134,16 @@ class Incident:
     hasType: str
     remarks: str
 
-TABLE_COLUMN_MAPPINGS = {
-    "related_incidents": ["Region", "Province", "Municity", "Barangay", "Type of Incident", "Date", "Time", "Description", "Actions Taken", "Remarks", "Status"]
+INCIDENT_COLUMN_MAPPINGS = {
+    "Column_1": "Qty",
+    "Column_2": "Type of Incident",
+    "Column_3": "Date",
+    "Column_4": "Time",
+    "Column_5": "Description",
+    "Column_6": "Actions Taken",
+    "Column_7": "Remarks",
+    "Column_8": "Status",
+
 }
 
 

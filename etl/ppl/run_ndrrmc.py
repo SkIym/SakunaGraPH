@@ -1,6 +1,6 @@
 from mappings.graph import create_graph
 from mappings.ndrrmc_mappings import event_mapping, prov_mapping
-from mappers.ndrrmc_mapper import load_events, load_uuids, load_provenance
+from mappers.ndrrmc_mapper import load_events, load_incidents, load_uuids, load_provenance
 import os
 
 DATA_DIR = "./data/ndrrmc"
@@ -24,6 +24,8 @@ def run():
 
         if prov:
             prov_mapping(g, prov, event_iri)
+
+        inci = load_incidents(event_folder)
 
     g.serialize(
         destination=OUT_FILE,

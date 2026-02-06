@@ -2,10 +2,11 @@
 import os
 import uuid
 import json
-from mappings.ndrrmc_mappings import Event, Provenance
+from etl.prep.disaster_classifier import DISASTER_CLASSIFIER
+from mappings.ndrrmc_mappings import INCIDENT_COLUMN_MAPPINGS, Event, Provenance, Incident
 from datetime import datetime
-
-
+from prep.ndrrmc_cleaner import forward_fill_and_collapse
+import polars as pl
 
 
 def load_uuids(folder_path: str):
@@ -81,4 +82,51 @@ def load_provenance(event_folder_path: str) -> Provenance | None:
     
     return p
 
-def
+def load_incidents(event_folder_path: str) -> list[Incident] | None:
+
+    src_path = os.path.join(event_folder_path, "related_incidents.csv")
+
+    if not os.path.exists(src_path):
+        return None
+
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = pl.read_csv(src_path)
+
+    # fix column names
+    df = df.rename(INCIDENT_COLUMN_MAPPINGS)
+
+    # clean rows by retaining only the actual incident entry
+    df = forward_fill_and_collapse(df, target_cols, "Qty", "Type of Incident")
+
+    # classify the type of the disaster
+    type_texts = df.select("Type of Incident").to_series().to_list()
+    predictions = DISASTER_CLASSIFIER.classify(type_texts)
+    pred_classes: list[str] = []
+
+    for _, (pred_class, _) in zip(type_texts, predictions):
+        pred_classes.append(pred_class)
+
+    # add column for predicted type
+    df = df.with_columns([
+        pl.Series("hasType", pred_classes),
+    ])
+
+    # add column for index 
+    df = df.with_row_index("incident_id", 1)
+    
+
+    # Construct Incident objects
+    incidents = []
+    for row in df.iter_rows(named=True):
+        incident = Incident(
+            region=row["Region"],
+            province=row["Province"],
+            city=row["City_Muni"],
+            incident_type=row["Type of Incident"],
+            predicted_class=row["PredictedClass"],
+            similarity_score=row["SimilarityScore"],
+            qty=row.get("Qty")
+        )
+        incidents.append(incident)
+
+    return incidents
