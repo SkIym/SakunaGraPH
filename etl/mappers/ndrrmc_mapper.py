@@ -2,7 +2,7 @@
 import os
 import uuid
 import json
-from etl.prep.disaster_classifier import DISASTER_CLASSIFIER
+from prep.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc_mappings import INCIDENT_COLUMN_MAPPINGS, Event, Provenance, Incident
 from datetime import datetime
 from prep.ndrrmc_cleaner import forward_fill_and_collapse
@@ -95,11 +95,26 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     # fix column names
     df = df.rename(INCIDENT_COLUMN_MAPPINGS)
 
+    print("Forward filling...")
     # clean rows by retaining only the actual incident entry
     df = forward_fill_and_collapse(df, target_cols, "Qty", "Type of Incident")
 
-    # classify the type of the disaster
-    type_texts = df.select("Type of Incident").to_series().to_list()
+    print("Classifying disaster types...")
+    # classify the type of the disaster based on incident type text and description
+    type_texts = (
+        df
+        .select(
+            pl.concat_str(
+                ["Type of Incident", "Description"],
+                separator=" — ",
+                ignore_nulls=True
+            ).alias("combined")
+        )
+        .to_series()
+        .to_list()
+    )
+
+
     predictions = DISASTER_CLASSIFIER.classify(type_texts)
     pred_classes: list[str] = []
 
@@ -113,20 +128,29 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
     # add column for index 
     df = df.with_row_index("incident_id", 1)
+
+    print("Writing csv...")
+
+    df.write_csv("hakdog.csv")
     
+    #
 
-    # Construct Incident objects
-    incidents = []
-    for row in df.iter_rows(named=True):
-        incident = Incident(
-            region=row["Region"],
-            province=row["Province"],
-            city=row["City_Muni"],
-            incident_type=row["Type of Incident"],
-            predicted_class=row["PredictedClass"],
-            similarity_score=row["SimilarityScore"],
-            qty=row.get("Qty")
-        )
-        incidents.append(incident)
+    # # Construct Incident objects
+    # incidents = []
+    # for row in df.iter_rows(named=True):
+    #     incident = Incident(
+    #         region=row["Region"],
+    #         province=row["Province"],
+    #         city=row["City_Muni"],
+    #         incident_type=row["Type of Incident"],
+    #         predicted_class=row["PredictedClass"],
+    #         similarity_score=row["SimilarityScore"],
+    #         qty=row.get("Qty")
+    #     )
+    #     incidents.append(incident)
 
-    return incidents
+    # return incidents
+
+
+if __name__ == "__main__":
+    load_incidents("./data/ndrrmc/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")

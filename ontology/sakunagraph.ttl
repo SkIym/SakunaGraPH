@@ -2286,7 +2286,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Derecho rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
          rdfs:label "Derecho"@en ;
-         skos:definition "Widespread and usually fast-moving windstorms associated with a convection/convective storm. Derechos include downburst and straight-line winds. The damage from derechos is often confused with the damage from tornadoes." .
+         skos:definition "Windstorms associated with a convection/convective storm. Derechos include downburst and straight-line winds." .
 
 
 ###  https://sakuna.ph/DisasterEvent
@@ -3113,7 +3113,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RiverineFlood rdf:type owl:Class ;
                rdfs:subClassOf :Flood ;
                rdfs:label "Riverine Flood"@en ;
-               skos:definition "A type of flooding resulting from the overflow of water from a stream or river channel onto normally dry land in the floodplain adjacent to the channel." .
+               skos:definition "A type of flooding resulting from the swelling of rivers or overflowing of a stream, creek, or river channel onto normally dry land in the floodplain adjacent to the channel." .
 
 
 ###  https://sakuna.ph/Road
@@ -3224,7 +3224,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :SevereWeather rdf:type owl:Class ;
                rdfs:subClassOf :Storm ;
                rdfs:label "Severe Weather"@en ;
-               skos:definition "Severe weather not considered to be part of significant and long disturbance like storms nor tropical cyclones." .
+               skos:definition "Severe weather, heavy rains and strong winds bringing damage." .
 
 
 ###  https://sakuna.ph/SevereWinterConditions
@@ -3367,7 +3367,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Tornado rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
          rdfs:label "Tornado"@en ;
-         skos:definition "A violently rotating column of air that reaches the ground or open water (waterspout)." .
+         skos:definition "Tornadoes and whirlwinds. A violently rotating column of air that reaches the ground or open water (waterspout)." .
 
 
 ###  https://sakuna.ph/Transport
@@ -3450,7 +3450,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :WaveAction rdf:type owl:Class ;
             rdfs:subClassOf :Hydrological ;
             rdfs:label "Wave Action"@en ;
-            skos:definition "Wind-generated surface waves that can occur on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
+            skos:definition "Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
 
 
 ###  https://sakuna.ph/Wildfire
