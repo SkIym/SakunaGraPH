@@ -1,7 +1,10 @@
 import os
 import polars as pl
+from polars import DataFrame
+from disaster_classifier import DISASTER_CLASSIFIER
 
-def forward_fill_and_collapse(folder_path: str, cols: list[str]):
+
+def forward_fill_and_collapse(folder_path: str, cols: list[str]) -> DataFrame:
     """
     Forward fill location values and collapse rows down only to most granular and detailed level
     
@@ -11,11 +14,10 @@ def forward_fill_and_collapse(folder_path: str, cols: list[str]):
     :type cols: list[str]
     """
     files = os.listdir(folder_path)
-    print(files)
+    # print(files)
     
     for cpt in files:
         if cpt.endswith("incidents.csv"):
-            print(cpt)
             file_path = os.path.join(folder_path, cpt)
             
             # Load the data
@@ -33,9 +35,23 @@ def forward_fill_and_collapse(folder_path: str, cols: list[str]):
             )
 
             output_path = os.path.join(folder_path, "ffilled.csv")
+
+            return df
             df.write_csv(output_path)
+
 
 if __name__ == "__main__":
     DATA_DIR = "./data/ndrrmc/TY Ambo 2020/"
     target_cols = ["Region", "Province", "City_Muni"]
-    forward_fill_and_collapse(DATA_DIR, target_cols)
+    df = forward_fill_and_collapse(DATA_DIR, target_cols)
+
+    texts = df.select("Column_2").to_series()
+
+
+    predictions = DISASTER_CLASSIFIER.classify(list(texts))
+
+    for text, (pred_class, score) in zip(texts, predictions):
+        print(f"\nType of incident: {text}")
+        print(f"→ Predicted class: {pred_class}")
+        print(f"→ Similarity score: {score:.4f}")
+

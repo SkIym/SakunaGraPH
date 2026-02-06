@@ -2200,13 +2200,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :CollapseIndustrial rdf:type owl:Class ;
                     rdfs:subClassOf :IndustrialAccident ;
                     rdfs:label "Collapse (Industrial)"@en ;
-                    skos:definition "Accident involving the collapse of a building or structure. Can either involve industrial structures or domestic/non-industrial structures." .
+                    skos:definition "Accident involving the fall or collapse of a building or structure. Can involve fallen industrial or commercial structures like billboards, towers, stores." .
 
 
 ###  https://sakuna.ph/CollapseMiscellaneous
 :CollapseMiscellaneous rdf:type owl:Class ;
                        rdfs:subClassOf :MiscellaneousAccident ;
-                       rdfs:label "Collapse (Misc)"@en .
+                       rdfs:label "Collapse (Misc)"@en ;
+                       skos:definition "Non-industrial and non-transport accident involving the collapse of a building or structure. Can involve fallen debris, trees." .
 
 
 ###  https://sakuna.ph/CommunicationLines
@@ -2407,7 +2408,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/ExplosionMiscellaneous
 :ExplosionMiscellaneous rdf:type owl:Class ;
                         rdfs:subClassOf :MiscellaneousAccident ;
-                        rdfs:label "Explosion (Misc)"@en .
+                        rdfs:label "Explosion (Misc)"@en ;
+                        skos:definition "Non-industrial explosions involving buildings or structures." .
 
 
 ###  https://sakuna.ph/Extraterrestrial
@@ -2441,7 +2443,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/FireMiscellaneous
 :FireMiscellaneous rdf:type owl:Class ;
                    rdfs:subClassOf :MiscellaneousAccident ;
-                   rdfs:label "Fire (Misc)"@en .
+                   rdfs:label "Fire (Misc)"@en ;
+                   skos:definition "Non-industrial urban fire involving buildings or structures. Can involve residential structures." .
 
 
 ###  https://sakuna.ph/FlashFlood
@@ -2462,7 +2465,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              skos:definition "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
+              skos:definition "A general term for flooded areas not specifying the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
 
 
 ###  https://sakuna.ph/Fog
@@ -2637,7 +2640,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :IndustrialAccidentGeneral rdf:type owl:Class ;
                            rdfs:subClassOf :IndustrialAccident ;
                            rdfs:label "Industrial Accident (General)"@en ;
-                           skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
+                           skos:definition "Any form of general industrial accidents." .
 
 
 ###  https://sakuna.ph/InfectiousDiseaseGeneral
@@ -2657,7 +2660,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/InfestationGeneral
 :InfestationGeneral rdf:type owl:Class ;
                     rdfs:subClassOf :Infestation ;
-                    rdfs:label "Infestation (General)"@en .
+                    rdfs:label "Infestation (General)"@en ;
+                    skos:definition "General infestation incidents." .
 
 
 ###  https://sakuna.ph/Infrastructure
@@ -2808,13 +2812,15 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/MiscellaneousAccidentGeneral
 :MiscellaneousAccidentGeneral rdf:type owl:Class ;
                               rdfs:subClassOf :MiscellaneousAccident ;
-                              rdfs:label "Miscellaneous Accident (General)"@en .
+                              rdfs:label "Miscellaneous Accident (General)"@en ;
+                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents." .
 
 
 ###  https://sakuna.ph/Mudslide
 :Mudslide rdf:type owl:Class ;
           rdfs:subClassOf :MassMovementWet ;
-          rdfs:label "Mudslide"@en .
+          rdfs:label "Mudslide"@en ;
+          skos:definition "A form of mass wasting involving fast-moving flow of debris and dirt that has become liquified by the addition of water. Also called a mudflow." .
 
 
 ###  https://sakuna.ph/Municipality
@@ -3155,13 +3161,15 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/RockfallDry
 :RockfallDry rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementDry ;
-             rdfs:label "Rockfall (Dry)"@en .
+             rdfs:label "Rockfall (Dry)"@en ;
+             skos:definition "A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions." .
 
 
 ###  https://sakuna.ph/RockfallWet
 :RockfallWet rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementWet ;
-             rdfs:label "Rockfall (Wet)"@en .
+             rdfs:label "Rockfall (Wet)"@en ;
+             skos:definition "A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under wet conditions." .
 
 
 ###  https://sakuna.ph/RogueWave
@@ -3215,7 +3223,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/SevereWeather
 :SevereWeather rdf:type owl:Class ;
                rdfs:subClassOf :Storm ;
-               rdfs:label "Severe Weather"@en .
+               rdfs:label "Severe Weather"@en ;
+               skos:definition "Severe weather not considered to be part of significant and long disturbance like storms nor tropical cyclones." .
 
 
 ###  https://sakuna.ph/SevereWinterConditions
@@ -3385,7 +3394,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/ViralDisease
 :ViralDisease rdf:type owl:Class ;
               rdfs:subClassOf :Epidemic ;
-              rdfs:label "Viral Disease"@en .
+              rdfs:label "Viral Disease"@en ;
+              skos:definition "An unusual increase in the number of cases caused by exposure to virus either through skin contact, ingestion, or inhalation. Common viral illnesses include colds, the flu, COVID-19, norovirus (“stomach flu”), HPV (warts) and herpes simplex virus (cold sores)" .
 
 
 ###  https://sakuna.ph/VolcanicActivity
