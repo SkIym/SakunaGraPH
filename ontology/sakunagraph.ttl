@@ -486,20 +486,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
             rdfs:label "from source"@en .
 
 
-###  https://sakuna.ph/hasBarangay
-:hasBarangay rdf:type owl:ObjectProperty ;
-             rdfs:subPropertyOf :hasLocation ;
-             rdfs:domain [ rdf:type owl:Class ;
-                           owl:unionOf ( :DisasterEvent
-                                         :Impact
-                                         :Preparedness
-                                         :Response
-                                       )
-                         ] ;
-             rdfs:range :Barangay ;
-             rdfs:label "has barangay"@en .
-
-
 ###  https://sakuna.ph/hasImpact
 :hasImpact rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf owl:topObjectProperty ;
@@ -1096,6 +1082,19 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      rdfs:range xsd:decimal ;
                      rdfs:comment "In M PHP" ;
                      rdfs:label "general total damage amount"@en .
+
+
+###  https://sakuna.ph/hasBarangay
+:hasBarangay rdf:type owl:DatatypeProperty ;
+             rdfs:domain [ rdf:type owl:Class ;
+                           owl:unionOf ( :DisasterEvent
+                                         :Impact
+                                         :Preparedness
+                                         :Response
+                                       )
+                         ] ;
+             rdfs:range xsd:string ;
+             rdfs:label "has barangay" .
 
 
 ###  https://sakuna.ph/housingDamageAmount
@@ -2296,10 +2295,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  owl:someValuesFrom :Source
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :hasBarangay ;
-                                 owl:someValuesFrom :Barangay
-                               ] ,
-                               [ rdf:type owl:Restriction ;
                                  owl:onProperty :hasImpact ;
                                  owl:someValuesFrom :Impact
                                ] ,
@@ -2341,6 +2336,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                ] ,
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :eventName ;
+                                 owl:someValuesFrom xsd:string
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :hasBarangay ;
                                  owl:someValuesFrom xsd:string
                                ] ,
                                [ rdf:type owl:Restriction ;
@@ -2578,10 +2577,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                           owl:someValuesFrom :Source
                         ] ,
                         [ rdf:type owl:Restriction ;
-                          owl:onProperty :hasBarangay ;
-                          owl:someValuesFrom :Barangay
-                        ] ,
-                        [ rdf:type owl:Restriction ;
                           owl:onProperty :hasLocation ;
                           owl:someValuesFrom :Location
                         ] ,
@@ -2596,6 +2591,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :hasRegion ;
                           owl:someValuesFrom :Region
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :hasBarangay ;
+                          owl:someValuesFrom xsd:string
                         ] ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :remarks ;
@@ -2933,10 +2932,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                 owl:someValuesFrom :Source
                               ] ,
                               [ rdf:type owl:Restriction ;
-                                owl:onProperty :hasBarangay ;
-                                owl:someValuesFrom :Barangay
-                              ] ,
-                              [ rdf:type owl:Restriction ;
                                 owl:onProperty :hasLocation ;
                                 owl:someValuesFrom :Location
                               ] ,
@@ -2951,6 +2946,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                               [ rdf:type owl:Restriction ;
                                 owl:onProperty :hasRegion ;
                                 owl:someValuesFrom :Region
+                              ] ,
+                              [ rdf:type owl:Restriction ;
+                                owl:onProperty :hasBarangay ;
+                                owl:someValuesFrom xsd:string
                               ] ,
                               [ rdf:type owl:Restriction ;
                                 owl:onProperty :remarks ;
@@ -3082,10 +3081,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                             owl:someValuesFrom :Source
                           ] ,
                           [ rdf:type owl:Restriction ;
-                            owl:onProperty :hasBarangay ;
-                            owl:someValuesFrom :Barangay
-                          ] ,
-                          [ rdf:type owl:Restriction ;
                             owl:onProperty :hasLocation ;
                             owl:someValuesFrom :Location
                           ] ,
@@ -3100,6 +3095,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                           [ rdf:type owl:Restriction ;
                             owl:onProperty :hasRegion ;
                             owl:someValuesFrom :Region
+                          ] ,
+                          [ rdf:type owl:Restriction ;
+                            owl:onProperty :hasBarangay ;
+                            owl:someValuesFrom xsd:string
                           ] ,
                           [ rdf:type owl:Restriction ;
                             owl:onProperty :remarks ;
