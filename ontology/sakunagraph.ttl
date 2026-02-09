@@ -2464,7 +2464,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              skos:definition "A general term for flooded areas not specifying the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
+              skos:definition "A general term for flooded areas not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft." .
 
 
 ###  https://sakuna.ph/Fog
@@ -2745,7 +2745,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
+              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banks, rain induced and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
 
 
 ###  https://sakuna.ph/LavaFlow
@@ -3112,7 +3112,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RiverineFlood rdf:type owl:Class ;
                rdfs:subClassOf :Flood ;
                rdfs:label "Riverine Flood"@en ;
-               skos:definition "A type of flooding resulting from the swelling of rivers or overflowing of a stream, creek, or river channel onto normally dry land in the floodplain adjacent to the channel." .
+               skos:definition "A type of flooding resulting due to the river (swollen river) or overflowing of a stream, creek, or  channel onto normally dry land in the floodplain adjacent to the channel." .
 
 
 ###  https://sakuna.ph/Road
