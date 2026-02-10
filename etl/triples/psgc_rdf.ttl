@@ -2769,6 +2769,13 @@
     :isPartOf :Batangas ;
     :psgc 401028000 .
 
+:Santo_Tomas_Pampanga a :Municipality ;
+    rdfs:label "Santo Tomas" ;
+    :admLevel "Municipality" ;
+    :isPartOf :Pampanga ;
+    :psgc 305421000 .
+
+
 :City_of_Surigao a :Municipality ;
     rdfs:label "City of Surigao" ;
     :admLevel "City" ;
@@ -7255,7 +7262,7 @@
     :isPartOf :Tarlac ;
     :psgc 306911000 .
 
-:Quezon_Bukidnon a :Municipality ;
+:aBukidnon a :Municipality ;
     rdfs:label "Quezon" ;
     :admLevel "Municipality" ;
     :isPartOf :Bukidnon ;

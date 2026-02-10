@@ -22,9 +22,9 @@ class DisasterClassifier:
         SELECT DISTINCT ?c ?defi WHERE {
         ?c rdfs:subClassOf+ skg:DisasterType ;
             skos:definition ?defi ;
-        # FILTER NOT EXISTS {
-        #     ?child rdfs:subClassOf ?c .
-        #}
+        FILTER NOT EXISTS {
+            ?child rdfs:subClassOf ?c .
+        }
         }
         """
         for row in g.query(q, initNs={"rdfs": RDFS, "skg": SKG, "skos": SKOS}):

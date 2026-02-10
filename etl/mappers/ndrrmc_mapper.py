@@ -2,6 +2,7 @@
 import os
 import uuid
 import json
+from prep.location_matcher import LOCATION_MATCHER
 from prep.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc_mappings import INCIDENT_COLUMN_MAPPINGS, Event, Provenance, Incident
 from datetime import datetime
@@ -96,6 +97,7 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     df = df.rename(INCIDENT_COLUMN_MAPPINGS)
 
     print("Forward filling...")
+
     # clean rows by retaining only the actual incident entry
     df = forward_fill_and_collapse(df, target_cols, "Qty", "Type of Incident")
 
@@ -126,6 +128,27 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
         pl.Series("hasType", pred_classes),
     ])
 
+
+    # match location
+    locations = (
+        df
+        .select(
+            pl.concat_str(
+                ["City_Muni", "Province", "Region"],
+                separator=",",
+                ignore_nulls=True
+            ).alias("full location")
+        )
+        .to_series()
+        .to_list()
+    )
+
+    print("Matching locations...")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
     # add column for index 
     df = df.with_row_index("incident_id", 1)
 
@@ -153,4 +176,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+    load_incidents("./data/ndrrmc/Tropical Depression LANNIE 2021/")
