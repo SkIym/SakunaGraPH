@@ -2206,7 +2206,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :CollapseMiscellaneous rdf:type owl:Class ;
                        rdfs:subClassOf :MiscellaneousAccident ;
                        rdfs:label "Collapse (Misc)"@en ;
-                       skos:definition "Non-industrial and non-transport accident involving the collapse of a building or structure. Can involve fallen debris, fallen tree/s." .
+                       skos:definition "Non-industrial and non-transport accident involving the collapse of a building or structure. Can involve fallen debris, fallen tree/s, uprooted trees." .
 
 
 ###  https://sakuna.ph/CommunicationLines
@@ -2464,7 +2464,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              skos:definition "A general term for flooded areas not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft." .
+              skos:definition "A general term for flooded areas not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft. Involves flooding in roads, zones, and areas in the country." .
 
 
 ###  https://sakuna.ph/Fog
@@ -2478,7 +2478,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :ForestFire rdf:type owl:Class ;
             rdfs:subClassOf :Wildfire ;
             rdfs:label "Forest Fire"@en ;
-            skos:definition "A type of wildfire in a wooded area." .
+            skos:definition "A type of wildfire in a wooded area or forest." .
 
 
 ###  https://sakuna.ph/FungalDisase
@@ -2506,7 +2506,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Glacial rdf:type owl:Class ;
          rdfs:subClassOf :Climatological ;
          rdfs:label "Glacial"@en ;
-         skos:definition "These floods occur when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." .
+         skos:definition "Occurs when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." .
 
 
 ###  https://sakuna.ph/GrasshopperInfestation
@@ -2745,7 +2745,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banks, rain induced and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
+              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banks, rain induced and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
 
 
 ###  https://sakuna.ph/LavaFlow
@@ -3450,6 +3450,13 @@ baw:NaturalDisasterType rdf:type owl:Class ;
             rdfs:subClassOf :Hydrological ;
             rdfs:label "Wave Action"@en ;
             skos:definition "Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
+
+
+###  https://sakuna.ph/WaveActionGeneral
+:WaveActionGeneral rdf:type owl:Class ;
+                   rdfs:subClassOf :WaveAction ;
+                   rdfs:comment "Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." ;
+                   rdfs:label "Wave Action (General)" .
 
 
 ###  https://sakuna.ph/Wildfire
