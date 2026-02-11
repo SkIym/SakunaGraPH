@@ -90,6 +90,7 @@ class LocationMatcher:
             "13": "Region_XIII",
             "Region XIII": "Region_XIII",
             "CARAGA": "Region_XIII",
+            "RTR": "Region_XIII",
 
             "NCR": "National_Capital_Region",
             "Metro Manila": "National_Capital_Region",
@@ -239,8 +240,8 @@ class LocationMatcher:
                             muni_IRI = iri
                             break
                     
-                    if "Pampanga" in prov_IRI:
-                        print(muni_IRI)
+                    # if "Pampanga" in prov_IRI:
+                    #     print(muni_IRI)
 
                     if not muni_IRI:
                         temp = candidate.replace("City", "")
@@ -260,7 +261,7 @@ class LocationMatcher:
                                 muni_IRI = iri
                                 break
                         
-                        print(muni_IRI)
+                        # print(muni_IRI)
                         # muni_IRI = self.municipalities_rev[temp] if temp in self.municipalities_rev else ""
 
                     # fuzzy match

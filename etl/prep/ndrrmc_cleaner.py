@@ -26,6 +26,20 @@ def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, bas
 
     return df
 
+def event_name_expander(name: str) -> str:
+
+    abbr = {
+        "TC": "Tropical cyclone",
+        "TD": "Tropical depression",
+        "TS": "Tropical storm",
+        "LPA": "Low pressure area"
+    }
+
+    for a in abbr.keys():
+        if a in name:
+            return name.replace(a, abbr[a])
+    
+    return name
 
 # def normalize_datetime(folder_path: str, date_col: str, time_col: str):
 

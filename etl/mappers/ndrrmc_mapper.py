@@ -6,7 +6,7 @@ from prep.location_matcher import LOCATION_MATCHER
 from prep.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc_mappings import INCIDENT_COLUMN_MAPPINGS, Event, Provenance, Incident
 from datetime import datetime
-from prep.ndrrmc_cleaner import forward_fill_and_collapse
+from prep.ndrrmc_cleaner import event_name_expander, forward_fill_and_collapse
 import polars as pl
 
 
@@ -56,7 +56,7 @@ def load_events(folder_path: str) -> list[Event]:
             source: dict[str, str] = json.load(f)
 
         event_remarks = meta.get("remarks")
-        event_name = meta.get("eventName", folder)
+        event_name = event_name_expander(meta.get("eventName", folder)) 
         file_name = source.get("reportName", "")
         prediction = "MiscellaneousAccidentGeneral" # Deafult event type
 
@@ -114,12 +114,29 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     df = pl.read_csv(src_path)
 
     # fix column names
-    df = df.rename(INCIDENT_COLUMN_MAPPINGS)
+    df = df.rename(INCIDENT_COLUMN_MAPPINGS, strict=False)
 
     print("Forward filling...")
 
     # clean rows by retaining only the actual incident entry
-    df = forward_fill_and_collapse(df, target_cols, "Qty", "Type of Incident")
+    df = forward_fill_and_collapse(df, target_cols, "Qty", "TYPE_OF_INCIDENT")
+
+    meta_path = os.path.join(event_folder_path, "metadata.json")
+    # src_path = os.path.join(event_folder_path, "source.json" )
+
+    with open(meta_path, "r", encoding="utf-8") as f:
+            meta: dict[str, str] = json.load(f)
+        
+    # with open(src_path, "r", encoding="utf-8") as f:
+    #     source: dict[str, str] = json.load(f)
+
+    # event_remarks = meta.get("remarks")
+    event_name = meta.get("eventName", event_folder_path)
+    # file_name = source.get("reportName", "")
+
+    df = df.with_columns([
+        pl.lit("due to " + event_name_expander(event_name)).alias("event_name")
+    ])
 
     print("Classifying disaster types...")
     # classify the type of the disaster based on incident type text and description
@@ -127,7 +144,7 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
         df
         .select(
             pl.concat_str(
-                ["Type of Incident", "Description"],
+                ["TYPE_OF_INCIDENT", "DESCRIPTION", "event_name"],
                 separator=" — ",
                 ignore_nulls=True
             ).alias("combined")
@@ -196,4 +213,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/TY Ambo 2020/")
+    load_incidents("./data/ndrrmc/STS PAENG 2022/")

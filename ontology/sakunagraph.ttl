@@ -2464,7 +2464,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              skos:definition "Flood: A general term for flooded areas or floodwaters not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft. Involves flooding in roads, zones, and areas in the country. Can involve knee, waist, and gutter-deep levels of water as well as sheet flooding." .
+              skos:definition "Flood: A general term for flooded areas or floodwaters not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft. Involves flooding in roads, zones, and areas in the country. Can involve knee, waist, and gutter-deep levels of water. Sheet flooding. Can be due to tropical storms, tropical cyclones, tropical depressions, and low pressure areas." .
 
 
 ###  https://sakuna.ph/Fog
@@ -2738,14 +2738,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :LandslideDry rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementDry ;
               rdfs:label "Landslide (Dry)"@en ;
-              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face." .
+              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, earthquake-induced, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often earthquake-induced." .
 
 
 ###  https://sakuna.ph/LandslideWet
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banks, rain induced and debris flows (under wet conditions) brining damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
+              skos:definition "Landslide: Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banksand debris flows (under wet conditions) brining damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
 
 
 ###  https://sakuna.ph/LavaFlow
@@ -3119,7 +3119,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Road rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
       rdfs:label "Road"@en ;
-      skos:definition "Transport accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall." .
+      skos:definition "Transport accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall or earthquakes. Can involve road cuts." .
 
 
 ###  https://sakuna.ph/RoadAndBridges
@@ -3161,14 +3161,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RockfallDry rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementDry ;
              rdfs:label "Rockfall (Dry)"@en ;
-             skos:definition "A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions. Also called rock slide under dry conditions." .
+             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions like earthquakes. Also called rock slide under dry conditions." .
 
 
 ###  https://sakuna.ph/RockfallWet
 :RockfallWet rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementWet ;
              rdfs:label "Rockfall (Wet)"@en ;
-             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under wet conditions.Also called rock slide under wet conditions." .
+             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under wet conditions.Also called rock slide under wet conditions. Can be due to tropical cyclones, stroms, depressions" .
 
 
 ###  https://sakuna.ph/RogueWave
@@ -3291,7 +3291,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :StormSurge rdf:type owl:Class ;
             rdfs:subClassOf :Storm ;
             rdfs:label "Storm Surge"@en ;
-            skos:definition "Storm surge: An abnormal surge or rise in sea level." .
+            skos:definition "Storm Surge: An abnormal surge or rise in sea level." .
 
 
 ###  https://sakuna.ph/Stranded
@@ -3337,14 +3337,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :SuddenSubsidenceDry rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementDry ;
                      rdfs:label "Sudden Subsidence (Dry)"@en ;
-                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger." .
+                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger. Can involve liquefaction." .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceWet
 :SuddenSubsidenceWet rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementWet ;
                      rdfs:label "Sudden Subsidence (Wet)"@en ;
-                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain)." .
+                     skos:definition "Sinking of the ground like liquefaction due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain). Can be due to tropical cyclones, stroms, depressions as well." .
 
 
 ###  https://sakuna.ph/Technological
