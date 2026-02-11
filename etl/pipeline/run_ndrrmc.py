@@ -25,7 +25,7 @@ def run():
         if prov:
             prov_mapping(g, prov, event_iri)
 
-        # inci = load_incidents(event_folder)
+        load_incidents(event_folder)
 
     g.serialize(
         destination=OUT_FILE,

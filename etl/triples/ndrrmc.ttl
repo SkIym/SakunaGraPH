@@ -56,14 +56,14 @@ No Wind Signal currently hoisted.""" ;
     :endDate "2023-04-16T00:00:00"^^xsd:dateTime ;
     :eventName "TC AMANG" ;
     :fromSource :SitRep_No__5_for_TC_AMANG_BREAKDOWN ;
-    :hasType :Poisoning ;
+    :hasType :TropicalCyclone ;
     :startDate "2023-04-16T00:00:00"^^xsd:dateTime .
 
 :0bb7cdf6b84f4895a0a985019a058614 a :MajorEvent ;
     :endDate "2025-09-06T00:00:00"^^xsd:dateTime ;
     :eventName "Combined Effects of SWM and TC LANNIE 2025" ;
     :fromSource :Situational_Report_No__2_for_the_Combined_Effects_of_Southwest_Monsoon_and_TC_LANNIE_2025_Breakdown ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """September 07, 2025 08:00 am
 On 05 September 2025, 8:00 AM, the cloud cluster west of Northern Luzon is now a Low Pressure Area (LPA 09a) and is
 being monitored inside the Philippine Area of Responsibility (PAR). LPA 09a has a "MEDIUM" chance to develop into a
@@ -350,7 +350,7 @@ of up to 55 km/h, and central pressure of 1006 hPa. TCWS No. 1 is still raised i
     :endDate "2024-07-24T00:00:00"^^xsd:dateTime ;
     :eventName "Combined Effects of SWM and TCs BUTCHOY and CARINA 2024" ;
     :fromSource :SitRep_No__46_for_the_Combined_Effects_of_Southwest_Monsoon_and_TCs_BUTCHOY_and_CARINA_2024_Breakdown_Table ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """CARINA (2024)
 August 26, 2024 08:00 am
 Since 11 July 2024, the Southwest Monsoon brought moderate to heavy rains over different provinces in the country.
@@ -438,7 +438,7 @@ SYNOPSIS: Northeast Monsoon affecting Northern Luzon.""" ;
     :endDate "2022-04-06T00:00:00"^^xsd:dateTime ;
     :eventName "re Severe TS PEPITO" ;
     :fromSource :Breakdown_Table_Final_Report_re_Severe_Tropical_Storm_PEPITO ;
-    :hasType :TropicalCyclone ;
+    :hasType :StormGeneral ;
     :startDate "2022-04-06T00:00:00"^^xsd:dateTime .
 
 :3921cd58cf3b4a96a8af90cc4e649015 a :MajorEvent ;
@@ -740,7 +740,7 @@ estimated a Low Pressure Area (LPA) exists approximately 700 km east of Borongan
     :endDate "2022-09-03T00:00:00"^^xsd:dateTime ;
     :eventName "forTC Henry  2022" ;
     :fromSource :Final_Report_forTC_Henry__2022__Breakdown ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """31 August 2022
 At 5:30 PM, Super Typhoon “HINNAMNOR” has entered the Philippine Area of Responsibility (PAR) and is named
 At 10:00 PM, the center of the eye of Super Typhoon “HENRY” was estimated based on all available data at 690 km
@@ -1070,7 +1070,7 @@ Next Steps
     :endDate "2023-12-20T00:00:00"^^xsd:dateTime ;
     :eventName "Combined Effects of Shear Line and TC KABAYAN  2023" ;
     :fromSource :SitRep_No__9_for_the_Combined_Effects_of_Shear_Line_and_TC_KABAYAN__2023___Breakdown_Table_ ;
-    :hasType :GroundMovement ;
+    :hasType :StormGeneral ;
     :remarks """On 17 Dec 2023, 5:00 AM, the LPA located east of Surigao del Sur developed into TD "KABAYAN". Meanwhile, the
 Shear Line was forecast to bring significant amounts of rain in Bicol Region and Quezon Province.
 On 17 Dec 2023, 11:00 PM, “KABAYAN” intensified into a Tropical Storm. The highest signal raised was TCWS No. 2
@@ -1087,7 +1087,7 @@ persists due to the Shear Line and Northeast Monsoon.""" ;
     :endDate "2022-11-21T00:00:00"^^xsd:dateTime ;
     :eventName "Magnitude 6 4 Earthquake in Lagayan Abra  2022" ;
     :fromSource :Final_Report_for_Magnitude_6_4_Earthquake_in_Lagayan_Abra__2022__Breakdown ;
-    :hasType :MiscellaneousAccidentGeneral ;
+    :hasType :ExplosionMiscellaneous ;
     :remarks """On 25 October 2022, 10:59 PM, a strong Magnitude (Mw) 6.4 Earthquake shook the provinces of Northern Luzon. The
 epicenter of the earthquake is located 5 kilometers northeast of Lagayan, Abra, at a depth of 16 kilometers.
 Using the PHIVOLCS Earthquake Intensity Scale (PEIS), the largest reported intensity is at PEIS VII (Destructive) in
@@ -1219,14 +1219,14 @@ portion of Itbayat, Batanes.
     :endDate "2022-04-23T00:00:00"^^xsd:dateTime ;
     :eventName "TC VICKY 2020" ;
     :fromSource :Final_Report_for_TC_VICKY_2020_Breakdown ;
-    :hasType :ViralDisease ;
+    :hasType :StormGeneral ;
     :startDate "2022-04-23T00:00:00"^^xsd:dateTime .
 
 :7855bdb925884239a1a4e3fa2a79d194 a :MajorEvent ;
     :endDate "2024-01-09T00:00:00"^^xsd:dateTime ;
     :eventName "Effects of LPA  2023" ;
     :fromSource :Final_Report_for_the_Effects_of_Low_Pressure_Area__2023__Breakdown ;
-    :hasType :GasLeak ;
+    :hasType :SuddenSubsidenceWet ;
     :startDate "2024-01-09T00:00:00"^^xsd:dateTime .
 
 :7987df8670b041349941d984bf48b371 a :MajorEvent ;
@@ -1258,7 +1258,7 @@ Next Steps
     :endDate "2022-04-05T00:00:00"^^xsd:dateTime ;
     :eventName "re TC Dante" ;
     :fromSource :Breakdown_Table_Final_Report_re_Tropical_Cyclone_Dante ;
-    :hasType :TropicalCyclone ;
+    :hasType :StormGeneral ;
     :startDate "2022-04-05T00:00:00"^^xsd:dateTime .
 
 :7cae3dcaa083462982a53ab76499cb82 a :MajorEvent ;
@@ -1484,7 +1484,7 @@ slight to moderate sea.""" ;
     :endDate "2023-03-31T00:00:00"^^xsd:dateTime ;
     :eventName "TC NENENG  2022" ;
     :fromSource :Final_Report_for_the_TC_NENENG__2022__Breakdown ;
-    :hasType :Air ;
+    :hasType :TropicalCyclone ;
     :startDate "2023-03-31T00:00:00"^^xsd:dateTime .
 
 :8e7ee126e09d450abfffa944313a32ae a :MajorEvent ;
@@ -1695,7 +1695,7 @@ The Alert Level 2 (increasing unrest) still prevails over Kanlaon, but that curr
     :endDate "2020-10-15T00:00:00"^^xsd:dateTime ;
     :eventName "TC OFEL 2020" ;
     :fromSource :Situational_Report_for_TC_OFEL_\(2020\) ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """13 October 2020
 The Low Pressure Area east of Eastern Samar has developed into Tropical Depression "OFEL". At 4:00 AM, the center of
 TD "OFEL" was estimated at 115 km East Southeast of Guiuan, Eastern Samar moving North Northwestward at 15 km/h
@@ -1816,7 +1816,7 @@ The Taal Volcano Network (TVN) plotted a total of 2,484 volcanic earthquakes as 
     :endDate "2022-10-28T00:00:00"^^xsd:dateTime ;
     :eventName "STS PAENG 2022" ;
     :fromSource :SitRep_No__33_for_STS_PAENG_2022__Breakdown ;
-    :hasType :TropicalCyclone ;
+    :hasType :StormGeneral ;
     :remarks """25 October 2022
 - 10:00 PM: The Low-Pressure Area (LPA) was estimated at 990 km east of Eastern Visayas.
 26 October 2022
@@ -1854,7 +1854,7 @@ Garchitorena, Presentacion, Lagonoy, Goa, San Jose, Tigaon, Iriga City, Saglay, 
     :endDate "2022-08-22T00:00:00"^^xsd:dateTime ;
     :eventName "Magnitude 7 0 Earthquake in Tayum Abra 2022" ;
     :fromSource :Breakdown_Final_Report_for_the_Magnitude_7_0_Earthquake_in_Tayum_Abra_2022 ;
-    :hasType :GroundMovement ;
+    :hasType :CollapseMiscellaneous ;
     :remarks """At 8:43 AM, 27 July 2022, a major Magnitude (Mw) 7.0 earthquake shook the provinces in northwestern Luzon and
 adjacent areas including Metro Manila. The earthquake has an epicenter located 17.64°N, 120.63°E - 003 km N 45° W
 of Tayum (Abra), and a depth of 17 kilometers.
@@ -2236,7 +2236,7 @@ conducted across thirty five (35) sampling stations in the municipality of Puert
     :endDate "2025-09-03T00:00:00"^^xsd:dateTime ;
     :eventName "Combined Effects of SWM and TC KIKO 2025" ;
     :fromSource :Situational_Report_No__4_for_the_Combined_Effects_of_Southwest_Monsoon_and_TC_KIKO_2025_Breakdown_Table ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """On 29 August 2025, 2:00 PM, a Low Pressure area (LPA 08h) was monitored outside the Philippine Area of
 Responsibility (PAR) and was unlikely to develop into a tropical depression.
 On 30 August 2025, 8:00 AM, LPA 08h was monitored outside the Philippine Area of Responsibility (PAR) and was still
@@ -2337,7 +2337,7 @@ eastern sections of the country, while light to moderate winds over the rest of 
     :endDate "2023-07-30T00:00:00"^^xsd:dateTime ;
     :eventName "SWM enhanced by TCs EGAY and FALCON 2023" ;
     :fromSource :Breakdown_SitRep_No__37_for_Southwest_Monsoon_enhanced_by_TCs_EGAY_and_FALCON_2023 ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """January 09, 2024 04:00 pm
 21 July 2023
 At 8:00 AM, the Low-Pressure Area (LPA) east of Southeastern Luzon developed into Tropical Depression (TD) "EGAY".
@@ -2458,7 +2458,7 @@ On 07 September 2024, 11:00 AM, the effect of the Southwest Monsoon has weakened
     :endDate "2025-07-07T00:00:00"^^xsd:dateTime ;
     :eventName "Combined Effects of SWM and TC BISING 2025" ;
     :fromSource :Situational_Report_No__8_for_the_Combined_Effects_of_Southwest_Monsoon_and_TC_BISING_2025_Breakdown_Table ;
-    :hasType :StormGeneral ;
+    :hasType :TropicalCyclone ;
     :remarks """July 11, 2025 08:00 am
 On 29 June 2025, 8:00 PM, the monitored Low Pressure area (LPA 6h) has entered inside the Philippine Area of
 Responsibility (PAR) with LOW potential to develop into a tropical depression within the next 24 hours.

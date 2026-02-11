@@ -134,9 +134,9 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     event_name = meta.get("eventName", event_folder_path)
     # file_name = source.get("reportName", "")
 
-    df = df.with_columns([
-        pl.lit("due to " + event_name_expander(event_name)).alias("event_name")
-    ])
+    # df = df.with_columns([
+    #     pl.lit("due to " + event_name_expander(event_name)).alias("event_name")
+    # ])
 
     print("Classifying disaster types...")
     # classify the type of the disaster based on incident type text and description
@@ -144,7 +144,7 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
         df
         .select(
             pl.concat_str(
-                ["TYPE_OF_INCIDENT", "DESCRIPTION", "event_name"],
+                ["TYPE_OF_INCIDENT", "DESCRIPTION"],
                 separator=" — ",
                 ignore_nulls=True
             ).alias("combined")
@@ -189,9 +189,9 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     # add column for index 
     df = df.with_row_index("incident_id", 1)
 
-    print("Writing csv...")
+    print("Writing csv to " + event_folder_path)
 
-    df.write_csv("hakdog.csv")
+    df.write_csv(event_folder_path + "/hakdog.csv")
     
     #
 
@@ -213,4 +213,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/STS PAENG 2022/")
+    load_incidents("./data/ndrrmc/TC MARCE 2024/")

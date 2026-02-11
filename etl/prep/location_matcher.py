@@ -182,6 +182,7 @@ class LocationMatcher:
             # Region matching
             # -------------------------
             region = self.region_map.get(highest)
+            prov_label = ""
             if not region:
                 fuzzy = self._fuzzy_match(
                     highest,
@@ -197,11 +198,8 @@ class LocationMatcher:
                     continue
                 parent = region
                 highest = levels.pop()
-
-            # -------------------------
-            # Province matching
-            # -------------------------
-            prov_label = (
+            else:
+                prov_label = (
                 highest
                 if highest in self.provinces
                 else self._fuzzy_match(
@@ -210,6 +208,24 @@ class LocationMatcher:
                     FUZZ_THRESHOLD_PROVINCE
                 )
             )
+                
+            if not region:
+                matched.append("Fix location columns please")
+                continue
+
+            # -------------------------
+            # Province matching
+            # -------------------------
+            if not prov_label:
+                prov_label = (
+                    highest
+                    if highest in self.provinces
+                    else self._fuzzy_match(
+                        highest,
+                        list(self.provinces.keys()),
+                        FUZZ_THRESHOLD_PROVINCE
+                    )
+                )
 
             if prov_label :
 
