@@ -2013,7 +2013,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Ashfall rdf:type owl:Class ;
          rdfs:subClassOf :VolcanicActivity ;
          rdfs:label "Ashfall"@en ;
-         skos:definition "Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." .
+         skos:definition "Ashfall: Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." .
 
 
 ###  https://sakuna.ph/Assistance
@@ -2185,7 +2185,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :CoastalFlood rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Coastal Flood"@en ;
-              skos:definition "Higher-than-normal water levels along the coast caused by tidal changes or thunderstorms that result in flooding, which can last from days to weeks." .
+              skos:definition "Coastal Flood: Higher-than-normal water along the coast caused by tidal changes or storms." .
 
 
 ###  https://sakuna.ph/ColdWave
@@ -2450,7 +2450,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FlashFlood rdf:type owl:Class ;
             rdfs:subClassOf :Flood ;
             rdfs:label "Flash Flood"@en ;
-            skos:definition "Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall." .
+            skos:definition "Flashflood: Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall." .
 
 
 ###  https://sakuna.ph/Flood
@@ -2464,7 +2464,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              skos:definition "A general term for flooded areas not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft. Involves flooding in roads, zones, and areas in the country." .
+              skos:definition "Flood: A general term for flooded areas or floodwaters not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft. Involves flooding in roads, zones, and areas in the country. Can involve knee, waist, and gutter-deep levels of water as well as sheet flooding." .
 
 
 ###  https://sakuna.ph/Fog
@@ -2724,7 +2724,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Lahar rdf:type owl:Class ;
        rdfs:subClassOf :VolcanicActivity ;
        rdfs:label "Lahar"@en ;
-       skos:definition "Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." .
+       skos:definition "Lahar: Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." .
 
 
 ###  https://sakuna.ph/LandFire
@@ -2745,14 +2745,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banks, rain induced and debris flows (under wet conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
+              skos:definition "Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banks, rain induced and debris flows (under wet conditions) brining damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
 
 
 ###  https://sakuna.ph/LavaFlow
 :LavaFlow rdf:type owl:Class ;
           rdfs:subClassOf :VolcanicActivity ;
           rdfs:label "Lava Flow"@en ;
-          skos:definition "The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." .
+          skos:definition "Lava Flow: The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." .
 
 
 ###  https://sakuna.ph/Location
@@ -2812,7 +2812,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :MiscellaneousAccidentGeneral rdf:type owl:Class ;
                               rdfs:subClassOf :MiscellaneousAccident ;
                               rdfs:label "Miscellaneous Accident (General)"@en ;
-                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents." .
+                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents. Can involve incidents related to fireworks." .
 
 
 ###  https://sakuna.ph/Mudslide
@@ -2981,7 +2981,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :PyroclasticFlow rdf:type owl:Class ;
                  rdfs:subClassOf :VolcanicActivity ;
                  rdfs:label "Pyroclastic Flow"@en ;
-                 skos:definition "Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." .
+                 skos:definition "Pyroclastic Flow: Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." .
 
 
 ###  https://sakuna.ph/Radiation
@@ -3112,7 +3112,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RiverineFlood rdf:type owl:Class ;
                rdfs:subClassOf :Flood ;
                rdfs:label "Riverine Flood"@en ;
-               skos:definition "A type of flooding resulting due to the river (swollen river) or overflowing of a stream, creek, or  channel onto normally dry land in the floodplain adjacent to the channel." .
+               skos:definition "Riverine flood: A type of flooding resulting due to the river (swollen river) or overflowing of a stream, creek, or  channel onto normally dry land in the floodplain adjacent to the channel." .
 
 
 ###  https://sakuna.ph/Road
