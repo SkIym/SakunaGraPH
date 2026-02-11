@@ -2085,7 +2085,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :BacterialDisease rdf:type owl:Class ;
                   rdfs:subClassOf :Epidemic ;
                   rdfs:label "Bacterial Disease"@en ;
-                  skos:definition "An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), and cholera, among others." .
+                  skos:definition "An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), and cholera, pertussis, among others." .
 
 
 ###  https://sakuna.ph/Barangay
@@ -2185,7 +2185,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :CoastalFlood rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Coastal Flood"@en ;
-              skos:definition "Coastal Flood: Higher-than-normal water along the coast caused by tidal changes or storms." .
+              skos:definition "Coastal Flood: Flood along the coast caused by tidal changes or storms." .
 
 
 ###  https://sakuna.ph/ColdWave
@@ -2285,7 +2285,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Derecho rdf:type owl:Class ;
          rdfs:subClassOf :Storm ;
          rdfs:label "Derecho"@en ;
-         skos:definition "Windstorms associated with a convection/convective storm. Derechos include downburst and straight-line winds." .
+         skos:definition "Windstorms associated with a convection.. Derechos include downburst and straight-line winds." .
 
 
 ###  https://sakuna.ph/DisasterEvent
@@ -2422,7 +2422,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :ExtratropicalStorm rdf:type owl:Class ;
                     rdfs:subClassOf :Storm ;
                     rdfs:label "Extratropical Storm"@en ;
-                    skos:definition "A type of low-pressure cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor’easter)." .
+                    skos:definition "Extratropical storm: A type of cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor’easter)." .
 
 
 ###  https://sakuna.ph/ExtremeTemperature
@@ -2520,7 +2520,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :GroundMovement rdf:type owl:Class ;
                 rdfs:subClassOf :Earthquake ;
                 rdfs:label "Ground Movement"@en ;
-                skos:definition "Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions." .
+                skos:definition "Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions. Often described with magnitudes, intensities, and epicenters." .
 
 
 ###  https://sakuna.ph/Hail
@@ -2812,7 +2812,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :MiscellaneousAccidentGeneral rdf:type owl:Class ;
                               rdfs:subClassOf :MiscellaneousAccident ;
                               rdfs:label "Miscellaneous Accident (General)"@en ;
-                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents. Can involve incidents related to fireworks." .
+                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents. Can involve incidents related to fireworks or events around elections (Barangay, Sangguniang Kabataan, National), celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day)." .
 
 
 ###  https://sakuna.ph/Mudslide
@@ -3119,7 +3119,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Road rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
       rdfs:label "Road"@en ;
-      skos:definition "Transport accidents involving motor vehicles on roads and tracks." .
+      skos:definition "Transport accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall." .
 
 
 ###  https://sakuna.ph/RoadAndBridges
@@ -3161,14 +3161,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RockfallDry rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementDry ;
              rdfs:label "Rockfall (Dry)"@en ;
-             skos:definition "A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions." .
+             skos:definition "A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions. Also called rock slide under dry conditions." .
 
 
 ###  https://sakuna.ph/RockfallWet
 :RockfallWet rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementWet ;
              rdfs:label "Rockfall (Wet)"@en ;
-             skos:definition "A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under wet conditions." .
+             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under wet conditions.Also called rock slide under wet conditions." .
 
 
 ###  https://sakuna.ph/RogueWave
@@ -3283,14 +3283,15 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/StormGeneral
 :StormGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Storm ;
-              rdfs:label "Storm (General)"@en .
+              rdfs:label "Storm (General)"@en ;
+              skos:definition "Storm general: Can involve weather broughty by monsoons (southwest monsoons) and shear lines." .
 
 
 ###  https://sakuna.ph/StormSurge
 :StormSurge rdf:type owl:Class ;
             rdfs:subClassOf :Storm ;
             rdfs:label "Storm Surge"@en ;
-            skos:definition "An abnormal surge or rise in sea level generated by a tropical cyclone or other intense types of storm." .
+            skos:definition "Storm surge: An abnormal surge or rise in sea level." .
 
 
 ###  https://sakuna.ph/Stranded
@@ -3380,7 +3381,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :TropicalCyclone rdf:type owl:Class ;
                  rdfs:subClassOf :Storm ;
                  rdfs:label "Tropical Cyclone"@en ;
-                 skos:definition "A tropical cyclone originates over tropical or subtropical waters. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean)." .
+                 skos:definition "Tropical Cyclone: Can be called typhoons, super typhoons, tropical storms, tropical depressions, and low pressure areas. Sometimes called TS, TC, TD, LPA plus the name. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean). A tropical cyclone originates over tropical or subtropical waters." .
 
 
 ###  https://sakuna.ph/Tsunami
@@ -3408,7 +3409,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :VolcanicActivityGeneral rdf:type owl:Class ;
                          rdfs:subClassOf :VolcanicActivity ;
                          rdfs:label "Volcanic Activity (General)"@en ;
-                         skos:definition "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
+                         skos:definition "Volcanic activity: A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material. Explosive eruptions in volcanoes." .
 
 
 ###  https://sakuna.ph/Water
