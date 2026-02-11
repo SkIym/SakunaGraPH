@@ -289,7 +289,7 @@ class LocationMatcher:
                 if levels:
                     highest = levels.pop()
                     if "(" in highest:
-                        highest = highest.split(" (")[0]
+                        highest = highest.split(" (")[0].replace("-", "")
                 
 
                 iri = self.municipalities_rev[highest] if highest in self.municipalities_rev else ""
@@ -304,15 +304,18 @@ class LocationMatcher:
                 if loc_label in self.municipalities_rev:
                     matched.append(self.municipalities_rev[loc_label])
                 else:
-                    matched.append(self.base + region)
+                    
 
-                    # fuzzy = self._fuzzy_match(
-                    #         loc_label,
-                    #         list(self.municipalities_rev.keys()),
-                    #         FUZZ_THRESHOLD_MUNI
-                    #     )
-                    # if fuzzy:
-                    #     matched.append(self.municipalities_rev[fuzzy])
+                    fuzzy = self._fuzzy_match(
+                            highest,
+                            list(self.municipalities_rev.keys()),
+                            FUZZ_THRESHOLD_MUNI
+                        )
+                    if fuzzy:
+                        matched.append(self.municipalities_rev[fuzzy])
+                    else:
+
+                        matched.append(self.base + region)
   
         return matched
 
