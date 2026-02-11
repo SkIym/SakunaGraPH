@@ -24,6 +24,11 @@
 
 **ABOUT DATA**
 
+***NDRRMC***
+
+To do:
+- Manually correct hasType values for major events (the event corresponding to report)
+
 ***GEOG ARCHIVE***
 
 DONE:
