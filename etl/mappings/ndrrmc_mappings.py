@@ -9,10 +9,12 @@ from .iris import event_iri, prov_iri
 @dataclass
 class Event:
     eventName: str
+    hasType: str
     startDate: datetime | None
     endDate: datetime | None
     id: str
     remarks: str | None = None
+    
 
 def event_mapping(g: Graph, ev: Event) -> URIRef:
     uri = event_iri(ev.id)
@@ -26,6 +28,11 @@ def event_mapping(g: Graph, ev: Event) -> URIRef:
         uri, 
         URIRef(SKG["eventName"]), 
         Literal(ev.eventName)
+    ))
+    g.add((
+        uri,
+        URIRef(SKG["hasType"]),
+        URIRef(SKG[ev.hasType])
     ))
 
     if ev.startDate:

@@ -57,21 +57,8 @@ class DisasterClassifier:
         return results
 
 DISASTER_CLASSIFIER = DisasterClassifier(
-    model_name="all-MiniLM-L6-v2",
+    # model_name="all-MiniLM-L6-v2",
+    model_name="all-mpnet-base-v2",
     classes_path="disaster_classes.json"
 )
 
-
-# if __name__ == "__main__":
-#     classifier = DisasterClassifier("all-MiniLM-L6-v2", "disaster_classes.json")
-
-#     incident_texts = [
-#         "Flooding in Metro Manila after heavy rains",
-#     ]
-
-#     predictions = classifier.classify(incident_texts)
-
-#     for text, (pred_class, score) in zip(incident_texts, predictions):
-#         print(f"\nIncident text: {text}")
-#         print(f"→ Predicted class: {pred_class}")
-#         print(f"→ Similarity score: {score:.4f}")

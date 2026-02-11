@@ -31,7 +31,7 @@ def load_uuids(folder_path: str):
             with open(meta_path, "w", encoding="utf-8") as f:
                 json.dump(meta, f, ensure_ascii=False, indent=2)
 
-            print(f"Updated metadata: {meta_path}")
+            # print(f"Updated metadata: {meta_path}")
 
         except Exception as e:
             print(f"Failed to update {meta_path}: {e}")
@@ -44,19 +44,39 @@ def load_events(folder_path: str) -> list[Event]:
 
     for folder in next(os.walk(folder_path))[1]:
         meta_path = os.path.join(folder_path, folder, "metadata.json")
+        src_path = os.path.join(folder_path, folder, "source.json" )
 
         if not os.path.exists(meta_path):
             continue
 
         with open(meta_path, "r", encoding="utf-8") as f:
             meta: dict[str, str] = json.load(f)
+        
+        with open(src_path, "r", encoding="utf-8") as f:
+            source: dict[str, str] = json.load(f)
+
+        event_remarks = meta.get("remarks")
+        event_name = meta.get("eventName", folder)
+        file_name = source.get("reportName", "")
+        prediction = "MiscellaneousAccidentGeneral" # Deafult event type
+
+        if event_remarks:
+            
+            first_d = event_remarks.split(". ")[0]
+            # print(first_d)
+
+            (prediction, _) = DISASTER_CLASSIFIER.classify([event_name + file_name + ": " + first_d])[0]
+        else:
+            (prediction, _) = DISASTER_CLASSIFIER.classify([event_name  + file_name])[0]
+
 
         ev = Event(
             id=meta.get("id", uuid.uuid4().hex),
             eventName=meta.get("eventName", folder),
             startDate=datetime.fromisoformat(meta["startDate"]) if meta["startDate"] else None,
             endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
-            remarks=meta.get("remarks")
+            remarks=meta.get("remarks"),
+            hasType=prediction,
         )
 
         events.append(ev)
@@ -176,4 +196,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/Tropical Depression LANNIE 2021/")
+    load_incidents("./data/ndrrmc/TY Ambo 2020/")

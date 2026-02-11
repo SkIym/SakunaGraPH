@@ -1,84 +1,46 @@
 incident_id,Page,Region,Province,City_Muni,Barangay,Qty,Type of Incident,Date,Time,Description,Actions Taken,Remarks,Status,hasType,hasLocation
-1,3,MIMAROPA,PALAWAN,Rizal (Marcos),Taburi,,Landslide (Rain- Induced),05 October 2021,06:30 am,Unpassable road due to landslide,"Office of Engineering and MDRRMO conducted clearing operations on 5 October 2021, 9:30 AM",Road was reported passable 5 October 2021. 3;00 PM,,LandslideWet,https://sakuna.ph/Rizal_Palawan
-2,3,MIMAROPA,PALAWAN,Rizal (Marcos),Taburi,,Flooded Areas,05 October 2021,08:00 am,Ankle to knee deep,,"Flooded due to heavy rains,",Subsided,FloodGeneral,https://sakuna.ph/Rizal_Palawan
-3,3,MIMAROPA,PALAWAN,Rizal (Marcos),Culasian,,Flooded Areas,05 October 2021,10:00 am,Ankle to knee deep,,"Flooded due to heavy rains,",Subsided,FloodGeneral,https://sakuna.ph/Rizal_Palawan
-4,3,MIMAROPA,PALAWAN,Taytay,Poblacion,,Landslide (Rain- Induced),05 October 2021,03:00 pm,,"MDRRMO and Motorpool Engineering conducted clearing operations on 5 October 2021, 3:56 PM,","Landslide is due to heavy rains,",,LandslideWet,https://sakuna.ph/Taytay_Palawan
-5,3,REGION 6,CAPIZ,Jamindan,Jagnaya,,Flooded Areas,04 October 2021,06:00 am,flooded ricefield and residential areas,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-6,3,REGION 6,CAPIZ,Jamindan,Agcagay,,Flooded Areas,04 October 2021,06:00 am,flooded rice fields and Brgy roads,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-7,3,REGION 6,CAPIZ,Jamindan,Caridad,,Flooded Areas,04 October 2021,06:00 am,flooded rice fields and brgy roads,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-8,3,REGION 6,CAPIZ,Jamindan,Pangabuan,,Flooded Areas,04 October 2021,06:00 am,flooded residential area and roads,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-9,3,REGION 6,CAPIZ,Jamindan,Guintas,,Flooded Areas,04 October 2021,06:00 am,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-10,3,REGION 6,CAPIZ,Jamindan,Poblacion,,Flooded Areas,05 October 2021,08:00 am,portion of Magsaysay St. residential area,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-11,3,REGION 6,CAPIZ,Jamindan,Guintas,,Flooded Areas,05 October 2021,08:00 am,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Jamindan
-12,3,REGION 6,CAPIZ,Mambusao,Tumalalud,,Flooded Areas,05 October 2021,08:00 am,Flooded roads passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-13,4,REGION 6,CAPIZ,Mambusao,Pob. Proper,,Flooded Areas,05 October 2021,08:00 am,Flooded roads and residential area passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-14,4,REGION 6,CAPIZ,Mambusao,Balat-an,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-15,4,REGION 6,CAPIZ,Mambusao,Tugas,,Flooded Areas,05 October 2021,08:00 am,Flooded rice field and brgy road; passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-16,4,REGION 6,CAPIZ,Mambusao,Bato-bato,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-17,4,REGION 6,CAPIZ,Mambusao,Pob. Tabuc,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. road but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-18,4,REGION 6,CAPIZ,Mambusao,Maralag,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-19,4,REGION 6,CAPIZ,Mambusao,Sinondojan,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-20,4,REGION 6,CAPIZ,Mambusao,Pangpang Sur,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-21,4,REGION 6,CAPIZ,Mambusao,Atiplo,,Flooded Areas,05 October 2021,08:00 am,Flooded rice fields and brgy. roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-22,4,REGION 6,CAPIZ,Mambusao,Maralag,,Flooded Areas,05 October 2021,05:00 pm,flooded rice fields and brgy road,,passable to all types of vehicles,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-23,4,REGION 6,CAPIZ,Mambusao,Brgy. Manibad,,Flooded Areas,06 October 2021,05:00 pm,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Mambusao
-24,4,REGION 6,CAPIZ,Sigma,Pagbunitan,,Flooded Areas,05 October 2021,08:00 am,Flooded rice field and brgy. road passable to all types of vehicles,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-25,4,REGION 6,CAPIZ,Sigma,Bangon-bangon,,Flooded Areas,05 October 2021,08:00 am,Flooded rice field and brgy road not passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-26,4,REGION 6,CAPIZ,Sigma,Cogon,,Flooded Areas,05 October 2021,08:00 am,Flooded rice field and brgy road not passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-27,5,REGION 6,CAPIZ,Sigma,Tawog,,Flooded Areas,05 October 2021,08:00 am,Flooded rice field and brgy road passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-28,5,REGION 6,CAPIZ,Sigma,Pob. Norte,,Flooded Areas,05 October 2021,08:00 am,Flooded rice field and brgy road but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-29,5,REGION 6,CAPIZ,Sigma,Amaga,,Flooded Areas,05 October 2021,08:00 am,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-30,5,REGION 6,CAPIZ,Sigma,Capuyhan,,Flooded Areas,05 October 2021,08:00 am,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-31,5,REGION 6,CAPIZ,Sigma,Guintas,,Flooded Areas,05 October 2021,08:00 am,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-32,5,REGION 6,CAPIZ,Sigma,Dayhagon,,Flooded Areas,05 October 2021,08:00 am,"flooded rice fields and roads, not passable to all types of vehicles",,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-33,5,REGION 6,CAPIZ,Sigma,Mangoso,,Flooded Areas,05 October 2021,08:00 am,"flooded rice fields and roads, passable to all types of vehicles",,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-34,5,REGION 6,CAPIZ,Sigma,Acbo,,Flooded Areas,06 October 2021,08:00 am,flooded roads but passable to all types of vehicle,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-35,5,REGION 6,CAPIZ,Sigma,Matangcong,,Flooded Areas,06 October 2021,08:00 am,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Sigma
-36,5,REGION 6,CAPIZ,Dumalag,Sto. Niño,,Flooded Areas,05 October 2021,08:00 am,portion of Purok 4,,,Subsided,CoastalFlood,https://sakuna.ph/Dumalag
-37,5,REGION 6,CAPIZ,Dumalag,Sta. Cruz,,Flooded Areas,05 October 2021,08:00 am,portion of Purok 3,,,Subsided,CoastalFlood,https://sakuna.ph/Dumalag
-38,5,REGION 6,CAPIZ,Panitan,Salocon,,Flooded Areas,05 October 2021,08:00 am,flooded ricefields,,,Subsided,FloodGeneral,https://sakuna.ph/Panitan
-39,5,REGION 6,CAPIZ,Panitan,Intampilan,,Flooded Areas,05 October 2021,08:00 am,flooded ricefields,,,Subsided,FloodGeneral,https://sakuna.ph/Panitan
-40,5,REGION 6,CAPIZ,Panitan,Cadio,,Flooded Areas,05 October 2021,08:00 am,flooded ricefields,,,Subsided,FloodGeneral,https://sakuna.ph/Panitan
-41,5,REGION 6,CAPIZ,Panitan,Conciencia,,Flooded Areas,05 October 2021,08:00 am,flooded ricefields,,,Subsided,FloodGeneral,https://sakuna.ph/Panitan
-42,5,REGION 6,CAPIZ,Panitan,Agkilo,,Flooded Areas,05 October 2021,08:00 am,flooded ricefields,,,Subsided,FloodGeneral,https://sakuna.ph/Panitan
-43,5,REGION 6,CAPIZ,Panitan,Brgy. Quios,,Flooded Areas,06 October 2021,05:00 pm,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Panitan
-44,5,REGION 6,CAPIZ,Dao,Lacaron,,Flooded Areas,05 October 2021,05:00 pm,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Dao
-45,5,REGION 6,CAPIZ,Dao,Duyoc,,Flooded Areas,05 October 2021,05:00 pm,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Dao
-46,5,REGION 6,CAPIZ,Dao,Pob. Ilawod,,Flooded Areas,05 October 2021,05:00 pm,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Dao
-47,5,REGION 6,CAPIZ,Dao,Balacuan,,Flooded Areas,05 October 2021,05:29 pm,flooded rice fields,,,Subsided,FloodGeneral,https://sakuna.ph/Dao
-48,6,REGION 6,CAPIZ,Ivisan,Cabugao,,Landslide (Rain- Induced),06 October 2021,04:30 pm,,"landslide with estimated 100m damage at Sitio Tigis was cleared by Arriba Ivisan Response Unit together with BFP Ivisan Search and Rescue Unit, PCG Sub- station Ivisan and Barangay Kagawad Officials. Warning signs were placed, an forced evacuation was done",No casualty reported and road obstruction cleared,,LandslideWet,https://sakuna.ph/Ivisan
-49,6,REGION 6,ILOILO,Iloilo City,Cubay,,Uprooted Tree,04 October 2021,04:00 pm,Zone 2 in front of Lucille & jade bread store Uprooted tree that affects 3 houses & 5 families,,No recorded evacuees,,CollapseMiscellaneous,https://sakuna.ph/City_of_Iloilo
-50,6,REGION 6,ILOILO,Iloilo City,"Pali Benedicto, Mandurriao",,Flooded Areas,06 October 2021,07:00 am,"flooding in Zone 3, Brgy. Hall, Zone 5, Capaque",,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-51,6,REGION 6,ILOILO,Iloilo City,"Q. Abeto, Mandurriao",,Flooded Areas,06 October 2021,07:00 am,flooding in PHHC road and AMES Subdivision,,,Subsided,RiverineFlood,https://sakuna.ph/City_of_Iloilo
-52,6,REGION 6,ILOILO,Iloilo City,"PHHC Block 17, Mandurriao",,Flooded Areas,06 October 2021,07:00 am,flooding in Phase 1 Block 27 and 278,,,Subsided,CoastalFlood,https://sakuna.ph/City_of_Iloilo
-53,6,REGION 6,ILOILO,Iloilo City,"Sinikway, Lapuz",,Flooded Areas,06 October 2021,07:00 am,"flooding in Blocks 4,5,6,7,7 extension, 10,11 and 12",,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-54,6,REGION 6,ILOILO,Iloilo City,"Bo. Obrero, Lapuz",,Flooded Areas,06 October 2021,07:00 am,flooding in Zone 1 in front of Petron Depot,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-55,6,REGION 6,ILOILO,Iloilo City,"Loboc, Lapuz",,Flooded Areas,06 October 2021,07:00 am,flooding in entrance of San Lorenzo Village,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-56,6,REGION 6,ILOILO,Iloilo City,"Benedicto, Jaro",,Flooded Areas,06 October 2021,07:00 am,"flooding in Sitio Dikers, Langka",,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-57,6,REGION 6,ILOILO,Iloilo City,"Simon Ledesma, Jaro",,Flooded Areas,06 October 2021,07:00 am,evacuees currently in Simon Gym; 14 families/36 persons,,,Subsided,CoastalFlood,https://sakuna.ph/City_of_Iloilo
-58,6,REGION 6,ILOILO,Iloilo City,"San Isidro, Jaro",,Flooded Areas,06 October 2021,07:00 am,"flooding in Zone Habitat; evacuees currently in Uswag ES, 6 Families/11 persons",,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-59,6,REGION 6,ILOILO,Iloilo City,"Camalig, Jaro",,Flooded Areas,06 October 2021,07:00 am,flooded in Zone 5 and 6,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-60,6,REGION 6,ILOILO,Iloilo City,"Cubay, Jaro",,Flooded Areas,06 October 2021,07:00 am,,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-61,7,REGION 6,ILOILO,Iloilo City,"Caingin, Lapaz",,Flooded Areas,06 October 2021,07:00 am,flooding in Zones 3 & 4,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-62,7,REGION 6,ILOILO,Iloilo City,"Tanza Timawa, City Proper",,Flooded Areas,06 October 2021,07:00 am,flooding in Area 5,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-63,7,REGION 6,ILOILO,Iloilo City,"Flores, City Proper",,Flooded Areas,06 October 2021,07:00 am,flooding in Super Area,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-64,7,REGION 6,ILOILO,Iloilo City,"San Agustin, City Proper",,Flooded Areas,06 October 2021,07:00 am,flooding in Liberation Road,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-65,7,REGION 6,ILOILO,Iloilo City,"Bonifacio, Arevalo",,Flooded Areas,06 October 2021,07:00 am,,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Iloilo
-66,7,REGION 6,ILOILO,Zarraga,Sanbag,,Flooded Areas,05 October 2021,01:30 pm,,,,Subsided,FloodGeneral,https://sakuna.ph/Zarraga
-67,7,REGION 6,ILOILO,Zarraga,Inagdanan Sur,,Flooded Areas,05 October 2021,01:30 pm,,,,Subsided,FloodGeneral,https://sakuna.ph/Zarraga
-68,7,REGION 6,ILOILO,Zarraga,Talibong,,Tornado/Destructive Winds/Strong Winds,04 October 2021,05:20 pm,,MDRRMO conducted area assessment and provided assistance to the affected population,,,SevereWeather,https://sakuna.ph/Zarraga
-69,7,REGION 6,ANTIQUE,Tobias Fornier (Dao),Igdalaquit,,Landslide (Rain- Induced),05 October 2021,04:00 pm,Minimal landslide along the national road,PDRRMO Antique coordinated with DPWH for appropriate actions. Area already cleared.,passable to all types of vehicle,,LandslideWet,https://sakuna.ph/Tobias_Fornier
-70,7,REGION 6,ANTIQUE,Tobias Fornier (Dao),Igdanlog,,Landslide (Rain- Induced),06 October 2021,05:00 pm,portion of the riverbank of Igdanlog creek eroded,MDRRMO conductedocular inspection and recommended to relocate a house which is situated near the riverbank due to imminent danger,,,LandslideWet,https://sakuna.ph/Tobias_Fornier
-71,7,REGION 6,ANTIQUE,Tobias Fornier (Dao),Igdanlog,,Eroded Road,,,a shoulder of concrete road (barangay road) eroded due to the overflow of large volume of water from a nearby rice field,close monitoring of the situation,Road passable to all types of vehicle,,FloodGeneral,https://sakuna.ph/Tobias_Fornier
-72,7,REGION 6,ANTIQUE,San Jose de Buenavista,Atabay,,Uprooted Tree,05 October 2021,02:50 pm,Uprooted / Fallen Tree,Clearing operations were conducted,"No reported casualties, affected population and damage to properties",,CollapseMiscellaneous,https://sakuna.ph/San_Jose_De_Buan
-73,7,REGION 6,ANTIQUE,San Jose de Buenavista,Bugarot,,Uprooted Tree,05 October 2021,02:45 pm,Fallen Bamboo Grooves,Clearing operations were conducted,"No reported casualties, affected population and damage to properties",,CollapseMiscellaneous,https://sakuna.ph/San_Jose_De_Buan
-74,8,REGION 6,ANTIQUE,Hamtic,Piapi 1,,Uprooted Tree,06 October 2021,08:00 am,Uprooted / Fallen Tree - 1 house incurred minimal damage at Sitio Guru-an,,No reported casualties,,CollapseMiscellaneous,https://sakuna.ph/Hamtic
-75,8,REGION 6,NEGROS OCCIDENTAL,Bacolod,Handumanan,,Flooded Areas,05 October 2021,01:30 pm,,,,Subsided,FloodGeneral,https://sakuna.ph/Bacolod
-76,8,REGION 6,NEGROS OCCIDENTAL,Bacolod,Bata,,Flooded Areas,05 October 2021,01:30 pm,,,,Subsided,FloodGeneral,https://sakuna.ph/Bacolod
-77,8,REGION 6,GUIMARAS,Buenavista,Dagsaan,,Rockslide,04 October 2021,11:00 pm,caused total damage to a house owned by Ms. Juvylee Talaron and partial damage to a house owned by Mrs. Sandy Jimenez,PDRRMO Guimaras conducted site assessment and assisted affected families. Affected families were evacuated to identified evacuation area in the barangay. Representatives from MGB VI went to the site to assess the area. Residents were advised to go back to their houses since the soil is still wet.,No casualty,,CollapseIndustrial,https://sakuna.ph/Buenavista_Guimaras
-78,8,REGION 7,CEBU,Cebu City,"Sitio Tanay, Brgy Pulangbato",,Landslide (Rain- Induced),04 October 2021,10:07 am,Landslide,Pulangbato FV Dispatch,Road Closed for 4-wheel vehicles,,LandslideWet,https://sakuna.ph/City_of_Cebu
-79,8,REGION 7,CEBU,Cebu City,"Sitio Pili, Brgy Babag",,Uprooted Tree,04 October 2021,10:20 am,Fallen tree,,A tree fell resulted affecting one house,,CollapseMiscellaneous,https://sakuna.ph/City_of_Cebu
-80,8,REGION 7,CEBU,Cebu City,"Sitio Sangi, Brgy Sinsin",,Landslide (Rain- Induced),04 October 2021,11:06 am,Landslide,Clearing and Monitoring by Brgy Responders,,,LandslideWet,https://sakuna.ph/City_of_Cebu
-81,8,REGION 7,CEBU,Cebu City,"Sirao Garden, Brgy Sirao",,Soil Movement,04 October 2021,11:29 am,Cracked Road in the vicinity of Sirao Garden,Closed access to all Vehicles,,,LandslideDry,https://sakuna.ph/City_of_Cebu
-82,8,REGION 7,CEBU,Cebu City,"Sitio Rotunda, Brgy Apas",,Landslide (Rain- Induced),04 October 2021,04:00 pm,Fallen post and Landsline,Road is block to all,Properly advised VECO substation,,LandslideWet,https://sakuna.ph/City_of_Cebu
-83,9,REGION 8,SOUTHERN LEYTE,Tomas Oppus,Brgy. Mapgap,,Landslide (Rain- Induced),04 October 2021,,Minor Landslide,Conducted clearing operations by the concerned BDRRMC,Cleared as of6:00am 04 Oct 2021,,LandslideWet,https://sakuna.ph/Tomas_Oppus
+1,3,REGION 1,ILOCOS NORTE,Pagudpud,,,Rock Slide,16 May 2020,,"a rock slide incident happened at Manila North Road, Pagudpud Section before viaduct",,,,RockfallDry,https://sakuna.ph/Pagudpud
+2,3,REGION 3,AURORA,Baler,Pingit,,Flooded Areas,,,2-3 ft,,,Subsided,FloodGeneral,https://sakuna.ph/Baler
+3,3,REGION 3,AURORA,Baler,Obligacion,,Flooded Areas,,,,,,Subsided,FloodGeneral,https://sakuna.ph/Baler
+4,3,REGION 3,AURORA,Baler,Calabuanan,,Flooded Areas,,,1-2 ft,,,Subsided,FloodGeneral,https://sakuna.ph/Baler
+5,3,REGION 3,AURORA,Baler,Suklayin,,Flooded Areas,,,1-2 ft,,,Subsided,FloodGeneral,https://sakuna.ph/Baler
+6,3,REGION 3,AURORA,Baler,Buhangin,,Flooded Areas,,,2-3 ft,,,Subsided,FloodGeneral,https://sakuna.ph/Baler
+7,3,REGION 3,BULACAN,Meycauayan,Banga,,Flooded Areas,,,4 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+8,3,REGION 3,BULACAN,Meycauayan,Pandayan,,Flooded Areas,,,1 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+9,3,REGION 3,BULACAN,Meycauayan,Iba,,Flooded Areas,,,1 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+10,3,REGION 3,BULACAN,Meycauayan,Saluysoy,,Flooded Areas,,,1 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+11,3,REGION 3,BULACAN,Meycauayan,Tugatog,,Flooded Areas,,,2 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+12,3,REGION 3,BULACAN,Meycauayan,Calvario,,Flooded Areas,,,2 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+13,3,REGION 3,BULACAN,Meycauayan,Caingin,,Flooded Areas,,,3 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+14,3,REGION 3,BULACAN,Meycauayan,Longos,,Flooded Areas,,,1 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+15,3,REGION 3,BULACAN,Meycauayan,Tabing Ilog,,Flooded Areas,,,1 ft,,,Subsided,FloodGeneral,https://sakuna.ph/City_of_Meycauayan
+16,3,NCR,NCR,Mandaluyong,,,Flooded Areas,15 May 2020,,New Zuniga F. Ortigas cor Boni (Ground to knee),,"As of 11:30PM of 15 May 2020, all flooded areas have subsided",Subsided,FloodGeneral,https://sakuna.ph/City_of_Mandaluyong
+17,4,NCR,NCR,Mandaluyong,,,Flooded Areas,15 May 2020,,Ballesteros cor. Boni (Ground to ankle),,"As of 11:30PM of 15 May 2020, all flooded areas have subsided",Subsided,SevereWeather,https://sakuna.ph/City_of_Mandaluyong
+18,4,NCR,NCR,Mandaluyong,,,Flooded Areas,15 May 2020,,Barangka Ilaya San Roque (Ground to knee),,"As of 11:30PM of 15 May 2020, all flooded areas have subsided",Subsided,FloodGeneral,https://sakuna.ph/City_of_Mandaluyong
+19,4,NCR,NCR,Mandaluyong,,,Flooded Areas,15 May 2020,,Daang Bakal Haig St. (Ground to ankle),,"As of 11:30PM of 15 May 2020, all flooded areas have subsided",Subsided,FloodGeneral,https://sakuna.ph/City_of_Mandaluyong
+20,4,NCR,NCR,Mandaluyong,,,Fallen / Uprooted Tree,16 May 2020,,Pleasant Hills Shaw cor. Torres,,Cleared,,CollapseMiscellaneous,https://sakuna.ph/City_of_Mandaluyong
+21,4,NCR,NCR,Mandaluyong,,,Fallen / Uprooted Tree,16 May 2020,,"Mabini J. Rizal, A. Mabini St.",,Cleared,,CollapseMiscellaneous,https://sakuna.ph/City_of_Mandaluyong
+22,4,NCR,NCR,Mandaluyong,,,Fallen / Uprooted Tree,16 May 2020,,New Zuniga P. Cruz I. Lopez,,Cleared,,CollapseMiscellaneous,https://sakuna.ph/City_of_Mandaluyong
+23,4,NCR,NCR,Mandaluyong,,,Fallen Tarpaulin / Billboard,16 May 2020,,Barangka Ilaya,,Cleared,,CollapseIndustrial,https://sakuna.ph/City_of_Mandaluyong
+24,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Acacia (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+25,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Catmon Gov. Pascual Sitio 6 Hernandez St. (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+26,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Concepcion Burgos cor. Gen Luna (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+27,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Dampalit Dulong Rodriguez 1 Subd Lecors to Rd 25 (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+28,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Flores Portion of Women’s Club (10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+29,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,"Hulong Duhat Gen Trias Women’s Club Baytown Don Basilio Tabing Ilog, Gabriel 2, Karen St, Robert St., Paolo St. (8”-10”)",,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,CoastalFlood,https://sakuna.ph/City_of_Malabon
+30,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Ibaba C. Arellano Camus St. (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+31,4,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Maysilo Along MH Del Pilar St (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,CoastalFlood,https://sakuna.ph/City_of_Malabon
+32,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Muzon Portions of Kaunlaran St (10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+33,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Panghulo Tatawid area (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+34,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,"Potrero Araneta Village (Along Yellow Bell and Sunflower St.) Dona Juana, Juliana Riverside, University Avenue, Atis San Miguel, F. Rivera St. (20”-24”)",,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+35,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,San Agustin Rizal Ave. Gen Luna St. along C. Arellano f. Sevilla Blvd. (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+36,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Santulan MH del Pilar St. Pazon Cmpd/LNA (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+37,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Tañong F. Sevilla cor Estrella St. (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+38,5,NCR,NCR,Malabon,,,Flooded Areas,16 May 2020,,Tonsuya Fronting Brgy Hall (8”-10”),,"Flood subsided as of 12 AM-1 AM, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Malabon
+39,5,NCR,NCR,Parañaque,,,Flooded Areas,16 May 2020,,"San Dionisio NT Garcia, Gatchalian 2 Yakal St., Phase 3 Sto Niño Olivarez Compound",,"Flood subsided as of 2100H, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Parañaque
+40,5,NCR,NCR,Parañaque,,,Flooded Areas,16 May 2020,,Sto Niño Pascor Drive,,"Flood subsided as of 2100H, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Parañaque
+41,5,NCR,NCR,Parañaque,,,Flooded Areas,16 May 2020,,Tambo Mayuga Riverside San Antonio,,"Flood subsided as of 2100H, 16 May 2020",Subsided,CoastalFlood,https://sakuna.ph/City_of_Parañaque
+42,5,NCR,NCR,Parañaque,,,Flooded Areas,16 May 2020,,"Banner St, San Martin St, San Antonio Ave cor Ma Susafe St.",,"Flood subsided as of 2100H, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Parañaque
+43,5,NCR,NCR,Parañaque,,,Flooded Areas,16 May 2020,,Merville Mangahan,,"Flood subsided as of 2100H, 16 May 2020",Subsided,FloodGeneral,https://sakuna.ph/City_of_Parañaque
+44,5,NCR,NCR,Manila,,,Fallen / Uprooted Tree,16 May 2020,,"Mirasol St., Tondo and Bato St. Cor. Callejon St. Tondo Manila",,Cleared,,CollapseMiscellaneous,https://sakuna.ph/City_of_Manila
+45,6,NCR,NCR,Manila,,,Fallen Debris,16 May 2020,,"Quirino cor. M.H. Del Pilar St. Ermita Malate, Manila.",,Cleared / GI Sheets obstructed the area,,CollapseMiscellaneous,https://sakuna.ph/City_of_Manila
