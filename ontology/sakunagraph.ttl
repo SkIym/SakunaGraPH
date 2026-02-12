@@ -2006,7 +2006,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :ArmedConflict rdf:type owl:Class ;
                rdfs:subClassOf :Technological ;
                rdfs:label "Armed Conflict"@en ;
-               skos:definition "Ambush/shooting, grenade/bombing incidents, can also involve civil disturbances, violence, and gun fires or armed scandals that can be due to national and local elections and holidays, for example." .
+               skos:definition "Ambush/shooting, grenade/bombing incidents, can also involve civil disturbances, violence, and gun fires or armed scandals that can be due to national and local elections and holidays, for example. Often involves victims, killings, and results to deaths or injury." .
 
 
 ###  https://sakuna.ph/Ashfall
@@ -2436,7 +2436,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FireIndustrial rdf:type owl:Class ;
                 rdfs:subClassOf :IndustrialAccident ;
                 rdfs:label "Fire (Industrial)"@en ;
-                skos:definition "Urban fire involving buildings or structures. Can involve industrial structures." .
+                skos:definition "Urban fire involving industrial buildings or structures." .
 
 
 ###  https://sakuna.ph/FireMiscellaneous
@@ -2464,7 +2464,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FloodGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Flood ;
               rdfs:label "Flood (General)"@en ;
-              skos:definition "Flood: A general term for flooded areas or floodwaters not specifying the overflow of water from a stream channel onto normally dry land. Barangays and sitios normally flooded in ft. Involves flooding in roads, zones, and areas in the country, affecting families and households. Can involve knee, waist, and gutter-deep levels of water. Sheet flooding. Can be due to tropical storms, tropical cyclones, tropical depressions, and low pressure areas." .
+              skos:definition "Flood: A general term for flooded areas (subsided, receding, or still flooded) or floodwaters and the overflow of water levels. Barangays and sitios affected, damaged and normally flooded in ft. Involves flooding in roads, zones, and areas in the country, affecting families and households. Can involve overflow or box of culverts, knee, waist, and gutter-deep levels of water. Sheet flooding. Can be due to heavy rains, monsoons, tropical storms, tropical cyclones, tropical depressions, and low pressure areas." .
 
 
 ###  https://sakuna.ph/Fog
@@ -2478,7 +2478,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :ForestFire rdf:type owl:Class ;
             rdfs:subClassOf :Wildfire ;
             rdfs:label "Forest Fire"@en ;
-            skos:definition "A type of wildfire in a wooded area or forest." .
+            skos:definition "Forest Fire: A type of wildfire in a wooded area or forest. Can be due to El Nino." .
 
 
 ###  https://sakuna.ph/FungalDisase
@@ -2731,21 +2731,21 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :LandFire rdf:type owl:Class ;
           rdfs:subClassOf :Wildfire ;
           rdfs:label "Land Fire"@en ;
-          skos:definition "A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment." .
+          skos:definition "Land Fire: A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment. Can be due to El Nino." .
 
 
 ###  https://sakuna.ph/LandslideDry
 :LandslideDry rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementDry ;
               rdfs:label "Landslide (Dry)"@en ;
-              skos:definition "Landslide: Any kind of moderate to rapid soil movement incl. lahars, mudslides, earthquake- induced, and debris flows (under dry conditions). A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often earthquake-induced." .
+              skos:definition "Landslide: Any kind of moderate to rapid soil movement, often due to earthquakes (under dry conditions) bringing damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often earthquake-induced." .
 
 
 ###  https://sakuna.ph/LandslideWet
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Landslide: Any kind of moderate to rapid soil movement incl. lahars, mudslides, river banksand debris flows (under wet conditions) brining damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
+              skos:definition "Landslide: Any kind of moderate to rapid soil movement, often due to rain (under wet conditions) brining damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
 
 
 ###  https://sakuna.ph/LavaFlow
@@ -2812,14 +2812,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :MiscellaneousAccidentGeneral rdf:type owl:Class ;
                               rdfs:subClassOf :MiscellaneousAccident ;
                               rdfs:label "Miscellaneous Accident (General)"@en ;
-                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents. Can involve fireworks or firework-related incidents (injuries) or events about elections (Barangay, Sangguniang Kabataan, National), celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day)." .
+                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents. Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents." .
 
 
 ###  https://sakuna.ph/Mudslide
 :Mudslide rdf:type owl:Class ;
           rdfs:subClassOf :MassMovementWet ;
           rdfs:label "Mudslide"@en ;
-          skos:definition "A form of mass wasting involving fast-moving flow of debris and dirt that has become liquified by the addition of water. Also called a mudflow." .
+          skos:definition "Mudslide: A form of mass wasting involving fast-moving flow of debris and dirt that has become liquified by the addition of water. Also called a mudflow." .
 
 
 ###  https://sakuna.ph/Municipality
@@ -3119,7 +3119,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Road rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
       rdfs:label "Road"@en ;
-      skos:definition "Transport accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall or earthquakes. Can involve road cuts." .
+      skos:definition "Transport or vehicular accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall or earthquakes. Can involve road cuts and collisions." .
 
 
 ###  https://sakuna.ph/RoadAndBridges
@@ -3284,7 +3284,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :StormGeneral rdf:type owl:Class ;
               rdfs:subClassOf :Storm ;
               rdfs:label "Storm (General)"@en ;
-              skos:definition "Storm general: Can involve weather broughty by monsoons (southwest monsoons) and shear lines." .
+              skos:definition "Storm general: Can be storms brought by monsoons (southwest monsoons) and shear lines." .
 
 
 ###  https://sakuna.ph/StormSurge
@@ -3337,7 +3337,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :SuddenSubsidenceDry rdf:type owl:Class ;
                      rdfs:subClassOf :MassMovementDry ;
                      rdfs:label "Sudden Subsidence (Dry)"@en ;
-                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger. Can involve liquefaction." .
+                     skos:definition "Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger. Can involve liquefaction and can be due to earthquakes." .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceWet
@@ -3416,7 +3416,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Water rdf:type owl:Class ;
        rdfs:subClassOf :Transport ;
        rdfs:label "Water" ;
-       skos:definition "Transport accidents involving sailing boats, ferries, cruise ships, and other vessels." .
+       skos:definition "Transport or maritime accidents involving sailing boats (motorbancas), ferries, cruise ships, and other vessels. Can be due to weather conditions." .
 
 
 ###  https://sakuna.ph/WaterDisruption
@@ -3471,7 +3471,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :WildfireGeneral rdf:type owl:Class ;
                  rdfs:subClassOf :Wildfire ;
                  rdfs:label "Wildfire (General)"@en ;
-                 skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
+                 skos:definition "Wildfire: Any type of fire  in a natural setting such as a grassland, mountain, brush land or tundra, which consumes natural fuels such as tress and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions. Can affect animals, trees, and properties. Can be due to El Nino." .
 
 
 ###  https://sakuna.ph/Work

@@ -142,7 +142,8 @@ class Incident:
     remarks: str
 
 INCIDENT_COLUMN_MAPPINGS = {
-    "Column_1": "Qty",
+    "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
     "Column_2": "Type of Incident",
     "Column_3": "Date",
     "Column_4": "Time",
