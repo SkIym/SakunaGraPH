@@ -2436,14 +2436,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :FireIndustrial rdf:type owl:Class ;
                 rdfs:subClassOf :IndustrialAccident ;
                 rdfs:label "Fire (Industrial)"@en ;
-                skos:definition "Urban fire involving industrial buildings or structures." .
+                skos:definition "Fire: Fire incidents involving industrial buildings or structures." .
 
 
 ###  https://sakuna.ph/FireMiscellaneous
 :FireMiscellaneous rdf:type owl:Class ;
                    rdfs:subClassOf :MiscellaneousAccident ;
                    rdfs:label "Fire (Misc)"@en ;
-                   skos:definition "Non-industrial urban fire involving buildings or structures. Can involve residential structures." .
+                   skos:definition "Fire: Non-industrial fire incidents. Can involve residential structures." .
 
 
 ###  https://sakuna.ph/FlashFlood
@@ -2738,14 +2738,14 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :LandslideDry rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementDry ;
               rdfs:label "Landslide (Dry)"@en ;
-              skos:definition "Landslide: Any kind of moderate to rapid soil movement, often due to earthquakes (under dry conditions) bringing damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often earthquake-induced." .
+              skos:definition "Landslide: Any kind of moderate to rapid soil movement, can be and often induced by an earthquake (under dry conditions) bringing damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often due to earthquakes and affecting houses." .
 
 
 ###  https://sakuna.ph/LandslideWet
 :LandslideWet rdf:type owl:Class ;
               rdfs:subClassOf :MassMovementWet ;
               rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Landslide: Any kind of moderate to rapid soil movement, often due to rain (under wet conditions) brining damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often rain- induced." .
+              skos:definition "Landslide: Any kind of moderate to rapid soil movement, can be induced by rain (under wet conditions) bringing damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.  Often due to rain and affecting houses." .
 
 
 ###  https://sakuna.ph/LavaFlow
@@ -2812,7 +2812,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :MiscellaneousAccidentGeneral rdf:type owl:Class ;
                               rdfs:subClassOf :MiscellaneousAccident ;
                               rdfs:label "Miscellaneous Accident (General)"@en ;
-                              skos:definition "Any form of non-industrial and non-transport miscellanueous accidents. Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents and food poisoning." .
+                              skos:definition "Any form of miscellanueous accidents. Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents and food poisoning. Does not include transport or vehicular accidents." .
 
 
 ###  https://sakuna.ph/Mudslide
@@ -3119,7 +3119,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Road rdf:type owl:Class ;
       rdfs:subClassOf :Transport ;
       rdfs:label "Road"@en ;
-      skos:definition "Transport or vehicular accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall or earthquakes. Can involve road cuts and collisions." .
+      skos:definition "Transport or vehicular accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall, earthquakes, or certain special events like holidays. Can involve road cuts and collisions." .
 
 
 ###  https://sakuna.ph/RoadAndBridges
