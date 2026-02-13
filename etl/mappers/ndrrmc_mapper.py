@@ -165,6 +165,10 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
         pl.Series("hasType", pred_classes),
     ])
 
+    # lower case locations
+    df = df.with_columns(Province=pl.col("Province").str.to_lowercase(),
+                    City_Muni=pl.col("City_Muni").str.to_lowercase())
+
 
     # match location
     locations = (
@@ -213,4 +217,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/Severe TS MARING/")
+    load_incidents("./data/ndrrmc/Combined Effects of SWM and TCs BUTCHOY and CARINA 2024/")

@@ -1,5 +1,5 @@
 from rdflib import Graph, RDF, Namespace, URIRef, RDFS
-from typing import List
+from typing import List, Optional
 from thefuzz import fuzz, process
 import re
 
@@ -126,7 +126,7 @@ class LocationMatcher:
 
         # label -> IRI
         self.municipalities_rev = {
-            label: iri for iri, label in self.municipalities.items()
+            label.lower(): iri for iri, label in self.municipalities.items()
         }
 
     # --------------------------------------------------
@@ -135,14 +135,14 @@ class LocationMatcher:
     def _load_locations(self) -> None:
         for s, _, _ in self.g.triples((None, RDF.type, URIRef(self.SKG["Municipality"]))):
             label = str(self.g.value(s, RDFS.label))
-            self.municipalities[str(s)] = label
+            self.municipalities[str(s)] = label.lower()
             self.municipalities_parent[str(s)] = str(
                 self.g.value(s, URIRef(self.SKG["isPartOf"]))
             )
 
         for s, _, _ in self.g.triples((None, RDF.type, URIRef(self.SKG["Province"]))):
             label = str(self.g.value(s, RDFS.label))
-            self.provinces[label] = str(s)
+            self.provinces[label.lower()] = str(s)
 
     # --------------------------------------------------
     # Fuzzy helper
@@ -158,6 +158,74 @@ class LocationMatcher:
         )
         return match if score >= threshold else None
 
+    def match_region(self, label: str) -> Optional[str]:
+        """
+        Matches region. Returns loc if found, else none.
+        
+        """
+        if label in self.region_map:
+            return self.base + self.region_map[label]
+
+        fuzzy = self._fuzzy_match(
+            label,
+            list(self.region_map.keys()),
+            FUZZ_THRESHOLD_REGION
+        )
+        if fuzzy:
+            return self.base + self.region_map[fuzzy]
+
+        return None
+    
+    def match_province(self, label: str) -> Optional[str]:
+        """
+        Matches province. Returns loc if found, else none.
+        
+        """
+        if label in self.provinces:
+            return self.provinces[label]
+
+        fuzzy = self._fuzzy_match(
+            label,
+            list(self.provinces.keys()),
+            FUZZ_THRESHOLD_PROVINCE
+        )
+        return self.provinces[fuzzy] if fuzzy else None
+    
+    def match_municipality(self, label: str, parent_iri: str | None) -> Optional[str]:
+        """
+        Matches municity. Requires parent province iri to resolve duplicate names. 
+        Returns loc if found, else none.
+        
+        """
+        label = label.lower()
+        candidate = label.split(" (")[0].strip()
+        
+        if parent_iri:
+            # exact label + correct parent
+            
+            city = candidate + " city"
+            city_of = "city of " + city.replace(" city", "")
+            
+            for iri, lbl in self.municipalities.items():
+
+                if (lbl == candidate or lbl == city or lbl == city_of) and self.municipalities_parent[iri] == parent_iri:
+                    return iri
+
+            # another pass for HUCs
+
+            for iri, lbl in self.municipalities.items():
+                if (lbl == city or lbl == city_of):
+                    return iri
+
+
+        # fuzzy fallback
+        fuzzy = self._fuzzy_match(
+            candidate,
+            list(self.municipalities_rev.keys()),
+            FUZZ_THRESHOLD_MUNI
+        )
+
+        return self.municipalities_rev[fuzzy] if fuzzy else None
     # --------------------------------------------------
     # Main matcher
     # --------------------------------------------------
@@ -168,172 +236,90 @@ class LocationMatcher:
             levels = [lvl.strip() for lvl in loc.split(",")]
             highest = levels.pop()
 
-            # Country / island groups
             if highest in {"Philippines", "Luzon", "Visayas", "Mindanao"}:
                 matched.append(highest)
                 continue
 
-            # Region IV split case
             if highest in {"4", "Region 4", "IV"}:
-                matched.extend(["Region_IV-A", "Region_IV-B"])
+                matched.extend([
+                    self.base + "Region_IV-A",
+                    self.base + "Region_IV-B"
+                ])
                 continue
 
-            # -------------------------
-            # Region matching
-            # -------------------------
-            region = self.region_map.get(highest)
-            prov_label = ""
-            if not region:
-                fuzzy = self._fuzzy_match(
-                    highest,
-                    list(self.region_map.keys()),
-                    FUZZ_THRESHOLD_REGION
-                )
-                if fuzzy:
-                    region = self.region_map[fuzzy]
+            region_iri = self.match_region(highest)
 
-            if region:
-                if not levels:
-                    matched.append(self.base + region)
-                    continue
-                parent = region
-                highest = levels.pop()
-            else:
-                prov_label = (
-                highest
-                if highest in self.provinces
-                else self._fuzzy_match(
-                    highest,
-                    list(self.provinces.keys()),
-                    FUZZ_THRESHOLD_PROVINCE
-                )
-            )
-                
-            if not region:
-                matched.append("Fix location columns please")
-                continue
-
-            # -------------------------
-            # Province matching
-            # -------------------------
-            if not prov_label:
-                prov_label = (
-                    highest
-                    if highest in self.provinces
-                    else self._fuzzy_match(
-                        highest,
-                        list(self.provinces.keys()),
-                        FUZZ_THRESHOLD_PROVINCE
-                    )
-                )
-
-            if prov_label :
-
-                prov_IRI = self.provinces[prov_label]
-
-                if levels:
-                    candidate = levels.pop()
-
-                    # -------------------------
-                    # Municipality matching
-                    # -------------------------
-
-                    if "(" in candidate:
-                        candidate = candidate.split(" (")[0]
-
-                    # handle municities with the same name
-                    munis = [
-                        iri
-                        for iri, label in self.municipalities.items()
-                        if label == candidate
-                    ]
-
-                    muni_IRI = ""
-
-                    
-                    for iri in munis:
-                        if self.municipalities_parent[iri] == prov_IRI:
-                            muni_IRI = iri
-                            break
-                    
-                    # if "Pampanga" in prov_IRI:
-                    #     print(muni_IRI)
-
-                    if not muni_IRI:
-                        temp = candidate.replace("City", "")
-                        temp = temp.strip()
-                        temp = "City of " + temp
-
-                        munis = [
-                            iri
-                            for iri, label in self.municipalities.items()
-                            if label == temp
-                        ]
-
-                        muni_IRI = ""
-
-                        for iri in munis:
-                            if self.municipalities_parent[iri] == prov_IRI:
-                                muni_IRI = iri
-                                break
-                        
-                        # print(muni_IRI)
-                        # muni_IRI = self.municipalities_rev[temp] if temp in self.municipalities_rev else ""
-
-                    # fuzzy match
-                    if not muni_IRI:
-                        fuzzy = self._fuzzy_match(
-                            candidate,
-                            list(self.municipalities_rev.keys()),
-                            FUZZ_THRESHOLD_MUNI
-                        )
-                        if fuzzy:
-                            muni_IRI = self.municipalities_rev[fuzzy]
-
-                    if muni_IRI:
-                        matched.append(muni_IRI)
-                        
-                    else:
-                        matched.append(prov_IRI)
-
-                else:
-                    matched.append(prov_IRI)
-
+            if region_iri and not levels:
+                matched.append(region_iri)
                 continue
             
-            else:
-                
-                if levels:
-                    highest = levels.pop()
-                    if "(" in highest:
-                        highest = highest.split(" (")[0].replace("-", "")
-                
+            prov_label = levels.pop()
+            prov_iri = self.match_province(prov_label)
 
-                iri = self.municipalities_rev[highest] if highest in self.municipalities_rev else ""
-                if iri:
-                    matched.append(iri)
-                    continue
+            # Get prov level
+            if region_iri:
+            
+                # Get municity level
+                if prov_iri and levels:
+                    muni_label = levels.pop()
+                    muni_iri = self.match_municipality(muni_label, prov_iri)
 
-                loc_label = highest.replace("City", "")
-                loc_label = loc_label.strip()
-                loc_label = "City of " + loc_label
 
-                if loc_label in self.municipalities_rev:
-                    matched.append(self.municipalities_rev[loc_label])
+                    matched.append(muni_iri if muni_iri else prov_iri)
+
+                # If no municity match, use province
+                elif prov_iri:
+                    matched.append(prov_iri)
+
+                # If no province match, use region
                 else:
                     
+                    # handle city placed in provinces
+                    muni_iri = self.match_municipality(prov_label, region_iri)
 
-                    fuzzy = self._fuzzy_match(
-                            highest,
-                            list(self.municipalities_rev.keys()),
-                            FUZZ_THRESHOLD_MUNI
-                        )
-                    if fuzzy:
-                        matched.append(self.municipalities_rev[fuzzy])
+                    if muni_iri:
+                        matched.append(muni_iri)
+
+                    # handle outdated province or repated region (NCR) names
+                    # e.g. maguindanao 
                     else:
+                        muni_label = levels.pop()
+                        if prov_label == "maguindanao":
+                            muni_iri = self.match_municipality(muni_label, None)
+                        else:
+                            muni_iri = self.match_municipality(muni_label, region_iri)
 
-                        matched.append(self.base + region)
-  
+                        matched.append(muni_iri if muni_iri else region_iri)
+            
+            # handle erratic parsed locations
+            # e.g. city_muni in region column
+            else:
+
+                if prov_iri and levels:
+                    muni_label = levels.pop()
+                    muni_iri = self.match_municipality(muni_label, prov_iri)
+
+
+                    if not muni_iri or self.municipalities_parent[muni_iri] != prov_iri:
+                        muni_iri = self.match_municipality(highest, prov_iri)
+
+                    matched.append(muni_iri if muni_iri else prov_iri)
+
+                    # if muni_iri:
+                    #     if self.municipalities_parent[muni_iri] != prov_iri: 
+                    #         muni_iri = self.match_municipality(highest, prov_iri)
+                    #         matched.append(muni_iri if muni_iri else prov_iri)
+                    #     else:
+                    #         matched.append(muni_iri)
+                    
+                    # else:
+                    #     muni_iri = self.match_municipality(highest, prov_iri)
+                    #     matched.append(muni_iri if muni_iri else prov_iri)
+                
+                else:
+                    matched.append("Fix location columns please")
+
+
         return matched
 
 LOCATION_MATCHER = LocationMatcher(

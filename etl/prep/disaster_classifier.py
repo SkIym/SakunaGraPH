@@ -3,7 +3,7 @@ from typing import List, Tuple
 from rdflib import Graph, RDF, Namespace, URIRef, RDFS, SKOS
 
 class DisasterClassifier:
-    def __init__(self, model_name: str, classes_path: str):
+    def __init__(self, model_name: str):
         # Load model 
         self.model = SentenceTransformer(model_name)
 
@@ -47,7 +47,8 @@ class DisasterClassifier:
         text_embeddings = self.model.encode(texts, convert_to_tensor=True)
 
         # Compute cosine similarities in one shot
-        scores = util.cos_sim(text_embeddings, self.embeddings)  # shape: [num_texts, num_classes]
+        # scores = util.dot_score(text_embeddings, self.embeddings)
+        scores = util.cos_sim(text_embeddings, self.embeddings)  
 
         # Find best class per text
         results = []
@@ -59,6 +60,6 @@ class DisasterClassifier:
 DISASTER_CLASSIFIER = DisasterClassifier(
     # model_name="all-MiniLM-L6-v2",
     model_name="all-mpnet-base-v2",
-    classes_path="disaster_classes.json"
+    # model_name="multi-qa-mpnet-base-dot-v1",
 )
 

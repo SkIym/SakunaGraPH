@@ -1,33 +1,52 @@
-from mappings.graph import create_graph
-from mappings.ndrrmc_mappings import event_mapping, prov_mapping
-from mappers.ndrrmc_mapper import load_events, load_incidents, load_uuids, load_provenance
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from mappings.graph import create_graph, Graph
+from mappers.ndrrmc_mapper import load_events, load_uuids
+from mappings.ndrrmc_mappings import Event, event_mapping, prov_mapping
+from mappers.ndrrmc_mapper import load_incidents, load_provenance
 import os
+from typing import Tuple
+
+def process_event(args: Tuple[str, Event]) -> Graph:
+    DATA_DIR, ev = args
+
+    g = create_graph()
+
+    event_iri = event_mapping(g, ev)
+
+    event_folder = os.path.join(DATA_DIR, ev.eventName)
+
+    prov = load_provenance(event_folder)
+    if prov:
+        prov_mapping(g, prov, event_iri)
+
+    load_incidents(event_folder)
+
+    return g
 
 DATA_DIR = "./data/ndrrmc"
 OUT_FILE = "./triples/ndrrmc.ttl"
 
 
 def run():
-    g = create_graph()
+    # Base graph
+    main_graph = create_graph()
 
-    # Load uuids to each event
+    # UUIDs must be done once
     load_uuids(DATA_DIR)
 
     events = load_events(DATA_DIR)
 
+    with ProcessPoolExecutor() as executor:
+        futures = [
+            executor.submit(process_event, (DATA_DIR, ev))
+            for ev in events
+        ]
 
-    for ev in events:
-        event_iri = event_mapping(g, ev)
+        for future in as_completed(futures):
+            subgraph = future.result()
+            main_graph += subgraph  # safe merge
 
-        event_folder = os.path.join(DATA_DIR, ev.eventName)
-        prov = load_provenance(event_folder)
-
-        if prov:
-            prov_mapping(g, prov, event_iri)
-
-        load_incidents(event_folder)
-
-    g.serialize(
+    main_graph.serialize(
         destination=OUT_FILE,
         format="turtle"
     )

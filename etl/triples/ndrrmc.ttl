@@ -551,7 +551,7 @@ CAR, I, II, III, CALABARZON, NCR""" ;
     :endDate "2022-05-09T00:00:00"^^xsd:dateTime ;
     :eventName "2022 National and Local Elections  pdf1" ;
     :fromSource :Final_Report_for_the_2022_National_and_Local_Elections_Breakdown_pdf1 ;
-    :hasType :MiscellaneousAccidentGeneral ;
+    :hasType :ExplosionMiscellaneous ;
     :remarks """The synchronized fully automated National and Local Elections (NLE) will be conducted on Monday, 9 May 2022 as
 mandated in Section 2 of RA 7166. Likewise, the ARMM elections were also synchronized with the 2019 NLE per RA
 Further, Gun Ban is implemented from 9 January to 8 June 2022. Per COMELEC, during the election period, no person
@@ -1815,7 +1815,7 @@ of up to 55 km/h, and central pressure of 1006 hPa. TCWS No. 1 is still raised i
     :endDate "2022-08-22T00:00:00"^^xsd:dateTime ;
     :eventName "Magnitude 7 0 Earthquake in Tayum Abra 2022" ;
     :fromSource :Breakdown_Final_Report_for_the_Magnitude_7_0_Earthquake_in_Tayum_Abra_2022 ;
-    :hasType :CollapseMiscellaneous ;
+    :hasType :GroundMovement ;
     :remarks """At 8:43 AM, 27 July 2022, a major Magnitude (Mw) 7.0 earthquake shook the provinces in northwestern Luzon and
 adjacent areas including Metro Manila. The earthquake has an epicenter located 17.64°N, 120.63°E - 003 km N 45° W
 of Tayum (Abra), and a depth of 17 kilometers.
