@@ -213,4 +213,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/Magnitude 6 4 Earthquake in Lagayan Abra  2022/")
+    load_incidents("./data/ndrrmc/Severe TS MARING/")
