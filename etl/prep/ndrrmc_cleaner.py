@@ -27,6 +27,14 @@ def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, bas
     return df
 
 def event_name_expander(name: str) -> str:
+    """
+    Docstring for event_name_expander
+    
+    :param name: Abbreviated cyclone tag
+    :type name: str
+    :return: Expanded cyclone tag
+    :rtype: str
+    """
 
     abbr = {
         "TC": "Tropical cyclone",
@@ -41,7 +49,40 @@ def event_name_expander(name: str) -> str:
     
     return name
 
-# def normalize_datetime(folder_path: str, date_col: str, time_col: str):
+def normalize_datetime(df: DataFrame, date_col: str, time_col: str):
+    """
+    Normalize date and time values into ISO datetime format
+    
+    :param df: Dataframe
+    :type df: DataFrame
+    :param date_col: name of the column containing the dates
+    :type date_col: str
+    :param time_col: name of the column containing the time
+    :type time_col: str
+    """
+    df = df.with_columns(
+        pl.col(date_col).forward_fill()
+    )
+
+    df = df.with_columns(
+        pl.coalesce([
+            # try DATE + TIME
+            pl.concat_str(
+                [date_col, time_col], 
+                separator=" ", 
+                ignore_nulls=True)
+            .str.strip_chars()
+            .str.strptime(pl.Datetime, "%d %B %Y %I:%M %P", strict=False),
+
+            # fallback: DATE only
+            pl.col(date_col)
+            .str.strip_chars()
+            .str.strptime(pl.Datetime, "%d %B %Y", strict=False),
+        ])
+        .alias("startDate")
+    )
+
+    return df
 
 
 # if __name__ == "__main__":

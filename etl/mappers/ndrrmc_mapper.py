@@ -6,7 +6,7 @@ from prep.location_matcher import LOCATION_MATCHER
 from prep.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc_mappings import INCIDENT_COLUMN_MAPPINGS, Event, Provenance, Incident
 from datetime import datetime
-from prep.ndrrmc_cleaner import event_name_expander, forward_fill_and_collapse
+from prep.ndrrmc_cleaner import event_name_expander, forward_fill_and_collapse, normalize_datetime
 import polars as pl
 
 
@@ -189,6 +189,9 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     df = df.with_columns([
         pl.Series("hasLocation", matched_locations),
     ])
+    
+    print("Normalizing datetime...")
+    df = normalize_datetime(df,"DATE_OF\nOCCURENCE" ,"TIME_OF\nOCCURENCE")
 
     # add column for index 
     df = df.with_row_index("incident_id", 1)
@@ -217,4 +220,4 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
 
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/Combined Effects of SWM and TCs BUTCHOY and CARINA 2024/")
+    load_incidents("./data/ndrrmc/Combined Effects of SWM and TCs CRISING EMONG DANTE Breakdow/")
