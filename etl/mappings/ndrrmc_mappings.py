@@ -1,10 +1,11 @@
 # NDRRMC MAPPINGS HERE (rdflib)
+from typing import List
 from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import event_iri, prov_iri
+from .iris import event_iri, incident_iri, prov_iri
 
 @dataclass
 class Event:
@@ -15,7 +16,6 @@ class Event:
     id: str
     remarks: str | None = None
     
-
 def event_mapping(g: Graph, ev: Event) -> URIRef:
     uri = event_iri(ev.id)
     g.add((
@@ -132,14 +132,16 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
 
 @dataclass
 class Incident:
-    incidentActionsTaken: str
-    incidentCause: str
-    incidentDescription: str
+    id: str
+    incidentActionsTaken: str | None
+    incidentCause: str | None
+    incidentDescription: str | None
     startDate: datetime
     endDate: datetime
     hasLocation: str
+    hasBarangay: str | None
     hasType: str
-    remarks: str
+    remarks: str | None
 
 INCIDENT_COLUMN_MAPPINGS = {
     "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
@@ -154,5 +156,20 @@ INCIDENT_COLUMN_MAPPINGS = {
 
 }
 
+def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
 
-# def incident_mapping(g: Graph, inci: Incident, event_iri: URIRef):
+    for i in inci:
+
+        uri = incident_iri(event_iri, i.id)
+
+        g.add((
+            uri,
+            RDF.type,
+            URIRef(SKG["Incident"])
+        ))
+
+        g.add((
+            uri,
+            SKG.incidentActionsTaken,
+            Literal(i.incidentActionsTaken)
+        ))

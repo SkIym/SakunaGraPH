@@ -1,5 +1,6 @@
 # NDRRMC CSVs AND JSONS MAPPER HERE
 import os
+from typing import List
 import uuid
 import json
 from prep.location_matcher import LOCATION_MATCHER
@@ -103,7 +104,7 @@ def load_provenance(event_folder_path: str) -> Provenance | None:
     
     return p
 
-def load_incidents(event_folder_path: str) -> list[Incident] | None:
+def load_incidents(event_folder_path: str) -> List[Incident] | None:
 
     src_path = os.path.join(event_folder_path, "related_incidents.csv")
 
@@ -191,32 +192,37 @@ def load_incidents(event_folder_path: str) -> list[Incident] | None:
     ])
     
     print("Normalizing datetime...")
-    df = normalize_datetime(df,"DATE_OF\nOCCURENCE" ,"TIME_OF\nOCCURENCE")
+    df = normalize_datetime(df,
+                            "DATE_OF\nOCCURENCE","TIME_OF\nOCCURENCE", 
+                            "%d %B %Y %I:%M %P", 
+                            "%d %B %Y")
 
     # add column for index 
     df = df.with_row_index("incident_id", 1)
 
     print("Writing csv to " + event_folder_path)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
-    
-    #
+    df.write_csv(event_folder_path + "/cleaned_related_incidents.csv")
 
-    # # Construct Incident objects
-    # incidents = []
-    # for row in df.iter_rows(named=True):
-    #     incident = Incident(
-    #         region=row["Region"],
-    #         province=row["Province"],
-    #         city=row["City_Muni"],
-    #         incident_type=row["Type of Incident"],
-    #         predicted_class=row["PredictedClass"],
-    #         similarity_score=row["SimilarityScore"],
-    #         qty=row.get("Qty")
-    #     )
-    #     incidents.append(incident)
+    # Construct Incident objects
+    incidents: List[Incident] = []
+    for row in df.iter_rows(named=True):
+        incident = Incident(
+            id=row["incident_id"],
+            incidentActionsTaken=row["ACTIONS_TAKEN"],
+            incidentDescription=row["DESCRIPTION"],
+            startDate=row["startDate"],
+            endDate=row["startDate"],
+            hasLocation=row["hasLocation"],
+            hasBarangay=row["Barangay"],
+            hasType=row["hasType"],
+            remarks=row["REMARKS"],
+            incidentCause=row["CAUSE"] if row["CAUSE"] else None
+        )
 
-    # return incidents
+        incidents.append(incident)
+
+    return incidents
 
 
 if __name__ == "__main__":

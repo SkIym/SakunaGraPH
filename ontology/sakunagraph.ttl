@@ -2199,7 +2199,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :CollapseIndustrial rdf:type owl:Class ;
                     rdfs:subClassOf :IndustrialAccident ;
                     rdfs:label "Collapse (Industrial)"@en ;
-                    skos:definition "Accident involving the fall or collapse of a building or structure. Can involve fallen industrial or commercial structures like billboards, towers, stores.  Can be due to tropical storms, tropical cyclones, tropical depressions." .
+                    skos:definition "Accident involving the fall or collapse of a building or structure. Can involve fallen industrial or commercial structures like billboards, towers, stores. Can be due to tropical storms, tropical cyclones, tropical depressions." .
 
 
 ###  https://sakuna.ph/CollapseMiscellaneous
@@ -3168,7 +3168,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RockfallWet rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementWet ;
              rdfs:label "Rockfall (Wet)"@en ;
-             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under wet conditions.Also called rock slide under wet conditions. Can be due to tropical cyclones, stroms, depressions" .
+             skos:definition "Rockfall: A quantity of rock or boulders that has fallen from a cliff face, mountain or from the roof or walls of mine or quarry workings under wet conditions or rain. Also called rock slide under wet conditions. Can be due to tropical cyclones, tropical storms, tropical depressions, shear line, monsoons. Sometimes reported to hit structures." .
 
 
 ###  https://sakuna.ph/RogueWave

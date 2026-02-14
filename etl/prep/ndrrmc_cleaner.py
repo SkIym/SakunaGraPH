@@ -49,7 +49,7 @@ def event_name_expander(name: str) -> str:
     
     return name
 
-def normalize_datetime(df: DataFrame, date_col: str, time_col: str):
+def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_format: str, date_format: str):
     """
     Normalize date and time values into ISO datetime format
     
@@ -59,6 +59,8 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str):
     :type date_col: str
     :param time_col: name of the column containing the time
     :type time_col: str
+    :param datetime_format: format of the datetime to convert
+    :param date_fromat: format of the date to convert (no time)
     """
     df = df.with_columns(
         pl.col(date_col).forward_fill()
@@ -66,18 +68,22 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str):
 
     df = df.with_columns(
         pl.coalesce([
-            # try DATE + TIME
+            # try date + time
             pl.concat_str(
                 [date_col, time_col], 
                 separator=" ", 
                 ignore_nulls=True)
             .str.strip_chars()
-            .str.strptime(pl.Datetime, "%d %B %Y %I:%M %P", strict=False),
+            .str.strptime(pl.Datetime, 
+                          datetime_format, 
+                          strict=False),
 
-            # fallback: DATE only
+            # fallback: date only
             pl.col(date_col)
             .str.strip_chars()
-            .str.strptime(pl.Datetime, "%d %B %Y", strict=False),
+            .str.strptime(pl.Datetime, 
+                          date_format, 
+                          strict=False),
         ])
         .alias("startDate")
     )

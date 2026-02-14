@@ -12,5 +12,5 @@ def prov_iri(report: str) -> URIRef:
                       .replace(".pdf", "")
                       .replace("-", "")])
 
-def incident_iri(event_id: str, row_id: str) -> URIRef:
-    return URIRef(SKG[f"{event_id}/related_incident/{row_id}"])
+def incident_iri(event_id: URIRef, incident_id: str) -> URIRef:
+    return URIRef(SKG[event_id.fragment + f"/related_incident/{incident_id}"])
