@@ -27,7 +27,7 @@ logging.basicConfig(
 log = logging.getLogger()
 
 BASE_URL = "https://dromic.dswd.gov.ph/category/situation-reports/2025/"  # starting list page
-DOWNLOAD_DIR = "../data/dromic/2025"
+DOWNLOAD_DIR = "../../data/dromic/2025"
 LAST_SCRAPE_DATE = datetime(2025, 9, 24)            
 
 os.makedirs(DOWNLOAD_DIR, exist_ok=True)
