@@ -25,8 +25,8 @@ def process_event(args: Tuple[str, Event]) -> Graph:
 
     return g
 
-DATA_DIR = "./data/ndrrmc"
-OUT_FILE = "./triples/ndrrmc.ttl"
+DATA_DIR = "./data/ndrrmc_mini"
+OUT_FILE = "./triples/ndrrmc_mini.ttl"
 
 
 def run():

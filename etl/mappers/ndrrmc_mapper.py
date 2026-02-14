@@ -216,8 +216,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
             hasLocation=row["hasLocation"],
             hasBarangay=row["Barangay"],
             hasType=row["hasType"],
-            remarks=row["REMARKS"],
-            incidentCause=row["CAUSE"] if row["CAUSE"] else None
+            remarks=row["REMARKS"]
         )
 
         incidents.append(incident)

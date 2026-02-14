@@ -13,4 +13,4 @@ def prov_iri(report: str) -> URIRef:
                       .replace("-", "")])
 
 def incident_iri(event_id: URIRef, incident_id: str) -> URIRef:
-    return URIRef(SKG[event_id.fragment + f"/related_incident/{incident_id}"])
+    return URIRef(event_id + f"/related_incident/{incident_id}")

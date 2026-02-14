@@ -2625,7 +2625,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                           ] ;
           owl:disjointWith :MajorEvent ;
           rdfs:label "Incident"@en ;
-          skos:definition "A localized or small-scale disaster event, often reported at the municipal or barangay level." .
+          skos:definition "A localized or small-scale disaster event, often reported at the municipal or barangay level and is related with a bigger, major event." .
 
 
 ###  https://sakuna.ph/IndustrialAccident
@@ -3161,7 +3161,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :RockfallDry rdf:type owl:Class ;
              rdfs:subClassOf :MassMovementDry ;
              rdfs:label "Rockfall (Dry)"@en ;
-             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions like earthquakes. Also called rock slide under dry conditions." .
+             skos:definition "Rockfall: A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions. Also called rock slide under dry conditions. Can be due to earthquakes. Can occur near roads." .
 
 
 ###  https://sakuna.ph/RockfallWet

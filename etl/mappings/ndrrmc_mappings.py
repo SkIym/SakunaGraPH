@@ -134,11 +134,10 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
 class Incident:
     id: str
     incidentActionsTaken: str | None
-    incidentCause: str | None
     incidentDescription: str | None
     startDate: datetime
     endDate: datetime
-    hasLocation: str
+    hasLocation: URIRef
     hasBarangay: str | None
     hasType: str
     remarks: str | None
@@ -159,17 +158,74 @@ INCIDENT_COLUMN_MAPPINGS = {
 def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
 
     for i in inci:
-
         uri = incident_iri(event_iri, i.id)
 
+        # rdf:type
         g.add((
             uri,
             RDF.type,
-            URIRef(SKG["Incident"])
+            SKG.Incident
+        ))
+
+        # Link incident to its parent event
+        g.add((
+            event_iri,
+            SKG.hasRelatedIncident,
+            uri
+        ))
+
+        # --- Textual / descriptive properties ---
+        if i.incidentDescription:
+            g.add((
+                uri,
+                SKG.incidentDescription,
+                Literal(i.incidentDescription)
+            ))
+
+        if i.incidentActionsTaken:
+            g.add((
+                uri,
+                SKG.incidentActionsTaken,
+                Literal(i.incidentActionsTaken)
+            ))
+
+        if i.remarks:
+            g.add((
+                uri,
+                SKG.remarks,
+                Literal(i.remarks)
+            ))
+
+        # --- Temporal properties ---
+        g.add((
+            uri,
+            SKG.startDate,
+            Literal(i.startDate, datatype=XSD.dateTime)
+        ))
+
+        if i.endDate:
+            g.add((
+                uri,
+                SKG.endDate,
+                Literal(i.endDate, datatype=XSD.dateTime)
+            ))
+
+        # --- Classification / location ---
+        g.add((
+            uri,
+            SKG.hasType,
+            URIRef(SKG[i.hasType])
         ))
 
         g.add((
             uri,
-            SKG.incidentActionsTaken,
-            Literal(i.incidentActionsTaken)
+            SKG.hasLocation,
+            URIRef(i.hasLocation)
         ))
+
+        if i.hasBarangay:
+            g.add((
+                uri,
+                SKG.hasBarangay,
+                Literal(i.hasBarangay)
+            ))

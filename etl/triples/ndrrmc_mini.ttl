@@ -1,0 +1,2118 @@
+@prefix : <https://sakuna.ph/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+:03b16f2a287745ba979ce4ce39b120c7 a :MajorEvent ;
+    :endDate "2024-09-22T00:00:00"^^xsd:dateTime ;
+    :eventName "Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024" ;
+    :fromSource :SitRep_No__24_for_the_Combined_Effects_of_the_Enhanced_Southwest_Monsoon_and_TCs_FERDIE_GENER_and_HELEN_IGME_2024_Breakdown_Table ;
+    :hasRelatedIncident <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/1>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/10>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/100>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/101>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/102>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/103>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/104>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/105>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/106>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/107>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/108>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/109>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/11>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/110>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/111>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/112>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/113>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/114>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/115>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/116>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/117>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/118>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/119>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/12>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/120>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/121>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/122>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/123>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/124>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/125>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/126>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/127>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/128>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/129>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/13>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/130>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/131>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/132>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/133>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/134>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/135>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/136>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/137>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/138>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/139>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/14>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/140>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/141>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/142>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/143>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/144>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/145>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/146>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/147>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/148>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/149>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/15>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/150>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/151>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/152>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/153>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/154>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/155>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/156>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/157>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/158>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/159>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/16>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/160>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/161>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/162>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/163>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/164>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/165>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/166>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/167>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/168>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/169>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/17>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/170>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/171>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/172>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/173>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/174>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/175>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/176>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/177>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/178>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/179>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/18>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/180>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/181>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/182>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/183>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/184>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/185>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/186>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/187>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/188>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/189>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/19>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/190>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/191>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/192>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/193>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/194>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/195>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/196>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/197>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/198>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/199>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/2>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/20>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/200>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/201>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/202>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/203>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/204>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/205>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/206>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/207>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/208>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/21>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/22>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/23>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/24>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/25>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/26>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/27>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/28>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/29>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/3>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/30>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/31>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/32>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/33>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/34>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/35>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/36>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/37>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/38>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/39>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/4>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/40>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/41>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/42>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/43>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/44>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/45>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/46>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/47>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/48>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/49>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/5>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/50>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/51>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/52>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/53>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/54>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/55>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/56>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/57>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/58>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/59>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/6>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/60>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/61>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/62>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/63>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/64>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/65>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/66>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/67>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/68>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/69>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/7>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/70>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/71>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/72>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/73>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/74>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/75>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/76>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/77>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/78>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/79>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/8>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/80>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/81>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/82>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/83>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/84>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/85>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/86>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/87>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/88>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/89>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/9>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/90>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/91>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/92>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/93>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/94>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/95>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/96>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/97>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/98>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/99> ;
+    :hasType :StormGeneral ;
+    :remarks """FERDIE, GENER, HELEN, and IGME (2024)
+September 28, 2024 08:00 am
+On 11 September 2024, 11:00 PM, PAGASA issued Weather Advisory No. 1 for Southwest Monsoon. Per the advisory,
+moderate to heavy rains were forecasted to be experienced over Masbate, Eastern Visayas, Surigao del Norte, Dinagat
+Islands, Palawan, Antique, Negros Occidental, Negros Oriental, Sultan Kudarat, Sarangani, and South Cotabato.
+On 12 September 2024, 11:00 PM, heavy to intense rainfall were forecasted to be experienced over Occidental Mindoro,
+Palawan, Antique, and Negros Occidental.
+Meanwhile, moderate to heavy rains were forecasted to be experienced over Camarines Sur, Catanduanes, Albay,
+Sorsogon, Masbate, the southern portion of Quezon, the rest of MIMAROPA, the rest of Visayas, Zamboanga Peninsula,
+Misamis Occidental, Lanao del Norte, Lanao del Sur, Maguindanao del Norte, and Sultan Kudarat.
+On 13 September 2024, 5:00 AM, heavy to intense rains were forecasted to be experienced over MIMAROPA, Western
+Visayas, Sorsogon, Masbate, and Negros Occidental. Meanwhile, moderate to heavy rains were forecasted to be
+experienced over Batangas, Quezon, the rest of Bicol Region, and the rest of Visayas.
+On 13 September 2024, 6:00 PM, Tropical Storm Ferdie entered the Philippine Area of Responsibility. Heavy to intense
+rains were forecasted to be experienced over MIMAROPA, the southern portion of Quezon, Western Visayas, and Negros
+lsland Region. Meanwhile, moderate to heavy rains were forecasted to be experienced over Zambales, Bataan, Metro
+Manila, the rest of CALABARZON, Bicol Region, the rest of Visayas, Misamis Occidental, Zamboanga del Norte, Lanao
+del Norte, Lanao del Sur, Maguindanao del Norte, Maguindanao del Sur, Sultan Kudarat, Sarangani, Basilan, Sulu, and
+Tawi-Tawi.
+On 14 September 2024, 2:00 AM, TS Ferdie exited the Philippine Area of Responsibility. However, heavy to intense rains
+were forecasted to be experienced over MIMAROPA, Western Visayas, and Negros Occidental. Meanwhile, moderate to
+heavy rains were forecasted to be experienced over Zambales, Bataan, Cavite, Laguna, Batangas, the southern portion
+of Quezon, Bicol Region, the rest of Visayas, Misamis Occidental, Zamboanga del Norte, Lanao del Norte, Lanao del Sur,
+Maguindanao del Norte, Maguindanao del Sur, Sultan Kudarat, Sarangani, Basilan, Sulu, and Tawi-Tawi. By 11:00 PM,
+the Southwest Monsoon was forecasted to affect some parts of the country in the next three days.
+On 15 September 2024, 8:00 AM, a Low Pressure Area (LPA) was estimated based on all available data at 440 km East
+of Casiguran, Aurora (16.8°N, 126.4°E). Southwest Monsoon brought significant rainfall over the western sections of
+Southern Luzon and Visayas. It also brought cloudy skies with light to moderate to at times heavy rains over the rest of
+Southern Luzon and Visayas and the northern and western sections of Mindanao.
+On 16 September 2024, 5:00 AM, the Low Pressure Area East of Aurora has developed into Tropical Depression
+"GENER". At 7:00 AM, the center of Tropical Depression "GENER" was estimated based on all available data at 315 km
+East Northeast of Casiguran, Aurora (16.9°N, 125.0°E) with maximum sustained winds of 45 km/h near the center,
+gustiness of up to 55 km/h. It is moving west northwestward at 10 km/h. At 8:00 AM, Tropical Cyclone Wind Signal No. 1
+was raised. By 8:00 PM, TD "GENER" slightly accelerated towards Northern Luzon mainland. By 11:00 PM, TD "GENER"
+made landfall over Palanan, Isabela.
+On 17 September 2024, 5:00 AM, "GENER" maintained its strength while moving westward over Northern Luzon. By 5:00
+PM, TCWS No. 1 is still in effect over the portions of Ilocos Norte, Ilocos Sur, La Union, and the western portion of
+Pangasinan. Meanwhile, at 6:30 PM, Tropical Storm "HELEN" (PULASAN) entered PAR.
+On 18 September 2024, 2:00 AM, Tropical Depression "GENER" exited PAR. Meanwhile, at 5:00 AM, "HELEN"
+continued to move West Northwestward over the Philippine Sea. At 5:00 AM all Tropical Cyclone Wind Signal has been
+
+lifted. Tropical Storm "HELEN" exited the Philippine Area of Responsibility (PAR) at 5:00 PM. Meanwhile, at 11:00 PM,
+the Southwest Monsoon was forecasted to bring heavy to intense rains in Zambales and Bataan and moderate to heavy
+rains in Ilocos Region, Occidental Mindoro, Calamian Islands, Batanes, and Babuyan Islands in the next days.
+On 20 September 2024, 3:00 AM, a Low Pressure Area (LPA) was estimated based on all available data at 745 km East
+Southeast of Itbayat, Batanes (19.3°N, 128.8°E). At 2:00 PM, the LPA has developed into a Tropical Depression
+“IGME”, and was estimated based on all available data at 530 km East Northeast of Itbayat, Batanes (22.0°N, 126.8°E)
+with maximum sustained winds of 55 km/h near the center and gustiness of up to 70 km/h. It is moving Northwestward at
+15km/h. Meanwhile, at 5:00 PM, the Southwest Monsoon was forecasted to bring moderate to heavy rains in Ilocos
+Region, Batanes, Babuyan Islands, Zambales, and Bataan. Heavy to intense rains will be experienced in Batanes and
+moderate to heavy rains in Cagayan including Babuyan Islands in the next days.
+On 21 September 2024, 2:30 AM, Tropical Depression "IGME" exited PAR. At 4:00 AM, TD "IGME" was estimated at 520
+km North Northeast of Itbayat, Batanes (OUTSIDE PAR) (25.2°N, 123.5°E).
+On 22 September 2024, 5:00 AM, the effect of the Southwest Monsoon has weakened. However, scattered rains and
+thunderstorms were forecasted over Ilocos Region, Batanes, and Babuyan Islands.""" ;
+    :startDate "2024-09-11T00:00:00"^^xsd:dateTime .
+
+:a44736600e434873a9504e45b73cefee a :MajorEvent ;
+    :endDate "2023-11-17T00:00:00"^^xsd:dateTime ;
+    :eventName "Magnitude 6 8 Earthquake in Sarangani Davao Occidental" ;
+    :fromSource :Breakdown1SitRep_No__16_for_the_Magnitude_6_8_Earthquake_in_Sarangani_Davao_Occidental ;
+    :hasRelatedIncident <https://sakuna.ph/a44736600e434873a9504e45b73cefee/related_incident/1> ;
+    :hasType :GroundMovement ;
+    :remarks """On 17 November 2023, 4:14 PM, a magnitude Mw 6.8 earthquake occurred at 05.38°N, 125.24°E - 028 km S 68° W of
+Sarangani Island (Municipality Of Sarangani) (Davao Occidental) with a 63-km depth of focus and tectonic origin.
+Below are the reported intensities:
+Intensity VII - Glan, SARANGANI
+Intensity VI - City of Koronadal and Polomolok, SOUTH COTABATO; CITY OF GENERAL SANTOS
+Intensity V - Pantukan, DAVAO DE ORO; City of Tagum, DAVAO DEL NORTE; Jose Abad Santos,
+DAVAO OCCIDENTAL; Alabel, Kiamba, Maitum, Maasim, and Malungon, SARANGANI; Banga,
+Lake Sebu, Tampakan, and Tupi, SOUTH COTABATO; City of Tacurong, SULTAN KUDARAT
+Intensity IV - CITY OF ZAMBOANGA; Magsaysay, DAVAO DEL SUR;
+CITY OF DAVAO; Banisilan, Matalam, Kabacan, and City of Kidapawan, COTABATO; Malapatan, SARANGANI; Norala,
+Tantangan, Santo Niño, and T'Boli, SOUTH COTABATO;
+Bagumbayan, Kalamansig, Lebak, Lutayan, Palimbang, President Quirino, and Senator Ninoy
+Aquino, SULTAN KUDARAT; City of Bislig, and Hinatuan, SURIGAO DEL SUR; Datu Odin Sinsuat, MAGUINDANAO;
+CITY OF COTABATO; City of Bayugan, AGUSAN DEL SUR
+Intensity III - Kalilangan, BUKIDNON; Laak, and Nabunturan, DAVAO DE ORO; Aleosan, Antipas,
+M'lang, Magpet, and Pigkawayan, COTABATO; Surallah, SOUTH COTABATO;
+CITY OF BUTUAN; City of Isabela, BASILAN; Jolo, SULU
+Intensity II - Don Carlos, and San Fernando, BUKIDNON; Maco, and New Bataan, DAVAO DE ORO; Carmen,
+COTABATO
+Intensity I - Cabanglasan, Dangcagan, Libona, Malitbog, Manolo Fortich, Maramag, Talakag, and City of Valencia,
+BUKIDNON; Mambajao, CAMIGUIN; Balingasag, and Villanueva, MISAMIS ORIENTAL
+Aftershocks and damage were reported. Per PHIVOLCS Tsunami Information, there was no destructive tsunami threat
+based on available sea-level data. However, the earthquake generated unusual sea level disturbances along coasts near
+the epicenter.""" ;
+    :startDate "2023-11-17T00:00:00"^^xsd:dateTime .
+
+:f94d7f471d7a4eb7878acca7be74930d a :MajorEvent ;
+    :endDate "2025-05-12T00:00:00"^^xsd:dateTime ;
+    :eventName "2025 National and Local Elections" ;
+    :fromSource :SitRep_No__5_for_2025_National_and_Local_Elections_Breakdown_Table ;
+    :hasRelatedIncident <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/1>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/2>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/3>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/4> ;
+    :hasType :ArmedConflict ;
+    :remarks """The synchronized fully automated National and Local Elections (NLE) will be conducted on Monday, 12 May 2025 as
+mandated in Section 2 of RA 7166.
+Further, gun ban is implemented from 12 January to 11 June 2025. Per COMELEC, during the election period, no person
+shall bear, carry or transport firearms or other deadly weapons in public places, including any building, street, park,
+private vehicle or public conveyance, even if licensed to possess or carry the same, unless authorized in writing by the
+Commission.
+Special Weather Outlook for 2025 National Election
+- The dominant weather system that may affect the country during the conduct of election will be the Frontal System and
+the Easterlies.
+- Batanes, Apayao, and Cagayan will experience cloudy skies with scattered rains and thunderstorms due to the Frontal
+System
+- Ilocos Norte, Isabela, and the rest of Cordillera Administrative Region will experience partly cloudy in the morning while
+cloudy with scattered rains and thunderstorms for the rest of the day.
+- Metro Manila and the rest of the country will experience partly cloudy to cloudy skies with the possibility of isolated
+rainshowers or thunderstorms, which may result to brief and sudden heavy downpours mostly in the afternoon or evening
+due to Easterlies
+As to date, no major incidents have been reported on election day, 12 May 2025.""" ;
+    :startDate "2025-05-12T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/1> a :Incident ;
+    :endDate "2024-09-14T17:00:00"^^xsd:dateTime ;
+    :hasLocation :Bambang ;
+    :hasType :LandslideWet ;
+    :incidentActionsTaken "Affected families were provided with assistance to repair their houses." ;
+    :incidentDescription "On September 14, 2024, at 5:00 PM, a heavy downpour triggered a landslide in Barangay Magsaysay Hills, damaging seven houses." ;
+    :remarks "The affected families already returned to their houses." ;
+    :startDate "2024-09-14T17:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/10> a :Incident ;
+    :endDate "2024-09-20T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Natividad" ;
+    :hasLocation :San_Narciso ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentActionsTaken "Conducted clearing operations as 1740H, 20 September 2024." ;
+    :incidentDescription "On 20 September 2024, one (1) partially damaged house was reported due to a fallen tree" ;
+    :startDate "2024-09-20T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/100> a :Incident ;
+    :endDate "2024-09-13T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion 2" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Knee level flood; flooded houses" ;
+    :startDate "2024-09-13T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/101> a :Incident ;
+    :endDate "2024-09-12T16:30:00"^^xsd:dateTime ;
+    :hasBarangay "Yapo" ;
+    :hasLocation :Barbaza ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "As of 3:20 pm, September 13, 2024, flooded area in Brgy Yapo is" ;
+    :incidentDescription "One house has been swept away by the flood due to its proximity to the river area" ;
+    :startDate "2024-09-12T16:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/102> a :Incident ;
+    :endDate "2024-09-12T16:50:00"^^xsd:dateTime ;
+    :hasBarangay "Capuyuan" ;
+    :hasLocation :Barbaza ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "As of 3:20 pm, September 13, 2024, flooded area in Brgy Capuyuan is already subsided" ;
+    :incidentDescription "-1 foot above Ankle-level flood" ;
+    :startDate "2024-09-12T16:50:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/103> a :Incident ;
+    :endDate "2024-09-12T18:15:00"^^xsd:dateTime ;
+    :hasBarangay "Igbarawan" ;
+    :hasLocation :Patnongon ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Sept 13, 2024 as of 5:00 PM, gradually subsided" ;
+    :incidentDescription "Below knee level flood, still passable" ;
+    :startDate "2024-09-12T18:15:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/104> a :Incident ;
+    :endDate "2024-09-12T18:15:00"^^xsd:dateTime ;
+    :hasBarangay "Carit-an" ;
+    :hasLocation :Patnongon ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Sept 13, 2024 as of 5:00 PM, gradually subsided" ;
+    :incidentDescription "Below knee level flood, still passable" ;
+    :startDate "2024-09-12T18:15:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/105> a :Incident ;
+    :endDate "2024-09-12T17:00:00"^^xsd:dateTime ;
+    :hasBarangay "Ilaures" ;
+    :hasLocation :Bugasong ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Sept 13, 2024 as of 8:00 PM, gradually subsided" ;
+    :incidentDescription "-1 foot above Flood waters over national highway" ;
+    :startDate "2024-09-12T17:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/106> a :Incident ;
+    :endDate "2024-09-12T18:30:00"^^xsd:dateTime ;
+    :hasBarangay "Cubay South" ;
+    :hasLocation :Bugasong ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Passable to all types of vehicles" ;
+    :incidentDescription "-1 foot above Flood waters over national highway" ;
+    :remarks "Sept 13, 2024 as of 8:00 PM, totally subsided" ;
+    :startDate "2024-09-12T18:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/107> a :Incident ;
+    :endDate "2024-09-12T20:30:00"^^xsd:dateTime ;
+    :hasBarangay "Lugta" ;
+    :hasLocation :Laua-An ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "-1 foot above Flood waters over Lugta housing" ;
+    :remarks "Gradually subsided as of 8:43 PM" ;
+    :startDate "2024-09-12T20:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/108> a :Incident ;
+    :endDate "2024-09-12T20:37:00"^^xsd:dateTime ;
+    :hasBarangay "Purok 4, Centro Norte" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Waist level flood" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-12T20:37:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/109> a :Incident ;
+    :endDate "2024-09-13T05:00:00"^^xsd:dateTime ;
+    :hasBarangay "Centro Sur" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Waist level flood and neck level flood in some areas" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-13T05:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/11> a :Incident ;
+    :endDate "2024-09-21T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Kalaklan" ;
+    :hasLocation :City_of_Olongapo ;
+    :hasType :LandslideWet ;
+    :incidentActionsTaken "Responded by Brgy Kalaklan and reported to City Engineer" ;
+    :incidentDescription "On 21 September 2024, one (1) family and five (5) persons were evacuated due to a reported landslide." ;
+    :startDate "2024-09-21T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/110> a :Incident ;
+    :endDate "2024-09-13T05:00:00"^^xsd:dateTime ;
+    :hasBarangay "Carmen" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Waist level flood" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-13T05:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/111> a :Incident ;
+    :endDate "2024-09-13T05:00:00"^^xsd:dateTime ;
+    :hasBarangay "Bagumbayan" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Chest level flood near river banks" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-13T05:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/112> a :Incident ;
+    :endDate "2024-09-13T05:30:00"^^xsd:dateTime ;
+    :hasBarangay "Jinalinan" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Waist level flood" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-13T05:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/113> a :Incident ;
+    :endDate "2024-09-13T05:00:00"^^xsd:dateTime ;
+    :hasBarangay "Baybay" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Waist level flood" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-13T05:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/114> a :Incident ;
+    :endDate "2024-09-13T05:30:00"^^xsd:dateTime ;
+    :hasBarangay "Talisay" ;
+    :hasLocation :Pandan_Antique ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "-1 foot above Ankle level" ;
+    :remarks "As of 4:00 PM, flood level in Centro Sur, North, Baybay, Carmen, Bagumbayan, Talisay, Cabugao and Jinalinan have already subsided" ;
+    :startDate "2024-09-13T05:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/115> a :Incident ;
+    :endDate "2024-09-12T20:00:00"^^xsd:dateTime ;
+    :hasBarangay "Magdalena" ;
+    :hasLocation :San_Remigio ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Requested immediate assistance from the PDRRMO" ;
+    :incidentDescription "The whole Barangay was flooded due to continuous rains and since it is a flood prone area and 210 families were affected" ;
+    :startDate "2024-09-12T20:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/116> a :Incident ;
+    :endDate "2024-09-12T17:30:00"^^xsd:dateTime ;
+    :hasBarangay "District III (Crossing Aldea)" ;
+    :hasLocation :Sibalom ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Impassable to light vehicles as of the moment" ;
+    :incidentDescription "1-foot water level" ;
+    :remarks "Sept 13, 2024 as of 6:00 AM, gradually subsided. Passable to all types of vehicles Sept 13, 2024 as of 9:00 PM, totally subsided" ;
+    :startDate "2024-09-12T17:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/117> a :Incident ;
+    :endDate "2024-09-12T20:30:00"^^xsd:dateTime ;
+    :hasBarangay "Catungan I-II" ;
+    :hasLocation :Sibalom ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Flood water over National Road of Catungan I going to Catungan II" ;
+    :incidentDescription "-1 foot above Ankle to knee level" ;
+    :remarks "Sept 13, 2024 as of 5:00 AM, gradually subsided Sept 13, 2024 as of 7:00 PM, gradually subsided" ;
+    :startDate "2024-09-12T20:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/118> a :Incident ;
+    :endDate "2024-09-12T18:30:00"^^xsd:dateTime ;
+    :hasBarangay "Dist. III" ;
+    :hasLocation :Sibalom ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Flooding beside Sibalom SCES" ;
+    :incidentDescription "Above ankle level" ;
+    :remarks "Sept 13, 2024 as of 5:00 AM, totally subsided" ;
+    :startDate "2024-09-12T18:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/119> a :Incident ;
+    :endDate "2024-09-12T21:20:00"^^xsd:dateTime ;
+    :hasLocation :Sibalom ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Irrigation canal overflow at Brgy road in Villar" ;
+    :incidentDescription "-1 foot above Ankle level" ;
+    :remarks "Sept 13, 2024 as of 12:00 MN, gradually subsided" ;
+    :startDate "2024-09-12T21:20:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/12> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Calumpang" ;
+    :hasLocation :Binangonan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Continuous Monitoring" ;
+    :incidentDescription "1.5ft" ;
+    :remarks "Subsided as of 17 September 2024, 4PM" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/120> a :Incident ;
+    :endDate "2024-09-12T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Tigbalua 1" ;
+    :hasLocation :Sibalom ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentActionsTaken "As of September 13, 2024, Barangay official ongoing clearing operation" ;
+    :incidentDescription "As of September 12, 2024. Uprooted Star Apple Tree, one house partially damage" ;
+    :startDate "2024-09-12T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/121> a :Incident ;
+    :endDate "2024-09-17T06:45:00"^^xsd:dateTime ;
+    :hasBarangay "PHHC Block 17" ;
+    :hasLocation :City_of_Iloilo ;
+    :hasType :CoastalFlood ;
+    :incidentDescription "1 foot" ;
+    :startDate "2024-09-17T06:45:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/122> a :Incident ;
+    :endDate "2024-09-17T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Sta. Rosa" ;
+    :hasLocation :City_of_Iloilo ;
+    :hasType :CoastalFlood ;
+    :incidentDescription "1 foot" ;
+    :startDate "2024-09-17T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/123> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Lutuban" ;
+    :hasLocation :Zamboanguita ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/124> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Mayabon" ;
+    :hasLocation :Zamboanguita ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/125> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Basak" ;
+    :hasLocation :Zamboanguita ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/126> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Albiga" ;
+    :hasLocation :Siaton ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/127> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Canaway" ;
+    :hasLocation :Siaton ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/128> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Sumaliring" ;
+    :hasLocation :Siaton ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/129> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Poblacion 4" ;
+    :hasLocation :Siaton ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/13> a :Incident ;
+    :endDate "2024-09-17T08:00:00"^^xsd:dateTime ;
+    :hasBarangay "Calumpang" ;
+    :hasLocation :Binangonan ;
+    :hasType :LandslideWet ;
+    :incidentDescription "1 house partially damaged due to rock fall incident" ;
+    :startDate "2024-09-17T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/130> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Poblacion 3" ;
+    :hasLocation :Siaton ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/131> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Mantuyop" ;
+    :hasLocation :Siaton ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/132> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Fatima" ;
+    :hasLocation :Santa_Catalina_Negros_Oriental ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/133> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Poblacion" ;
+    :hasLocation :Santa_Catalina_Negros_Oriental ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/134> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Amio" ;
+    :hasLocation :Santa_Catalina_Negros_Oriental ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/135> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. San Pedro" ;
+    :hasLocation :Santa_Catalina_Negros_Oriental ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/136> a :Incident ;
+    :endDate "2024-09-16T09:01:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy San Francisco" ;
+    :hasLocation :Santa_Catalina_Negros_Oriental ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-16T09:01:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/137> a :Incident ;
+    :endDate "2024-09-13T03:01:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy Linothangan" ;
+    :hasLocation :City_of_Canlaon ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T03:01:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/138> a :Incident ;
+    :endDate "2024-09-13T03:01:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy Lumapao" ;
+    :hasLocation :City_of_Canlaon ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T03:01:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/139> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Nangka" ;
+    :hasLocation :City_of_Bayawan ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/14> a :Incident ;
+    :endDate "2024-09-12T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Panitian" ;
+    :hasLocation :Quezon_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Personnel from Palawan Rescue Quezon assisted trapped individuals" ;
+    :incidentDescription "Approximate water level: 36 inches/3ft" ;
+    :remarks "Water subsided at 7:00AM" ;
+    :startDate "2024-09-12T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/140> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Kalumbuyan" ;
+    :hasLocation :City_of_Bayawan ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/141> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Poblacion" ;
+    :hasLocation :City_of_Bayawan ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/142> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. San Jose" ;
+    :hasLocation :City_of_Bayawan ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/143> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Banga" ;
+    :hasLocation :City_of_Bayawan ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/144> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy Poblacion" ;
+    :hasLocation :Basay ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/145> a :Incident ;
+    :endDate "2024-09-16T09:01:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy Tagbino" ;
+    :hasLocation :Vallehermoso ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-16T09:01:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/146> a :Incident ;
+    :endDate "2024-09-12T11:39:00"^^xsd:dateTime ;
+    :hasLocation :Panglao ;
+    :hasType :Water ;
+    :incidentDescription "Capsizing of three Pumpboats (RBCA Margie, RBCA Plaza, RBCA Leah Mae)" ;
+    :remarks "All 20 passengers of the 3 motorbancas were rescued by CGSS Panglao" ;
+    :startDate "2024-09-12T11:39:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/147> a :Incident ;
+    :endDate "2024-09-12T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Panglao ;
+    :hasType :Water ;
+    :incidentDescription "A boatman from Tauran, Inabanga, Bohol fell from his half submerged motor banca that causes his drowning and death around 1139H 12 September 2024." ;
+    :remarks "His body was retrieved by SOU-WB Sub- Station Personnel" ;
+    :startDate "2024-09-12T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/148> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "Tumaga" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/149> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "Guiwan" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/15> a :Incident ;
+    :endDate "2024-09-12T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Malatgao" ;
+    :hasLocation :Quezon_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Personnel from Palawan Rescue Quezon assisted trapped individuals" ;
+    :incidentDescription "Approximate water level: 24 inches/2ft" ;
+    :remarks "Water subsided at 6:00AM" ;
+    :startDate "2024-09-12T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/150> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "Pasonanca" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/151> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "Putik" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/152> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "San Jose Gusu" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/153> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "Tetuan" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/154> a :Incident ;
+    :endDate "2024-09-14T10:19:00"^^xsd:dateTime ;
+    :hasBarangay "Sta Maria" ;
+    :hasLocation :City_of_Zamboanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Dispatched rescue vehicle and personnel" ;
+    :startDate "2024-09-14T10:19:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/155> a :Incident ;
+    :endDate "2024-09-17T16:00:00"^^xsd:dateTime ;
+    :hasLocation :Dinas ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-17T16:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/156> a :Incident ;
+    :endDate "2024-09-14T17:00:00"^^xsd:dateTime ;
+    :hasBarangay "18 Barangays Affected" ;
+    :hasLocation :Sirawai ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Responded to the incident" ;
+    :startDate "2024-09-14T17:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/157> a :Incident ;
+    :endDate "2024-09-13T04:30:00"^^xsd:dateTime ;
+    :hasBarangay "3 affected barangays" ;
+    :hasLocation :Liloy ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentActionsTaken "Conducted clearing operation" ;
+    :incidentDescription "- Residential Houses were hit by the uprooted trees due to moderate to strong winds" ;
+    :remarks "-Coordinated with the Brgy Officials to conduct joint clearing operations. -Conducted clearing operation of debris -Provided initial assistance by providing food and non- food items. -Coordinated with the Brgy Officials to conduct joint clearing operations." ;
+    :startDate "2024-09-13T04:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/158> a :Incident ;
+    :endDate "2024-09-17T09:35:00"^^xsd:dateTime ;
+    :hasLocation :City_of_Dipolog ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Deployment of Clearing Teams from CDRRMO, ZANECO, BDRRM personne -CDRRMO personnel and Barangay Tanods were dispatched to keep the public from swimming -Prepared and distributed Hot meals and relief goods." ;
+    :remarks "-intense monitoring of the area were flooded area -residents refused to evacuate inspite the advise of the City and the Barangay instead stayed with their neighbors and relative in the area -Distribution of relief goods will continue tomorrow -Partially damaged houses were repaired" ;
+    :startDate "2024-09-17T09:35:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/159> a :Incident ;
+    :endDate "2024-09-14T12:00:00"^^xsd:dateTime ;
+    :hasBarangay "8 affected barangays" ;
+    :hasLocation :Siocon ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Conducted clearing operations to the damaged houses together with BDRRMC." ;
+    :startDate "2024-09-14T12:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/16> a :Incident ;
+    :endDate "2024-09-12T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Sowangan" ;
+    :hasLocation :Quezon_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Personnel from Philippine Army assisted trapped individuals" ;
+    :incidentDescription "Approximate water level:30 inches/2.5ft" ;
+    :remarks "Water subsided at 7:00AM" ;
+    :startDate "2024-09-12T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/160> a :Incident ;
+    :endDate "2024-09-17T00:15:00"^^xsd:dateTime ;
+    :hasLocation :Imelda ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "10 affected barangays" ;
+    :startDate "2024-09-17T00:15:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/161> a :Incident ;
+    :endDate "2024-09-16T16:00:00"^^xsd:dateTime ;
+    :hasBarangay "8 affected barangays" ;
+    :hasLocation :Diplahan ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-16T16:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/162> a :Incident ;
+    :endDate "2024-09-13T04:00:00"^^xsd:dateTime ;
+    :hasLocation :City_of_Isabela ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-13T04:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/163> a :Incident ;
+    :endDate "2024-09-12T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Camiguin ;
+    :hasType :SevereWeather ;
+    :incidentDescription "Five (5) municipalities of Camiguin experienced strong winds which resulted to two (2) partially damaged houses, several power interruptions, cancellation of classes as well as flights and sea travel." ;
+    :startDate "2024-09-12T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/164> a :Incident ;
+    :endDate "2024-09-12T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Sagay ;
+    :hasType :StormSurge ;
+    :incidentDescription "- Sagay, Camiguin experienced big waves along its coastal areas and prompted the Local Government Unit to enforce pre-emptive evacuation" ;
+    :startDate "2024-09-12T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/165> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Dampias" ;
+    :hasLocation :Binuangan ;
+    :hasType :StormSurge ;
+    :incidentActionsTaken "Pre-emptive evacuation" ;
+    :incidentDescription "Binuangan, Misamis Oriental also experienced big waves affecting coastal area and enforced pre- emptive evacuation." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/166> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Dableston" ;
+    :hasLocation :Sultan_Naga_Dimaporo ;
+    :hasType :SevereWeather ;
+    :incidentDescription "A whirlwind incident had occurred in the Municipality of Sultan Naga Dimaporo in Lanao del Norte which partially damaged Forty-Seven (47) houses." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/167> a :Incident ;
+    :endDate "2024-09-12T15:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :Governor_Generoso ;
+    :hasType :SevereWeather ;
+    :incidentDescription "Experienced strong winds that uprooted some trees and brought damage to motorized boats and houses." ;
+    :startDate "2024-09-12T15:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/168> a :Incident ;
+    :endDate "2024-09-12T15:00:00"^^xsd:dateTime ;
+    :hasBarangay "Chicote" ;
+    :hasLocation :Governor_Generoso ;
+    :hasType :SevereWeather ;
+    :incidentDescription "Experienced strong winds that brought damage to motorized boats and houses." ;
+    :remarks "experienced a reoccurrence of strong winds last September 18, 2024, at around 4:30 pm." ;
+    :startDate "2024-09-12T15:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/169> a :Incident ;
+    :endDate "2024-09-12T15:00:00"^^xsd:dateTime ;
+    :hasBarangay "Tibanban" ;
+    :hasLocation :Governor_Generoso ;
+    :hasType :SevereWeather ;
+    :incidentDescription "Experienced strong winds brought damage to motorized boats." ;
+    :startDate "2024-09-12T15:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/17> a :Incident ;
+    :endDate "2024-09-12T02:00:00"^^xsd:dateTime ;
+    :hasBarangay "Marangas" ;
+    :hasLocation :Bataraza ;
+    :hasType :Water ;
+    :incidentActionsTaken "-Search and rescue operation was conducted but was stopped due to unfavorable weather condition. -Information dissemination was conducted to all fisher folk near the area to be on lookout for the missing fisherman. -Search and rescue operation to be continued if weather condition permits." ;
+    :incidentDescription "-One (1) person was reported missing -Based on Coast Guard Station Southern Palawan report, the victim went fishing venture onboard his motorbanca 'AL- KHALAM' on the waters on the vicinity of Barangay Marangas at about 2:00AM of 12 September 2024 but failed to return at the expected time." ;
+    :remarks "Previously reported missing on 12 September 2024 but was found alive on 13 September 2024." ;
+    :startDate "2024-09-12T02:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/170> a :Incident ;
+    :endDate "2024-09-12T16:00:00"^^xsd:dateTime ;
+    :hasBarangay "Butulan" ;
+    :hasLocation :Jose_Abad_Santos ;
+    :hasType :SevereWeather ;
+    :incidentDescription "Experienced heavy rains and strong winds that caused damage to some houses." ;
+    :startDate "2024-09-12T16:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/171> a :Incident ;
+    :endDate "2024-09-12T16:00:00"^^xsd:dateTime ;
+    :hasBarangay "Malalan" ;
+    :hasLocation :Jose_Abad_Santos ;
+    :hasType :SevereWeather ;
+    :incidentDescription "Experienced heavy rains and strong winds that caused damage to some houses." ;
+    :startDate "2024-09-12T16:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/172> a :Incident ;
+    :endDate "2024-09-18T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Astorga" ;
+    :hasLocation :Santa_Cruz_Davao_del_Sur ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Reported street flooding above ankle to knee level" ;
+    :startDate "2024-09-18T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/173> a :Incident ;
+    :endDate "2024-09-19T00:55:00"^^xsd:dateTime ;
+    :hasBarangay "Bucana" ;
+    :hasLocation :City_of_Davao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Street flooding above ankle to knee level" ;
+    :startDate "2024-09-19T00:55:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/174> a :Incident ;
+    :endDate "2024-09-18T19:53:00"^^xsd:dateTime ;
+    :hasBarangay "Matina Crossing" ;
+    :hasLocation :City_of_Davao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Street flooding ankle to knee level" ;
+    :startDate "2024-09-18T19:53:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/175> a :Incident ;
+    :endDate "2024-09-19T00:35:00"^^xsd:dateTime ;
+    :hasBarangay "Matina Aplaya" ;
+    :hasLocation :City_of_Davao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Street flooding knee level" ;
+    :startDate "2024-09-19T00:35:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/176> a :Incident ;
+    :endDate "2024-09-18T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Talomo Proper" ;
+    :hasLocation :City_of_Davao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Street flooding ankle to knee level" ;
+    :startDate "2024-09-18T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/177> a :Incident ;
+    :endDate "2024-09-19T01:47:00"^^xsd:dateTime ;
+    :hasBarangay "Maa" ;
+    :hasLocation :City_of_Davao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Street flooding waist- deep level" ;
+    :startDate "2024-09-19T01:47:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/178> a :Incident ;
+    :endDate "2024-09-12T17:30:00"^^xsd:dateTime ;
+    :hasBarangay "Sta Maria" ;
+    :hasLocation :Kalamansig ;
+    :hasType :FloodGeneral ;
+    :startDate "2024-09-12T17:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/179> a :Incident ;
+    :endDate "2024-09-13T17:00:00"^^xsd:dateTime ;
+    :hasLocation :Lebak ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "18 brgys were affected" ;
+    :startDate "2024-09-13T17:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/18> a :Incident ;
+    :endDate "2024-09-18T14:31:00"^^xsd:dateTime ;
+    :hasBarangay "Rio Tuba" ;
+    :hasLocation :Bataraza ;
+    :hasType :SevereWeather ;
+    :incidentActionsTaken "ERT responded on the affected area. On-going repair as of September 20, 2024." ;
+    :incidentDescription "At around 02:31 PM, a tornado incident happened at Sito Marabahay Rio Tuba, Bataraza, Palawan. A total of five (5) houses were struck and two (2) of the houses' walls and roofs were blown off. Additionally, a total of 33 families / 139 persons were affected. Furthermore, a total of 30 families had partially damaged houses and three (3) families had totally damaged houses recorded as per report from Brgy. Secretary of Rio Tuba." ;
+    :startDate "2024-09-18T14:31:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/180> a :Incident ;
+    :endDate "2024-09-12T12:00:00"^^xsd:dateTime ;
+    :hasBarangay "Daliao" ;
+    :hasLocation :Maasim ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "fallen trees caused by strong winds with heavy rainfall" ;
+    :startDate "2024-09-12T12:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/181> a :Incident ;
+    :endDate "2024-09-12T13:30:00"^^xsd:dateTime ;
+    :hasBarangay "Sapu Padidu" ;
+    :hasLocation :Malapatan ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "fallen trees caused by strong winds with heavy rainfall" ;
+    :startDate "2024-09-12T13:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/182> a :Incident ;
+    :endDate "2024-09-12T13:30:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :Malapatan ;
+    :hasType :SevereWeather ;
+    :incidentDescription "A Temporary Learning Shelter was damaged due to uprooted tree caused by strong winds with heavy rainfall" ;
+    :startDate "2024-09-12T13:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/183> a :Incident ;
+    :endDate "2024-09-12T13:30:00"^^xsd:dateTime ;
+    :hasBarangay "Lun Padidu" ;
+    :hasLocation :Malapatan ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "1 house was partially damaged / 1 vehicular accident" ;
+    :startDate "2024-09-12T13:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/184> a :Incident ;
+    :endDate "2024-09-13T21:00:00"^^xsd:dateTime ;
+    :hasLocation :Alamada ;
+    :hasType :FloodGeneral ;
+    :remarks "Reported as subsided via phone call." ;
+    :startDate "2024-09-13T21:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/185> a :Incident ;
+    :endDate "2024-09-14T16:00:00"^^xsd:dateTime ;
+    :hasLocation :Pigkawayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "-Brgy. Bulucaon experienced flashflood and backflow flow from Rio Grande de Mindanao. -Brgy. Poblacion was flooded due to the large volume of rainwater from upstream areas." ;
+    :startDate "2024-09-14T16:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/186> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Cabpangi" ;
+    :hasLocation :Libungan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "The Irrigation System overflowed due to excessive rainwater and affected 13 families." ;
+    :remarks "Reported as subsided via phone call." ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/187> a :Incident ;
+    :endDate "2024-09-13T13:30:00"^^xsd:dateTime ;
+    :hasLocation :Malabang ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "- Local DRRM Officers and other stakeholders in the area responded to the incidents, conducted rescue operations to affected families and stranded commuters. - Conducted Clearing operation at Narciso Ramos National High Way in Malabang Lanao del Sur - Conducted Clearing operation due to uprooted tree at Baragay Paigoay, Marogong Lanao del Sur. - Conducted clearing operation for the fallen trees at Ibn Kaldon Integrated School, Pagalamatan, Binidayan, Lanao del Sur." ;
+    :incidentDescription "On 13 September 2024, around 01:30 PM flash floods were experienced at Malabang and Balabagan due to incessant rains brought about by the Southwest Monsoon affecting Mindanao. In addition, several uprooted trees have been reported in several municipalities in the province" ;
+    :startDate "2024-09-13T13:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/188> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Cabasaran" ;
+    :hasLocation :Malabang ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "Resulted in 4 dead and 3 injured persons." ;
+    :remarks "Still for verification and validation." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/189> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Balabagan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "- Local DRRM Officers and other stakeholders in the area responded to the incidents, conducted rescue operations to affected families and stranded commuters. - Conducted clearing operations at Narciso Ramos National High Way in Malabang Lanao del Sur. - Conducted clearing operations due to uprooted tree at Baragay Paigoay, Marogong Lanao del Sur. - Conducted clearing operations for the fallen trees at Ibn Kaldon Integrated School, Pagalamatan, Binidayan, Lanao del Sur." ;
+    :incidentDescription "On 13 September 2024, around 01:30 PM flash floods were experienced at Malabang and Balabagan due to incessant rains brought about by the Southwest Monsoon affecting Mindanao. In addition, several uprooted trees have been reported in several municipalities in the province." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/19> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "San Nicolas" ;
+    :hasLocation :Coron ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "monitoring and caution to vehicle" ;
+    :incidentDescription "Overflowed spillway and Not Passable to All Types of Vehicle" ;
+    :remarks "Subsided as of September 17, 2024 1800H" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/190> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Upi ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "- On 12 September 2024, conducted Pre disaster risk assessment. - Activated the Upi Emergency Operation Center - Continuous issuance and updating of weather forecast on social media and through text blast. - Continuous monitoring of water level along Matuber River, Nuro Creek, and Tubuan River. - Conducted clearing operations in Brgy Rempes, Darugao, Kibleg, and Nangi, Upi." ;
+    :incidentDescription "On 13 September 2024, flooding incident were reported at Sitio Kabugkabug and Dela Fuente, Brgy. Rempes and Sitio Magutay, Brgy. Kabakaba, Upi due to moderate to heavy rainfall experienced in the area." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/191> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Datu_Odin_Sinsuat ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentActionsTaken "Continuous monitoring to the 35 BDRRMCs." ;
+    :incidentDescription "On 13 September 2024, fallen trees were reported in Datu Odin Sinsuat, Maguindanao del Norte, which resulted in 3 injured persons." ;
+    :remarks "Said incidents happened in Barangay Awang and Barangay Capiton. Still subject for validation." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/192> a :Incident ;
+    :endDate "2024-09-15T12:00:00"^^xsd:dateTime ;
+    :hasLocation :Sultan_Kudarat_Maguindanao_del_Norte ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Continuous monitoring to the BDRRMCs." ;
+    :incidentDescription "On 15 September 2024. 12:00 PM, MDRRMO reported flooding in Brgy Gang and Limbo due to overflow of water in Nuling Creek due to heavy rainfall in the area." ;
+    :startDate "2024-09-15T12:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/193> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Sitangkai ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Convening BDRRMC and MDRRMC -Lobbying to higher office for possible interventions and supports" ;
+    :incidentDescription "On 16 September 2024. 11:00 PM, MDRRMO reported flooding in most of the AOR of Talitay, they experienced heavy rainfall resulting to spread of additional volume of water." ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/194> a :Incident ;
+    :endDate "2024-09-14T00:10:00"^^xsd:dateTime ;
+    :hasLocation :Guindulungan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "- Monitoring and constant coordination, warning, sounding of sirens. - Directive to implement pre-emptive action. - Implementation of pre- emptive action. - Deployment of Rescue Team, assessment of the situation, meetings and instructions, sustain preparedness and intact of responders. - Deployment of responders. - Traffic arrangements with PNP. - Initial assessments, enlistment of affected families, preparations for relief operations" ;
+    :incidentDescription "On 14 September 2024, around 12:10AM MDRRMO reported that Sitio Panusolen and Sitio Balas of Barangay Muti, Guindulungan are already flooded due to incessant rain experienced." ;
+    :startDate "2024-09-14T00:10:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/195> a :Incident ;
+    :endDate "2024-09-14T01:10:00"^^xsd:dateTime ;
+    :hasLocation :Talayan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "- Continuous assessment and validating the situation. - Municipal Emergency Operation Center (EOC) is activated. - BFP, AFP, PNP, MDRRMO RESCUE TEAM, BPATS and Volunteers are also in the area to monitor and rescue the affected families. - MMO and ME conducted validation and assessment in the area. - DPWH 12 assessed and inspect the National Road and Bridges. - Conducted inventory of response resource. - Closely monitored of current situation. - Disseminated warning information to the barangay officials. - Continuous coordination to the Barangay Officials. - Immediate distribution of drinking water and foods. - Preparation for another distribution of Food Packs." ;
+    :incidentDescription "On 14 September 2024, around 01:10 AM MDRRMO reported that Brgy TambunanI, Brgy Timbaluan, and Brgy South Binangga, Talayan, MDS are flooded due to incessant rainfall." ;
+    :startDate "2024-09-14T01:10:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/196> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Paglat ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Continuous assessment and validating the situation." ;
+    :incidentDescription "On 13 September 2024, due to the effects of Southwest Monsoon affecting Mindanao, the municipality of Paglat experienced Heavy Rainfall which resulted to flooding of the low- lying areas in the municipality." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/197> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Mamasapano ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Monitoring for possible pre-emptive or force evacuation of the residents. -Alerted the Barangay DRRM Council. -Send warnings and advisories. -Released situation report. -Activated Blue Alert Status. -Standby emergency responders from BLGU, 33rd IB, 6th IB, MPS Mamasapano, and BFP Mamasapano." ;
+    :incidentDescription "-On 13 September 2024, due to the effects of the Southwest Monsoon affecting Mindanao, the municipality of Mamasapano experienced Heavy Rainfall which resulted in flooding of the low- lying areas in the municipality. -As of 14 September 2024, six (6) barangays in Mamasapano were flooded." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/198> a :Incident ;
+    :endDate "2024-09-15T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Rajah_Buayan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Conducted RDANA to flood affected areas. -Conducted continuous monitoring to flood affected areas." ;
+    :incidentDescription "On 15 September 2024, MDRRMO reported flooding in ten (10) barangays of Rajah Buayan." ;
+    :startDate "2024-09-15T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/199> a :Incident ;
+    :endDate "2024-09-15T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Datu_Abdullah_Sangki ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-MDRRMO conducted assessment to affected areas. -MAFAR MMO will conduct an assessment and validation to affected agricultural areas." ;
+    :incidentDescription "On 15 September 2024, MDRRMO reported heavy rainfall that caused swelling of rivers and creeks that led to flooding in residential and agricultural areas in the municipality of Datu Abdullah Sangki. Numbers of affected families and hectares of affected agricultural land is still subject for validation." ;
+    :startDate "2024-09-15T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/2> a :Incident ;
+    :endDate "2024-09-14T17:00:00"^^xsd:dateTime ;
+    :hasBarangay "Abinganan" ;
+    :hasLocation :Bambang ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Affected families were provided with assistance to repair their houses." ;
+    :incidentDescription "On September 14, 2024, at 5:00 PM, a heavy downpour brought water levels up to 3 feet, damaging two houses." ;
+    :remarks "The affected families already returned to their houses." ;
+    :startDate "2024-09-14T17:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/20> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Guadalupe" ;
+    :hasLocation :Coron ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "continuous monitoring" ;
+    :incidentDescription "-almost 1.5ft flooded roads at Sitio Ceka -Sitio Ceka partially flooded -Approx 4ft flood in Sitio Detakling -Evacuated 1 family / 3 individuals -Flooded residential area (approx more than 2ft) at Labangan River -5 families were pre- emptively evacuated. -Flooded residential area (approx 4ft high) in Santa Monica -2 families were evacuated" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/200> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Sultan_Sa_Barongis ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Conducted RDANA to affected areas thru BDRRMO and Brgy Officials. -Activated Emergency Operations Center to Red Alert Status and imposed pre emptive evacuation in affected areas." ;
+    :incidentDescription "On 14 September 2024, nine (9) barangays in Sultan sa Barongis were flooded." ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/201> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Datu_Saudi_Ampatuan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Conduct of continuous coordination with BDRRMC, AFP, PNP, and BFP for close monitoring of the situation in the affected areas." ;
+    :incidentDescription "On 14 September 2024, six (6) barangays in Datu Saudi Ampatuan were flooded." ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/202> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Shariff_Saydona_Mustapha ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Continuous monitoring to the BDRRMCs." ;
+    :incidentDescription "On 14 September 2024, nine (9) barangays of Shariff Saydona Mustapha were flooded." ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/203> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Mangudadatu ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Continuous monitoring to the BDRRMCs." ;
+    :incidentDescription "On 14 September 2024, five (5) barangays of Mangudadatu were flooded." ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/204> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Datu_Anggal_Midtimbang ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Convened B/MDRRMC meeting. -Conducted risk assessment in the affected areas. -Prepositioned responders." ;
+    :incidentDescription "On 14 September 2024, three (3) barangays of Datu Anggal Midtimbang were flooded." ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/205> a :Incident ;
+    :endDate "2024-09-15T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Ampatuan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-The PDRRMO Maguindanao del Sur 24/7 Operations Center is actively conducting continuous monitoring of the situation to ensure timely updates and response to any emerging incidents. -Regular situational reports are being disseminated to all concerned agencies, ensuring that relevant stakeholders are kept informed of the latest developments" ;
+    :incidentDescription "On 15 September 2024, four (4) barangays in Ampatuan were flooded." ;
+    :startDate "2024-09-15T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/206> a :Incident ;
+    :endDate "2024-09-15T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Datu_Piang ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-The PDRRMO Maguindanao del Sur 24/7 Operations Center is actively conducting continuous monitoring of the situation to ensure timely updates and response to any emerging incidents. -Regular situational reports are being disseminated to all concerned agencies, ensuring that relevant stakeholders are kept informed of the latest developments" ;
+    :incidentDescription "On 15 September 2024, six (6) barangays in Datu Piang were flooded" ;
+    :startDate "2024-09-15T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/207> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Shariff_Aguak ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-Continuous monitoring of the water level in the affected area -Conducted clearing operations on clogged waterways -Recommended pre- emptive evacuation on high-risk areas" ;
+    :incidentDescription "On 16 September 2024, nine (9) barangays in Shariff Aguak were flooded." ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/208> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Datu_Salibo ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "-MDRRMO advised the residents to vacate their houses and proceed to evacuation center for their safety." ;
+    :incidentDescription "On 16 September 2024, seventeen (17) barangays in Datu Salibo were flooded" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/21> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Decalachao" ;
+    :hasLocation :Coron ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "continuous monitoring and caution to vehicles" ;
+    :incidentDescription "-Flooded Caltem Spillway and Hanging Bridge (approx 2ft)" ;
+    :remarks "passable as of 15 September 2024" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/22> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Barangay 5" ;
+    :hasLocation :Coron ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "continuous monitoring" ;
+    :incidentDescription "Flooded areas at Bancuang Baba (approx 3ft high)" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/23> a :Incident ;
+    :endDate "2024-09-13T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Water level rose to 1½ ft" ;
+    :remarks "subsided 4:10 PM, same date" ;
+    :startDate "2024-09-13T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/24> a :Incident ;
+    :endDate "2024-09-13T13:13:00"^^xsd:dateTime ;
+    :hasBarangay "Culasian" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "ongoing road clearing of MDRRMO, Palawan Rescue and other agencies" ;
+    :incidentDescription "water level rose to 3ft" ;
+    :remarks "Subsided at September 14, 2024, 0400H" ;
+    :startDate "2024-09-13T13:13:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/25> a :Incident ;
+    :endDate "2024-09-13T12:10:00"^^xsd:dateTime ;
+    :hasBarangay "Taburi" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "ongoing road clearing of MDRRMO, Palawan Rescue and other agencies" ;
+    :incidentDescription "water level rose to 3ft" ;
+    :remarks "Subsided at September 14, 2024, 0520H" ;
+    :startDate "2024-09-13T12:10:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/26> a :Incident ;
+    :endDate "2024-09-13T13:13:00"^^xsd:dateTime ;
+    :hasBarangay "Panalingaan" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "ongoing road clearing of MDRRMO, Palawan Rescue and other agencies" ;
+    :incidentDescription "water level rose to 1ft" ;
+    :remarks "Subsided at September 14, 2024, 0430H" ;
+    :startDate "2024-09-13T13:13:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/27> a :Incident ;
+    :endDate "2024-09-13T11:13:00"^^xsd:dateTime ;
+    :hasBarangay "Bunog" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "ongoing road clearing of MDRRMO, Palawan Rescue and other agencies" ;
+    :incidentDescription "water level rose to 1ft" ;
+    :remarks "Subsided at September 14, 2024, 0430H" ;
+    :startDate "2024-09-13T11:13:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/28> a :Incident ;
+    :endDate "2024-09-14T21:00:00"^^xsd:dateTime ;
+    :hasBarangay "Ransang" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentActionsTaken "brought victims to Rizal District Hospital" ;
+    :incidentDescription "per PDRRMO Report, a coconut tree fell down andit hit a house in Old Site, Brgy. Ransang, including the residents therein that resulted to the death of 2 individuals" ;
+    :startDate "2024-09-14T21:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/29> a :Incident ;
+    :endDate "2024-09-17T11:45:00"^^xsd:dateTime ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :hasType :CollapseIndustrial ;
+    :incidentActionsTaken "victims were brought the hospital, The 3 injured individuals are were transported to a Medical Facility." ;
+    :incidentDescription "A house was struck by a Falling Coconut; hitting the people inside the said house. 2 were declared dead on the spot, and 3 were Injured" ;
+    :startDate "2024-09-17T11:45:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/3> a :Incident ;
+    :endDate "2024-09-18T18:06:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :Ambaguio ;
+    :hasType :LandslideWet ;
+    :incidentActionsTaken "Affected families were provided with assistance to repair their houses." ;
+    :incidentDescription "On September 18, 2024, at 6:06 PM, a landslide was reported, damaging one house." ;
+    :remarks "The affected families already returned to their houses." ;
+    :startDate "2024-09-18T18:06:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/30> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Caruray" ;
+    :hasLocation :San_Vicente_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "approximate water level: 2 ft" ;
+    :remarks "Passable as of September 15, 2024" ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/31> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "New Agutaya" ;
+    :hasLocation :San_Vicente_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "approximate water level: 3 ft in Riverside, Purok Magsasaka" ;
+    :remarks "Passable as of September 15, 2024" ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/32> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Kemdeng" ;
+    :hasLocation :San_Vicente_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "approximate water level: 1 ft in Purok Ugnayan" ;
+    :remarks "Subsided as of 0600H September 18, 2024" ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/33> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :San_Vicente_Palawan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "approximate water level: 1 ft in Purok Rosal" ;
+    :remarks "Passable as of September 15, 2024" ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/34> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Bacungan" ;
+    :hasLocation :City_of_Puerto_Princesa ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "clearing operation completed" ;
+    :incidentDescription "limited access, due to flooding (500mm/1.64ft)" ;
+    :remarks "subsided as of 15 September 2024" ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/35> a :Incident ;
+    :endDate "2024-09-14T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Concepcion" ;
+    :hasLocation :City_of_Puerto_Princesa ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "clearing operation completed" ;
+    :incidentDescription "flooding (500mm/1.64ft)" ;
+    :remarks "subsided as of 15 September 2024" ;
+    :startDate "2024-09-14T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/36> a :Incident ;
+    :endDate "2024-09-15T07:00:00"^^xsd:dateTime ;
+    :hasBarangay "Bogtong" ;
+    :hasLocation :Busuanga ;
+    :hasType :Water ;
+    :incidentActionsTaken "Barangay Residents rescued the individuals involved in the sunken fishing boat" ;
+    :incidentDescription "Motorbanca sunk due to strong winds and big waves" ;
+    :remarks "5 persons rescued" ;
+    :startDate "2024-09-15T07:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/37> a :Incident ;
+    :endDate "2024-09-18T16:00:00"^^xsd:dateTime ;
+    :hasBarangay "Cheey" ;
+    :hasLocation :Busuanga ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "MDRRMO On going clearing Operations" ;
+    :incidentDescription "Overflowing culvert that caused the road to become UNPASSABLE as per John Ray Aguilar" ;
+    :remarks "Passable as of September 20, 2024" ;
+    :startDate "2024-09-18T16:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/38> a :Incident ;
+    :endDate "2024-09-14T09:00:00"^^xsd:dateTime ;
+    :hasBarangay "Saraza" ;
+    :hasLocation <https://sakuna.ph/Brooke'S_Point> ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "Fallen Tree, Partially Damaging Roof of a Resident" ;
+    :startDate "2024-09-14T09:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/39> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion District II" ;
+    :hasLocation <https://sakuna.ph/Brooke'S_Point> ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "Fallen Tree, Partially Damaging Roof of a Resident" ;
+    :remarks "Clearing operation was conducted 1:00PM; 16 September 2024" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/4> a :Incident ;
+    :endDate "2024-09-18T15:24:00"^^xsd:dateTime ;
+    :hasBarangay "Mapayao" ;
+    :hasLocation :Kayapa ;
+    :hasType :LandslideWet ;
+    :incidentActionsTaken "Affected families were provided with assistance to repair their houses." ;
+    :incidentDescription "On September 18, 2024, at 3:24 PM, a landslide was reported, damaging one house." ;
+    :remarks "The affected families already returned to their houses." ;
+    :startDate "2024-09-18T15:24:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/40> a :Incident ;
+    :endDate "2024-09-17T11:21:00"^^xsd:dateTime ;
+    :hasBarangay "Punang" ;
+    :hasLocation :Sofronio_Española ;
+    :hasType :Road ;
+    :incidentActionsTaken "Patients were transported to district hospital" ;
+    :incidentDescription "as per MDRRMO, heavy rain is being experienced at the time of the addicdent and the road is slippery" ;
+    :startDate "2024-09-17T11:21:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/41> a :Incident ;
+    :endDate "2024-09-16T21:30:00"^^xsd:dateTime ;
+    :hasBarangay "Mangsee" ;
+    :hasLocation :Balabac ;
+    :hasType :Water ;
+    :incidentDescription "6 missing individuals, accordingly, the said individuals aboard a pump boat tried to save a boat being carried away by water but due to strong winds, they were not able to return to the island The group (Hji Apeh Julalie et al) were found alive in the vicinity of Tawi-tawi on 19 September 2024. On 21 September 2024, they were ferried back home aboard BRP Malapascua." ;
+    :remarks "reflected in DILG MDM" ;
+    :startDate "2024-09-16T21:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/42> a :Incident ;
+    :endDate "2024-09-17T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Salang" ;
+    :hasLocation :Balabac ;
+    :hasType :StormSurge ;
+    :incidentActionsTaken "a boat capsized in the vicinity waters of Barangay Ramos in Balabac. this resulted to death of 3 of the passengers" ;
+    :remarks "per PDRRMO SitRep; DILG MDM" ;
+    :startDate "2024-09-17T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/43> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Catagupan" ;
+    :hasLocation :Balabac ;
+    :hasType :Water ;
+    :incidentDescription "1 fisherman went missing when he chased his boat drifting away on September 16, 2024 and reported missing on September 17, 2024. UPDATE: About 5:30 PM of September 18, 2024, a cadaver was reported through to the Balabac MPS found at the mangrove area of Sitio Panaa, Barangay Catagupan, Balabac, Palawan by a fisherman at about 4:00 PM of September 18, 2024. The investigation conducted disclosed that the found cadaver was positively identified by the wife of the victim through the clothes he wore when he disappeared. Further, the family of the victim believed that the victim drowned while recovering his boat. The family decided to bury the cadaver immediately due to their religious tradition (Islam)." ;
+    :remarks "per DILG MDM" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/44> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Labangan Poblacion" ;
+    :hasLocation :San_Jose_Occidental_Mindoro ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1 ft flood was reported at highway in front of Gaisano and NFA" ;
+    :remarks "Subsided as per MDRRMO San Jose" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/45> a :Incident ;
+    :endDate "2024-09-14T13:40:00"^^xsd:dateTime ;
+    :hasBarangay "Barangay 2" ;
+    :hasLocation :Mamburao ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "CGSS Mamburao SAR team conducted rescue operation and at around 1645H of same date, CGSS Mamburao SAR Team successfully rescued the said individual" ;
+    :incidentDescription "drowning incident at approximately 0.5 NM away from the shorelines of Barangay 2" ;
+    :remarks "rescued, patient brought to hospital" ;
+    :startDate "2024-09-14T13:40:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/46> a :Incident ;
+    :endDate "2024-09-14T06:00:00"^^xsd:dateTime ;
+    :hasBarangay "Santo Niño" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Not passable Flooded area 2 1/2 feet at Sitio Parao" ;
+    :remarks "Subsided as of September 18, 2024" ;
+    :startDate "2024-09-14T06:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/47> a :Incident ;
+    :endDate "2024-09-14T06:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Passable to light vehicles Flooded area at Zone 4" ;
+    :remarks "Subsided as of September 18, 2024" ;
+    :startDate "2024-09-14T06:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/48> a :Incident ;
+    :endDate "2024-09-14T20:00:00"^^xsd:dateTime ;
+    :hasBarangay "Tuban" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Flooded area 1 feet at Sitio Buscad Flooded area 1 1/2 feet at Sitio Tambungon; both passable" ;
+    :remarks "Subsided as of September 18, 2024" ;
+    :startDate "2024-09-14T20:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/49> a :Incident ;
+    :endDate "2024-09-14T20:00:00"^^xsd:dateTime ;
+    :hasBarangay "Buenavista" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Flooded area 1 feet at Sitio Maugong Flooded area 1 1/2 feet at Martinez St; both passable" ;
+    :remarks "Subsided as of September 18, 2024" ;
+    :startDate "2024-09-14T20:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/5> a :Incident ;
+    :endDate "2024-09-17T23:00:00"^^xsd:dateTime ;
+    :hasBarangay "Bintawan Norte" ;
+    :hasLocation :Kayapa ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "3 families were evacuated to her relatives" ;
+    :incidentDescription "On September 17, 2024, a 2 ft. deep flooding due to overflowing of creeks due to heavy rains" ;
+    :startDate "2024-09-17T23:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/50> a :Incident ;
+    :endDate "2024-09-15T02:37:00"^^xsd:dateTime ;
+    :hasBarangay "Victoria" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "- Flooded area 2 feet at Zone 5 - Flooded area 2 feet at Zone 6 - Flooded area 2 feet at Zone 7" ;
+    :remarks "Subsided as of September 18, 2024 not passable" ;
+    :startDate "2024-09-15T02:37:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/51> a :Incident ;
+    :endDate "2024-09-14T08:46:00"^^xsd:dateTime ;
+    :hasBarangay "General Emilio Aguinaldo" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1.5 feet flood water in Sitio Tambungon" ;
+    :remarks "Subsided as of September 18, 2024 passable" ;
+    :startDate "2024-09-14T08:46:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/52> a :Incident ;
+    :endDate "2024-09-15T02:00:00"^^xsd:dateTime ;
+    :hasBarangay "Ilvita" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2.5 ft flooding in Zone 2" ;
+    :remarks "Subsided as per MDRRMO Sablayan- not passable" ;
+    :startDate "2024-09-15T02:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/53> a :Incident ;
+    :endDate "2024-09-15T02:40:00"^^xsd:dateTime ;
+    :hasBarangay "Claudio Salgado" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "3 feet flooding incident in Sitio Pandan" ;
+    :remarks "Subsided as of September 18, 2024 not passable" ;
+    :startDate "2024-09-15T02:40:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/54> a :Incident ;
+    :endDate "2024-09-15T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Tagumpay" ;
+    :hasLocation :Sablayan ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "5 feet flood in Zone 1; 5 feet flood in Zone 2" ;
+    :remarks "Subsided as of September 18, 2024 not passable" ;
+    :startDate "2024-09-15T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/55> a :Incident ;
+    :endDate "2024-09-14T08:00:00"^^xsd:dateTime ;
+    :hasBarangay "Nicolas" ;
+    :hasLocation :Magsaysay_Occidental_Mindoro ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "estimated 2-3 ft flood water in Sitio Bukal" ;
+    :remarks "per MDRRMO SitRep No. 12" ;
+    :startDate "2024-09-14T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/56> a :Incident ;
+    :endDate "2024-09-15T07:00:00"^^xsd:dateTime ;
+    :hasBarangay "Gapasan" ;
+    :hasLocation :Magsaysay_Occidental_Mindoro ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Flood water with 1-2 feet level" ;
+    :remarks "Subsided as per MDRRMO Magsaysay- Overflowing of flood water with estimated 1-2 feet above the surface - Not passable to all vehicles" ;
+    :startDate "2024-09-15T07:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/57> a :Incident ;
+    :endDate "2024-09-15T07:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :Magsaysay_Occidental_Mindoro ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Flood water with 1-2 feet level in Barangay Poblacion to Santa Teresa Road" ;
+    :remarks "Subsided as per MDRRMO Magsaysay- - Overflowing of flood water with estimated 1-2 feet above the surface - Passable to vehicles" ;
+    :startDate "2024-09-15T07:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/58> a :Incident ;
+    :endDate "2024-09-15T06:30:00"^^xsd:dateTime ;
+    :hasBarangay "Caguray" ;
+    :hasLocation :Magsaysay_Occidental_Mindoro ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Flooded area, 2-3 feet level in Sitio Bayabas" ;
+    :remarks "Subsided as per MDRRMO Magsaysay- Flooded with estimated 2-3 feet water level above the ground surface subsided per MDRRMO SitRep No. 12" ;
+    :startDate "2024-09-15T06:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/59> a :Incident ;
+    :endDate "2024-09-13T04:00:00"^^xsd:dateTime ;
+    :hasBarangay "Laon and Capayang" ;
+    :hasLocation :Mogpog ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "DPWH conducted clearing operations of blocked drainage of flood control" ;
+    :incidentDescription "1 ft high flood water at Laon - Capayang Road Section" ;
+    :remarks "Re-routing of traffic for small - light vehicle Reported subsided at 12:27 PM, 13 Sept 2024" ;
+    :startDate "2024-09-13T04:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/6> a :Incident ;
+    :endDate "2024-09-17T23:00:00"^^xsd:dateTime ;
+    :hasBarangay "Ibung" ;
+    :hasLocation :Kayapa ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "3 families were evacuated to her relatives" ;
+    :incidentDescription "On September 17, 2024, 1 ft. deep flooding due to overflowing of creeks due to heavy rains" ;
+    :startDate "2024-09-17T23:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/60> a :Incident ;
+    :endDate "2024-09-13T20:30:00"^^xsd:dateTime ;
+    :hasBarangay "Bangbangalon" ;
+    :hasLocation :Boac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1 ft deep" ;
+    :remarks "Passable to all types of Vehicle" ;
+    :startDate "2024-09-13T20:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/61> a :Incident ;
+    :endDate "2024-09-13T20:30:00"^^xsd:dateTime ;
+    :hasBarangay "Isok I" ;
+    :hasLocation :Boac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 ft deep" ;
+    :remarks "Passable to all types of Vehicle" ;
+    :startDate "2024-09-13T20:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/62> a :Incident ;
+    :endDate "2024-09-13T20:30:00"^^xsd:dateTime ;
+    :hasBarangay "Isok II" ;
+    :hasLocation :Boac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 ft deep" ;
+    :remarks "Passable to all types of Vehicle" ;
+    :startDate "2024-09-13T20:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/63> a :Incident ;
+    :endDate "2024-09-13T20:25:00"^^xsd:dateTime ;
+    :hasBarangay "Malusak" ;
+    :hasLocation :Boac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2-3ft deep" ;
+    :remarks "Passable to all types of Vehicle" ;
+    :startDate "2024-09-13T20:25:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/64> a :Incident ;
+    :endDate "2024-09-13T21:00:00"^^xsd:dateTime ;
+    :hasBarangay "Mercado" ;
+    :hasLocation :Boac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 ft deep" ;
+    :remarks "Passable to all types of Vehicle" ;
+    :startDate "2024-09-13T21:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/65> a :Incident ;
+    :endDate "2024-09-13T21:30:00"^^xsd:dateTime ;
+    :hasBarangay "Daypay" ;
+    :hasLocation :Boac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 ft deep" ;
+    :remarks "Passable to all types of Vehicle" ;
+    :startDate "2024-09-13T21:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/66> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Cambijang" ;
+    :hasLocation :Cajidiocan ;
+    :hasType :LandslideWet ;
+    :incidentDescription "Per MDRRMO, the landslide occurred due to the recent weather disturbances that have brought continuous light to heavy rain. It caused the evacuation of 25 families / 84 persons to Cambijang Elementary School," ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/67> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "San Roque" ;
+    :hasLocation :Bulalacao ;
+    :hasType :LandslideWet ;
+    :incidentDescription "Per MDRRMO, the landslide occurred due to the recent weather disturbances that have brought continuous light to heavy rain. It caused the evacuation of 4 families / 18 persons to the Barangay Hall and destruction of 30 houses (totally - 4; partially - 26)." ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/68> a :Incident ;
+    :endDate "2024-09-13T08:00:00"^^xsd:dateTime ;
+    :hasLocation :Donsol ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 barangays" ;
+    :startDate "2024-09-13T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/69> a :Incident ;
+    :endDate "2024-09-13T08:00:00"^^xsd:dateTime ;
+    :hasLocation :Juban ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "3 barangays" ;
+    :startDate "2024-09-13T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/7> a :Incident ;
+    :endDate "2024-09-21T08:00:00"^^xsd:dateTime ;
+    :hasBarangay "Barangay East Dirita" ;
+    :hasLocation :San_Antonio_Zambales ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "On 21 0800H September 2024, one (1) totally damaged house was reported due to a fallen tree" ;
+    :startDate "2024-09-21T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/70> a :Incident ;
+    :endDate "2024-09-13T08:00:00"^^xsd:dateTime ;
+    :hasLocation :Magallanes_Sorsogon ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 barangays" ;
+    :startDate "2024-09-13T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/71> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Daet ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "5 barangays" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/72> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Nabua ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "3 barangays" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/73> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Nabua ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "35 barangays" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/74> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Sipocot ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "3 barangays" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/75> a :Incident ;
+    :endDate "2024-09-18T08:45:00"^^xsd:dateTime ;
+    :hasLocation :Gainza ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "7 barangays" ;
+    :startDate "2024-09-18T08:45:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/76> a :Incident ;
+    :endDate "2024-09-14T06:00:00"^^xsd:dateTime ;
+    :hasLocation :San_Fernando ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "13 barangays" ;
+    :startDate "2024-09-14T06:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/77> a :Incident ;
+    :endDate "2024-09-14T06:00:00"^^xsd:dateTime ;
+    :hasLocation :Milaor ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "5 barangays" ;
+    :startDate "2024-09-14T06:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/78> a :Incident ;
+    :endDate "2024-09-14T09:30:00"^^xsd:dateTime ;
+    :hasLocation :Minalabac ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "20 barangays" ;
+    :startDate "2024-09-14T09:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/79> a :Incident ;
+    :endDate "2024-09-14T09:30:00"^^xsd:dateTime ;
+    :hasLocation :Pamplona_Camarines_Sur ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1 barangay" ;
+    :startDate "2024-09-14T09:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/8> a :Incident ;
+    :endDate "2024-09-21T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Calapandayan" ;
+    :hasLocation :Subic ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "On 21 September 2024, one (1) partially damaged house was reported due to a fallen tree" ;
+    :startDate "2024-09-21T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/80> a :Incident ;
+    :endDate "2024-09-14T09:30:00"^^xsd:dateTime ;
+    :hasLocation :Bula ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "6 barangays" ;
+    :startDate "2024-09-14T09:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/81> a :Incident ;
+    :endDate "2024-09-14T09:30:00"^^xsd:dateTime ;
+    :hasLocation :Bula ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 barangays" ;
+    :startDate "2024-09-14T09:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/82> a :Incident ;
+    :endDate "2024-09-14T15:00:00"^^xsd:dateTime ;
+    :hasLocation :Calabanga ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 barangays" ;
+    :startDate "2024-09-14T15:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/83> a :Incident ;
+    :endDate "2024-09-14T12:30:00"^^xsd:dateTime ;
+    :hasLocation :Magarao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1 barangay" ;
+    :startDate "2024-09-14T12:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/84> a :Incident ;
+    :endDate "2024-09-14T16:05:00"^^xsd:dateTime ;
+    :hasLocation :Baao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1 barangay" ;
+    :startDate "2024-09-14T16:05:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/85> a :Incident ;
+    :endDate "2024-09-14T16:05:00"^^xsd:dateTime ;
+    :hasLocation :Baao ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "4 barangay" ;
+    :startDate "2024-09-14T16:05:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/86> a :Incident ;
+    :endDate "2024-09-13T08:00:00"^^xsd:dateTime ;
+    :hasLocation :Bato ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "6 barangays" ;
+    :startDate "2024-09-13T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/87> a :Incident ;
+    :endDate "2024-09-13T08:00:00"^^xsd:dateTime ;
+    :hasLocation :Bato ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "12 barangays" ;
+    :startDate "2024-09-13T08:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/88> a :Incident ;
+    :endDate "2024-09-15T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Buhi ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "2 barangays" ;
+    :startDate "2024-09-15T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/89> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Buhi ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "1 barangay-10 families evacuated" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/9> a :Incident ;
+    :endDate "2024-09-21T14:00:00"^^xsd:dateTime ;
+    :hasBarangay "Brgy. Matain" ;
+    :hasLocation :Subic ;
+    :hasType :CollapseMiscellaneous ;
+    :incidentDescription "On 21 1400H September 2024, one (1) partially damage house is reported due to a fallen tree" ;
+    :startDate "2024-09-21T14:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/90> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasLocation :City_of_Iriga ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "6 barangays" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/91> a :Incident ;
+    :endDate "2024-09-16T00:00:00"^^xsd:dateTime ;
+    :hasLocation :Polangui ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "4 barangays" ;
+    :startDate "2024-09-16T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/92> a :Incident ;
+    :endDate "2024-09-12T15:00:00"^^xsd:dateTime ;
+    :hasBarangay "Buhang" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Buhang National High School issued school memorandum No. 01, s. 2024, suspending the afternoon class" ;
+    :incidentDescription "-1 foot above Flood waters reached two (2) classrooms" ;
+    :startDate "2024-09-12T15:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/93> a :Incident ;
+    :endDate "2024-09-12T19:30:00"^^xsd:dateTime ;
+    :hasBarangay "Bia-an" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Below knee level flood; flooded houses" ;
+    :startDate "2024-09-12T19:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/94> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Caridad" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Knee level flood; flooded houses" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/95> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Gen. Fullon" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Knee level flood; flooded houses" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/96> a :Incident ;
+    :endDate "2024-09-13T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Poblacion 3" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Knee level flood; flooded houses" ;
+    :startDate "2024-09-13T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/97> a :Incident ;
+    :endDate "2024-09-13T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Sitio Guruan, Piapi I" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentActionsTaken "Prevailing floodwaters as of September 13, 2024, 9:40 A.M." ;
+    :incidentDescription "Approximately 2 ft. flood; flooded houses" ;
+    :startDate "2024-09-13T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/98> a :Incident ;
+    :endDate "2024-09-13T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Budbudan" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Knee level flood; flooded houses" ;
+    :startDate "2024-09-13T03:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/99> a :Incident ;
+    :endDate "2024-09-13T03:00:00"^^xsd:dateTime ;
+    :hasBarangay "Malandog" ;
+    :hasLocation :Hamtic ;
+    :hasType :FloodGeneral ;
+    :incidentDescription "Knee level flood; flooded houses" ;
+    :startDate "2024-09-13T03:00:00"^^xsd:dateTime .
+
+:Breakdown1SitRep_No__16_for_the_Magnitude_6_8_Earthquake_in_Sarangani_Davao_Occidental a :Source ;
+    prov:wasAttributedTo :NDRRMC ;
+    prov:wasGeneratedBy :ndrrmc_website_access ;
+    :format "pdf" ;
+    :lastUpdateDate "2023-12-08T08:00:00"^^xsd:dateTime ;
+    :reportName "Breakdown1-SitRep_No__16_for_the_Magnitude_6_8_Earthquake_in_Sarangani_Davao_Occidental.pdf" .
+
+:SitRep_No__24_for_the_Combined_Effects_of_the_Enhanced_Southwest_Monsoon_and_TCs_FERDIE_GENER_and_HELEN_IGME_2024_Breakdown_Table a :Source ;
+    prov:wasAttributedTo :NDRRMC ;
+    prov:wasGeneratedBy :ndrrmc_website_access ;
+    :format "pdf" ;
+    :lastUpdateDate "2024-09-28T08:00:00"^^xsd:dateTime ;
+    :reportName "SitRep_No__24_for_the_Combined_Effects_of_the_Enhanced_Southwest_Monsoon_and_TCs_FERDIE_GENER_and_HELEN_IGME_2024_Breakdown_Table.pdf" .
+
+:SitRep_No__5_for_2025_National_and_Local_Elections_Breakdown_Table a :Source ;
+    prov:wasAttributedTo :NDRRMC ;
+    prov:wasGeneratedBy :ndrrmc_website_access ;
+    :format "pdf" ;
+    :lastUpdateDate "2025-05-14T08:00:00"^^xsd:dateTime ;
+    :reportName "SitRep_No__5_for_2025_National_and_Local_Elections_Breakdown_Table.pdf" .
+
+<https://sakuna.ph/a44736600e434873a9504e45b73cefee/related_incident/1> a :Incident ;
+    :endDate "2023-11-17T00:00:00"^^xsd:dateTime ;
+    :hasBarangay "Sugal" ;
+    :hasLocation :Jose_Abad_Santos ;
+    :hasType :LandslideDry ;
+    :incidentActionsTaken "Conducted evacuation" ;
+    :incidentDescription "Rockslide on road with nearby community" ;
+    :remarks "Near community" ;
+    :startDate "2023-11-17T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/1> a :Incident ;
+    :endDate "2025-01-25T06:30:00"^^xsd:dateTime ;
+    :hasBarangay "Tamag" ;
+    :hasLocation :City_of_Vigan ;
+    :hasType :ArmedConflict ;
+    :incidentActionsTaken "-The CDRRMO Vigan, Ilocos Sur responded to the incident and rushed the victim to the Ilocos Sur Provincial Hospital-Gabriela Silang. -The PNP PRO1 conducted backtracking of CCTV footage, obtained statements from witnesses, and carried out case build-up, which led to the identification of a suspect on 08 February 2025." ;
+    :incidentDescription "The victim, a Municipal Councilor of Caoayan, Ilocos Sur, was having breakfast in front of a food stall in Brgy. Tamag, Vigan City, Ilocos Sur, when two (2) individuals riding a motorcycle shot him once in the head. He was rushed to the Provincial Hospital Gabriel Silang General but was declared dead on arrival (DOA) by the attending physician. The Special Investigation Task Group (SITG) determined the incident to be election- related, and this classification was approved by TG I/LO, DIDM on 27 February 2025." ;
+    :remarks "Through PNP Task Group I/LO, DIDM Memorandum confirmed that the incident is validated election-related incident" ;
+    :startDate "2025-01-25T06:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/2> a :Incident ;
+    :endDate "2025-04-23T21:30:00"^^xsd:dateTime ;
+    :hasBarangay "Iluru Sur" ;
+    :hasLocation :Rizal_Cagayan ;
+    :hasType :ArmedConflict ;
+    :incidentDescription "At approximately 9:30 PM of April 23, 2025, during a campaign rally held near the barangay hall of Brgy. Iluru Sur, Rizal, Cagayan, a shooting incident occurred. While the incumbent Mayor was delivering his speech, unidentified gunmen opened fire from a mountainous area nearby. Incumbent Mayor was declared dead on arrival and 2 individuals were injured." ;
+    :startDate "2025-04-23T21:30:00"^^xsd:dateTime .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/3> a :Incident ;
+    :endDate "2025-04-25T21:40:00"^^xsd:dateTime ;
+    :hasBarangay "Bungad" ;
+    :hasLocation :San_Pablo ;
+    :hasType :ArmedConflict ;
+    :incidentDescription "Also, at about 9:40 PM of April 25, 2025, a shooting incident transpired in Brgy Bungad, San Pablo, Isabela resulting injuries to three individuals, one victim was identified as running candidate for Sanguniang Bayan in the said municipality while the suspects were unidentified." ;
+    :startDate "2025-04-25T21:40:00"^^xsd:dateTime .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/4> a :Incident ;
+    :endDate "2025-05-12T14:30:00"^^xsd:dateTime ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :hasType :ArmedConflict ;
+    :incidentActionsTaken "Continuous monitoring" ;
+    :incidentDescription "Commotion incident at Purok PTH, Brgy Dulag, Iligan City on or about 2:30PM May 12, 2025 due to heated argument regarding provision of assistance to voters. The said parties decided to settle the matter based on Islamic traditional settlement." ;
+    :startDate "2025-05-12T14:30:00"^^xsd:dateTime .
+
