@@ -28,6 +28,7 @@
 
 To do:
 - Manually correct hasType values for major events (the event corresponding to report)
+- Consider casualty counts from summary report (includes casualties not yet validated)
 
 ***GEOG ARCHIVE***
 
