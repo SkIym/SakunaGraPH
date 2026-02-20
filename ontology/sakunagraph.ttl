@@ -912,6 +912,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                rdfs:label "count of casualty" .
 
 
+###  https://sakuna.ph/casualtyDataSource
+:casualtyDataSource rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :Casualties ;
+                    rdfs:range xsd:string ;
+                    rdfs:label "source of casualty data" .
+
+
 ###  https://sakuna.ph/casualtyType
 :casualtyType rdf:type owl:DatatypeProperty ;
               rdfs:domain :Casualties ;
@@ -2117,6 +2124,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                             [ rdf:type owl:Restriction ;
                               owl:onProperty :casualtyCount ;
                               owl:someValuesFrom xsd:int
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :casualtyDataSource ;
+                              owl:someValuesFrom xsd:string
                             ] ,
                             [ rdf:type owl:Restriction ;
                               owl:onProperty :casualtyType ;
