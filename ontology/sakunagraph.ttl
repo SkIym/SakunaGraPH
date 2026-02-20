@@ -60,6 +60,10 @@ geo:kmlLiteral rdf:type rdfs:Datatype ;
 geo:wktLiteral rdf:type rdfs:Datatype .
 
 
+###  https://sakuna.ph/skg:casualtyType
+:skg:casualtyType rdf:type rdfs:Datatype .
+
+
 #################################################################
 #    Object Properties
 #################################################################
@@ -894,12 +898,25 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                    rdfs:label "cancelled datetime"@en .
 
 
-###  https://sakuna.ph/casualties
-:casualties rdf:type owl:DatatypeProperty ;
-            rdfs:subPropertyOf owl:topDataProperty ;
-            rdfs:domain :Casualties ;
-            rdfs:range xsd:int ;
-            rdfs:label "casualties"@en .
+###  https://sakuna.ph/casualtyCause
+:casualtyCause rdf:type owl:DatatypeProperty ;
+               rdfs:domain :Casualties ;
+               rdfs:range xsd:string ;
+               rdfs:label "cause of casualty"@en .
+
+
+###  https://sakuna.ph/casualtyCount
+:casualtyCount rdf:type owl:DatatypeProperty ;
+               rdfs:domain :Casualties ;
+               rdfs:range xsd:int ;
+               rdfs:label "count of casualty" .
+
+
+###  https://sakuna.ph/casualtyType
+:casualtyType rdf:type owl:DatatypeProperty ;
+              rdfs:domain :Casualties ;
+              rdfs:range :skg:casualtyType ;
+              rdfs:label "type of casualty"@en .
 
 
 ###  https://sakuna.ph/classLevelFrom
@@ -957,14 +974,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                            rdfs:comment "In M PHP" ;
                            rdfs:label "cross sectoral damage amount" ;
                            skos:example "health government, transmission lines" .
-
-
-###  https://sakuna.ph/dead
-:dead rdf:type owl:DatatypeProperty ;
-      rdfs:subPropertyOf :casualties ;
-      rdfs:domain :Casualties ;
-      rdfs:range xsd:int ;
-      rdfs:label "dead"@en .
 
 
 ###  https://sakuna.ph/declarationType
@@ -1117,13 +1126,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                       rdfs:label "incident actions taken"@en .
 
 
-###  https://sakuna.ph/incidentCause
-:incidentCause rdf:type owl:DatatypeProperty ;
-               rdfs:domain :Incident ;
-               rdfs:range xsd:string ;
-               rdfs:label "incident cause"@en .
-
-
 ###  https://sakuna.ph/incidentDescription
 :incidentDescription rdf:type owl:DatatypeProperty ;
                      rdfs:domain :Incident ;
@@ -1179,14 +1181,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                   rdfs:domain :Infrastructure ;
                   rdfs:range xsd:string ;
                   rdfs:label "units of infrastructure damage"@en .
-
-
-###  https://sakuna.ph/injured
-:injured rdf:type owl:DatatypeProperty ;
-         rdfs:subPropertyOf :casualties ;
-         rdfs:domain :Casualties ;
-         rdfs:range xsd:int ;
-         rdfs:label "injured"@en .
 
 
 ###  https://sakuna.ph/insuredDamage
@@ -1289,14 +1283,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
            rdfs:domain :Earthquake ;
            rdfs:range xsd:decimal ;
            rdfs:label "magnitude"@en .
-
-
-###  https://sakuna.ph/missing
-:missing rdf:type owl:DatatypeProperty ;
-         rdfs:subPropertyOf :casualties ;
-         rdfs:domain :Casualties ;
-         rdfs:range xsd:int ;
-         rdfs:label "missing"@en .
 
 
 ###  https://sakuna.ph/motorBanca
@@ -2125,20 +2111,16 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :Casualties rdf:type owl:Class ;
             rdfs:subClassOf :Impact ,
                             [ rdf:type owl:Restriction ;
-                              owl:onProperty :casualties ;
-                              owl:someValuesFrom xsd:integer
+                              owl:onProperty :casualtyCause ;
+                              owl:someValuesFrom xsd:string
                             ] ,
                             [ rdf:type owl:Restriction ;
-                              owl:onProperty :dead ;
-                              owl:someValuesFrom xsd:integer
+                              owl:onProperty :casualtyCount ;
+                              owl:someValuesFrom xsd:int
                             ] ,
                             [ rdf:type owl:Restriction ;
-                              owl:onProperty :injured ;
-                              owl:someValuesFrom xsd:integer
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :missing ;
-                              owl:someValuesFrom xsd:integer
+                              owl:onProperty :casualtyType ;
+                              owl:someValuesFrom :skg:casualtyType
                             ] ;
             rdfs:label "Casualties"@en ;
             skos:definition "Represents the number of deaths, injured, and missing due to a disaster." .
@@ -2620,11 +2602,11 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                             owl:someValuesFrom :MajorEvent
                           ] ,
                           [ rdf:type owl:Restriction ;
-                            owl:onProperty :incidentActionsTaken ;
+                            owl:onProperty :casualtyCause ;
                             owl:someValuesFrom xsd:string
                           ] ,
                           [ rdf:type owl:Restriction ;
-                            owl:onProperty :incidentCause ;
+                            owl:onProperty :incidentActionsTaken ;
                             owl:someValuesFrom xsd:string
                           ] ,
                           [ rdf:type owl:Restriction ;
