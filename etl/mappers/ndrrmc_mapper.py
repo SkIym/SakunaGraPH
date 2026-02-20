@@ -5,9 +5,9 @@ import uuid
 import json
 from preprocessors.location_matcher import LOCATION_MATCHER
 from preprocessors.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc_mappings import INCIDENT_COLUMN_MAPPINGS, Event, Provenance, Incident
+from mappings.ndrrmc_mappings import AFF_POP_COL_MAP, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Event, Provenance, Incident
 from datetime import datetime
-from preprocessors.ndrrmc_cleaner import event_name_expander, forward_fill_and_collapse, normalize_datetime
+from preprocessors.ndrrmc_cleaner import event_name_expander, forward_fill_and_collapse, normalize_datetime, to_int
 import polars as pl
 
 
@@ -123,17 +123,11 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     df = forward_fill_and_collapse(df, target_cols, "QTY", "TYPE_OF_INCIDENT")
 
     meta_path = os.path.join(event_folder_path, "metadata.json")
-    # src_path = os.path.join(event_folder_path, "source.json" )
 
     with open(meta_path, "r", encoding="utf-8") as f:
             meta: dict[str, str] = json.load(f)
         
-    # with open(src_path, "r", encoding="utf-8") as f:
-    #     source: dict[str, str] = json.load(f)
-
-    # event_remarks = meta.get("remarks")
     event_name = meta.get("eventName", event_folder_path)
-    # file_name = source.get("reportName", "")
 
     df = df.with_columns([
         pl.lit("due to " + event_name_expander(event_name)).alias("event_name")
@@ -223,6 +217,64 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
 
     return incidents
 
+def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
+    src_path = os.path.join(event_folder_path, "affected_population.csv")
+
+    if not os.path.exists(src_path):
+        return None
+    
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = pl.read_csv(src_path)
+
+    # fix column names
+    df = df.rename(AFF_POP_COL_MAP, strict=False)
+
+
+    # clean rows by retaining only the actual incident entry
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "affectedBarangays")
+
+    # Match locations
+    locations = (
+        df
+        .select(
+            pl.concat_str(
+                ["City_Muni", "Province", "Region"],
+                separator=",",
+                ignore_nulls=True
+            ).alias("full location")
+        )
+        .to_series()
+        .to_list()
+    )
+
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    # downcast to int for int columns
+    df = to_int(df, ["affectedFamilies", "affectedBarangays", "affectedPersons", "displacedFamilies", "displacedPersons"])
+
+    df = df.with_row_index("id", 1)
+    
+    df.write_csv(event_folder_path + "cleaned_affected_population.csv")
+    affpops: List[AffectedPopulation] = []
+    for row in df.iter_rows(named=True):
+        affpop = AffectedPopulation(
+            id=row["id"],
+            affectedBarangays=row["affectedBarangays"],
+            affectedFamilies=row["affectedFamilies"],
+            affectedPersons=row["affectedPersons"],
+            displacedFamilies=row["displacedFamilies"],
+            displacedPersons=row["displacedPersons"],
+            hasLocation=row["hasLocation"],
+            hasBarangay=row["Barangay"]
+        )
+
+        affpops.append(affpop)
+    
+    return affpops
+
 
 if __name__ == "__main__":
-    load_incidents("./data/ndrrmc/Combined Effects of SWM and TCs CRISING EMONG DANTE Breakdow/")
+    load_aff_pop("./data/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")

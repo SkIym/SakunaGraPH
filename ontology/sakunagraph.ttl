@@ -979,7 +979,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :displacedFamilies rdf:type owl:DatatypeProperty ;
                    rdfs:domain :AffectedPopulation ;
                    rdfs:range xsd:int ;
-                   rdfs:comment "Synonymous with evacuated families (in or out of centers)" ;
+                   rdfs:comment "Synonymous with served or evacuated families (in or out of centers) and refers to the cumulative count." ;
                    rdfs:label "displaced families"@en .
 
 
@@ -987,7 +987,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :displacedPersons rdf:type owl:DatatypeProperty ;
                   rdfs:domain :AffectedPopulation ;
                   rdfs:range xsd:int ;
-                  rdfs:comment "Synonymous with evacuated persons (in or out of centers)" ;
+                  rdfs:comment "Synonymous with served or evacuated persons (in or out of centers) and refers to the cumulative count." ;
                   rdfs:label "displaced persons"@en .
 
 
@@ -1028,7 +1028,11 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 
 ###  https://sakuna.ph/evacuationCenters
 :evacuationCenters rdf:type owl:DatatypeProperty ;
-                   rdfs:domain :PreemptiveEvacuation ;
+                   rdfs:domain [ rdf:type owl:Class ;
+                                 owl:unionOf ( :AffectedPopulation
+                                               :PreemptiveEvacuation
+                                             )
+                               ] ;
                    rdfs:range xsd:int ;
                    rdfs:label "no. of evacuation centers"@en .
 
@@ -1880,19 +1884,23 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                     ] ,
                                     [ rdf:type owl:Restriction ;
                                       owl:onProperty :affectedFamilies ;
-                                      owl:someValuesFrom xsd:integer
+                                      owl:someValuesFrom xsd:int
                                     ] ,
                                     [ rdf:type owl:Restriction ;
                                       owl:onProperty :affectedPersons ;
-                                      owl:someValuesFrom xsd:integer
+                                      owl:someValuesFrom xsd:int
                                     ] ,
                                     [ rdf:type owl:Restriction ;
                                       owl:onProperty :displacedFamilies ;
-                                      owl:someValuesFrom xsd:integer
+                                      owl:someValuesFrom xsd:int
                                     ] ,
                                     [ rdf:type owl:Restriction ;
                                       owl:onProperty :displacedPersons ;
-                                      owl:someValuesFrom xsd:integer
+                                      owl:someValuesFrom xsd:int
+                                    ] ,
+                                    [ rdf:type owl:Restriction ;
+                                      owl:onProperty :evacuationCenters ;
+                                      owl:someValuesFrom xsd:int
                                     ] ;
                     rdfs:label "Affected Population"@en ;
                     skos:definition "Represents affected and displaced persons or families." .
@@ -2646,7 +2654,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :InfectiousDiseaseGeneral rdf:type owl:Class ;
                           rdfs:subClassOf :Epidemic ;
                           rdfs:label "Infectious Disease (General)"@en ;
-                          skos:definition "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
+                          skos:definition "Either an unusual, often sudden, increase in the number of cases or outbreak of an infectious disease that already existed in the region (e.g., flu, or E. coli, gastroentritis or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
 
 
 ###  https://sakuna.ph/Infestation
@@ -2912,6 +2920,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                       [ rdf:type owl:Restriction ;
                                         owl:onProperty :preemptMales ;
                                         owl:someValuesFrom xsd:integer
+                                      ] ,
+                                      [ rdf:type owl:Restriction ;
+                                        owl:onProperty :preemptPersons ;
+                                        owl:someValuesFrom xsd:int
                                       ] ;
                       rdfs:label "Preemptive Evacuation"@en ;
                       skos:definition "Represents information on evacuation centers and preemptively evacuated individuals." .

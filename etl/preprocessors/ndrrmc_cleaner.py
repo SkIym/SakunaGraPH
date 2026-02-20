@@ -90,6 +90,19 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_for
 
     return df
 
+def to_int(df: DataFrame, cols: list[str]):
+
+    df = df.with_columns(
+        pl.col(col)
+            .cast(pl.Utf8, strict=False)
+            .str.replace_all(",", "")
+            .cast(pl.Int64, strict=False)
+        for col in cols
+    )
+
+    return df
+
+
 
 # if __name__ == "__main__":
 #     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"

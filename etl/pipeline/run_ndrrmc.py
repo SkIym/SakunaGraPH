@@ -1,7 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from mappers.ndrrmc_mapper import load_events, load_uuids
-from mappings.ndrrmc_mappings import Event, event_mapping, incident_mapping, prov_mapping
+from mappers.ndrrmc_mapper import load_aff_pop, load_events, load_uuids
+from mappings.ndrrmc_mappings import Event, aff_pop_mapping, event_mapping, incident_mapping, prov_mapping
 from mappers.ndrrmc_mapper import load_incidents, load_provenance
 import os
 from typing import Tuple
@@ -22,6 +22,11 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     inci = load_incidents(event_folder)
     if inci:
         incident_mapping(g, inci, event_iri)
+
+    
+    aff_pop = load_aff_pop(event_folder)
+    if aff_pop:
+        aff_pop_mapping(g, aff_pop, event_iri)
 
     return g
 

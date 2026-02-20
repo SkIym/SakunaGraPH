@@ -5,7 +5,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import event_iri, incident_iri, prov_iri
+from .iris import aff_pop_iri, event_iri, incident_iri, prov_iri
 
 @dataclass
 class Event:
@@ -229,3 +229,92 @@ def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
                 SKG.hasBarangay,
                 Literal(i.hasBarangay)
             ))
+
+AFF_POP_COL_MAP = {
+    "REGION_|_PROVINCE_|_CITY_\nMUNICIPALITY_|_BARANGAY": "QTY",
+    "NO_OF_AFFECTED_Brgys": "affectedBarangays",
+    "NO_OF_AFFECTED_Families": "affectedFamilies",
+    "NO_OF_AFFECTED_Persons": "affectedPersons",
+    "TOTAL_SERVED_CURRENT_Inside_+_Outside_Persons_CUM": "displacedPersons",
+    "TOTAL_SERVED_CURRENT_Inside_+_Outside_Families_CUM": "displacedFamilies",
+    "TOTAL_SERVED_Inside_+_Outside_Persons_CUM": "displacedPersons",
+    "TOTAL_SERVED_Inside_+_Outside_Families_CUM": "displacedFamilies",
+    "No_of_ECs_Persons_CUM": "evacuationCenters",
+}
+
+@dataclass
+class AffectedPopulation:
+    id: str
+    affectedBarangays: int
+    affectedFamilies: int
+    affectedPersons: int
+    displacedFamilies: int
+    displacedPersons: int
+    hasLocation: URIRef
+    hasBarangay: str | None
+
+def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
+
+    for ap in aps:
+        uri = aff_pop_iri(event_iri, ap.id)
+
+        # rdf:type
+        g.add((
+            uri,
+            RDF.type,
+            SKG.AffectedPopulation
+        ))
+
+        # Link impact to parent event
+        g.add((
+            event_iri,
+            SKG.hasImpact,
+            uri
+        ))
+
+        if int(ap.affectedBarangays) > 1:
+
+            g.add((
+                uri,
+                SKG.affectedBarangays,
+                Literal(ap.affectedBarangays, datatype=XSD.int)
+            ))
+        
+        else:
+
+            g.add((
+                uri,
+                SKG.hasBarangay,
+                Literal(ap.hasBarangay)
+            ))
+
+        g.add((
+                uri,
+                SKG.affectedFamilies,
+                Literal(ap.affectedFamilies, datatype=XSD.int)
+        ))
+
+        g.add((
+                uri,
+                SKG.affectedPersons,
+                Literal(ap.affectedPersons, datatype=XSD.int)
+        ))
+
+        g.add((
+                uri,
+                SKG.displacedFamilies,
+                Literal(ap.displacedFamilies, datatype=XSD.int)
+        ))
+
+        g.add((
+                uri,
+                SKG.displacedPersons,
+                Literal(ap.displacedPersons, datatype=XSD.int)
+        ))
+
+        g.add((
+                uri,
+                SKG.hasLocation,
+                URIRef(ap.hasLocation)
+        ))
+        

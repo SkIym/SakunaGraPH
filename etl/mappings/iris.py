@@ -14,3 +14,6 @@ def prov_iri(report: str) -> URIRef:
 
 def incident_iri(event_id: URIRef, incident_id: str) -> URIRef:
     return URIRef(event_id + f"/related_incident/{incident_id}")
+
+def aff_pop_iri(event_id: URIRef, aff_pop_id: str) -> URIRef:
+    return URIRef(event_id + f"/affected_population/{aff_pop_id}")
