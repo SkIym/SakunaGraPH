@@ -1,3 +1,5 @@
+from typing import List
+
 import polars as pl
 from polars import DataFrame
 
@@ -91,7 +93,9 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_for
     return df
 
 def to_int(df: DataFrame, cols: list[str]):
-
+    """
+    Cast df columns to integer (handles comma'd values)
+    """
     df = df.with_columns(
         pl.col(col)
             .cast(pl.Utf8, strict=False)
@@ -102,7 +106,22 @@ def to_int(df: DataFrame, cols: list[str]):
 
     return df
 
+def concat_loc_levels(df: DataFrame, loc_cols: list[str], sep: str):
 
+    locs = (
+        df
+        .select(
+            pl.concat_str(
+                loc_cols,
+                separator=sep,
+                ignore_nulls=True
+            ).alias("full location")
+        )
+        .to_series()
+        .to_list()
+    )
+
+    return locs
 
 # if __name__ == "__main__":
 #     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"

@@ -577,7 +577,14 @@
         <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/affected_population/96>,
         <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/affected_population/97>,
         <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/affected_population/98>,
-        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/affected_population/99> ;
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/affected_population/99>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/1>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/2>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/3>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/4>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/5>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/6>,
+        <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/7> ;
     :hasRelatedIncident <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/1>,
         <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/10>,
         <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/100>,
@@ -901,7 +908,12 @@ thunderstorms were forecasted over Ilocos Region, Batanes, and Babuyan Islands."
         <https://sakuna.ph/a44736600e434873a9504e45b73cefee/affected_population/6>,
         <https://sakuna.ph/a44736600e434873a9504e45b73cefee/affected_population/7>,
         <https://sakuna.ph/a44736600e434873a9504e45b73cefee/affected_population/8>,
-        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/affected_population/9> ;
+        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/affected_population/9>,
+        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/1>,
+        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/2>,
+        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/3>,
+        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/4>,
+        <https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/5> ;
     :hasRelatedIncident <https://sakuna.ph/a44736600e434873a9504e45b73cefee/related_incident/1> ;
     :hasType :GroundMovement ;
     :remarks """On 17 November 2023, 4:14 PM, a magnitude Mw 6.8 earthquake occurred at 05.38°N, 125.24°E - 028 km S 68° W of
@@ -934,6 +946,20 @@ the epicenter.""" ;
     :endDate "2025-05-12T00:00:00"^^xsd:dateTime ;
     :eventName "2025 National and Local Elections" ;
     :fromSource :SitRep_No__5_for_2025_National_and_Local_Elections_Breakdown_Table ;
+    :hasImpact <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/1>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/10>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/11>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/12>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/13>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/14>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/2>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/3>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/4>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/5>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/6>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/7>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/8>,
+        <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/9> ;
     :hasRelatedIncident <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/1>,
         <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/2>,
         <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/3>,
@@ -5534,6 +5560,69 @@ As to date, no major incidents have been reported on election day, 12 May 2025."
     :displacedPersons "2305"^^xsd:int ;
     :hasLocation :San_Jose_Antique .
 
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/1> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "Ransang" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "The incident happened on 15 September 2024. The victim was brought to Rizal District Hospital by their family and the Punong Barangay of Barangay Ransang, but was declared dead by the attending physician." .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/2> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "Ransang" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "The incident happened on 15 September 2024. The victim was brought to Rizal District Hospital by their family and the Punong Barangay of Barangay Ransang, but was declared dead by the attending physician." .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/3> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "Incident happened on September 17 while victims are inside their house (Palawan PDRRMO SITREP #20)" .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/4> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "Incident happened on September 17 while victims are inside their house (Palawan PDRRMO SITREP #20)" .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/5> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "Incident happened on 17 September 2024; victim is 'for transfer'." .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/6> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "Incident happened on 17 September 2024; victim is under observation." .
+
+<https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/casualties/7> a :Casualties ;
+    :casualtyCause "Hit by fallen coconut tree" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DILG" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Iraan" ;
+    :hasLocation :Rizal_Palawan ;
+    :remarks "Incident happened on 17 September 2024; victim is under observation." .
+
 <https://sakuna.ph/03b16f2a287745ba979ce4ce39b120c7/related_incident/1> a :Incident ;
     :endDate "2024-09-14T17:00:00"^^xsd:dateTime ;
     :hasLocation :Bambang ;
@@ -7705,6 +7794,47 @@ As to date, no major incidents have been reported on election day, 12 May 2025."
     :hasBarangay "Kitayo" ;
     :hasLocation :Jose_Abad_Santos .
 
+<https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/1> a :Casualties ;
+    :casualtyCause "Hit by a falling boulder coming from a cliff while he was resting on his hammock" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP XI - Davao Occidental Police Provincial Office" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Jose_Abad_Santos .
+
+<https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/2> a :Casualties ;
+    :casualtyCause "Hit by a fallen debris from a damaged wall" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PDRRMO Davao Occidental" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Jose_Abad_Santos .
+
+<https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/3> a :Casualties ;
+    :casualtyCause "Injury to Fallen Wall" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PDRRMO Davao Occidentaal" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Jose_Abad_Santos .
+
+<https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/4> a :Casualties ;
+    :casualtyCause "Lacerated wound due to fallen store cabinet" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PDRRMO Davao Occidental" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Don_Marcelino ;
+    :remarks "Treated at MHO" .
+
+<https://sakuna.ph/a44736600e434873a9504e45b73cefee/casualties/5> a :Casualties ;
+    :casualtyCause "Collapsing of Wall" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PDRRMO Davao Occidental" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Sarangani_Davao_Occidental .
+
 <https://sakuna.ph/a44736600e434873a9504e45b73cefee/related_incident/1> a :Incident ;
     :endDate "2023-11-17T00:00:00"^^xsd:dateTime ;
     :hasBarangay "Sugal" ;
@@ -7714,6 +7844,128 @@ As to date, no major incidents have been reported on election day, 12 May 2025."
     :incidentDescription "Rockslide on road with nearby community" ;
     :remarks "Near community" ;
     :startDate "2023-11-17T00:00:00"^^xsd:dateTime .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/1> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP PRO1" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "Tamag" ;
+    :hasLocation :City_of_Vigan ;
+    :remarks "-The victim, a Municipal Councilor of Caoayan, Ilocos Sur, was having breakfast in front of a food stall in Brgy. Tamag, Vigan City, Ilocos Sur, when two (2) individuals riding a motorcycle shot him once in the head. He was rushed to the Provincial Hospital Gabriel Silang General but was declared dead on arrival (DOA) by the attending physician. The Special Investigation Task Group (SITG) determined the incident to be election-related, and this classification was approved by TG I/LO, DIDM on 27 February 2025. -The CDRRMO Vigan, Ilocos Sur responded to the incident and rushed the victim to the Ilocos Sur Provincial Hospital-Gabriela Silang." .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/10> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "CDRRMO" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Minor abrasion" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/11> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "CDRRMO" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Minor abrasion" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/12> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "CDRRMO" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Minor abrasion" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/13> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "CDRRMO" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Minor abrasion" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/14> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "CDRRMO" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Minor abrasion" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/2> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP" ;
+    :casualtyType "DEAD"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Rizal_Cagayan ;
+    :remarks "Incumbent Mayor" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/3> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Rizal_Cagayan .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/4> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "None" ;
+    :hasLocation :Rizal_Cagayan .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/5> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :San_Pablo ;
+    :remarks "Running Candidate for SB" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/6> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :San_Pablo .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/7> a :Casualties ;
+    :casualtyCause "Shooting Incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "PNP" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Poblacion" ;
+    :hasLocation :San_Pablo .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/8> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "DOH" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Traumatic Brain Concussion" .
+
+<https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/casualties/9> a :Casualties ;
+    :casualtyCause "Commotion incident" ;
+    :casualtyCount "1"^^xsd:int ;
+    :casualtyDataSource "CDRRMO" ;
+    :casualtyType "INJURED"^^:casualtyType ;
+    :hasBarangay "Dulag" ;
+    :hasLocation :City_of_Iligan ;
+    :remarks "Minor abrasion" .
 
 <https://sakuna.ph/f94d7f471d7a4eb7878acca7be74930d/related_incident/1> a :Incident ;
     :endDate "2025-01-25T06:30:00"^^xsd:dateTime ;

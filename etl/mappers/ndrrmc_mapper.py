@@ -5,9 +5,9 @@ import uuid
 import json
 from preprocessors.location_matcher import LOCATION_MATCHER
 from preprocessors.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc_mappings import AFF_POP_COL_MAP, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Event, Provenance, Incident
+from mappings.ndrrmc_mappings import AFF_POP_COL_MAP, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident
 from datetime import datetime
-from preprocessors.ndrrmc_cleaner import event_name_expander, forward_fill_and_collapse, normalize_datetime, to_int
+from preprocessors.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_int
 import polars as pl
 
 
@@ -165,21 +165,14 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
                     City_Muni=pl.col("City_Muni").str.to_lowercase())
 
 
-    # match location
-    locations = (
-        df
-        .select(
-            pl.concat_str(
-                ["City_Muni", "Province", "Region"],
-                separator=",",
-                ignore_nulls=True
-            ).alias("full location")
-        )
-        .to_series()
-        .to_list()
-    )
 
-    print("Matching locations...")
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
     matched_locations = LOCATION_MATCHER.match(locations)
     df = df.with_columns([
         pl.Series("hasLocation", matched_locations),
@@ -234,19 +227,7 @@ def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
     df = forward_fill_and_collapse(df, target_cols, "QTY", "affectedBarangays")
 
     # Match locations
-    locations = (
-        df
-        .select(
-            pl.concat_str(
-                ["City_Muni", "Province", "Region"],
-                separator=",",
-                ignore_nulls=True
-            ).alias("full location")
-        )
-        .to_series()
-        .to_list()
-    )
-
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
     matched_locations = LOCATION_MATCHER.match(locations)
     df = df.with_columns([
         pl.Series("hasLocation", matched_locations),
@@ -257,7 +238,7 @@ def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
 
     df = df.with_row_index("id", 1)
     
-    df.write_csv(event_folder_path + "cleaned_affected_population.csv")
+    df.write_csv(event_folder_path + "/cleaned_affected_population.csv")
     affpops: List[AffectedPopulation] = []
     for row in df.iter_rows(named=True):
         affpop = AffectedPopulation(
@@ -275,6 +256,56 @@ def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
     
     return affpops
 
+def load_casualties(event_folder_path: str) -> List[Casualties] | None:
+    src_path = os.path.join(event_folder_path, "casualties.csv")
+
+    if not os.path.exists(src_path):
+        src_path = os.path.join(event_folder_path, "casualties_2.csv")
+    
+    if not os.path.exists(src_path): return None
+    
+    df = pl.read_csv(src_path)
+
+    # forward fille and retain most granular entity
+    target_cols = ["Region", "Province", "City_Muni", "Summary_Type"]
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "VALIDATED")
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    # Normalize casualty type
+    df = df.with_columns(
+        pl.when(pl.col("Summary_Type").str.contains(r"(?i)injured"))
+            .then(pl.lit("INJURED"))
+            .otherwise(pl.col("Summary_Type"))
+            .alias("casualtyType")
+    )
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(f"{event_folder_path} + /cleaned_casualties.csv")
+
+    casualties: List[Casualties] = []
+
+    for row in df.iter_rows(named=True):
+        cas = Casualties(
+            id=row["id"],
+            casualtyType=row["casualtyType"],
+            casualtyCount=row["QTY"] if row["QTY"] else 1,
+            hasLocation=row["hasLocation"],
+            hasBarangay=row["Barangay"],
+            casualtyDataSource=row["SOURCE_OF\nDATA"],
+            casualtyCause=row["CAUSE"],
+            remarks=row["REMARKS"]
+        )
+
+        casualties.append(cas)
+    
+    return casualties
+
 
 if __name__ == "__main__":
-    load_aff_pop("./data/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+    load_casualties("./data/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")

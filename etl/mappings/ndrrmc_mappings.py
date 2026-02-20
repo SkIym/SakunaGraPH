@@ -1,11 +1,12 @@
 # NDRRMC MAPPINGS HERE (rdflib)
-from typing import List
+
+from typing import List, Literal as TypingLiteral
 from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, event_iri, incident_iri, prov_iri
+from .iris import aff_pop_iri, casualties_iri, event_iri, incident_iri, prov_iri
 
 @dataclass
 class Event:
@@ -317,4 +318,83 @@ def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
                 SKG.hasLocation,
                 URIRef(ap.hasLocation)
         ))
+
+CasualtyType = TypingLiteral["DEAD", "INJURED", "MISSING"]
+       
+@dataclass
+class Casualties:
+    id: str
+    casualtyType: CasualtyType
+    casualtyCount: int
+    hasLocation: URIRef
+    hasBarangay: str | None
+    casualtyDataSource: str | None
+    casualtyCause: str | None
+    remarks: str | None
+
+def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
+
+    for c in cas:
+        uri = casualties_iri(event_iri, c.id)
+
+        # rdf:type
+        g.add((
+            uri,
+            RDF.type,
+            SKG.Casualties
+        ))
+
+        # Link impact to parent event
+        g.add((
+            event_iri,
+            SKG.hasImpact,
+            uri
+        ))
+
+        g.add((
+            uri,
+            SKG.casualtyType,
+            Literal(c.casualtyType, datatype=SKG.casualtyType)
+        ))
+
+        g.add((
+            uri,
+            SKG.casualtyCount,
+            Literal(c.casualtyCount, datatype=XSD.int)
+        ))
+
+        g.add((
+                uri,
+                SKG.hasLocation,
+                URIRef(c.hasLocation)
+        ))
+
+        if c.casualtyCause:
+            g.add((
+                uri,
+                SKG.casualtyCause,
+                Literal(c.casualtyCause)
+            ))
         
+        if c.remarks:
+            g.add((
+                uri,
+                SKG.remarks,
+                Literal(c.remarks)
+            ))
+        
+        if c.casualtyDataSource:
+            g.add((
+                uri,
+                SKG.casualtyDataSource,
+                Literal(c.casualtyDataSource)
+            ))
+        
+        if c.hasBarangay:
+            g.add((
+                uri,
+                SKG.hasBarangay,
+                Literal(c.hasBarangay)
+            ))
+
+
