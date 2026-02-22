@@ -1,8 +1,8 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from mappers.ndrrmc_mapper import load_aff_pop, load_casualties, load_events, load_uuids
+from transform.ndrrmc_mapper import load_aff_pop, load_casualties, load_events, load_uuids
 from mappings.ndrrmc_mappings import Event, aff_pop_mapping, casualties_mapping, event_mapping, incident_mapping, prov_mapping
-from mappers.ndrrmc_mapper import load_incidents, load_provenance
+from transform.ndrrmc_mapper import load_incidents, load_provenance
 import os
 from typing import Tuple
 
@@ -34,8 +34,8 @@ def process_event(args: Tuple[str, Event]) -> Graph:
 
     return g
 
-DATA_DIR = "./data/ndrrmc_mini"
-OUT_FILE = "./triples/ndrrmc_mini.ttl"
+DATA_DIR = "../data/parsed/ndrrmc_mini"
+OUT_FILE = "../data/rdf/ndrrmc_mini.ttl"
 
 
 def run():

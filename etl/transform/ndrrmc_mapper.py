@@ -3,11 +3,11 @@ import os
 from typing import List
 import uuid
 import json
-from preprocessors.location_matcher import LOCATION_MATCHER
-from preprocessors.disaster_classifier import DISASTER_CLASSIFIER
+from semantic_processing.location_matcher import LOCATION_MATCHER
+from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc_mappings import AFF_POP_COL_MAP, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident
 from datetime import datetime
-from preprocessors.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_int
+from ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_int
 import polars as pl
 
 
@@ -308,4 +308,4 @@ def load_casualties(event_folder_path: str) -> List[Casualties] | None:
 
 
 if __name__ == "__main__":
-    load_casualties("./data/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_casualties("../data/raw/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")

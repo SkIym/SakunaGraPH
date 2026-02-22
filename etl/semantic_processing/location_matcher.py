@@ -323,5 +323,5 @@ class LocationMatcher:
         return matched
 
 LOCATION_MATCHER = LocationMatcher(
-    graph_path="triples/psgc_rdf.ttl"
+    graph_path="../data/rdf/psgc_rdf.ttl"
 )

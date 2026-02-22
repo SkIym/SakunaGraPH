@@ -1,4 +1,3 @@
-from typing import List
 
 import polars as pl
 from polars import DataFrame

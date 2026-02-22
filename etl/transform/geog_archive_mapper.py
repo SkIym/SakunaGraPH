@@ -468,7 +468,7 @@ def clean_date_range(value):
 
     return (None, None)
 
-def export_slices(df, specs, out_dir="./data/gda"):
+def export_slices(df, specs, out_dir="../data/parsed/gda"):
     for filename, spec in specs.items():
         tmp = df[spec["cols"]].copy()
 
@@ -540,7 +540,7 @@ def load_with_tiered_headers(path):
     df.columns = new_cols
     return df
 
-df = load_with_tiered_headers("../../data/geog-archive-cleaned.xlsx")
+df = load_with_tiered_headers("../data/raw/static/geog-archive-cleaned.xlsx")
 df = df.rename(columns=COLUMN_MAPPING)
 
 # print("\n=== XLSX column names ===")
@@ -591,9 +591,9 @@ for i, row in df.iterrows():
 
 
 inci_df = pd.DataFrame(incidents)
-inci_df.to_csv("./data/gda/gda_incidents.csv")
+inci_df.to_csv("../data/parsed/gda_incidents.csv")
 
 # export csv slices for subject mapping
 export_slices(df, EXPORT_SPECS)
 
-df.to_csv('./data/gda/gda.csv')
+df.to_csv('../data/parsed/gda.csv')
