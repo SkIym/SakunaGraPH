@@ -1,8 +1,8 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from transform.ndrrmc_mapper import load_aff_pop, load_casualties, load_events, load_uuids
-from mappings.ndrrmc_mappings import Event, aff_pop_mapping, casualties_mapping, event_mapping, incident_mapping, prov_mapping
-from transform.ndrrmc_mapper import load_incidents, load_provenance
+from etl.transform.ndrrmc import load_aff_pop, load_casualties, load_events, load_uuids
+from etl.mappings.ndrrmc import Event, aff_pop_mapping, casualties_mapping, event_mapping, incident_mapping, prov_mapping
+from etl.transform.ndrrmc import load_incidents, load_provenance
 import os
 from typing import Tuple
 

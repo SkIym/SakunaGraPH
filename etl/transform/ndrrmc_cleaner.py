@@ -105,6 +105,20 @@ def to_int(df: DataFrame, cols: list[str]):
 
     return df
 
+def to_decimal(df: DataFrame, cols: list[str]):
+    """
+    Cast df columns to decimal (handles comma'd values)
+    """
+    df = df.with_columns(
+        pl.col(col)
+            .cast(pl.Utf8, strict=False)
+            .str.replace_all(",", "")
+            .cast(pl.Float64, strict=False)
+        for col in cols
+    )
+
+    return df
+
 def concat_loc_levels(df: DataFrame, loc_cols: list[str], sep: str):
 
     locs = (

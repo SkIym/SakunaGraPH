@@ -5,9 +5,9 @@ import uuid
 import json
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc_mappings import AFF_POP_COL_MAP, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident
+from etl.mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident, Relief
 from datetime import datetime
-from ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_int
+from transform.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_decimal, to_int
 import polars as pl
 
 
@@ -286,7 +286,7 @@ def load_casualties(event_folder_path: str) -> List[Casualties] | None:
     )
 
     df = df.with_row_index("id", 1)
-    df.write_csv(f"{event_folder_path} + /cleaned_casualties.csv")
+    df.write_csv(event_folder_path + "cleaned_casualties.csv")
 
     casualties: List[Casualties] = []
 
@@ -306,6 +306,56 @@ def load_casualties(event_folder_path: str) -> List[Casualties] | None:
     
     return casualties
 
+def load_relief(event_folder_path: str) -> List[Relief] | None:
+
+    # src_path = os.path.join(event_folder_path, "assistance_provided.csv")
+
+    # handle different types of assistance provided tables
+    src_paths: list[str] = []
+    for file in os.listdir(event_folder_path):
+        if "assistance_provided" in file and file.endswith(".csv"):
+            src_paths.append(os.path.join(event_folder_path, file))
+    
+    reliefs: List[Relief] = []
+    index = 1
+    for src_path in src_paths:
+    
+        df = pl.read_csv(src_path)
+        df = df.rename(mapping=ASSISTANCE_PROVIDED_MAPPING, strict=False)
+        
+        # forward fill and retain most granular entity
+        target_cols = ["Region", "Province", "City_Muni"]
+        df = forward_fill_and_collapse(df, target_cols, "QTY", "COSTPHP")
+
+        # Match locations
+        locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+        matched_locations = LOCATION_MATCHER.match(locations)
+        df = df.with_columns([
+            pl.Series("hasLocation", matched_locations),
+        ])
+
+        df = to_decimal(df, ["COSTPHP"])
+
+        df = df.with_row_index("id", index)
+        df.write_csv(event_folder_path + "cleaned_assistance_provided.csv")
+
+
+        for row in df.iter_rows(named=True):
+            rel = Relief(
+                id=row["id"],
+                hasLocation=row["hasLocation"],
+                hasBarangay=row["Barangay"],
+                itemSource=row["SOURCE"],
+                itemQuantity=row["QUANTITY"],
+                itemUnit=row["UNIT"],
+                itemTypeOrNeeds=row["TYPE"],
+                itemCost=row["COSTPHP"]
+            )
+
+            reliefs.append(rel)
+            index += 1
+        
+    return reliefs
 
 if __name__ == "__main__":
-    load_casualties("../data/raw/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_relief("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")

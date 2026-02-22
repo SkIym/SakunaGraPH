@@ -1235,13 +1235,20 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                  rdfs:label "item cost per unit"@en .
 
 
-###  https://sakuna.ph/itemQty
-:itemQty rdf:type owl:DatatypeProperty ;
-         rdfs:subPropertyOf owl:topDataProperty ;
-         rdfs:domain :Relief ;
-         rdfs:range xsd:int ,
-                    xsd:string ;
-         rdfs:label "item quantity"@en .
+###  https://sakuna.ph/itemQuantity
+:itemQuantity rdf:type owl:DatatypeProperty ;
+              rdfs:subPropertyOf owl:topDataProperty ;
+              rdfs:domain :Relief ;
+              rdfs:range xsd:int ,
+                         xsd:string ;
+              rdfs:label "item quantity"@en .
+
+
+###  https://sakuna.ph/itemSource
+:itemSource rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Relief ;
+            rdfs:range xsd:string ;
+            rdfs:label "item source" .
 
 
 ###  https://sakuna.ph/itemTypeOrNeeds
@@ -1256,7 +1263,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :itemUnit rdf:type owl:DatatypeProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
           rdfs:domain :Relief ;
-          rdfs:range xsd:decimal ;
+          rdfs:range xsd:string ;
           rdfs:label "item unit"@en .
 
 
@@ -2065,7 +2072,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                               owl:someValuesFrom xsd:integer
                             ] ;
             rdfs:label "Assistance"@en ;
-            skos:definition "Represents the assistance provided during or after a disaster event." .
+            skos:definition "Represents the monetary assistance provided during or after a disaster event." .
 
 
 ###  https://sakuna.ph/AvalancheDry
@@ -3049,8 +3056,12 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                           owl:someValuesFrom xsd:decimal
                         ] ,
                         [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemQty ;
+                          owl:onProperty :itemQuantity ;
                           owl:someValuesFrom xsd:int
+                        ] ,
+                        [ rdf:type owl:Restriction ;
+                          owl:onProperty :itemSource ;
+                          owl:someValuesFrom xsd:string
                         ] ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :itemTypeOrNeeds ;
@@ -3058,7 +3069,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                         ] ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :itemUnit ;
-                          owl:someValuesFrom xsd:decimal
+                          owl:someValuesFrom xsd:string
                         ] ;
         rdfs:label "Relief" ;
         skos:definition "Represents the relief items provided after a disaster event." .

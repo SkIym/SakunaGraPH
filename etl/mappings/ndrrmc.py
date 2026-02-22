@@ -1,12 +1,12 @@
 # NDRRMC MAPPINGS HERE (rdflib)
-
+from dataclasses import fields
 from typing import List, Literal as TypingLiteral
 from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, casualties_iri, event_iri, incident_iri, prov_iri
+from .iris import aff_pop_iri, casualties_iri, event_iri, incident_iri, prov_iri, relief_iri
 
 @dataclass
 class Event:
@@ -397,4 +397,57 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
                 Literal(c.hasBarangay)
             ))
 
+# assistance provided
+
+ASSISTANCE_PROVIDED_MAPPING = {
+    "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
+    "NEEDS": "TYPE",
+    "NFIs_Services_Provided_TYPE": "TYPE",
+    "F_NFIs_PROVIDED_QTY": "QUANTITY",
+    "NFIs_Services_Provided_QTY": "QUANTITY",
+    "NFIs_Services_Provided_UNIT": "UNIT",
+    "F_NFIs_PROVIDED_UNIT": "UNIT",
+    "F_NFIs_PROVIDED_AMOUNT": "COSTPHP",
+    "NFIs_Services_Provided_AMOUNT": "COSTPHP",
+    "F_NFIs_PROVIDED_COST_PER\nUNIT": "COST PER UNIT",
+    "F_NFIs_PROVIDED_SOURCE": "SOURCE",
+    "SOURCE_AMOUNT": "SOURCE",
+    "REMARKS_SOURCE": "REMARKS",
+    "REMARKS_AMOUNT": "REMARKS"
+
+}
+
+
+@dataclass
+class Relief:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    itemSource: str | None
+    itemQuantity: int | None
+    itemUnit: str | None
+    itemTypeOrNeeds: str | None
+    itemCost: float
+
+def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
+
+    for r in reliefs:
+        uri = relief_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.Relief)) # rdf type
+        g.add((event_iri, SKG.hasResponse, uri)) # event link
+
+        for f in fields(r):
+            value = getattr(r, f.name)
+
+            if value is None:
+                continue  
+
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(value)))
+            elif f.name == "itemCost":
+                g.add((uri, SKG.itemCost, Literal(value, datatype=XSD.decimal)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value)))
 
