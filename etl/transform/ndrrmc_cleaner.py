@@ -114,7 +114,7 @@ def to_decimal(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .cast(pl.Float64, strict=False)
-        for col in cols
+        for col in cols if col in df.columns
     )
 
     return df

@@ -1239,8 +1239,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :itemQuantity rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
               rdfs:domain :Relief ;
-              rdfs:range xsd:int ,
-                         xsd:string ;
+              rdfs:range xsd:decimal ;
               rdfs:label "item quantity"@en .
 
 
@@ -3057,7 +3056,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                         ] ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :itemQuantity ;
-                          owl:someValuesFrom xsd:int
+                          owl:someValuesFrom xsd:decimal
                         ] ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :itemSource ;

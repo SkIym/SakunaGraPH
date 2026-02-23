@@ -1,11 +1,12 @@
 # NDRRMC CSVs AND JSONS MAPPER HERE
 import os
-from typing import List
+from typing import Iterable, List
 import uuid
 import json
+from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from etl.mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident, Relief
 from datetime import datetime
 from transform.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_decimal, to_int
 import polars as pl
@@ -316,8 +317,13 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
         if "assistance_provided" in file and file.endswith(".csv"):
             src_paths.append(os.path.join(event_folder_path, file))
     
+    if len(src_paths) == 0: return None
+    
     reliefs: List[Relief] = []
     index = 1
+
+    dfs: Iterable[pl.DataFrame] = []
+
     for src_path in src_paths:
     
         df = pl.read_csv(src_path)
@@ -325,7 +331,7 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
         
         # forward fill and retain most granular entity
         target_cols = ["Region", "Province", "City_Muni"]
-        df = forward_fill_and_collapse(df, target_cols, "QTY", "COSTPHP")
+        df = forward_fill_and_collapse(df, target_cols, "QTY", "itemCost")
 
         # Match locations
         locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
@@ -334,27 +340,43 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
             pl.Series("hasLocation", matched_locations),
         ])
 
-        df = to_decimal(df, ["COSTPHP"])
+        df = to_decimal(df, ["itemCost", "itemCostPerUnit", "itemQuantity"])
 
         df = df.with_row_index("id", index)
-        df.write_csv(event_folder_path + "cleaned_assistance_provided.csv")
-
+        dfs.append(df)
 
         for row in df.iter_rows(named=True):
-            rel = Relief(
-                id=row["id"],
-                hasLocation=row["hasLocation"],
-                hasBarangay=row["Barangay"],
-                itemSource=row["SOURCE"],
-                itemQuantity=row["QUANTITY"],
-                itemUnit=row["UNIT"],
-                itemTypeOrNeeds=row["TYPE"],
-                itemCost=row["COSTPHP"]
-            )
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(Relief)}
+            rel = Relief(**rel_kwargs)
 
             reliefs.append(rel)
             index += 1
         
+    final_dfs: Iterable[pl.DataFrame] = []
+
+    for df in dfs:
+        existing_cols = [f.name for f in fields(Relief) if f.name in df.columns]
+        missing_cols = [f.name for f in fields(Relief) if f.name not in df.columns]
+        
+        # select existing columns
+        df_selected = df.select(existing_cols)
+        
+        # add missing columns as None
+        for col in missing_cols:
+            df_selected = df_selected.with_columns(pl.lit(None).alias(col))
+        
+        # reorder columns to match Relief fields
+        df_selected = df_selected.select([f.name for f in fields(Relief)])
+        
+        final_dfs.append(df_selected)
+
+    # concatenate all DataFrames
+    final_df = pl.concat(final_dfs, rechunk=True)
+
+    # print(len(final_df) == len(reliefs))
+    final_df.write_csv(event_folder_path + "cleaned_assistance.csv")
+ 
+
     return reliefs
 
 if __name__ == "__main__":

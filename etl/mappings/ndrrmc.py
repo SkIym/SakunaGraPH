@@ -269,7 +269,7 @@ def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
         # Link impact to parent event
         g.add((
             event_iri,
-            SKG.hasImpact,
+            SKG.hasAffectedPopulation,
             uri
         ))
 
@@ -347,7 +347,7 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
         # Link impact to parent event
         g.add((
             event_iri,
-            SKG.hasImpact,
+            SKG.hasCasualties,
             uri
         ))
 
@@ -402,22 +402,33 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
 ASSISTANCE_PROVIDED_MAPPING = {
     "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
     "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
-    "NEEDS": "TYPE",
-    "NFIs_Services_Provided_TYPE": "TYPE",
-    "F_NFIs_PROVIDED_QTY": "QUANTITY",
-    "NFIs_Services_Provided_QTY": "QUANTITY",
-    "NFIs_Services_Provided_UNIT": "UNIT",
-    "F_NFIs_PROVIDED_UNIT": "UNIT",
-    "F_NFIs_PROVIDED_AMOUNT": "COSTPHP",
-    "NFIs_Services_Provided_AMOUNT": "COSTPHP",
-    "F_NFIs_PROVIDED_COST_PER\nUNIT": "COST PER UNIT",
-    "F_NFIs_PROVIDED_SOURCE": "SOURCE",
-    "SOURCE_AMOUNT": "SOURCE",
-    "REMARKS_SOURCE": "REMARKS",
-    "REMARKS_AMOUNT": "REMARKS"
+    "REGION_|_PROVINCE_|_CITY\r\n_MUNICIPALITY_|_BARANGAY": "QTY",
+    "NEEDS": "itemTypeOrNeeds",
+    "NFIs_Services_Provided_TYPE": "itemTypeOrNeeds",
+    "TYPE": "itemTypeOrNeeds",
+    "QUANTITY": "itemQuantity",
+    "F_NFIs_PROVIDED_QTY": "itemQuantity",
+    "NFIs_Services_Provided_QTY": "itemQuantity",
+    "NFIs_Services_Provided_UNIT": "itemUnit",
+    "F_NFIs_PROVIDED_UNIT": "itemUnit",
+    "UNIT": "itemUnit",
+    "F_NFIs_PROVIDED_AMOUNT": "itemCost",
+    "NFIs_Services_Provided_AMOUNT": "itemCost",
+    "COSTPHP": "itemCost",
+    "F_NFIs_PROVIDED_COST_PER\nUNIT": "itemCostPerUnit",
+    "F_NFIs_PROVIDED_COST_PER\rUNIT": "itemCostPerUnit",
+    "F_NFIs_PROVIDED_COST_PER\r\nUNIT": "itemCostPerUnit",
+    "NFIs_Services_Provided_COST_PER_UNIT": "itemCostPerUnit",
+    "COST PER UNIT": "itemCostPerUnit",
+    "F_NFIs_PROVIDED_SOURCE": "itemSource",
+    "SOURCE_AMOUNT": "itemSource",
+    "SOURCE": "itemSource",
+    "REMARKS": "remarks",
+    "REMARKS_SOURCE": "remarks",
+    "REMARKS_AMOUNT": "remarks",
+    "Barangay": "hasBarangay"
 
 }
-
 
 @dataclass
 class Relief:
@@ -425,10 +436,12 @@ class Relief:
     hasLocation: URIRef
     hasBarangay: str | None
     itemSource: str | None
-    itemQuantity: int | None
+    itemQuantity: float | None
     itemUnit: str | None
     itemTypeOrNeeds: str | None
     itemCost: float
+    remarks: str | None
+    itemCostPerUnit: float | None
 
 def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
 
@@ -436,18 +449,25 @@ def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
         uri = relief_iri(event_iri, r.id)
 
         g.add((uri, RDF.type, SKG.Relief)) # rdf type
-        g.add((event_iri, SKG.hasResponse, uri)) # event link
+        g.add((event_iri, SKG.hasRelief, uri)) # event link
 
         for f in fields(r):
-            value = getattr(r, f.name)
 
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
             if value is None:
                 continue  
+            
+            if (type(value) == int or type(value) == float) and value == 0:
+                continue
 
             if f.name == "hasLocation":
-                g.add((uri, SKG.hasLocation, URIRef(value)))
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "itemCost":
                 g.add((uri, SKG.itemCost, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "itemCostPerUnit" and value > 0:
+                g.add((uri, SKG.itemCostPerUnit, Literal(value, datatype=XSD.decimal)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
 

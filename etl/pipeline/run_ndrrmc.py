@@ -1,8 +1,8 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from etl.transform.ndrrmc import load_aff_pop, load_casualties, load_events, load_uuids
-from etl.mappings.ndrrmc import Event, aff_pop_mapping, casualties_mapping, event_mapping, incident_mapping, prov_mapping
-from etl.transform.ndrrmc import load_incidents, load_provenance
+from transform.ndrrmc import load_aff_pop, load_casualties, load_events, load_relief, load_uuids
+from mappings.ndrrmc import Event, aff_pop_mapping, casualties_mapping, event_mapping, incident_mapping, prov_mapping, relief_mapping
+from transform.ndrrmc import load_incidents, load_provenance
 import os
 from typing import Tuple
 
@@ -31,6 +31,10 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     casualties = load_casualties(event_folder)
     if casualties:
         casualties_mapping(g, casualties, event_iri)
+
+    relief = load_relief(event_folder)
+    if relief:
+        relief_mapping(g, relief, event_iri)
 
     return g
 
