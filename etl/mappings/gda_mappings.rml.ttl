@@ -614,7 +614,7 @@
     rml:logicalSource <#EvacLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/evacuation";
+        rr:template "https://sakuna.ph/{id}/preemptive_evacuation";
         rr:class :PreemptiveEvacuation ;
     ];
 
@@ -768,7 +768,7 @@
     rml:logicalSource <#HousingLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/housing";
+        rr:template "https://sakuna.ph/{id}/housing_damage";
         rr:class :HousingDamage ;
     ];
 
@@ -795,7 +795,7 @@
     rml:logicalSource <#InfraLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/infrastructure";
+        rr:template "https://sakuna.ph/{id}/infrastructure_damage";
         rr:class :InfrastructureDamage ;
     ];
 
@@ -857,7 +857,7 @@
     rml:logicalSource <#PowerLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/power";
+        rr:template "https://sakuna.ph/{id}/power_disruption";
         rr:class :PowerDisruption ;
     ];
 
@@ -875,7 +875,7 @@
     rml:logicalSource <#CommsLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/communication_lines";
+        rr:template "https://sakuna.ph/{id}/communication_line_disruption";
         rr:class :CommunicationLineDisruption ;
     ];
 
@@ -894,7 +894,7 @@
     rml:logicalSource <#RNBLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/road_and_bridges";
+        rr:template "https://sakuna.ph/{id}/road_and_bridges_damage";
         rr:class :RoadAndBridgesDamage ;
     ];
 
@@ -912,7 +912,7 @@
     rml:logicalSource <#SeaportLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/seaports";
+        rr:template "https://sakuna.ph/{id}/seaport_disruption";
         rr:class :SeaportDisruption ;
     ];
 
@@ -929,7 +929,7 @@
     rml:logicalSource <#WaterLogicalSource> ;
 
     rr:subjectMap [
-        rr:template "https://sakuna.ph/{id}/water";
+        rr:template "https://sakuna.ph/{id}/water_disruption";
         rr:class :WaterDisruption ;
     ];
 
