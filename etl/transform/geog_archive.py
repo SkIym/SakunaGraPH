@@ -591,9 +591,9 @@ for i, row in df.iterrows():
 
 
 inci_df = pd.DataFrame(incidents)
-inci_df.to_csv("../data/parsed/gda_incidents.csv")
+inci_df.to_csv("../data/parsed/gda/gda_incidents.csv")
 
 # export csv slices for subject mapping
 export_slices(df, EXPORT_SPECS)
 
-df.to_csv('../data/parsed/gda.csv')
+df.to_csv('../data/parsed/gda/gda.csv')
