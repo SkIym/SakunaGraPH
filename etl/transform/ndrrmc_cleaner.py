@@ -1,6 +1,6 @@
 
 import polars as pl
-from polars import DataFrame
+from polars import DataFrame, Decimal
 
 def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, baseline_col: str) -> DataFrame:
     """
@@ -114,6 +114,21 @@ def to_decimal(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .cast(pl.Float64, strict=False)
+        for col in cols if col in df.columns
+    )
+
+    return df
+
+def to_million_php(df: DataFrame, cols: list[str]):
+    """
+    Convert monetary values to millions PHP
+    """
+    df = df.with_columns(
+        pl.col(col)
+            .cast(pl.Utf8, strict=False)
+            .str.replace_all(",", "")
+            .cast(pl.Decimal(18, 6))
+            / 1000000
         for col in cols if col in df.columns
     )
 

@@ -1281,13 +1281,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                            rdfs:label "infrastructure damage classification"@en .
 
 
-###  https://sakuna.ph/infraDamageCost
-:infraDamageCost rdf:type owl:DatatypeProperty ;
-                 rdfs:domain :InfrastructureDamage ;
-                 rdfs:range xsd:decimal ;
-                 rdfs:label "infrastructure damage cost"@en .
-
-
 ###  https://sakuna.ph/infraDamageType
 :infraDamageType rdf:type owl:DatatypeProperty ;
                  rdfs:domain :InfrastructureDamage ;
@@ -1454,11 +1447,11 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      rdfs:label "not passable datetime"@en .
 
 
-###  https://sakuna.ph/numberDamaged
-:numberDamaged rdf:type owl:DatatypeProperty ;
-               rdfs:domain :InfrastructureDamage ;
-               rdfs:range xsd:int ;
-               rdfs:label "no. of damaged infrastructure"@en .
+###  https://sakuna.ph/numberInfraDamaged
+:numberInfraDamaged rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :InfrastructureDamage ;
+                    rdfs:range xsd:int ;
+                    rdfs:label "no. of damaged infrastructure"@en .
 
 
 ###  https://sakuna.ph/obtainedDate
@@ -2816,10 +2809,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                         owl:someValuesFrom xsd:string
                                       ] ,
                                       [ rdf:type owl:Restriction ;
-                                        owl:onProperty :infraDamageCost ;
-                                        owl:someValuesFrom xsd:decimal
-                                      ] ,
-                                      [ rdf:type owl:Restriction ;
                                         owl:onProperty :infraDamageType ;
                                         owl:someValuesFrom xsd:string
                                       ] ,
@@ -2836,7 +2825,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                         owl:someValuesFrom xsd:string
                                       ] ,
                                       [ rdf:type owl:Restriction ;
-                                        owl:onProperty :numberDamaged ;
+                                        owl:onProperty :numberInfraDamaged ;
                                         owl:someValuesFrom xsd:integer
                                       ] ,
                                       [ rdf:type owl:Restriction ;

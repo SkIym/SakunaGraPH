@@ -23,3 +23,6 @@ def casualties_iri(event_id: URIRef, cas_id: str) -> URIRef:
 
 def relief_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/relief/{r_id}")
+
+def infra_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/infrastructure_damage/{r_id}")

@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, casualties_iri, event_iri, incident_iri, prov_iri, relief_iri
+from .iris import aff_pop_iri, casualties_iri, event_iri, incident_iri, infra_iri, prov_iri, relief_iri
 
 @dataclass
 class Event:
@@ -466,8 +466,65 @@ def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "itemCost":
                 g.add((uri, SKG.itemCost, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "itemQuantity":
+                g.add((uri, SKG.itemQuantity, Literal(value, datatype=XSD.decimal)))
             elif f.name == "itemCostPerUnit" and value > 0:
                 g.add((uri, SKG.itemCostPerUnit, Literal(value, datatype=XSD.decimal)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
 
+
+INFRA_MAPPING = {
+    "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY\r\n_MUNICIPALITY_|_BARANGAY": "QTY",
+    "TYPE": "infraDamageType",
+    "CLASSIFICATION": "infraDamageClassification",
+    "INFRASTRUCTURE": "infraName",
+    "INFRASTRUCTU\nRE": "infraName",
+    "INFRASTRUCTU\r\nRE": "infraName",
+    "NUMBER_OF\nDAMAGED": "numberInfraDamaged",
+    "NUMBER_OF\r\nDAMAGED": "numberInfraDamaged",
+    "COSTPHP": "infraDamageAmount",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class Infrastructure:
+    id: str
+    hasBarangay: str | None
+    hasLocation: URIRef
+    infraDamageType: str | None
+    infraDamageClassification: str | None
+    infraName: str | None
+    numberInfraDamaged: int
+    infraDamageAmount: float 
+    remarks: str | None
+
+def infra_mapping(g: Graph, infra: List[Infrastructure], event_iri: URIRef):
+
+    for r in infra:
+        uri = infra_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.InfrastructureDamage)) # rdf type
+        g.add((event_iri, SKG.hasInfrastructureDamage, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if (type(value) == int or type(value) == float) and value == 0:
+                continue
+
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "infraDamageAmount" and int(value) > 0:
+                g.add((uri, SKG.infraDamageAmount, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "numberInfraDamaged" and value < 2:
+                continue
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value)))

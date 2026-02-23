@@ -6,9 +6,9 @@ import json
 from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, INCIDENT_COLUMN_MAPPINGS, AffectedPopulation, Casualties, Event, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, AffectedPopulation, Casualties, Event, Infrastructure, Provenance, Incident, Relief
 from datetime import datetime
-from transform.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_decimal, to_int
+from transform.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_decimal, to_int, to_million_php
 import polars as pl
 
 
@@ -379,5 +379,44 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
 
     return reliefs
 
+def load_infra(event_folder_path: str) -> List[Infrastructure] | None:
+
+    src_path = os.path.join(event_folder_path, "damage_to_infrastructure.csv")
+    
+    if not os.path.exists(src_path): return None
+    
+    df = pl.read_csv(src_path)
+    df = df.rename(mapping=INFRA_MAPPING, strict=False)
+
+    # forward fille and retain most granular entity
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "infraDamageType")
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+
+    df = to_int(df, ["numberInfraDamaged"])
+    df = to_million_php(df, ["infraDamageAmount"])
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "cleaned_infra.csv")
+
+    infra: List[Infrastructure] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(Infrastructure)}
+            inf = Infrastructure(**rel_kwargs)
+
+            infra.append(inf)
+
+    
+    return infra
+
+
 if __name__ == "__main__":
-    load_relief("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+    load_infra("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
