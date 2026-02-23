@@ -220,7 +220,7 @@
     # Preparedness
 
     rr:predicateObjectMap [
-        rr:predicate :hasPreparedness    ;
+        rr:predicate :hasPreparedness ;
         rr:objectMap [
 
             rr:parentTriplesMap <#PreparednessMapping> ;
@@ -232,7 +232,7 @@
     ] ;
 
     rr:predicateObjectMap [
-        rr:predicate :hasPreparedness ;
+        rr:predicate :hasPreemptiveEvacuation ;
         rr:objectMap [
 
             rr:parentTriplesMap <#EvacuationMapping> ;
@@ -244,7 +244,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasPreparedness ;
+        rr:predicate :hasRescue ;
         rr:objectMap [
 
             rr:parentTriplesMap <#RescueMapping> ;
@@ -256,7 +256,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasDeclarationOfCalamity ;
         rr:objectMap [
 
             rr:parentTriplesMap <#CalamMapping> ;
@@ -270,7 +270,7 @@
     # Impact
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasAffectedPopulation ;
         rr:objectMap [
 
             rr:parentTriplesMap <#AffPopMapping> ;
@@ -282,7 +282,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasCasualties ;
         rr:objectMap [
 
             rr:parentTriplesMap <#CasualtiesMapping> ;
@@ -294,7 +294,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasHousingDamage ;
         rr:objectMap [
 
             rr:parentTriplesMap <#HousingMapping> ;
@@ -306,7 +306,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasInfrastructureDamage ;
         rr:objectMap [
 
             rr:parentTriplesMap <#InfraMapping> ;
@@ -318,7 +318,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasDamageGeneral ;
         rr:objectMap [
 
             rr:parentTriplesMap <#GenDmgMapping> ;
@@ -330,7 +330,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasPowerDisruption ;
         rr:objectMap [
 
             rr:parentTriplesMap <#PowerMapping> ;
@@ -342,7 +342,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasCommunicationLineDisruption ;
         rr:objectMap [
 
             rr:parentTriplesMap <#CommsMapping> ;
@@ -354,7 +354,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasRoadAndBridgesDamage ;
         rr:objectMap [
 
             rr:parentTriplesMap <#RNBMapping> ;
@@ -366,7 +366,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasSeaportDisruption ;
         rr:objectMap [
 
             rr:parentTriplesMap <#SeaportMapping> ;
@@ -378,7 +378,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasImpact ;
+        rr:predicate :hasWaterDisruption ;
         rr:objectMap [
 
             rr:parentTriplesMap <#WaterMapping> ;
@@ -392,7 +392,7 @@
     # Response
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasAssistance ;
         rr:objectMap [
 
             rr:parentTriplesMap <#AssistanceMapping> ;
@@ -404,7 +404,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRelief ;
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefGMapping> ;
@@ -416,7 +416,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRelief ;
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefWMapping> ;
@@ -428,7 +428,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRelief ;
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefCMapping> ;
@@ -440,7 +440,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRelief ;
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefMMapping> ;
@@ -452,7 +452,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRelief ;
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefUMapping> ;
@@ -464,7 +464,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRelief ;
         rr:objectMap [
 
             rr:parentTriplesMap <#ReliefGenMapping> ;
@@ -476,7 +476,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasResponse ;
+        rr:predicate :hasRecovery ;
         rr:objectMap [
 
             rr:parentTriplesMap <#RecoveryMapping> ;
@@ -769,7 +769,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/housing";
-        rr:class :Housing ;
+        rr:class :HousingDamage ;
     ];
 
     rr:predicateObjectMap [
@@ -796,7 +796,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/infrastructure";
-        rr:class :Infrastructure ;
+        rr:class :InfrastructureDamage ;
     ];
 
     rr:predicateObjectMap [
@@ -858,7 +858,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/power";
-        rr:class :Power ;
+        rr:class :PowerDisruption ;
     ];
 
     rr:predicateObjectMap [
@@ -876,7 +876,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/communication_lines";
-        rr:class :CommunicationLines ;
+        rr:class :CommunicationLineDisruption ;
     ];
 
     rr:predicateObjectMap [
@@ -895,7 +895,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/road_and_bridges";
-        rr:class :RoadAndBridges ;
+        rr:class :RoadAndBridgesDamage ;
     ];
 
     rr:predicateObjectMap [
@@ -913,7 +913,7 @@
 
     rr:subjectMap [
         rr:template "https://sakuna.ph/{id}/seaports";
-        rr:class :Seaports ;
+        rr:class :SeaportDisruption ;
     ];
 
     rr:predicateObjectMap [
