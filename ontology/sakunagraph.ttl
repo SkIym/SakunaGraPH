@@ -2672,11 +2672,11 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                ] ,
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :partiallyDamagedHouses ;
-                                 owl:someValuesFrom xsd:integer
+                                 owl:someValuesFrom xsd:int
                                ] ,
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :totallyDamagedHouses ;
-                                 owl:someValuesFrom xsd:integer
+                                 owl:someValuesFrom xsd:int
                                ] ;
                rdfs:label "Housing Damage"@en ;
                skos:definition "Represents impact on housing." .
