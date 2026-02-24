@@ -6,9 +6,9 @@ import json
 from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, AffectedPopulation, Casualties, Event, Infrastructure, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, AffectedPopulation, Casualties, Event, Housing, Infrastructure, Provenance, Incident, Relief
 from datetime import datetime
-from transform.ndrrmc_cleaner import concat_loc_levels, event_name_expander, forward_fill_and_collapse, normalize_datetime, to_decimal, to_int, to_million_php
+from transform.ndrrmc_cleaner import concat_loc_levels, correct_QTY_column, event_name_expander, forward_fill_and_collapse, normalize_datetime, remove_summary_rows, to_decimal, to_int, to_million_php
 import polars as pl
 
 
@@ -116,6 +116,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     df = pl.read_csv(src_path)
 
     # fix column names
+    df = correct_QTY_column(df)
     df = df.rename(INCIDENT_COLUMN_MAPPINGS, strict=False)
 
     print("Forward filling...")
@@ -221,6 +222,7 @@ def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
     df = pl.read_csv(src_path)
 
     # fix column names
+    df = correct_QTY_column(df)
     df = df.rename(AFF_POP_COL_MAP, strict=False)
 
 
@@ -327,6 +329,7 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
     for src_path in src_paths:
     
         df = pl.read_csv(src_path)
+        df = correct_QTY_column(df)
         df = df.rename(mapping=ASSISTANCE_PROVIDED_MAPPING, strict=False)
         
         # forward fill and retain most granular entity
@@ -386,6 +389,7 @@ def load_infra(event_folder_path: str) -> List[Infrastructure] | None:
     if not os.path.exists(src_path): return None
     
     df = pl.read_csv(src_path)
+    df = correct_QTY_column(df)
     df = df.rename(mapping=INFRA_MAPPING, strict=False)
 
     # forward fille and retain most granular entity
@@ -417,6 +421,74 @@ def load_infra(event_folder_path: str) -> List[Infrastructure] | None:
     
     return infra
 
+def load_housing(event_folder_path: str) -> List[Housing] | None:
+
+    src_path = os.path.join(event_folder_path, "damaged_houses.csv")
+    
+    if not os.path.exists(src_path): return None
+    
+    df = pl.read_csv(src_path)
+    df = correct_QTY_column(df)
+    df = df.rename(mapping=HOUSES_MAPPING, strict=False)
+
+    # forward fill
+    target_cols = ["Region", "Province"]
+    df = df.with_columns(
+        pl.col(c).forward_fill() for c in target_cols
+    )
+
+    # remove summary rows
+    df = remove_summary_rows(df, nulls=["City_Muni", "Barangay"])
+
+    # remove dupes
+    df = df.unique(
+        subset=[
+                "City_Muni",
+                "Barangay",
+                "totallyDamagedHouses",
+                "partiallyDamagedHouses",
+                "housingDamageAmount"
+            ],
+        maintain_order=True)
+
+    # forward fill
+    df = df.with_columns(
+        pl.col("City_Muni").forward_fill()
+    )
+
+    # remove city summary rows
+    df = df.filter(
+        ~(
+            pl.col("Barangay").is_null()
+            & pl.col("City_Muni").is_duplicated()
+        )
+    )
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    df = to_int(df, ["totallyDamagedHouses", "partiallyDamagedHouses"])
+    df = to_million_php(df, ["housingDamageAmount"])
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "cleaned_houses.csv")
+
+    houses: List[Housing] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(Housing)}
+            h = Housing(**rel_kwargs)
+
+            houses.append(h)
+
+    
+    return houses
 
 if __name__ == "__main__":
-    load_infra("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+    # load_housing("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+
+    load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

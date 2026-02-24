@@ -1,6 +1,6 @@
 
 import polars as pl
-from polars import DataFrame, Decimal
+from polars import DataFrame
 
 def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, baseline_col: str) -> DataFrame:
     """
@@ -124,11 +124,12 @@ def to_million_php(df: DataFrame, cols: list[str]):
     Convert monetary values to millions PHP
     """
     df = df.with_columns(
-        pl.col(col)
+        (pl.col(col)
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
-            .cast(pl.Decimal(18, 6))
-            / 1000000
+            .cast(pl.Float64)
+            / 1000000)
+        .round(6)
         for col in cols if col in df.columns
     )
 
@@ -150,6 +151,29 @@ def concat_loc_levels(df: DataFrame, loc_cols: list[str], sep: str):
     )
 
     return locs
+
+def correct_QTY_column(df: DataFrame):
+
+    return df.rename(mapping={
+        "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY_\nMUNICIPALITY_|_BARANGAY": "QTY",
+    "REGION_|_PROVINCE_|_CITY\r\n_MUNICIPALITY_|_BARANGAY": "QTY"
+    }, strict=False)
+
+
+def remove_summary_rows(df: DataFrame, nulls: list[str]):
+    """
+    Removes summary rows
+    """
+    df = df.filter(
+        ~pl.all_horizontal(pl.col(c).is_null() for c in nulls)
+    )
+
+    # to be continued
+
+    return df
+
 
 # if __name__ == "__main__":
 #     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"

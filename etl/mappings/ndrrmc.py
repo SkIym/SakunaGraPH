@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, casualties_iri, event_iri, incident_iri, infra_iri, prov_iri, relief_iri
+from .iris import aff_pop_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, prov_iri, relief_iri
 
 @dataclass
 class Event:
@@ -144,8 +144,6 @@ class Incident:
     remarks: str | None
 
 INCIDENT_COLUMN_MAPPINGS = {
-    "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
-    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
     "Column_2": "Type of Incident",
     "Column_3": "Date",
     "Column_4": "Time",
@@ -232,7 +230,6 @@ def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
             ))
 
 AFF_POP_COL_MAP = {
-    "REGION_|_PROVINCE_|_CITY_\nMUNICIPALITY_|_BARANGAY": "QTY",
     "NO_OF_AFFECTED_Brgys": "affectedBarangays",
     "NO_OF_AFFECTED_Families": "affectedFamilies",
     "NO_OF_AFFECTED_Persons": "affectedPersons",
@@ -281,7 +278,7 @@ def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
                 Literal(ap.affectedBarangays, datatype=XSD.int)
             ))
         
-        else:
+        elif ap.hasBarangay:
 
             g.add((
                 uri,
@@ -400,9 +397,6 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
 # assistance provided
 
 ASSISTANCE_PROVIDED_MAPPING = {
-    "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
-    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
-    "REGION_|_PROVINCE_|_CITY\r\n_MUNICIPALITY_|_BARANGAY": "QTY",
     "NEEDS": "itemTypeOrNeeds",
     "NFIs_Services_Provided_TYPE": "itemTypeOrNeeds",
     "TYPE": "itemTypeOrNeeds",
@@ -475,9 +469,6 @@ def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
 
 
 INFRA_MAPPING = {
-    "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
-    "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
-    "REGION_|_PROVINCE_|_CITY\r\n_MUNICIPALITY_|_BARANGAY": "QTY",
     "TYPE": "infraDamageType",
     "CLASSIFICATION": "infraDamageClassification",
     "INFRASTRUCTURE": "infraName",
@@ -522,9 +513,56 @@ def infra_mapping(g: Graph, infra: List[Infrastructure], event_iri: URIRef):
 
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
-            elif f.name == "infraDamageAmount" and int(value) > 0:
+            elif f.name == "infraDamageAmount":
                 g.add((uri, SKG.infraDamageAmount, Literal(value, datatype=XSD.decimal)))
             elif f.name == "numberInfraDamaged" and value < 2:
                 continue
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
+
+HOUSES_MAPPING = {
+    "NO_OF_DAMAGED_HOUSES_TOTALLY": "totallyDamagedHouses",
+    "NO_OF_DAMAGED_HOUSES_PARTIALLY": "partiallyDamagedHouses",
+    "AMOUNT_PHP_GRAND_TOTAL": "housingDamageAmount",
+    "REMARKS_GRAND_TOTAL": "remarks"
+}
+
+@dataclass
+class Housing:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    totallyDamagedHouses: int
+    partiallyDamagedHouses: int
+    housingDamageAmount: float | None
+    remarks: str | None
+
+def housing_mapping(g: Graph, hs: List[Housing], event_iri: URIRef):
+
+    for r in hs:
+        uri = housing_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.HousingDamage)) # rdf type
+        g.add((event_iri, SKG.hasHousingDamage, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            # if (type(value) == int or type(value) == float) and value == 0:
+            #     continue
+
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "housingDamageAmount":
+                g.add((uri, SKG.housingDamageAmount, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "totallyDamagedHouses":
+                g.add((uri, SKG.totallyDamagedHouses, Literal(value, datatype=XSD.int)))
+            elif f.name == "partiallyDamagedHouses":                
+                g.add((uri, SKG.partiallyDamagedHouses, Literal(value, datatype=XSD.int)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
