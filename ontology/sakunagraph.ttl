@@ -916,27 +916,41 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                    rdfs:label "agency and LGUs present"@en .
 
 
-###  https://sakuna.ph/agricultureClassification
-:agricultureClassification rdf:type owl:DatatypeProperty ;
-                           rdfs:domain :AgricultureDamage ;
-                           rdfs:range xsd:string ;
-                           rdfs:label "agriculture classification"@en .
+###  https://sakuna.ph/agriDamageAmount
+:agriDamageAmount rdf:type owl:DatatypeProperty ;
+                  rdfs:domain :AgricultureDamage ;
+                  rdfs:range xsd:decimal ;
+                  rdfs:comment "From Department of Geography digitized archives" ,
+                               "In M PHP" ;
+                  rdfs:label "agriculture damage amount"@en .
 
 
-###  https://sakuna.ph/agricultureDamageAmount
-:agricultureDamageAmount rdf:type owl:DatatypeProperty ;
-                         rdfs:domain :AgricultureDamage ;
-                         rdfs:range xsd:decimal ;
-                         rdfs:comment "From Department of Geography digitized archives" ,
-                                      "In M PHP" ;
-                         rdfs:label "agriculture damage amount"@en .
+###  https://sakuna.ph/agriDamageClassification
+:agriDamageClassification rdf:type owl:DatatypeProperty ;
+                          rdfs:domain :AgricultureDamage ;
+                          rdfs:range xsd:string ;
+                          rdfs:label "agriculture damage classification"@en .
 
 
-###  https://sakuna.ph/agricultureType
-:agricultureType rdf:type owl:DatatypeProperty ;
-                 rdfs:domain :AgricultureDamage ;
-                 rdfs:range xsd:string ;
-                 rdfs:label "agriculture type"@en .
+###  https://sakuna.ph/agriDamageQuantity
+:agriDamageQuantity rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :AgricultureDamage ;
+                    rdfs:range xsd:decimal ;
+                    rdfs:label "agriculture damage quantity" .
+
+
+###  https://sakuna.ph/agriDamageType
+:agriDamageType rdf:type owl:DatatypeProperty ;
+                rdfs:domain :AgricultureDamage ;
+                rdfs:range xsd:string ;
+                rdfs:label "agriculture damage type"@en .
+
+
+###  https://sakuna.ph/agriDamageUnit
+:agriDamageUnit rdf:type owl:DatatypeProperty ;
+                rdfs:domain :AgricultureDamage ;
+                rdfs:range xsd:string ;
+                rdfs:label "agriculture damage unit" .
 
 
 ###  https://sakuna.ph/airline
@@ -1466,6 +1480,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :partiallyDamagedCropArea rdf:type owl:DatatypeProperty ;
                           rdfs:domain :AgricultureDamage ;
                           rdfs:range xsd:decimal ;
+                          rdfs:comment "in hectares" ;
                           rdfs:label "partially damaged crop area"@en .
 
 
@@ -1583,6 +1598,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :productionLossCost rdf:type owl:DatatypeProperty ;
                     rdfs:domain :AgricultureDamage ;
                     rdfs:range xsd:decimal ;
+                    rdfs:comment "in M PHP" ;
                     rdfs:label "production loss cost"@en .
 
 
@@ -1590,6 +1606,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :productionLossVolume rdf:type owl:DatatypeProperty ;
                       rdfs:domain :AgricultureDamage ;
                       rdfs:range xsd:decimal ;
+                      rdfs:comment "in metric tons" ;
                       rdfs:label "production loss volume"@en .
 
 
@@ -1803,6 +1820,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :totallyDamagedCropArea rdf:type owl:DatatypeProperty ;
                         rdfs:domain :AgricultureDamage ;
                         rdfs:range xsd:decimal ;
+                        rdfs:comment "in hectares" ;
                         rdfs:label "totally damaged crop area"@en .
 
 
@@ -2028,15 +2046,23 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :AgricultureDamage rdf:type owl:Class ;
                    rdfs:subClassOf :Impact ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :agricultureClassification ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :agricultureDamageAmount ;
+                                     owl:onProperty :agriDamageAmount ;
                                      owl:someValuesFrom xsd:decimal
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :agricultureType ;
+                                     owl:onProperty :agriDamageClassification ;
+                                     owl:someValuesFrom xsd:string
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :agriDamageQuantity ;
+                                     owl:someValuesFrom xsd:decimal
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :agriDamageType ;
+                                     owl:someValuesFrom xsd:string
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :agriDamageUnit ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
