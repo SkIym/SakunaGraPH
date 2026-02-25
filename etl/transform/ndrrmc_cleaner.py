@@ -1,6 +1,7 @@
 
 import polars as pl
 from polars import DataFrame
+import re
 
 def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, baseline_col: str) -> DataFrame:
     """
@@ -100,12 +101,12 @@ def to_int(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .cast(pl.Int64, strict=False)
-        for col in cols
+        for col in cols if col in df.columns
     )
 
     return df
 
-def to_decimal(df: DataFrame, cols: list[str]):
+def to_float(df: DataFrame, cols: list[str]):
     """
     Cast df columns to decimal (handles comma'd values)
     """
@@ -173,6 +174,10 @@ def remove_summary_rows(df: DataFrame, nulls: list[str]):
     # to be continued
 
     return df
+
+def replace_column_whitespace_with_underscore(df: DataFrame) -> DataFrame:
+    # Replace all whitespace characters with '_'
+    return df.rename(lambda c: re.sub(r"\s+", "_", c))
 
 
 # if __name__ == "__main__":

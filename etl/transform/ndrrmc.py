@@ -6,9 +6,9 @@ import json
 from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc import AFF_POP_COL_MAP, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, AffectedPopulation, Casualties, Event, Housing, Infrastructure, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, AffectedPopulation, Agriculture, Casualties, Event, Housing, Infrastructure, Provenance, Incident, Relief
 from datetime import datetime
-from transform.ndrrmc_cleaner import concat_loc_levels, correct_QTY_column, event_name_expander, forward_fill_and_collapse, normalize_datetime, remove_summary_rows, to_decimal, to_int, to_million_php
+from transform.ndrrmc_cleaner import concat_loc_levels, correct_QTY_column, event_name_expander, forward_fill_and_collapse, normalize_datetime, remove_summary_rows, replace_column_whitespace_with_underscore, to_float, to_int, to_million_php
 import polars as pl
 
 
@@ -119,7 +119,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     df = correct_QTY_column(df)
     df = df.rename(INCIDENT_COLUMN_MAPPINGS, strict=False)
 
-    print("Forward filling...")
+    # print("Forward filling...")
 
     # clean rows by retaining only the actual incident entry
     df = forward_fill_and_collapse(df, target_cols, "QTY", "TYPE_OF_INCIDENT")
@@ -135,7 +135,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
         pl.lit("due to " + event_name_expander(event_name)).alias("event_name")
     ])
 
-    print("Classifying disaster types...")
+    # print("Classifying disaster types...")
     # classify the type of the disaster based on incident type text and description
     type_texts = (
         df
@@ -180,7 +180,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
         pl.Series("hasLocation", matched_locations),
     ])
     
-    print("Normalizing datetime...")
+    # print("Normalizing datetime...")
     df = normalize_datetime(df,
                             "DATE_OF\nOCCURENCE","TIME_OF\nOCCURENCE", 
                             "%d %B %Y %I:%M %P", 
@@ -189,7 +189,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     # add column for index 
     df = df.with_row_index("incident_id", 1)
 
-    print("Writing csv to " + event_folder_path)
+    # print("Writing csv to " + event_folder_path)
 
     df.write_csv(event_folder_path + "/cleaned_related_incidents.csv")
 
@@ -343,7 +343,7 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
             pl.Series("hasLocation", matched_locations),
         ])
 
-        df = to_decimal(df, ["itemCost", "itemCostPerUnit", "itemQuantity"])
+        df = to_float(df, ["itemCost", "itemCostPerUnit", "itemQuantity"])
 
         df = df.with_row_index("id", index)
         dfs.append(df)
@@ -488,7 +488,52 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
     
     return houses
 
-if __name__ == "__main__":
-    # load_housing("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+def load_agri(event_folder_path: str) -> List[Agriculture] | None:
 
-    load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")
+
+    src_path = None
+    for file in os.listdir(event_folder_path):
+        if "agriculture" in file.lower() and file.endswith(".csv"):
+            src_path = os.path.join(event_folder_path, file)
+            break
+    
+    if not src_path: return None
+    
+    df = pl.read_csv(src_path)
+    df = correct_QTY_column(df)
+    df = replace_column_whitespace_with_underscore(df)
+    df = df.rename(mapping=AGRI_MAPPING, strict=False)
+
+    # forward fille and retain most granular entity
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "agriDamageClassification")
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    df = to_int(df, ["partiallyDamagedInfrastructure", "totallyDamagedInfrastructure", "farmerFisherfolkAffected"])
+    df = to_million_php(df, ["productionLossCost", "agriDamageAmount"])
+    df = to_float(df, ["productionLossVolume", "partiallyDamagedCropArea", "totallyDamagedCropArea"])
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "cleaned_agri.csv")
+
+    ents: List[Agriculture] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(Agriculture)}
+            ent = Agriculture(**rel_kwargs)
+
+            ents.append(ent)
+
+    
+    return ents
+
+if __name__ == "__main__":
+    load_agri("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+
+    # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

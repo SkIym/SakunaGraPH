@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, prov_iri, relief_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, prov_iri, relief_iri
 
 @dataclass
 class Event:
@@ -564,5 +564,78 @@ def housing_mapping(g: Graph, hs: List[Housing], event_iri: URIRef):
                 g.add((uri, SKG.totallyDamagedHouses, Literal(value, datatype=XSD.int)))
             elif f.name == "partiallyDamagedHouses":                
                 g.add((uri, SKG.partiallyDamagedHouses, Literal(value, datatype=XSD.int)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+
+AGRI_MAPPING = {
+    "CLASSIFICATION": "agriDamageClassification",
+    "CLASSIFICATI_ON": "agriDamageClassification",
+    "TYPE": "agriDamageType",
+    "UNIT": "agriDamageUnit",
+    "QUANTITY": "agriDamageQuantity",
+    "TOTAL_COSTPHP": "agriDamageAmount",
+    "REMARKS": "remarks",
+    "NO_OF_FARMERS__FISHERFOLK_AFFECTED": "farmerFisherfolkAffected",
+    "AFFECTED_CROP_AREA_HA_WITH_NO_CHANCE_OF_RECOVERY_TOTALLY_DAMAGED": "totallyDamagedCropArea",
+    "AFFECTED_CROP_AREA_HA_WITH_CHANCE_OF_RECOVERY_PARTIALLY_DAMAGED": "partiallyDamagedCropArea",
+    "NUMBER_OF_DAMAGED_INFRASTRUCTURE,_MACHINERIES,_EQUIPMENT_TOTALLY_DAMAGED": "totallyDamagedInfrastructure",
+    "NUMBER_OF_DAMAGED_INFRASTRUCTURE,_MACHINERIES,_EQUIPMENT_PARTIALLY_DAMAGED": "partiallyDamagedInfrastructure",
+    "PRODUCTION_LOSS_IN_VOLUME_MT_TOTAL": "productionLossVolume",
+    "PRODUCTION_LOSS_COST_OF_DAMAGE_IN_VALUE_PHP_TOTAL": "productionLossCost",
+
+}
+
+@dataclass
+class Agriculture:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    agriDamageAmount: float
+    agriDamageClassification: str | None
+    agriDamageType: str | None
+    agriDamageQuantity: float | None
+    agriDamageUnit: str | None
+    farmerFisherfolkAffected: int | None
+    partiallyDamagedCropArea: float | None
+    totallyDamagedCropArea: float | None
+    partiallyDamagedInfrastructure: int | None
+    totallyDamagedInfrastructure: int | None
+    productionLossCost: float | None
+    productionLossVolume: float | None
+    remarks: str | None
+def agri_mapping(g: Graph, hs: List[Agriculture], event_iri: URIRef):
+
+    for r in hs:
+        uri = agri_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.AgricultureDamage)) # rdf type
+        g.add((event_iri, SKG.hasAgricultureDamage, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            # if (type(value) == int or type(value) == float) and value == 0:
+            #     continue
+
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "agriDamageAmount":
+                g.add((uri, SKG.agriDamageAmount, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "agriDamageQuantity":
+                g.add((uri, SKG.agriDamageQuantity, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "totallyDamagedCropArea":
+                g.add((uri, SKG.totallyDamagedCropArea, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "partiallyDamagedCropArea":                
+                g.add((uri, SKG.partiallyDamagedCropArea, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "productionLossCost":
+                g.add((uri, SKG.productionLossCost, Literal(value, datatype=XSD.decimal)))
+            elif f.name == "productionLossVolume":                
+                g.add((uri, SKG.productionLossVolume, Literal(value, datatype=XSD.decimal)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
