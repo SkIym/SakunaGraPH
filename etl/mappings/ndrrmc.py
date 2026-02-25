@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, prov_iri, relief_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, prov_iri, relief_iri
 
 @dataclass
 class Event:
@@ -238,6 +238,7 @@ AFF_POP_COL_MAP = {
     "TOTAL_SERVED_Inside_+_Outside_Persons_CUM": "displacedPersons",
     "TOTAL_SERVED_Inside_+_Outside_Families_CUM": "displacedFamilies",
     "No_of_ECs_Persons_CUM": "evacuationCenters",
+    "Barangay": "hasBarangay"
 }
 
 @dataclass
@@ -604,6 +605,7 @@ class Agriculture:
     productionLossCost: float | None
     productionLossVolume: float | None
     remarks: str | None
+
 def agri_mapping(g: Graph, hs: List[Agriculture], event_iri: URIRef):
 
     for r in hs:
@@ -637,5 +639,43 @@ def agri_mapping(g: Graph, hs: List[Agriculture], event_iri: URIRef):
                 g.add((uri, SKG.productionLossCost, Literal(value, datatype=XSD.decimal)))
             elif f.name == "productionLossVolume":                
                 g.add((uri, SKG.productionLossVolume, Literal(value, datatype=XSD.decimal)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+PEVAC_MAPPING = {
+    "FAMILIES": "preemptFamilies",
+    "TOTAL": "preemptPersons",
+    "REMARKS": "remarks",
+    "Barangay": "hasBarangay"
+}
+
+@dataclass
+class PEvacuation: #Preemptive Evacuation
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    preemptFamilies: int | None
+    preemptPersons: int | None
+    remarks: str | None
+    evacuationCenters: int | None
+
+def pevac_mapping (g: Graph, hs: List[PEvacuation], event_iri: URIRef):
+
+    for r in hs:
+        uri = pevac_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.PreemptiveEvacuation)) # rdf type
+        g.add((event_iri, SKG.hasPreemptiveEvacuation, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 

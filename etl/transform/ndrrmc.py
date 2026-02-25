@@ -1,12 +1,13 @@
 # NDRRMC CSVs AND JSONS MAPPER HERE
 import os
+from re import S
 from typing import Iterable, List
 import uuid
 import json
 from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, AffectedPopulation, Agriculture, Casualties, Event, Housing, Infrastructure, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING, AffectedPopulation, Agriculture, Casualties, Event, Housing, Infrastructure, PEvacuation, Provenance, Incident, Relief
 from datetime import datetime
 from transform.ndrrmc_cleaner import concat_loc_levels, correct_QTY_column, event_name_expander, forward_fill_and_collapse, normalize_datetime, remove_summary_rows, replace_column_whitespace_with_underscore, to_float, to_int, to_million_php
 import polars as pl
@@ -240,24 +241,25 @@ def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
     df = to_int(df, ["affectedFamilies", "affectedBarangays", "affectedPersons", "displacedFamilies", "displacedPersons"])
 
     df = df.with_row_index("id", 1)
-    
-    df.write_csv(event_folder_path + "/cleaned_affected_population.csv")
-    affpops: List[AffectedPopulation] = []
-    for row in df.iter_rows(named=True):
-        affpop = AffectedPopulation(
-            id=row["id"],
-            affectedBarangays=row["affectedBarangays"],
-            affectedFamilies=row["affectedFamilies"],
-            affectedPersons=row["affectedPersons"],
-            displacedFamilies=row["displacedFamilies"],
-            displacedPersons=row["displacedPersons"],
-            hasLocation=row["hasLocation"],
-            hasBarangay=row["Barangay"]
-        )
 
-        affpops.append(affpop)
+    app_fields = [f.name for f in fields(AffectedPopulation)]
+    app_fields.append("evacuationCenters")
+
+    df = df.select(app_fields)
+
+    df.write_csv(event_folder_path + "/cleaned_affected_population.csv")
     
-    return affpops
+    ents: List[AffectedPopulation] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(AffectedPopulation)}
+            ent = AffectedPopulation(**rel_kwargs)
+
+            ents.append(ent)
+
+    
+    return ents
+    
 
 def load_casualties(event_folder_path: str) -> List[Casualties] | None:
     src_path = os.path.join(event_folder_path, "casualties.csv")
@@ -289,7 +291,7 @@ def load_casualties(event_folder_path: str) -> List[Casualties] | None:
     )
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "cleaned_casualties.csv")
+    df.write_csv(event_folder_path + "/cleaned_casualties.csv")
 
     casualties: List[Casualties] = []
 
@@ -377,7 +379,7 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
     final_df = pl.concat(final_dfs, rechunk=True)
 
     # print(len(final_df) == len(reliefs))
-    final_df.write_csv(event_folder_path + "cleaned_assistance.csv")
+    final_df.write_csv(event_folder_path + "/cleaned_assistance.csv")
  
 
     return reliefs
@@ -408,7 +410,7 @@ def load_infra(event_folder_path: str) -> List[Infrastructure] | None:
     df = to_million_php(df, ["infraDamageAmount"])
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "cleaned_infra.csv")
+    df.write_csv(event_folder_path + "/cleaned_infra.csv")
 
     infra: List[Infrastructure] = []
 
@@ -475,7 +477,7 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
     df = to_million_php(df, ["housingDamageAmount"])
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "cleaned_houses.csv")
+    df.write_csv(event_folder_path + "/cleaned_houses.csv")
 
     houses: List[Housing] = []
 
@@ -520,7 +522,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
     df = to_float(df, ["productionLossVolume", "partiallyDamagedCropArea", "totallyDamagedCropArea"])
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "cleaned_agri.csv")
+    df.write_csv(event_folder_path + "/cleaned_agri.csv")
 
     ents: List[Agriculture] = []
 
@@ -533,7 +535,119 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
     
     return ents
 
+def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
+
+
+    # preemptive evac csv path
+    src_path = os.path.join(event_folder_path, "pre-emptive_evacuation.csv")
+    
+    # affected pop path (for no. of evacuationCenters)
+    ap_path = os.path.join(event_folder_path, "cleaned_affected_population.csv")
+
+    src_exists = os.path.exists(src_path)
+    ap_exists = os.path.exists(ap_path)
+
+    if not src_exists and not ap_exists: return None
+    
+    e_df: pl.DataFrame = pl.DataFrame()
+    if src_exists:
+
+        e_df = pl.read_csv(src_path)
+        e_df = correct_QTY_column(e_df)
+        e_df = replace_column_whitespace_with_underscore(e_df)
+        e_df = e_df.rename(mapping=PEVAC_MAPPING, strict=False)
+
+        # forward fille and retain most granular entity
+        target_cols = ["Region", "Province", "City_Muni"]
+        e_df = forward_fill_and_collapse(e_df, target_cols, "QTY", "preemptPersons")
+
+        # Match locations
+        locations = concat_loc_levels(e_df, ["City_Muni", "Province", "Region"], ",")
+        matched_locations = LOCATION_MATCHER.match(locations)
+        e_df = e_df.with_columns([
+            pl.Series("hasLocation", matched_locations),
+        ])
+
+
+        e_df = to_int(e_df, ["preemptFamilies", "preemptPersons"])
+
+
+    ap_df: pl.DataFrame = pl.DataFrame()
+    if ap_exists:
+
+        ap_df = pl.read_csv(ap_path)
+        ap_df = ap_df.select([
+            "hasLocation",
+            "hasBarangay",
+            "evacuationCenters"
+        ])
+
+        ap_df = to_int(ap_df, ["evacuationCenters"])
+
+    
+    df: pl.DataFrame = pl.DataFrame()
+
+    if ap_exists and not src_exists:
+        df = ap_df
+        df = df.filter(
+            ~(
+                (pl.col("evacuationCenters") == 0)
+            )
+        )
+    elif src_exists and not ap_exists:
+        df = e_df
+    else:
+        df = e_df.join(
+            other=ap_df,
+            on=["hasLocation"],
+            how="full", 
+            coalesce=True
+        )
+
+        # remove entries with all empty values
+        df = df.filter(
+            ~(
+                (pl.col("evacuationCenters") == 0)
+                & pl.all_horizontal(
+                    pl.col(["preemptFamilies", "preemptPersons"]).is_null()
+                )
+            )
+        )
+
+        # merge barangay columns, skip same barangays
+        df = df.with_columns(
+            pl.when(pl.col("hasBarangay") == pl.col("hasBarangay_right"))
+            .then(pl.col("hasBarangay"))
+            .otherwise(
+                pl.concat_str(
+                    ["hasBarangay", "hasBarangay_right"],
+                    separator="",
+                    ignore_nulls=True
+                )
+            ).replace("", None)
+            .alias("hasBarangay")
+        )
+
+    
+
+    
+    
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "/cleaned_preemptive_evacuation.csv")
+
+    ents: List[PEvacuation] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(PEvacuation)}
+            ent = PEvacuation(**rel_kwargs)
+
+            ents.append(ent)
+
+    return ents
+
 if __name__ == "__main__":
-    load_agri("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024/")
+    load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_pevac("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")
