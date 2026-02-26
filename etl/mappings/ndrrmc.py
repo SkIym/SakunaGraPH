@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, prov_iri, relief_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri
 
 @dataclass
 class Event:
@@ -478,7 +478,9 @@ INFRA_MAPPING = {
     "NUMBER_OF\nDAMAGED": "numberInfraDamaged",
     "NUMBER_OF\r\nDAMAGED": "numberInfraDamaged",
     "COSTPHP": "infraDamageAmount",
-    "REMARKS": "remarks"
+    "REMARKS": "remarks",
+    "Barangay": "hasBarangay"
+
 }
 
 @dataclass
@@ -525,7 +527,9 @@ HOUSES_MAPPING = {
     "NO_OF_DAMAGED_HOUSES_TOTALLY": "totallyDamagedHouses",
     "NO_OF_DAMAGED_HOUSES_PARTIALLY": "partiallyDamagedHouses",
     "AMOUNT_PHP_GRAND_TOTAL": "housingDamageAmount",
-    "REMARKS_GRAND_TOTAL": "remarks"
+    "REMARKS_GRAND_TOTAL": "remarks",    
+    "Barangay": "hasBarangay"
+
 }
 
 @dataclass
@@ -584,6 +588,7 @@ AGRI_MAPPING = {
     "NUMBER_OF_DAMAGED_INFRASTRUCTURE,_MACHINERIES,_EQUIPMENT_PARTIALLY_DAMAGED": "partiallyDamagedInfrastructure",
     "PRODUCTION_LOSS_IN_VOLUME_MT_TOTAL": "productionLossVolume",
     "PRODUCTION_LOSS_COST_OF_DAMAGE_IN_VALUE_PHP_TOTAL": "productionLossCost",
+    "Barangay": "hasBarangay"
 
 }
 
@@ -659,7 +664,7 @@ class PEvacuation: #Preemptive Evacuation
     remarks: str | None
     evacuationCenters: int | None
 
-def pevac_mapping (g: Graph, hs: List[PEvacuation], event_iri: URIRef):
+def pevac_mapping(g: Graph, hs: List[PEvacuation], event_iri: URIRef):
 
     for r in hs:
         uri = pevac_iri(event_iri, r.id)
@@ -679,3 +684,121 @@ def pevac_mapping (g: Graph, hs: List[PEvacuation], event_iri: URIRef):
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
+    
+
+RNB_MAPPING = {
+    "TYPE": "roadBridgeType",
+    "CLASSIFICATION": "roadBridgeClassification",
+    "ROAD_SECTION_BRIDG_E": "roadBridgeName",
+    "DATE_REPORTED_passable": "passableDate",
+    "TIME_REPORTED_passable": "passableTime",
+    "DATE_REPORTED_not_passable": "notPassableDate",
+    "TIME_REPORTED_not_passable": "notPassableTime",
+    "STATUS": "roadBridgeStatus",
+    "REMARK": "remarks",
+    "Barangay": "hasBarangay"
+}
+
+@dataclass
+class RNB:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    roadBridgeType: str | None
+    roadBridgeClassification: str | None
+    roadBridgeName: str | None
+    passableDateTime: datetime | None
+    notPassableDateTime: datetime | None
+    roadBridgeStatus: str | None
+    remarks: str | None
+
+
+def rnb_mapping(g: Graph, hs: List[RNB], event_iri: URIRef):
+
+    for r in hs:
+        uri = rnb_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.RoadAndBridgesDamage)) # rdf type
+        g.add((event_iri, SKG.hasRoadAndBridgesDamage, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "passableDateTime":
+                g.add((uri, SKG.passableDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "notPassableDateTime":
+                g.add((uri, SKG.notPassableDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+POWER_MAPPING = {
+    "TYPE": "disruptionType",
+    "SERVICE_PROVIDER": "serviceProvider",
+    "DATE_OF_INTERRUPTION__OUTAGE": "interruptionDate",
+    "TIME_OF_INTERRUPTION__OUTAGE": "interruptionTime",
+    "DATE_RESTORED": "restorationDate",
+    "TIME_RESTORED": "restorationTime",
+    "REMARKS": "remarks",
+    "Barangay": "hasBarangay"
+}
+
+@dataclass
+class Power:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    disruptionType: str 
+    serviceProvider: str | None
+    interruptionDateTime: datetime | None
+    restorationDateTime: datetime | None
+    remarks: str | None
+
+def power_mapping(g: Graph, hs: List[Power], event_iri: URIRef):
+
+    for r in hs:
+        uri = power_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.PowerDisruption)) # rdf type
+        g.add((event_iri, SKG.hasPowerDisruption, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "interruptionDateTime":
+                g.add((uri, SKG.interruptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "restorationDateTime":
+                g.add((uri, SKG.restorationDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+
+COMMS_MAPPING = {
+    "TELECOM_PANY": "telecompany",
+    "TELECOMPANY": "telecompany",
+    "STATUS_OF_COMM_UNICATIO_N": "communicationStatus",
+    "STATUS_OF_COMMUNICATION": "communicationStatus",
+    "DATE_INT_ERRUPTI_ON": "interruptionDate",
+    "DATE_INTERRUPTION": "interruptionDate",
+    "TIME_INTE_RRUPTIO_N": "interruptionTime",
+    "TIME_INTERRUPTION": "interruptionTime",
+    "DATE_RES_TORATIO_N": "restorationDate",
+    "DATE_RESTORATION": "restorationDate",
+    "TIME_RES_TORATIO_N": "restorationTime",
+    "TIME_RESTORATION": "restorationTime",
+    "REMARKS": "remarks",
+    "Barangay": "hasBarangay"
+}

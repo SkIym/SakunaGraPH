@@ -7,7 +7,7 @@ import json
 from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING, AffectedPopulation, Agriculture, Casualties, Event, Housing, Infrastructure, PEvacuation, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING, POWER_MAPPING, RNB, RNB_MAPPING, AffectedPopulation, Agriculture, Casualties, Event, Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief
 from datetime import datetime
 from transform.ndrrmc_cleaner import concat_loc_levels, correct_QTY_column, event_name_expander, forward_fill_and_collapse, normalize_datetime, remove_summary_rows, replace_column_whitespace_with_underscore, to_float, to_int, to_million_php
 import polars as pl
@@ -167,8 +167,6 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     df = df.with_columns(Province=pl.col("Province").str.to_lowercase(),
                     City_Muni=pl.col("City_Muni").str.to_lowercase())
 
-
-
     # Match locations
     locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
     matched_locations = LOCATION_MATCHER.match(locations)
@@ -185,14 +183,15 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     df = normalize_datetime(df,
                             "DATE_OF\nOCCURENCE","TIME_OF\nOCCURENCE", 
                             "%d %B %Y %I:%M %P", 
-                            "%d %B %Y")
+                            "%d %B %Y",
+                            "startDate")
 
     # add column for index 
     df = df.with_row_index("incident_id", 1)
 
     # print("Writing csv to " + event_folder_path)
 
-    df.write_csv(event_folder_path + "/cleaned_related_incidents.csv")
+    # df.write_csv(event_folder_path + "/cleaned_related_incidents.csv")
 
     # Construct Incident objects
     incidents: List[Incident] = []
@@ -247,7 +246,7 @@ def load_aff_pop(event_folder_path: str) -> List[AffectedPopulation] | None:
 
     df = df.select(app_fields)
 
-    df.write_csv(event_folder_path + "/cleaned_affected_population.csv")
+    # df.write_csv(event_folder_path + "/cleaned_affected_population.csv")
     
     ents: List[AffectedPopulation] = []
 
@@ -291,7 +290,7 @@ def load_casualties(event_folder_path: str) -> List[Casualties] | None:
     )
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "/cleaned_casualties.csv")
+    # df.write_csv(event_folder_path + "/cleaned_casualties.csv")
 
     casualties: List[Casualties] = []
 
@@ -379,7 +378,7 @@ def load_relief(event_folder_path: str) -> List[Relief] | None:
     final_df = pl.concat(final_dfs, rechunk=True)
 
     # print(len(final_df) == len(reliefs))
-    final_df.write_csv(event_folder_path + "/cleaned_assistance.csv")
+    # final_df.write_csv(event_folder_path + "/cleaned_assistance.csv")
  
 
     return reliefs
@@ -410,7 +409,7 @@ def load_infra(event_folder_path: str) -> List[Infrastructure] | None:
     df = to_million_php(df, ["infraDamageAmount"])
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "/cleaned_infra.csv")
+    # df.write_csv(event_folder_path + "/cleaned_infra.csv")
 
     infra: List[Infrastructure] = []
 
@@ -440,13 +439,13 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
     )
 
     # remove summary rows
-    df = remove_summary_rows(df, nulls=["City_Muni", "Barangay"])
+    df = remove_summary_rows(df, nulls=["City_Muni", "hasBarangay"])
 
     # remove dupes
     df = df.unique(
         subset=[
                 "City_Muni",
-                "Barangay",
+                "hasBarangay",
                 "totallyDamagedHouses",
                 "partiallyDamagedHouses",
                 "housingDamageAmount"
@@ -461,7 +460,7 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
     # remove city summary rows
     df = df.filter(
         ~(
-            pl.col("Barangay").is_null()
+            pl.col("hasBarangay").is_null()
             & pl.col("City_Muni").is_duplicated()
         )
     )
@@ -477,7 +476,7 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
     df = to_million_php(df, ["housingDamageAmount"])
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "/cleaned_houses.csv")
+    # df.write_csv(event_folder_path + "/cleaned_houses.csv")
 
     houses: List[Housing] = []
 
@@ -522,7 +521,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
     df = to_float(df, ["productionLossVolume", "partiallyDamagedCropArea", "totallyDamagedCropArea"])
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "/cleaned_agri.csv")
+    # df.write_csv(event_folder_path + "/cleaned_agri.csv")
 
     ents: List[Agriculture] = []
 
@@ -532,7 +531,6 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
 
             ents.append(ent)
 
-    
     return ents
 
 def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
@@ -628,13 +626,8 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
             .alias("hasBarangay")
         )
 
-    
-
-    
-    
-
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "/cleaned_preemptive_evacuation.csv")
+    # df.write_csv(event_folder_path + "/cleaned_preemptive_evacuation.csv")
 
     ents: List[PEvacuation] = []
 
@@ -646,8 +639,120 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
 
     return ents
 
+def load_rnb(event_folder_path: str) -> List[RNB] | None:
+
+    src_path = None
+    for file in os.listdir(event_folder_path):
+        if "roads_and_bridges" in file.lower() and file.endswith(".csv"):
+            src_path = os.path.join(event_folder_path, file)
+            break
+    
+    if not src_path: return None
+    
+    df = pl.read_csv(src_path)
+    df = correct_QTY_column(df)
+    df = replace_column_whitespace_with_underscore(df)
+    df = df.rename(mapping=RNB_MAPPING, strict=False)
+
+    # forward fill and retain most granular entity
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "roadBridgeType")
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    # normalize passable datetime
+    df = normalize_datetime(df, 
+                            "passableDate", 
+                            "passableTime", 
+                            "%d %B %Y %I:%M %P", 
+                            "%d %B %Y",
+                            "passableDateTime")
+    
+    # normalize not passable datetime
+    df = normalize_datetime(df, 
+                            "notPassableDate", 
+                            "notPassableTime", 
+                            "%d %B %Y %I:%M %P", 
+                            "%d %B %Y",
+                            "notPassableDateTime")
+
+    df = df.with_row_index("id", 1)
+    # df.write_csv(event_folder_path + "/cleaned_rnb.csv")
+
+    ents: List[RNB] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(RNB)}
+            ent = RNB(**rel_kwargs)
+
+            ents.append(ent)
+
+    return ents
+
+def load_power(event_folder_path: str) -> List[Power] | None:
+
+    src_path = os.path.join(event_folder_path, "power.csv")
+
+    if not os.path.exists(src_path):
+        for file in os.listdir(event_folder_path):
+            if "power" in file.lower() and file.endswith(".csv"):
+                src_path = os.path.join(event_folder_path, file)
+                break
+    
+    if not src_path: return None
+    
+    df = pl.read_csv(src_path)
+    df = correct_QTY_column(df)
+    df = replace_column_whitespace_with_underscore(df)
+    df = df.rename(mapping=POWER_MAPPING, strict=False)
+
+    # forward fill and retain most granular entity
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "disruptionType")
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    # normalize interruption datetime
+    df = normalize_datetime(df, 
+                            "interruptionDate", 
+                            "interruptionTime", 
+                            "%d %B %Y %H:%M", 
+                            "%d %B %Y",
+                            "interruptionDateTime")
+    
+    # normalize restoration datetime
+    df = normalize_datetime(df, 
+                            "restorationDate", 
+                            "restorationTime", 
+                            "%d %B %Y %H:%M", 
+                            "%d %B %Y",
+                            "restorationDateTime")
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "/cleaned_power.csv")
+
+    ents: List[Power] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(Power)}
+            ent = Power(**rel_kwargs)
+
+            ents.append(ent)
+
+    return ents
+
 if __name__ == "__main__":
-    load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
-    load_pevac("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_power("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

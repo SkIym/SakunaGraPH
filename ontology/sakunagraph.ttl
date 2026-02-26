@@ -1147,16 +1147,16 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                   rdfs:label "displaced persons"@en .
 
 
-###  https://sakuna.ph/disruptedType
-:disruptedType rdf:type owl:DatatypeProperty ;
-               rdfs:subPropertyOf owl:topDataProperty ;
-               rdfs:domain [ rdf:type owl:Class ;
-                             owl:unionOf ( :PowerDisruption
-                                           :WaterDisruption
-                                         )
-                           ] ;
-               rdfs:range xsd:string ;
-               rdfs:label "disruption type"@en .
+###  https://sakuna.ph/disruptionType
+:disruptionType rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain [ rdf:type owl:Class ;
+                              owl:unionOf ( :PowerDisruption
+                                            :WaterDisruption
+                                          )
+                            ] ;
+                rdfs:range xsd:string ;
+                rdfs:label "disruption type"@en .
 
 
 ###  https://sakuna.ph/district
@@ -3019,7 +3019,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :disruptedType ;
+                                   owl:onProperty :disruptionType ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;
@@ -3583,7 +3583,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :disruptedType ;
+                                   owl:onProperty :disruptionType ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;

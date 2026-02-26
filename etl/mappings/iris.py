@@ -35,3 +35,9 @@ def agri_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def pevac_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/preemptive_evacuation/{r_id}")
+
+def rnb_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/road_and_bridges_damage/{r_id}")
+
+def power_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/power_disruption/{r_id}")

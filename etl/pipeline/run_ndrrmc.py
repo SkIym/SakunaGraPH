@@ -1,7 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from transform.ndrrmc import load_aff_pop, load_agri, load_casualties, load_events, load_housing, load_infra, load_pevac, load_relief, load_uuids
-from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, casualties_mapping, event_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, prov_mapping, relief_mapping
+from transform.ndrrmc import load_aff_pop, load_agri, load_casualties, load_events, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_uuids
+from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, casualties_mapping, event_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping
 from transform.ndrrmc import load_incidents, load_provenance
 import os
 from typing import Tuple
@@ -51,6 +51,17 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     pevac = load_pevac(event_folder)
     if pevac:
         pevac_mapping(g, pevac, event_iri)
+
+    rnb = load_rnb(event_folder)
+    if rnb:
+        rnb_mapping(g, rnb, event_iri)
+    
+    power = load_power(event_folder)
+    if power:
+        power_mapping(g, power, event_iri)
+
+    
+
 
     return g
 

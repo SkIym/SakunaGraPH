@@ -51,7 +51,7 @@ def event_name_expander(name: str) -> str:
     
     return name
 
-def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_format: str, date_format: str):
+def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_format: str, date_format: str, new_col: str):
     """
     Normalize date and time values into ISO datetime format
     
@@ -86,8 +86,9 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_for
             .str.strptime(pl.Datetime, 
                           date_format, 
                           strict=False),
+    
         ])
-        .alias("startDate")
+        .alias(new_col)
     )
 
     return df

@@ -181,6 +181,7 @@ class LocationMatcher:
         Matches province. Returns loc if found, else none.
         
         """
+        label = label.lower()
         if label in self.provinces:
             return self.provinces[label]
 
@@ -316,7 +317,12 @@ class LocationMatcher:
                     #     muni_iri = self.match_municipality(highest, prov_iri)
                     #     matched.append(muni_iri if muni_iri else prov_iri)
                 
+                elif prov_iri:
+                    muni_label = highest.lower()
+                    muni_iri = self.match_municipality(muni_label, prov_iri)
+                    matched.append(muni_iri if muni_iri else prov_iri)
                 else:
+                    print(prov_iri, highest, levels)
                     matched.append("Fix location columns please")
 
 
