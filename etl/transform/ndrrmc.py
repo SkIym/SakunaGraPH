@@ -11,7 +11,7 @@ from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 
 from mappings.ndrrmc import (
-    AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, COMMS_MAPPING,
+    AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
     POWER_MAPPING, RNB_MAPPING,
     AffectedPopulation, Agriculture, Casualties, CommunicationLines, Event,
@@ -269,7 +269,7 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
         "QTY": "casualtyCount"
     })
 
-    df.write_csv(event_folder_path + "hakdog.csv")
+    # df.write_csv(event_folder_path + "hakdog.csv")
 
     df = df.with_row_index("id", 1)
 
@@ -677,8 +677,46 @@ def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
 
     return df_to_entities(df, CommunicationLines)
 
+def load_docalamity(event_folder_path: str) -> List[DOC] | None:
+
+    src_path = next(
+        (
+            os.path.join(event_folder_path, f)
+            for f in os.listdir(event_folder_path)
+            if "calamity" in f.lower() and f.endswith(".csv")
+        ),
+        None,
+    )
+
+    if not src_path:
+        return None
+
+    df = load_csv_df(
+        src_path,
+        mapping=DOC_MAPPING,
+        target_cols=["Region", "Province", "City_Muni"],
+        collapse_on="QTY",
+        collapse_key="resolutionNo",
+        match_location=True
+    )
+
+    df = normalize_datetime(
+        df,
+        date_col="resolutionDate",
+        time_col=None,
+        datetime_format="",
+        date_format="%d %B %Y",
+        new_col="resolutionDate"
+    )
+
+    df = df.with_row_index("id", 1)
+
+    df.write_csv(event_folder_path + "/hakdog.csv")
+
+    return df_to_entities(df, DOC)
+
 if __name__ == "__main__":
     # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
-    load_comms("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_docalamity("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

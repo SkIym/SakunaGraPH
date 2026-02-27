@@ -51,7 +51,7 @@ def event_name_expander(name: str) -> str:
     
     return name
 
-def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_format: str, date_format: str, new_col: str):
+def normalize_datetime(df: DataFrame, date_col: str, time_col: str | None, datetime_format: str, date_format: str, new_col: str):
     """
     Normalize date and time values into ISO datetime format
     
@@ -68,28 +68,39 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str, datetime_for
         pl.col(date_col).forward_fill()
     )
 
-    df = df.with_columns(
-        pl.coalesce([
-            # try date + time
-            pl.concat_str(
-                [date_col, time_col], 
-                separator=" ", 
-                ignore_nulls=True)
-            .str.strip_chars()
-            .str.strptime(pl.Datetime, 
-                          datetime_format, 
-                          strict=False),
+    if time_col:
 
-            # fallback: date only
+        df = df.with_columns(
+            pl.coalesce([
+                # try date + time
+                pl.concat_str(
+                    [date_col, time_col], 
+                    separator=" ", 
+                    ignore_nulls=True)
+                .str.strip_chars()
+                .str.strptime(pl.Datetime, 
+                            datetime_format, 
+                            strict=False),
+
+                # fallback: date only
+                pl.col(date_col)
+                .str.strip_chars()
+                .str.strptime(pl.Datetime, 
+                            date_format, 
+                            strict=False),
+        
+            ])
+            .alias(new_col)
+        )
+
+    else:
+        df = df.with_columns(
             pl.col(date_col)
-            .str.strip_chars()
-            .str.strptime(pl.Datetime, 
-                          date_format, 
-                          strict=False),
-    
-        ])
-        .alias(new_col)
-    )
+                .str.strip_chars()
+                .str.strptime(pl.Date, 
+                            date_format, 
+                            strict=False),
+        )
 
     return df
 

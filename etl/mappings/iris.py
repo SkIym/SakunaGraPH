@@ -44,3 +44,6 @@ def power_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def comms_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/communication_line_disruption/{r_id}")
+
+def doc_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/declaration_of_calamity/{r_id}")

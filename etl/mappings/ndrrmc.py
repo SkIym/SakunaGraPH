@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, comms_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri
 
 @dataclass
 class Event:
@@ -855,9 +855,39 @@ DOC_MAPPING = {
     "TYPE": "declarationType",
     "RESOLUTION_NUMBER": "resolutionNo",
     "RESOLUTION_DATE": "resolutionDate",
-    "REMARKS": "remarks"
+    "REMARKS": "remarks",
+    "Barangay": "hasBarangay"
 }
 
 @dataclass
 class DOC:
     id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    declarationType: str | None
+    resolutionNo: str 
+    resolutionDate: datetime
+    remarks: str | None
+
+def doc_mapping(g: Graph, hs: List[DOC], event_iri: URIRef):
+
+    for r in hs:
+        uri = doc_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.DeclarationOfCalamity)) # rdf type
+        g.add((event_iri, SKG.hasDeclarationOfCalamity, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "resolutionDate":
+                g.add((uri, SKG.resolutionDate, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
