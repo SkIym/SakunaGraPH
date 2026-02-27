@@ -7,7 +7,7 @@ import json
 from dataclasses import fields
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING, POWER_MAPPING, RNB, RNB_MAPPING, AffectedPopulation, Agriculture, Casualties, Event, Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief
+from mappings.ndrrmc import AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, COMMS_MAPPING, HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING, POWER_MAPPING, RNB, RNB_MAPPING, AffectedPopulation, Agriculture, Casualties, CommunicationLines, Event, Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief
 from datetime import datetime
 from transform.ndrrmc_cleaner import concat_loc_levels, correct_QTY_column, event_name_expander, forward_fill_and_collapse, normalize_datetime, remove_summary_rows, replace_column_whitespace_with_underscore, to_float, to_int, to_million_php
 import polars as pl
@@ -704,7 +704,7 @@ def load_power(event_folder_path: str) -> List[Power] | None:
                 src_path = os.path.join(event_folder_path, file)
                 break
     
-    if not src_path: return None
+    if not os.path.exists(src_path): return None
     
     df = pl.read_csv(src_path)
     df = correct_QTY_column(df)
@@ -751,8 +751,68 @@ def load_power(event_folder_path: str) -> List[Power] | None:
 
     return ents
 
+def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
+
+    src_path = os.path.join(event_folder_path, "communication_lines.csv")
+
+    if not os.path.exists(src_path):
+        for file in os.listdir(event_folder_path):
+            if "communication" in file.lower() and file.endswith(".csv"):
+                src_path = os.path.join(event_folder_path, file)
+                break
+    
+    if not os.path.exists(src_path): return None
+    
+    df = pl.read_csv(src_path)
+    df = correct_QTY_column(df)
+    df = replace_column_whitespace_with_underscore(df)
+    df = df.rename(mapping=COMMS_MAPPING, strict=False)
+
+    # forward fill and retain most granular entity
+    target_cols = ["Region", "Province", "City_Muni"]
+    df = forward_fill_and_collapse(df, target_cols, "QTY", "City_Muni")
+
+    # Match locations
+    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    matched_locations = LOCATION_MATCHER.match(locations)
+    df = df.with_columns([
+        pl.Series("hasLocation", matched_locations),
+    ])
+
+    # normalize interruption datetime
+    df = normalize_datetime(df, 
+                            "interruptionDate", 
+                            "interruptionTime", 
+                            "%B %d, %Y %H:%M", 
+                            "%B %d, %Y",
+                            "interruptionDateTime")
+    
+    # normalize restoration datetime
+    df = normalize_datetime(df, 
+                            "restorationDate", 
+                            "restorationTime", 
+                            "%B %d, %Y %H:%M", 
+                            "%B %d, %Y",
+                            "restorationDateTime")
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "/cleaned_comms.csv")
+
+    ents: List[CommunicationLines] = []
+
+    for row in df.iter_rows(named=True):
+            rel_kwargs = {f.name: row.get(f.name) for f in fields(CommunicationLines)}
+            ent = CommunicationLines(**rel_kwargs)
+
+            ents.append(ent)
+
+    return ents
+
+
+
+
 if __name__ == "__main__":
     # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
-    load_power("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_comms("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

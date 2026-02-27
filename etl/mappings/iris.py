@@ -41,3 +41,6 @@ def rnb_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def power_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/power_disruption/{r_id}")
+
+def comms_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/communication_line_disruption/{r_id}")

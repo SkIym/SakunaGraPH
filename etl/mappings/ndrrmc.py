@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, comms_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri
 
 @dataclass
 class Event:
@@ -802,3 +802,39 @@ COMMS_MAPPING = {
     "REMARKS": "remarks",
     "Barangay": "hasBarangay"
 }
+
+@dataclass
+class CommunicationLines:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    telecompany: str | None
+    communicationStatus: str | None
+    interruptionDateTime: datetime | None
+    restorationDateTime: datetime | None
+    remarks: str | None
+
+def comms_mapping(g: Graph, hs: List[CommunicationLines], event_iri: URIRef):
+
+    for r in hs:
+        uri = comms_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.CommunicationLineDisruption)) # rdf type
+        g.add((event_iri, SKG.hasCommunicationLineDisruption, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "interruptionDateTime":
+                g.add((uri, SKG.interruptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "restorationDateTime":
+                g.add((uri, SKG.restorationDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
