@@ -144,14 +144,18 @@ class Incident:
     remarks: str | None
 
 INCIDENT_COLUMN_MAPPINGS = {
-    "Column_2": "Type of Incident",
-    "Column_3": "Date",
-    "Column_4": "Time",
-    "Column_5": "Description",
-    "Column_6": "Actions Taken",
-    "Column_7": "Remarks",
-    "Column_8": "Status",
-
+    "TYPE_OF_INCIDENT": "hasOrigType",
+    "STATUS_for_flooded\nareas": "incidentStatus",
+    "ACTIONS_TAKEN": "incidentActionsTaken",
+    "DESCRIPTION": "incidentDescription",
+    "Column_2": "hasType",
+    "Column_3": "startDate",
+    "Column_4": "startTime",
+    "Column_5": "incidentDescription",
+    "Column_6": "incidentActionsTaken",
+    "Column_7": "remarks",
+    "Column_8": "incidentStatus",
+    "Barangay": "hasBarangay",
 }
 
 def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
@@ -319,6 +323,13 @@ def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
 
 CasualtyType = TypingLiteral["DEAD", "INJURED", "MISSING"]
        
+CASUALTY_MAPPING = {
+    "Barangay": "hasBarangay",
+    "CAUSE": "casualtyCause",
+    "REMARKS": "remarks",
+    "SOURCE_OF\nDATA": "casualtyDataSource",
+}
+
 @dataclass
 class Casualties:
     id: str
@@ -358,9 +369,9 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
         g.add((
             uri,
             SKG.casualtyCount,
-            Literal(c.casualtyCount, datatype=XSD.int)
+            Literal(c.casualtyCount if c.casualtyCount else 1, datatype=XSD.int)
         ))
-
+        
         g.add((
                 uri,
                 SKG.hasLocation,
@@ -838,3 +849,15 @@ def comms_mapping(g: Graph, hs: List[CommunicationLines], event_iri: URIRef):
                 g.add((uri, SKG.restorationDateTime, Literal(value, datatype=XSD.dateTime)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+
+DOC_MAPPING = {
+    "TYPE": "declarationType",
+    "RESOLUTION_NUMBER": "resolutionNo",
+    "RESOLUTION_DATE": "resolutionDate",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class DOC:
+    id: str
