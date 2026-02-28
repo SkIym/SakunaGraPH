@@ -147,16 +147,34 @@ class LocationMatcher:
     # --------------------------------------------------
     # Fuzzy helper
     # --------------------------------------------------
-    def _fuzzy_match(self, query: str, choices: list[str], threshold: int):
+    def _fuzzy_match(self, query: str | list[str], choices: list[str], threshold: int):
         if not query or not choices:
             return None
 
-        match, score = process.extractOne(
-            query,
-            choices,
-            scorer=fuzz.token_sort_ratio
-        )
-        return match if score >= threshold else None
+        if type(query) == str:
+            match, score = process.extractOne(
+                query,
+                choices,
+                scorer=fuzz.token_sort_ratio
+            )
+            return match if score >= threshold else None
+        
+        else:
+            highest_score: int = 0
+            closest_match = query[0]
+
+            for q in query:
+                match, score = process.extractOne(
+                    q,
+                    choices,
+                    scorer=fuzz.token_sort_ratio
+                )
+                if score > highest_score: 
+                    highest_score = score
+                    closest_match = match
+
+            return closest_match if highest_score >= threshold else None
+
 
     def match_region(self, label: str) -> Optional[str]:
         """
@@ -200,28 +218,24 @@ class LocationMatcher:
         """
         label = label.lower()
         candidate = label.split(" (")[0].strip()
+        city = candidate + " city"
+        city_of = "city of " + city.replace(" city", "")
         
         if parent_iri:
             # exact label + correct parent
-            
-            city = candidate + " city"
-            city_of = "city of " + city.replace(" city", "")
-            
             for iri, lbl in self.municipalities.items():
 
                 if (lbl == candidate or lbl == city or lbl == city_of) and self.municipalities_parent[iri] == parent_iri:
                     return iri
 
             # another pass for HUCs
-
             for iri, lbl in self.municipalities.items():
                 if (lbl == city or lbl == city_of):
                     return iri
-
-
+                
         # fuzzy fallback
         fuzzy = self._fuzzy_match(
-            candidate,
+            [candidate, city, city_of],
             list(self.municipalities_rev.keys()),
             FUZZ_THRESHOLD_MUNI
         )
@@ -295,32 +309,24 @@ class LocationMatcher:
             # handle erratic parsed locations
             # e.g. city_muni in region column
             else:
-
+                
                 if prov_iri and levels:
                     muni_label = levels.pop()
                     muni_iri = self.match_municipality(muni_label, prov_iri)
 
-
                     if not muni_iri or self.municipalities_parent[muni_iri] != prov_iri:
+                        print(prov_iri, highest)
                         muni_iri = self.match_municipality(highest, prov_iri)
 
                     matched.append(muni_iri if muni_iri else prov_iri)
-
-                    # if muni_iri:
-                    #     if self.municipalities_parent[muni_iri] != prov_iri: 
-                    #         muni_iri = self.match_municipality(highest, prov_iri)
-                    #         matched.append(muni_iri if muni_iri else prov_iri)
-                    #     else:
-                    #         matched.append(muni_iri)
-                    
-                    # else:
-                    #     muni_iri = self.match_municipality(highest, prov_iri)
-                    #     matched.append(muni_iri if muni_iri else prov_iri)
-                
                 elif prov_iri:
                     muni_label = highest.lower()
                     muni_iri = self.match_municipality(muni_label, prov_iri)
                     matched.append(muni_iri if muni_iri else prov_iri)
+                elif levels:
+                    muni_label = levels.pop()
+                    muni_iri = self.match_municipality(muni_label, "")
+                    matched.append(muni_iri if muni_iri else "")
                 else:
                     print(prov_iri, highest, levels)
                     matched.append("Fix location columns please")
