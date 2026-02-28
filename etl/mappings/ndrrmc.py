@@ -891,3 +891,52 @@ def doc_mapping(g: Graph, hs: List[DOC], event_iri: URIRef):
                 g.add((uri, SKG.resolutionDate, Literal(value, datatype=XSD.dateTime)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+CLASS_MAPPING = {
+    "Barangay": "hasBarangay",
+    "LEVEL_FROM": "fromClassLevel",
+    "LEVEL_TO": "toClassLevel",
+    "TYPE": "suspensionType",
+    "DATE_OF_SUSPENSION": "cancellationDate",
+    "TIME_OF_SUSPENSION": "cancellationTime",
+    "DATE_RESUMED": "resumptionDate",
+    "TIME_RESUMED": "resumptionTime",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class ClassDisruption:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    fromClassLevel: str
+    toClassLevel: str
+    suspensionType: str | None
+    cancellationDateTime: datetime
+    resumptionDateTime: datetime
+    remarks: str | None
+
+def class_mapping(g: Graph, hs: List[ClassDisruption], event_iri: URIRef):
+
+    for r in hs:
+        uri = doc_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.ClassDisruption)) # rdf type
+        g.add((event_iri, SKG.hasClassDisruption, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "cancellationDateTime":
+                g.add((uri, SKG.cancellationDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "resumptionDateTime":
+                g.add((uri, SKG.resumptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 

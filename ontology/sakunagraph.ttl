@@ -1024,18 +1024,18 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                        skos:definition "Announcements released during preparation for a disaster." .
 
 
-###  https://sakuna.ph/cancelledDateTime
-:cancelledDateTime rdf:type owl:DatatypeProperty ;
-                   rdfs:subPropertyOf owl:topDataProperty ;
-                   rdfs:domain [ rdf:type owl:Class ;
-                                 owl:unionOf ( :AirportDisruption
-                                               :ClassDisruption
-                                               :SeaportDisruption
-                                               :WorkDisruption
-                                             )
-                               ] ;
-                   rdfs:range xsd:dateTime ;
-                   rdfs:label "cancelled datetime"@en .
+###  https://sakuna.ph/cancellationDateTime
+:cancellationDateTime rdf:type owl:DatatypeProperty ;
+                      rdfs:subPropertyOf owl:topDataProperty ;
+                      rdfs:domain [ rdf:type owl:Class ;
+                                    owl:unionOf ( :AirportDisruption
+                                                  :ClassDisruption
+                                                  :SeaportDisruption
+                                                  :WorkDisruption
+                                                )
+                                  ] ;
+                      rdfs:range xsd:dateTime ;
+                      rdfs:label "cancellation datetime"@en .
 
 
 ###  https://sakuna.ph/casualtyCause
@@ -1064,22 +1064,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
               rdfs:domain :Casualties ;
               rdfs:range :skg:casualtyType ;
               rdfs:label "type of casualty"@en .
-
-
-###  https://sakuna.ph/classLevelFrom
-:classLevelFrom rdf:type owl:DatatypeProperty ;
-                rdfs:subPropertyOf owl:topDataProperty ;
-                rdfs:domain :ClassDisruption ;
-                rdfs:range xsd:string ;
-                rdfs:label "from class level"@en .
-
-
-###  https://sakuna.ph/classLevelTo
-:classLevelTo rdf:type owl:DatatypeProperty ;
-              rdfs:subPropertyOf owl:topDataProperty ;
-              rdfs:domain :ClassDisruption ;
-              rdfs:range xsd:string ;
-              rdfs:label "to class level"@en .
 
 
 ###  https://sakuna.ph/commercialDamageAmount
@@ -1234,6 +1218,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
         rdfs:domain :Source ;
         rdfs:range xsd:string ;
         rdfs:label "format of the source" .
+
+
+###  https://sakuna.ph/fromClassLevel
+:fromClassLevel rdf:type owl:DatatypeProperty ;
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:domain :ClassDisruption ;
+                rdfs:range xsd:string ;
+                rdfs:label "from class level"@en .
 
 
 ###  https://sakuna.ph/generalDamageAmount
@@ -1698,18 +1690,18 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      rdfs:label "restoration datetime"@en .
 
 
-###  https://sakuna.ph/resumedDateTime
-:resumedDateTime rdf:type owl:DatatypeProperty ;
-                 rdfs:subPropertyOf owl:topDataProperty ;
-                 rdfs:domain [ rdf:type owl:Class ;
-                               owl:unionOf ( :AirportDisruption
-                                             :ClassDisruption
-                                             :SeaportDisruption
-                                             :WorkDisruption
-                                           )
-                             ] ;
-                 rdfs:range xsd:dateTime ;
-                 rdfs:label "resumed datetime"@en .
+###  https://sakuna.ph/resumptionDateTime
+:resumptionDateTime rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf owl:topDataProperty ;
+                    rdfs:domain [ rdf:type owl:Class ;
+                                  owl:unionOf ( :AirportDisruption
+                                                :ClassDisruption
+                                                :SeaportDisruption
+                                                :WorkDisruption
+                                              )
+                                ] ;
+                    rdfs:range xsd:dateTime ;
+                    rdfs:label "resumption datetime"@en .
 
 
 ###  https://sakuna.ph/roadBridgeClassification
@@ -1814,6 +1806,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:domain :CommunicationLineDisruption ;
              rdfs:range xsd:string ;
              rdfs:label "telecompany"@en .
+
+
+###  https://sakuna.ph/toClassLevel
+:toClassLevel rdf:type owl:DatatypeProperty ;
+              rdfs:subPropertyOf owl:topDataProperty ;
+              rdfs:domain :ClassDisruption ;
+              rdfs:range xsd:string ;
+              rdfs:label "to class level"@en .
 
 
 ###  https://sakuna.ph/totallyDamagedCropArea
@@ -2120,7 +2120,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :cancelledDateTime ;
+                                     owl:onProperty :cancellationDateTime ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ,
                                    [ rdf:type owl:Restriction ;
@@ -2140,7 +2140,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :resumedDateTime ;
+                                     owl:onProperty :resumptionDateTime ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ;
                    rdfs:label "Airport Disruption" ;
@@ -2303,23 +2303,23 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :cancelledDateTime ;
+                                   owl:onProperty :cancellationDateTime ;
                                    owl:someValuesFrom xsd:dateTime
                                  ] ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :classLevelFrom ;
+                                   owl:onProperty :fromClassLevel ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :classLevelTo ;
-                                   owl:someValuesFrom xsd:string
-                                 ] ,
-                                 [ rdf:type owl:Restriction ;
-                                   owl:onProperty :resumedDateTime ;
+                                   owl:onProperty :resumptionDateTime ;
                                    owl:someValuesFrom xsd:dateTime
                                  ] ,
                                  [ rdf:type owl:Restriction ;
                                    owl:onProperty :suspensionType ;
+                                   owl:someValuesFrom xsd:string
+                                 ] ,
+                                 [ rdf:type owl:Restriction ;
+                                   owl:onProperty :toClassLevel ;
                                    owl:someValuesFrom xsd:string
                                  ] ;
                  rdfs:label "Class Disruption"@en ;
@@ -3349,7 +3349,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :cancelledDateTime ;
+                                     owl:onProperty :cancellationDateTime ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ,
                                    [ rdf:type owl:Restriction ;
@@ -3361,7 +3361,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :resumedDateTime ;
+                                     owl:onProperty :resumptionDateTime ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ;
                    rdfs:label "Seaport Disruption" ;
@@ -3638,11 +3638,11 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                   owl:someValuesFrom xsd:string
                                 ] ,
                                 [ rdf:type owl:Restriction ;
-                                  owl:onProperty :cancelledDateTime ;
+                                  owl:onProperty :cancellationDateTime ;
                                   owl:someValuesFrom xsd:dateTime
                                 ] ,
                                 [ rdf:type owl:Restriction ;
-                                  owl:onProperty :resumedDateTime ;
+                                  owl:onProperty :resumptionDateTime ;
                                   owl:someValuesFrom xsd:dateTime
                                 ] ,
                                 [ rdf:type owl:Restriction ;

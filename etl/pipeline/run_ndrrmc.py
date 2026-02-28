@@ -32,9 +32,9 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     if casualties:
         casualties_mapping(g, casualties, event_iri)
 
-    # relief = load_relief(event_folder)
-    # if relief:
-    #     relief_mapping(g, relief, event_iri)
+    relief = load_relief(event_folder)
+    if relief:
+        relief_mapping(g, relief, event_iri)
 
     infra = load_infra(event_folder)
     if infra:
