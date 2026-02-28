@@ -1424,11 +1424,11 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
            rdfs:label "magnitude"@en .
 
 
-###  https://sakuna.ph/motorBanca
-:motorBanca rdf:type owl:DatatypeProperty ;
-            rdfs:domain :StrandedEvent ;
-            rdfs:range xsd:int ;
-            rdfs:label "no. of motor banca"@en .
+###  https://sakuna.ph/motorBancas
+:motorBancas rdf:type owl:DatatypeProperty ;
+             rdfs:domain :StrandedEvent ;
+             rdfs:range xsd:int ;
+             rdfs:label "no. of motor bancas"@en .
 
 
 ###  https://sakuna.ph/noFamiliesAssisted
@@ -3459,7 +3459,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  owl:someValuesFrom xsd:string
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :motorBanca ;
+                                 owl:onProperty :motorBancas ;
                                  owl:someValuesFrom xsd:integer
                                ] ,
                                [ rdf:type owl:Restriction ;
