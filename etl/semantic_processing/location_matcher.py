@@ -234,7 +234,8 @@ class LocationMatcher:
                 if (lbl == city or lbl == city_of):
                     return iri
                 
-            mun_cities_prov = [k for k, v in self.municipalities_parent.items() if v == parent_iri]
+            mun_cities_pro_iri = [k for k, v in self.municipalities_parent.items() if v == parent_iri]
+            mun_cities_prov = [self.municipalities[i] for i in mun_cities_pro_iri]
                 
         # fuzzy fallback
 

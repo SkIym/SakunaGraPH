@@ -1,7 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from transform.ndrrmc import load_aff_pop, load_agri, load_casualties, load_comms, load_events, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_uuids, load_incidents, load_provenance
-from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, casualties_mapping, comms_mapping, event_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping
+from transform.ndrrmc import load_aff_pop, load_agri, load_casualties, load_class_suspension, load_comms, load_docalamity, load_events, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_stranded_events, load_uuids, load_incidents, load_provenance, load_work_suspension
+from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, casualties_mapping, class_mapping, comms_mapping, doc_mapping, event_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping, stranded_mapping, work_mapping
 
 import os
 from typing import Tuple
@@ -64,6 +64,22 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     if comms:
         comms_mapping(g, comms, event_iri)
 
+    doc = load_docalamity(event_folder)
+    if doc:
+        doc_mapping(g, doc, event_iri)
+
+    class_sus = load_class_suspension(event_folder)
+    if class_sus:
+        class_mapping(g, class_sus, event_iri)
+
+    work_sus = load_work_suspension(event_folder)
+    if work_sus:
+        work_mapping(g, work_sus, event_iri)
+
+    stranded = load_stranded_events(event_folder)
+    if stranded:
+        stranded_mapping(g, stranded, event_iri)
+        
 
     return g
 
