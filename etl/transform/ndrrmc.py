@@ -13,9 +13,9 @@ from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
-    POWER_MAPPING, RNB_MAPPING, WORK_MAPPING,
+    POWER_MAPPING, RNB_MAPPING, STRANDED_MAPPING, WORK_MAPPING,
     AffectedPopulation, Agriculture, Casualties, ClassDisruption, CommunicationLines, Event,
-    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief, RNB, WorkDisruption
+    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief, RNB, Stranded, WorkDisruption
 )
 
 from transform.ndrrmc_cleaner import (
@@ -652,7 +652,7 @@ def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
         mapping=COMMS_MAPPING,
         target_cols=["Region", "Province", "City_Muni"],
         collapse_on="QTY",
-        collapse_key="City_Muni",
+        collapse_key="Province",
         replace_ws=True,
         match_location=True,
     )
@@ -759,7 +759,7 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, ClassDisruption)
 
@@ -807,12 +807,46 @@ def load_work_suspension(event_folder_path: str) -> List[WorkDisruption] | None:
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, WorkDisruption)
 
+def load_stranded_events(event_folder_path: str) -> List[Stranded] | None:
+    src_path = next(
+        (
+            os.path.join(event_folder_path, f)
+            for f in os.listdir(event_folder_path)
+            if "stranded" in f.lower() and f.endswith(".csv")
+        ),
+        None,
+    )
+
+    if not src_path:
+        return None
+
+    df = load_csv_df(
+        src_path,
+        mapping=STRANDED_MAPPING,
+        target_cols=["Region", "Province", "City_Muni"],
+        collapse_on="QTY",
+        collapse_key="Province",
+        replace_ws=True,
+        match_location=True
+    )
+
+    df = to_int(df, ["passengers", 
+                     "vessels", 
+                     "motorBancas", 
+                     "rollingCargoes"])
+
+    df = df.with_row_index("id", 1)
+
+    df.write_csv(event_folder_path + "/hakdog.csv")
+
+    return df_to_entities(df, Stranded)
+
 if __name__ == "__main__":
     # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
-    load_work_suspension("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    load_stranded_events("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

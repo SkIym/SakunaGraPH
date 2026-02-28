@@ -221,6 +221,7 @@ class LocationMatcher:
         city = candidate + " city"
         city_of = "city of " + city.replace(" city", "")
         
+        mun_cities_prov = []
         if parent_iri:
             # exact label + correct parent
             for iri, lbl in self.municipalities.items():
@@ -233,10 +234,13 @@ class LocationMatcher:
                 if (lbl == city or lbl == city_of):
                     return iri
                 
+            mun_cities_prov = [k for k, v in self.municipalities_parent.items() if v == parent_iri]
+                
         # fuzzy fallback
+
         fuzzy = self._fuzzy_match(
             [candidate, city, city_of],
-            list(self.municipalities_rev.keys()),
+            mun_cities_prov if mun_cities_prov else list(self.municipalities_rev.keys()),
             FUZZ_THRESHOLD_MUNI
         )
 

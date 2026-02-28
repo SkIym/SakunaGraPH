@@ -53,3 +53,6 @@ def class_dis_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def work_dis_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/work_suspension/{r_id}")
+
+def stranded_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/stranded/{r_id}")

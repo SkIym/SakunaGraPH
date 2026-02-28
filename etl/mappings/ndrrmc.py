@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, work_dis_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, stranded_iri, work_dis_iri
 
 @dataclass
 class Event:
@@ -983,5 +983,61 @@ def work_mapping(g: Graph, hs: List[WorkDisruption], event_iri: URIRef):
                 g.add((uri, SKG.cancellationDateTime, Literal(value, datatype=XSD.dateTime)))
             elif f.name == "resumptionDateTime":
                 g.add((uri, SKG.resumptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+STRANDED_MAPPING = {
+    "DISTRICT": "district",
+    "STATION": "station",
+    "SUBSTATION": "substation",
+    "PORT_TERMINAL": "portOrTerminal",
+    "PASSENGER": "passengers",
+    "ROLLING_CARGOES": "rollingCargoes",
+    "VESSELS_BUS_LINER": "vessels",
+    "MBCA_MOTOR_BANCA": "motorBancas",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class Stranded:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    district: str | None
+    station: str | None
+    substation: str | None
+    portOrTerminal: str | None
+    passengers: int
+    rollingCargoes: int
+    vessels: int
+    motorBancas: int
+    remarks: str | None
+
+def stranded_mapping(g: Graph, hs: List[Stranded], event_iri: URIRef):
+
+    for r in hs:
+        uri = stranded_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.StrandedEvent)) # rdf type
+        g.add((event_iri, SKG.hasStrandedEvent, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "passengers":
+                g.add((uri, SKG.passengers, Literal(value, datatype=XSD.int)))
+            elif f.name == "rollingCargoes":
+                g.add((uri, SKG.rollingCargoes, Literal(value, datatype=XSD.int)))
+            elif f.name == "vessels":
+                g.add((uri, SKG.vessels, Literal(value, datatype=XSD.int)))
+            elif f.name == "motorBancas":
+                g.add((uri, SKG.motorBancas, Literal(value, datatype=XSD.int)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
