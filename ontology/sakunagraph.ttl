@@ -876,13 +876,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :affectedDescription rdf:type owl:DatatypeProperty ;
                      rdfs:domain [ rdf:type owl:Class ;
                                    owl:unionOf ( :AirportDisruption
-                                                 :ClassDisruption
+                                                 :ClassSuspension
                                                  :CommunicationLineDisruption
                                                  :PowerDisruption
                                                  :RoadAndBridgesDamage
                                                  :SeaportDisruption
                                                  :WaterDisruption
-                                                 :WorkDisruption
+                                                 :WorkSuspension
                                                )
                                  ] ;
                      rdfs:range xsd:string ;
@@ -1029,13 +1029,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                       rdfs:subPropertyOf owl:topDataProperty ;
                       rdfs:domain [ rdf:type owl:Class ;
                                     owl:unionOf ( :AirportDisruption
-                                                  :ClassDisruption
+                                                  :ClassSuspension
                                                   :SeaportDisruption
-                                                  :WorkDisruption
+                                                  :WorkSuspension
                                                 )
                                   ] ;
                       rdfs:range xsd:dateTime ;
-                      rdfs:label "cancellation datetime"@en .
+                      rdfs:label "cancellation datetime"@en ;
+                      skos:altLabel "suspension datetime" .
 
 
 ###  https://sakuna.ph/casualtyCause
@@ -1223,7 +1224,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/fromClassLevel
 :fromClassLevel rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
-                rdfs:domain :ClassDisruption ;
+                rdfs:domain :ClassSuspension ;
                 rdfs:range xsd:string ;
                 rdfs:label "from class level"@en .
 
@@ -1695,9 +1696,9 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                     rdfs:subPropertyOf owl:topDataProperty ;
                     rdfs:domain [ rdf:type owl:Class ;
                                   owl:unionOf ( :AirportDisruption
-                                                :ClassDisruption
+                                                :ClassSuspension
                                                 :SeaportDisruption
-                                                :WorkDisruption
+                                                :WorkSuspension
                                               )
                                 ] ;
                     rdfs:range xsd:dateTime ;
@@ -1792,8 +1793,8 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :suspensionType rdf:type owl:DatatypeProperty ;
                 rdfs:subPropertyOf owl:topDataProperty ;
                 rdfs:domain [ rdf:type owl:Class ;
-                              owl:unionOf ( :ClassDisruption
-                                            :WorkDisruption
+                              owl:unionOf ( :ClassSuspension
+                                            :WorkSuspension
                                           )
                             ] ;
                 rdfs:range xsd:string ;
@@ -1811,7 +1812,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/toClassLevel
 :toClassLevel rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
-              rdfs:domain :ClassDisruption ;
+              rdfs:domain :ClassSuspension ;
               rdfs:range xsd:string ;
               rdfs:label "to class level"@en .
 
@@ -2295,8 +2296,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                skos:definition "Accident release occurring during the production, transportation, or handling of hazardous chemical substances." .
 
 
-###  https://sakuna.ph/ClassDisruption
-:ClassDisruption rdf:type owl:Class ;
+###  https://sakuna.ph/ClassSuspension
+:ClassSuspension rdf:type owl:Class ;
                  rdfs:subClassOf :Impact ,
                                  [ rdf:type owl:Restriction ;
                                    owl:onProperty :affectedDescription ;
@@ -2322,7 +2323,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                    owl:onProperty :toClassLevel ;
                                    owl:someValuesFrom xsd:string
                                  ] ;
-                 rdfs:label "Class Disruption"@en ;
+                 rdfs:label "Class Suspension"@en ;
                  skos:definition "Represents education operational disruptions." .
 
 
@@ -3630,8 +3631,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                  skos:definition "Wildfire: Any type of fire  in a natural setting such as a grassland, mountain, brush land or tundra, which consumes natural fuels such as tress and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions. Can affect animals, trees, and properties. Can be due to El Nino." .
 
 
-###  https://sakuna.ph/WorkDisruption
-:WorkDisruption rdf:type owl:Class ;
+###  https://sakuna.ph/WorkSuspension
+:WorkSuspension rdf:type owl:Class ;
                 rdfs:subClassOf :Impact ,
                                 [ rdf:type owl:Restriction ;
                                   owl:onProperty :affectedDescription ;
@@ -3649,7 +3650,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                   owl:onProperty :suspensionType ;
                                   owl:someValuesFrom xsd:string
                                 ] ;
-                rdfs:label "Work Disruption"@en ;
+                rdfs:label "Work Suspension"@en ;
                 skos:definition "Represents work operational disruptions." .
 
 
