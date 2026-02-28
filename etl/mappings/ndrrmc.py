@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, work_dis_iri
 
 @dataclass
 class Event:
@@ -919,10 +919,55 @@ class ClassDisruption:
 def class_mapping(g: Graph, hs: List[ClassDisruption], event_iri: URIRef):
 
     for r in hs:
-        uri = doc_iri(event_iri, r.id)
+        uri = class_dis_iri(event_iri, r.id)
 
-        g.add((uri, RDF.type, SKG.ClassDisruption)) # rdf type
-        g.add((event_iri, SKG.hasClassDisruption, uri)) # event link
+        g.add((uri, RDF.type, SKG.ClassSuspension)) # rdf type
+        g.add((event_iri, SKG.hasClassSuspension, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "cancellationDateTime":
+                g.add((uri, SKG.cancellationDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "resumptionDateTime":
+                g.add((uri, SKG.resumptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+WORK_MAPPING = {
+    "Barangay": "hasBarangay",
+    "TYPE": "suspensionType",
+    "DATE_OF_SUSPENSION": "cancellationDate",
+    "TIME_OF_SUSPENSION": "cancellationTime",
+    "DATE_RESUMED": "resumptionDate",
+    "TIME_RESUMED": "resumptionTime",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class WorkDisruption:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    suspensionType: str | None
+    cancellationDateTime: datetime
+    resumptionDateTime: datetime
+    remarks: str | None
+
+def work_mapping(g: Graph, hs: List[WorkDisruption], event_iri: URIRef):
+
+    for r in hs:
+        uri = work_dis_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.WorkSuspension)) # rdf type
+        g.add((event_iri, SKG.hasWorkSuspension, uri)) # event link
 
         for f in fields(r):
 
