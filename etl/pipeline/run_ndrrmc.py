@@ -1,7 +1,7 @@
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
-from transform.ndrrmc import load_aff_pop, load_agri, load_casualties, load_class_suspension, load_comms, load_docalamity, load_events, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_stranded_events, load_uuids, load_incidents, load_provenance, load_water, load_work_suspension
-from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, casualties_mapping, class_mapping, comms_mapping, doc_mapping, event_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping, stranded_mapping, water_mapping, work_mapping
+from transform.ndrrmc import load_aff_pop, load_agri, load_casualties, load_class_suspension, load_comms, load_docalamity, load_events, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_seaport, load_stranded_events, load_uuids, load_incidents, load_provenance, load_water, load_work_suspension
+from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, casualties_mapping, class_mapping, comms_mapping, doc_mapping, event_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping, seaport_mapping, stranded_mapping, water_mapping, work_mapping
 
 import os
 from typing import Tuple
@@ -80,10 +80,13 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     if stranded:
         stranded_mapping(g, stranded, event_iri)
 
-
     water = load_water(event_folder)
     if water:    
         water_mapping(g, water, event_iri)
+
+    seaport = load_seaport(event_folder)
+    if seaport:
+        seaport_mapping(g, seaport, event_iri)
 
     return g
 

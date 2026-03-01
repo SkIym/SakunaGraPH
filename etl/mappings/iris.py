@@ -55,7 +55,10 @@ def work_dis_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/work_suspension/{r_id}")
 
 def stranded_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/stranded/{r_id}")
+    return URIRef(event_id + f"/stranded_event/{r_id}")
 
 def water_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/water_disruption/{r_id}")
+
+def seaport_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/seaport_disruption/{r_id}")

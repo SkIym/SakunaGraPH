@@ -12,9 +12,9 @@ from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
-    POWER_MAPPING, RNB_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WATER_DISRUPTION, WORK_MAPPING,
+    POWER_MAPPING, RNB_MAPPING, SEAPORT_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WATER_DISRUPTION, WORK_MAPPING,
     AffectedPopulation, Agriculture, Casualties, ClassDisruption, CommunicationLines, Event,
-    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief, RNB, Stranded, WorkDisruption
+    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief, RNB, Seaport, Stranded, WorkDisruption
 )
 
 from transform.ndrrmc_cleaner import (
@@ -890,14 +890,62 @@ def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
                             "restorationDateTime")
 
     df = df.with_row_index("id", 1)
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, WATER_DISRUPTION)
+
+def load_seaport(event_folder_path: str) -> List[Seaport] | None:
+
+    src_path = next(
+        (
+            os.path.join(event_folder_path, f)
+            for f in os.listdir(event_folder_path)
+            if "seaport" in f.lower() and f.endswith(".csv")
+        ),
+        None,
+    )
+
+    if not src_path:
+        return None
+
+    df = load_csv_df(
+        src_path,
+        mapping=SEAPORT_MAPPING,
+        target_cols=["Region", "Province", "City_Muni"],
+        collapse_on="QTY",
+        collapse_key="cancellationDate",
+        replace_ws=True,
+        match_location=True
+    )
+
+    df = normalize_datetime(
+        df,
+        date_col="cancellationDate",
+        time_col="cancellationTime",
+        datetime_format="%d %B %Y %H:%M",
+        date_format="%d %B %Y",
+        new_col="cancellationDateTime"
+    )
+
+    df = normalize_datetime(
+        df,
+        date_col="resumptionDate",
+        time_col="resumptionTime",
+        datetime_format="%d %B %Y %H:%M",
+        date_format="%d %B %Y",
+        new_col="resumptionDateTime"
+    )
+
+    df = df.with_row_index("id", 1)
+
+    df.write_csv(event_folder_path + "/hakdog.csv")
+
+    return df_to_entities(df, Seaport)
 
 if __name__ == "__main__":
     # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
     # load_stranded_events("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
-    load_relief("../data/parsed/ndrrmc_mini/SWM enhanced by TCs EGAY and FALCON 2023")
+    load_seaport("../data/parsed/ndrrmc_mini/SWM enhanced by TCs EGAY and FALCON 2023")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

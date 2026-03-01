@@ -19,10 +19,6 @@ def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, bas
     #     df = df.filter(pl.col("Summary_Type") != "GRAND TOTAL")
     #     df = df.with_columns([
     #         pl.coalesce(["City_Muni", "Summary_Type"]).alias("City_Muni"),
-    #         pl.when(pl.col("City_Muni").is_null())
-    #         .then(pl.lit(None))
-    #         .otherwise(pl.col("Summary_Type"))
-    #         .alias("Summary_Type"),
     #     ])
     
     # 1. Forward fill specified columns
@@ -35,6 +31,16 @@ def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, bas
             ((pl.col(none_col).is_null()) & (pl.col(baseline_col).is_not_null()))
         )
     )
+
+    # set no breakdown to null
+
+    df = df.with_columns([
+        pl.when(pl.col(c).str.contains_any(["breakdown"], ascii_case_insensitive=True))
+        .then(None)
+        .otherwise(pl.col(c))
+        .alias(c)
+        for c in ["City_Muni", "Province"]
+    ])
 
     # output_path = os.path.join(folder_path, "ffilled.csv")
 
@@ -182,15 +188,10 @@ def concat_loc_levels(df: DataFrame, loc_cols: list[str], sep: str):
 
 def correct_QTY_Barangay_column(df: DataFrame):
 
-    return df.rename(mapping={
-        "Barangay": "hasBarangay",
-        "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
-        "REGION_|_PROVINCE_|\nCITY_MUNICIPALITY_|\nBARANGAY": "QTY",
-        "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|_BARANGAY": "QTY",
-        "REGION_|_PROVINCE_|_CITY\n_MUNICIPALITY_|_BARANGAY": "QTY",
-        "REGION_|_PROVINCE_|_CITY_\nMUNICIPALITY_|_BARANGAY": "QTY",
-        "REGION_|_PROVINCE_|_CITY\r\n_MUNICIPALITY_|_BARANGAY": "QTY"
-    }, strict=False)
+    rename_dict = {col: "QTY" for col in df.columns if "REGION" in col}
+    rename_dict["Barangay"] = "hasBarangay"
+
+    return df.rename(mapping=rename_dict, strict=False)
 
 
 def remove_summary_rows(df: DataFrame, nulls: list[str]):
