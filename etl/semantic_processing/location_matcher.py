@@ -273,6 +273,7 @@ class LocationMatcher:
                 matched.append(region_iri)
                 continue
             
+            # print(highest, levels)
             prov_label = levels.pop()
             prov_iri = self.match_province(prov_label)
 
@@ -320,7 +321,7 @@ class LocationMatcher:
                     muni_iri = self.match_municipality(muni_label, prov_iri)
 
                     if not muni_iri or self.municipalities_parent[muni_iri] != prov_iri:
-                        print(prov_iri, highest)
+                        # print(prov_iri, highest)
                         muni_iri = self.match_municipality(highest, prov_iri)
 
                     matched.append(muni_iri if muni_iri else prov_iri)
@@ -331,6 +332,9 @@ class LocationMatcher:
                 elif levels:
                     muni_label = levels.pop()
                     muni_iri = self.match_municipality(muni_label, "")
+                    matched.append(muni_iri if muni_iri else "")
+                elif highest:
+                    muni_iri = self.match_municipality(highest, "")
                     matched.append(muni_iri if muni_iri else "")
                 else:
                     print(prov_iri, highest, levels)

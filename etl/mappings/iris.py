@@ -56,3 +56,6 @@ def work_dis_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def stranded_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/stranded/{r_id}")
+
+def water_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/water_disruption/{r_id}")

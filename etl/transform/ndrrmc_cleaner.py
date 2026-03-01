@@ -12,6 +12,18 @@ def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, bas
     :param none_col: column that should be none 
     :param baseline_col: column that dictates the identity of the entry
     """
+
+    # Move erratic municities placement
+    # if "Summary_Type" in df.columns:
+
+    #     df = df.filter(pl.col("Summary_Type") != "GRAND TOTAL")
+    #     df = df.with_columns([
+    #         pl.coalesce(["City_Muni", "Summary_Type"]).alias("City_Muni"),
+    #         pl.when(pl.col("City_Muni").is_null())
+    #         .then(pl.lit(None))
+    #         .otherwise(pl.col("Summary_Type"))
+    #         .alias("Summary_Type"),
+    #     ])
     
     # 1. Forward fill specified columns
     # 2. Filter out rows where Column_1 is null AND Column_2 > 0
@@ -112,6 +124,7 @@ def to_int(df: DataFrame, cols: list[str]):
         pl.col(col)
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
+            .str.replace_all(" ", "")
             .cast(pl.Int64, strict=False)
         for col in cols if col in df.columns
     )
@@ -126,6 +139,7 @@ def to_float(df: DataFrame, cols: list[str]):
         pl.col(col)
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
+            .str.replace_all(" ", "")
             .cast(pl.Float64, strict=False)
         for col in cols if col in df.columns
     )
@@ -140,6 +154,7 @@ def to_million_php(df: DataFrame, cols: list[str]):
         (pl.col(col)
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
+            .str.replace_all(" ", "")
             .cast(pl.Float64)
             / 1000000)
         .round(6)
@@ -165,9 +180,10 @@ def concat_loc_levels(df: DataFrame, loc_cols: list[str], sep: str):
 
     return locs
 
-def correct_QTY_column(df: DataFrame):
+def correct_QTY_Barangay_column(df: DataFrame):
 
     return df.rename(mapping={
+        "Barangay": "hasBarangay",
         "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|\nBARANGAY": "QTY",
         "REGION_|_PROVINCE_|\nCITY_MUNICIPALITY_|\nBARANGAY": "QTY",
         "REGION_|_PROVINCE_|_CITY_MUNICIPALITY_|_BARANGAY": "QTY",

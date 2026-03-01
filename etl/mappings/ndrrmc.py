@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, stranded_iri, work_dis_iri
+from .iris import aff_pop_iri, agri_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, stranded_iri, water_iri, work_dis_iri
 
 @dataclass
 class Event:
@@ -155,7 +155,7 @@ INCIDENT_COLUMN_MAPPINGS = {
     "Column_6": "incidentActionsTaken",
     "Column_7": "remarks",
     "Column_8": "incidentStatus",
-    "Barangay": "hasBarangay",
+    
 }
 
 def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
@@ -242,7 +242,7 @@ AFF_POP_COL_MAP = {
     "TOTAL_SERVED_Inside_+_Outside_Persons_CUM": "displacedPersons",
     "TOTAL_SERVED_Inside_+_Outside_Families_CUM": "displacedFamilies",
     "No_of_ECs_Persons_CUM": "evacuationCenters",
-    "Barangay": "hasBarangay"
+    
 }
 
 @dataclass
@@ -324,7 +324,7 @@ def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
 CasualtyType = TypingLiteral["DEAD", "INJURED", "MISSING"]
        
 CASUALTY_MAPPING = {
-    "Barangay": "hasBarangay",
+    
     "CAUSE": "casualtyCause",
     "REMARKS": "remarks",
     "SOURCE_OF\nDATA": "casualtyDataSource",
@@ -432,7 +432,7 @@ ASSISTANCE_PROVIDED_MAPPING = {
     "REMARKS": "remarks",
     "REMARKS_SOURCE": "remarks",
     "REMARKS_AMOUNT": "remarks",
-    "Barangay": "hasBarangay"
+    
 
 }
 
@@ -490,7 +490,7 @@ INFRA_MAPPING = {
     "NUMBER_OF\r\nDAMAGED": "numberInfraDamaged",
     "COSTPHP": "infraDamageAmount",
     "REMARKS": "remarks",
-    "Barangay": "hasBarangay"
+    
 
 }
 
@@ -539,7 +539,7 @@ HOUSES_MAPPING = {
     "NO_OF_DAMAGED_HOUSES_PARTIALLY": "partiallyDamagedHouses",
     "AMOUNT_PHP_GRAND_TOTAL": "housingDamageAmount",
     "REMARKS_GRAND_TOTAL": "remarks",    
-    "Barangay": "hasBarangay"
+    
 
 }
 
@@ -599,7 +599,7 @@ AGRI_MAPPING = {
     "NUMBER_OF_DAMAGED_INFRASTRUCTURE,_MACHINERIES,_EQUIPMENT_PARTIALLY_DAMAGED": "partiallyDamagedInfrastructure",
     "PRODUCTION_LOSS_IN_VOLUME_MT_TOTAL": "productionLossVolume",
     "PRODUCTION_LOSS_COST_OF_DAMAGE_IN_VALUE_PHP_TOTAL": "productionLossCost",
-    "Barangay": "hasBarangay"
+    
 
 }
 
@@ -662,7 +662,7 @@ PEVAC_MAPPING = {
     "FAMILIES": "preemptFamilies",
     "TOTAL": "preemptPersons",
     "REMARKS": "remarks",
-    "Barangay": "hasBarangay"
+    
 }
 
 @dataclass
@@ -707,7 +707,7 @@ RNB_MAPPING = {
     "TIME_REPORTED_not_passable": "notPassableTime",
     "STATUS": "roadBridgeStatus",
     "REMARK": "remarks",
-    "Barangay": "hasBarangay"
+    
 }
 
 @dataclass
@@ -757,7 +757,7 @@ POWER_MAPPING = {
     "DATE_RESTORED": "restorationDate",
     "TIME_RESTORED": "restorationTime",
     "REMARKS": "remarks",
-    "Barangay": "hasBarangay"
+    
 }
 
 @dataclass
@@ -811,7 +811,7 @@ COMMS_MAPPING = {
     "TIME_RES_TORATIO_N": "restorationTime",
     "TIME_RESTORATION": "restorationTime",
     "REMARKS": "remarks",
-    "Barangay": "hasBarangay"
+    
 }
 
 @dataclass
@@ -856,7 +856,7 @@ DOC_MAPPING = {
     "RESOLUTION_NUMBER": "resolutionNo",
     "RESOLUTION_DATE": "resolutionDate",
     "REMARKS": "remarks",
-    "Barangay": "hasBarangay"
+    
 }
 
 @dataclass
@@ -893,7 +893,7 @@ def doc_mapping(g: Graph, hs: List[DOC], event_iri: URIRef):
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
 
 CLASS_MAPPING = {
-    "Barangay": "hasBarangay",
+    
     "LEVEL_FROM": "fromClassLevel",
     "LEVEL_TO": "toClassLevel",
     "TYPE": "suspensionType",
@@ -942,7 +942,7 @@ def class_mapping(g: Graph, hs: List[ClassDisruption], event_iri: URIRef):
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
 
 WORK_MAPPING = {
-    "Barangay": "hasBarangay",
+    
     "TYPE": "suspensionType",
     "DATE_OF_SUSPENSION": "cancellationDate",
     "TIME_OF_SUSPENSION": "cancellationTime",
@@ -1041,3 +1041,55 @@ def stranded_mapping(g: Graph, hs: List[Stranded], event_iri: URIRef):
                 g.add((uri, SKG.motorBancas, Literal(value, datatype=XSD.int)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+WATER_DIS_MAPPING = {
+    "TYPE": "disruptionType",
+    "SERVICE_PROVIDER": "serviceProvider",
+    "DATE_OF_INTERRUPTION__OUTAGE": "interruptionDate",
+    "TIME_OF_INTERRUPTION__OUTAGE": "interruptionTime",
+    "DATE_RESTORED": "restorationDate",
+    "TIME_RESTORED": "restorationTime",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class WATER_DISRUPTION:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    disruptionType: str | None
+    serviceProvider: str | None
+    interruptionDateTime: datetime
+    restorationDateTime: datetime | None
+    remarks: str | None
+
+def water_mapping(g: Graph, hs: List[WATER_DISRUPTION], event_iri: URIRef):
+
+    for r in hs:
+        uri = water_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.WaterDisruption)) # rdf type
+        g.add((event_iri, SKG.hasWaterDisruption, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "interruptionDateTime":
+                g.add((uri, SKG.interruptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "restorationDateTime":
+                g.add((uri, SKG.restorationDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+
+SEAPORT_MAPPING = {
+    
+
+}

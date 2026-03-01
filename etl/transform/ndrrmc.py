@@ -1,25 +1,24 @@
 import os
 import uuid
 import json
-from typing import Iterable, List, Type, TypeVar, Callable
+from typing import Iterable, List, Mapping, Type, TypeVar, Callable
 from dataclasses import fields
 from datetime import datetime
 
 import polars as pl
-
 from semantic_processing.location_matcher import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
-    POWER_MAPPING, RNB_MAPPING, STRANDED_MAPPING, WORK_MAPPING,
+    POWER_MAPPING, RNB_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WATER_DISRUPTION, WORK_MAPPING,
     AffectedPopulation, Agriculture, Casualties, ClassDisruption, CommunicationLines, Event,
     Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief, RNB, Stranded, WorkDisruption
 )
 
 from transform.ndrrmc_cleaner import (
-    concat_loc_levels, correct_QTY_column, event_name_expander,
+    concat_loc_levels, correct_QTY_Barangay_column, event_name_expander,
     forward_fill_and_collapse, normalize_datetime, remove_summary_rows,
     replace_column_whitespace_with_underscore, to_float, to_int, to_million_php
 )
@@ -35,9 +34,10 @@ def load_csv_df(
     collapse_key: str | None = None,
     replace_ws: bool = False,
     match_location: bool = True,
+    schema_overrides: Mapping[str, pl.DataType] | None = None
 ) -> pl.DataFrame:
-    df = pl.read_csv(path)
-    df = correct_QTY_column(df)
+    df = pl.read_csv(path, schema_overrides=schema_overrides)
+    df = correct_QTY_Barangay_column(df)
 
     if replace_ws:
         df = replace_column_whitespace_with_underscore(df)
@@ -202,7 +202,8 @@ def load_relief(event_folder_path: str) -> list[Relief] | None:
             target_cols=["Region", "Province", "City_Muni"],
             collapse_on="QTY",
             collapse_key="itemCost",
-            match_location=True
+            match_location=True,
+            schema_overrides={"QUANTITY": pl.Utf8()}
         )
 
         df = to_float(df, ["itemCost", "itemCostPerUnit", "itemQuantity"])
@@ -230,6 +231,7 @@ def load_relief(event_folder_path: str) -> list[Relief] | None:
         final_dfs.append(df_selected)
 
     # concatenate all DataFrames
+
     final_df = pl.concat(final_dfs, rechunk=True)
 
     return df_to_entities(final_df, Relief)
@@ -402,6 +404,8 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
     df = to_million_php(df, ["housingDamageAmount"])
 
     df = df.with_row_index("id", 1)
+
+    df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Housing)
 
@@ -841,12 +845,59 @@ def load_stranded_events(event_folder_path: str) -> List[Stranded] | None:
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Stranded)
 
+def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
+    # Locate water supply CSV
+    src_path = next(
+        (
+            os.path.join(event_folder_path, f)
+            for f in os.listdir(event_folder_path)
+            if "water" in f.lower() and f.endswith(".csv")
+        ),
+        None,
+    )
+
+    if not src_path:
+        return None
+
+    df = load_csv_df(
+        src_path,
+        mapping=WATER_DIS_MAPPING,
+        target_cols=["Region", "Province", "City_Muni"],
+        collapse_on="QTY",
+        collapse_key="interruptionDate",
+        replace_ws=True,
+        match_location=True,
+    )
+
+    # normalize interruption datetime
+    df = normalize_datetime(df, 
+                            "interruptionDate", 
+                            "interruptionTime", 
+                            "%d %B %Y %I:%M %P", 
+                            "%d %B %Y",
+                            "interruptionDateTime")
+    
+    # normalize restoration datetime
+    df = normalize_datetime(df, 
+                            "restorationDate", 
+                            "restorationTime", 
+                            "%d %B %Y %I:%M %P", 
+                            "%d %B %Y",
+                            "restorationDateTime")
+
+    df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "/hakdog.csv")
+
+    return df_to_entities(df, WATER_DISRUPTION)
+
 if __name__ == "__main__":
     # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
-    load_stranded_events("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    # load_stranded_events("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+
+    load_relief("../data/parsed/ndrrmc_mini/SWM enhanced by TCs EGAY and FALCON 2023")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")
