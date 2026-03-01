@@ -1,8 +1,11 @@
 - Latest: sakunagraph
 
 TO DO:
-- determine ways to store multiple paired values and attributes (itemCost, itemQty, )
-- align with PROV-O
+- use SKOS concept scheme for EM-dat clasification and the major/incident split in disaster events
+- convert string-typed categorical data properties to object properites poiting to skos concepts (castualtyType, damgclassifcaiton, dmgtype, AGENCY! (dswd, ocd, etc.))
+- Remove owl:someValuesFrom restrictions (subclass of data prop restricis in protege), clutters the file :<
+- hasType/hasSubtype to hasDisasterType, and add hasEventRole that has Major or Incident range (refer to first bullet point)
+- remove Brangay as a class, rely on hasBarangay data prop then reason out on the paper.
 
 DONE:
 - rename IRIs
