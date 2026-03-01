@@ -1512,22 +1512,16 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                rdfs:label "policy changes" .
 
 
-###  https://sakuna.ph/portName
-:portName rdf:type owl:DatatypeProperty ;
-          rdfs:domain [ rdf:type owl:Class ;
-                        owl:unionOf ( :AirportDisruption
-                                      :SeaportDisruption
-                                    )
-                      ] ;
-          rdfs:range xsd:string ;
-          rdfs:label "port name"@en .
-
-
-###  https://sakuna.ph/portOrTerminal
-:portOrTerminal rdf:type owl:DatatypeProperty ;
-                rdfs:domain :StrandedEvent ;
-                rdfs:range xsd:string ;
-                rdfs:label "port or terminal"@en .
+###  https://sakuna.ph/portOrTerminalName
+:portOrTerminalName rdf:type owl:DatatypeProperty ;
+                    rdfs:domain [ rdf:type owl:Class ;
+                                  owl:unionOf ( :AirportDisruption
+                                                :SeaportDisruption
+                                                :StrandedEvent
+                                              )
+                                ] ;
+                    rdfs:range xsd:string ;
+                    rdfs:label "port or terminal name"@en .
 
 
 ###  https://sakuna.ph/portStatus
@@ -2133,7 +2127,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :portName ;
+                                     owl:onProperty :portOrTerminalName ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
@@ -3354,7 +3348,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :portName ;
+                                     owl:onProperty :portOrTerminalName ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
@@ -3467,7 +3461,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  owl:someValuesFrom xsd:integer
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :portOrTerminal ;
+                                 owl:onProperty :portOrTerminalName ;
                                  owl:someValuesFrom xsd:string
                                ] ,
                                [ rdf:type owl:Restriction ;
