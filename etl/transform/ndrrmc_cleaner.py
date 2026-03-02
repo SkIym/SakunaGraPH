@@ -117,7 +117,8 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str | None, datet
                 .str.strip_chars()
                 .str.strptime(pl.Date, 
                             date_format, 
-                            strict=False),
+                            strict=False)
+                .alias(new_col)
         )
 
     return df
@@ -131,6 +132,7 @@ def to_int(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .str.replace_all(" ", "")
+            .str.replace_all(r"[^0-9.\-]", "")
             .cast(pl.Int64, strict=False)
         for col in cols if col in df.columns
     )
@@ -146,6 +148,7 @@ def to_float(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .str.replace_all(" ", "")
+            .str.replace_all(r"[^0-9.\-]", "")
             .cast(pl.Float64, strict=False)
         for col in cols if col in df.columns
     )
@@ -161,6 +164,7 @@ def to_million_php(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .str.replace_all(" ", "")
+            .str.replace_all(r"[^0-9.\-]", "")
             .cast(pl.Float64)
             / 1000000)
         .round(6)

@@ -59,7 +59,11 @@ def load_csv_df(
 def df_to_entities(df: pl.DataFrame, cls: Type[T]) -> list[T]:
     field_names = {f.name for f in fields(cls)}
     return [
-        cls(**{k: row.get(k) for k in field_names})
+        cls(**{
+            k: (None if (v is None or (isinstance(v, str) and v.strip().lower() == "none")) else v)
+            for k, v in row.items()
+            if k in field_names
+        })
         for row in df.iter_rows(named=True)
     ]
 
@@ -148,6 +152,7 @@ def load_aff_pop(event_folder_path: str) -> list[AffectedPopulation] | None:
     if not os.path.exists(path):
         return None
 
+    print("Transforming affected population table..")
     df = load_csv_df(
         path,
         mapping=AFF_POP_COL_MAP,
@@ -162,6 +167,7 @@ def load_aff_pop(event_folder_path: str) -> list[AffectedPopulation] | None:
     ])
 
     df = df.with_row_index("id", 1)
+    df.write_csv(event_folder_path + "/cleaned_affected_population.csv")
     return df_to_entities(df, AffectedPopulation)
 
 def load_infra(event_folder_path: str) -> list[Infrastructure] | None:
@@ -495,7 +501,7 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
     # --- Affected population (evacuation centers only) ---
     if ap_exists:
         ap_df = (
-            pl.read_csv(ap_path)
+            pl.read_csv(ap_path, ignore_errors=True)
             .select(
                 [
                     "hasLocation",
@@ -1042,6 +1048,8 @@ if __name__ == "__main__":
     # load_aff_pop("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
     # load_stranded_events("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
-    load_flight("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+    # load_flight("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
+
+    load_aff_pop("../data/parsed/ndrrmc/2022 National and Local Elections  pdf1")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

@@ -155,7 +155,7 @@ INCIDENT_COLUMN_MAPPINGS = {
     "Column_6": "incidentActionsTaken",
     "Column_7": "remarks",
     "Column_8": "incidentStatus",
-    
+    "REMARKS": "remarks",
 }
 
 def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):

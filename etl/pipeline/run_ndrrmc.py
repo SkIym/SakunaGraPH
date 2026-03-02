@@ -99,8 +99,8 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     return g
 
 
-DATA_DIR = "../data/parsed/ndrrmc_mini"
-OUT_FILE = "../data/rdf/ndrrmc_mini.ttl"
+DATA_DIR = "../data/parsed/ndrrmc"
+OUT_FILE = "../data/rdf/ndrrmc.ttl"
 
 
 def run():
