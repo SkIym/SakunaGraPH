@@ -955,14 +955,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 
 ###  https://sakuna.ph/airline
 :airline rdf:type owl:DatatypeProperty ;
-         rdfs:domain :AirportDisruption ;
+         rdfs:domain :FlightDisruption ;
          rdfs:range xsd:string ;
          rdfs:label "airline"@en .
 
 
 ###  https://sakuna.ph/airportType
 :airportType rdf:type owl:DatatypeProperty ;
-             rdfs:domain :AirportDisruption ;
+             rdfs:domain :FlightDisruption ;
              rdfs:range xsd:string ;
              rdfs:label "airport type"@en .
 
@@ -1030,13 +1030,15 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                       rdfs:domain [ rdf:type owl:Class ;
                                     owl:unionOf ( :AirportDisruption
                                                   :ClassSuspension
+                                                  :FlightDisruption
                                                   :SeaportDisruption
                                                   :WorkSuspension
                                                 )
                                   ] ;
                       rdfs:range xsd:dateTime ;
                       rdfs:label "cancellation datetime"@en ;
-                      skos:altLabel "suspension datetime" .
+                      skos:altLabel "non-operational datetime" ,
+                                    "suspension datetime" .
 
 
 ###  https://sakuna.ph/casualtyCause
@@ -1202,14 +1204,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 
 ###  https://sakuna.ph/flightNo
 :flightNo rdf:type owl:DatatypeProperty ;
-          rdfs:domain :AirportDisruption ;
+          rdfs:domain :FlightDisruption ;
           rdfs:range xsd:string ;
           rdfs:label "flight no."@en .
 
 
 ###  https://sakuna.ph/flightRoute
 :flightRoute rdf:type owl:DatatypeProperty ;
-             rdfs:domain :AirportDisruption ;
+             rdfs:domain :FlightDisruption ;
              rdfs:range xsd:string ;
              rdfs:label "flight route"@en .
 
@@ -1424,13 +1426,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
            rdfs:label "magnitude"@en .
 
 
-###  https://sakuna.ph/motorBancas
-:motorBancas rdf:type owl:DatatypeProperty ;
-             rdfs:domain :StrandedEvent ;
-             rdfs:range xsd:int ;
-             rdfs:label "no. of motor bancas"@en .
-
-
 ###  https://sakuna.ph/noFamiliesAssisted
 :noFamiliesAssisted rdf:type owl:DatatypeProperty ;
                     rdfs:subPropertyOf owl:topDataProperty ;
@@ -1498,13 +1493,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                   rdfs:label "passable datetime"@en .
 
 
-###  https://sakuna.ph/passengers
-:passengers rdf:type owl:DatatypeProperty ;
-            rdfs:domain :StrandedEvent ;
-            rdfs:range xsd:int ;
-            rdfs:label "no. of passengers"@en .
-
-
 ###  https://sakuna.ph/policyChanges
 :policyChanges rdf:type owl:DatatypeProperty ;
                rdfs:domain :Recovery ;
@@ -1516,6 +1504,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :portOrTerminalName rdf:type owl:DatatypeProperty ;
                     rdfs:domain [ rdf:type owl:Class ;
                                   owl:unionOf ( :AirportDisruption
+                                                :FlightDisruption
                                                 :SeaportDisruption
                                                 :StrandedEvent
                                               )
@@ -1691,6 +1680,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                     rdfs:domain [ rdf:type owl:Class ;
                                   owl:unionOf ( :AirportDisruption
                                                 :ClassSuspension
+                                                :FlightDisruption
                                                 :SeaportDisruption
                                                 :WorkSuspension
                                               )
@@ -1725,13 +1715,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                 rdfs:domain :RoadAndBridgesDamage ;
                 rdfs:range xsd:string ;
                 rdfs:label "road or bridge type"@en .
-
-
-###  https://sakuna.ph/rollingCargoes
-:rollingCargoes rdf:type owl:DatatypeProperty ;
-                rdfs:domain :StrandedEvent ;
-                rdfs:range xsd:int ;
-                rdfs:label "no. of rolling cargoes"@en .
 
 
 ###  https://sakuna.ph/serviceProvider
@@ -1774,6 +1757,38 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
          rdfs:domain :StrandedEvent ;
          rdfs:range xsd:string ;
          rdfs:label "station"@en .
+
+
+###  https://sakuna.ph/strandedMotorBancas
+:strandedMotorBancas rdf:type owl:DatatypeProperty ;
+                     rdfs:domain :StrandedEvent ;
+                     rdfs:range xsd:int ;
+                     rdfs:label "no. of stranded motor bancas"@en .
+
+
+###  https://sakuna.ph/strandedPassengers
+:strandedPassengers rdf:type owl:DatatypeProperty ;
+                    rdfs:domain [ rdf:type owl:Class ;
+                                  owl:unionOf ( :AirportDisruption
+                                                :StrandedEvent
+                                              )
+                                ] ;
+                    rdfs:range xsd:int ;
+                    rdfs:label "no. of stranded passengers"@en .
+
+
+###  https://sakuna.ph/strandedRollingCargoes
+:strandedRollingCargoes rdf:type owl:DatatypeProperty ;
+                        rdfs:domain :StrandedEvent ;
+                        rdfs:range xsd:int ;
+                        rdfs:label "no. of stranded rolling cargoes"@en .
+
+
+###  https://sakuna.ph/strandedVessels
+:strandedVessels rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :StrandedEvent ;
+                 rdfs:range xsd:int ;
+                 rdfs:label "no of. stranded vessels"@en .
 
 
 ###  https://sakuna.ph/substation
@@ -1831,13 +1846,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                               rdfs:domain :AgricultureDamage ;
                               rdfs:range xsd:int ;
                               rdfs:label "totally damaged infrastructure"@en .
-
-
-###  https://sakuna.ph/vessels
-:vessels rdf:type owl:DatatypeProperty ;
-         rdfs:domain :StrandedEvent ;
-         rdfs:range xsd:int ;
-         rdfs:label "no of. vessels"@en .
 
 
 #################################################################
@@ -2107,24 +2115,8 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :airline ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :airportType ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
                                      owl:onProperty :cancellationDateTime ;
                                      owl:someValuesFrom xsd:dateTime
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :flightNo ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :flightRoute ;
-                                     owl:someValuesFrom xsd:string
                                    ] ,
                                    [ rdf:type owl:Restriction ;
                                      owl:onProperty :portOrTerminalName ;
@@ -2139,6 +2131,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ;
                    rdfs:label "Airport Disruption" ;
+                   skos:altLabel "Flight Disruption" ;
                    skos:definition "Represents disruptions on airports." .
 
 
@@ -2598,6 +2591,12 @@ baw:NaturalDisasterType rdf:type owl:Class ;
             rdfs:subClassOf :Flood ;
             rdfs:label "Flash Flood"@en ;
             skos:definition "Flashflood: Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." .
+
+
+###  https://sakuna.ph/FlightDisruption
+:FlightDisruption rdf:type owl:Class ;
+                  rdfs:subClassOf :Impact ;
+                  rdfs:label "Flight Disruption" .
 
 
 ###  https://sakuna.ph/Flood
@@ -3457,32 +3456,32 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  owl:someValuesFrom xsd:string
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :motorBancas ;
-                                 owl:someValuesFrom xsd:integer
-                               ] ,
-                               [ rdf:type owl:Restriction ;
-                                 owl:onProperty :passengers ;
-                                 owl:someValuesFrom xsd:integer
-                               ] ,
-                               [ rdf:type owl:Restriction ;
                                  owl:onProperty :portOrTerminalName ;
                                  owl:someValuesFrom xsd:string
-                               ] ,
-                               [ rdf:type owl:Restriction ;
-                                 owl:onProperty :rollingCargoes ;
-                                 owl:someValuesFrom xsd:integer
                                ] ,
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :station ;
                                  owl:someValuesFrom xsd:string
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :substation ;
-                                 owl:someValuesFrom xsd:string
+                                 owl:onProperty :strandedMotorBancas ;
+                                 owl:someValuesFrom xsd:integer
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :vessels ;
+                                 owl:onProperty :strandedPassengers ;
                                  owl:someValuesFrom xsd:integer
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :strandedRollingCargoes ;
+                                 owl:someValuesFrom xsd:integer
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :strandedVessels ;
+                                 owl:someValuesFrom xsd:integer
+                               ] ,
+                               [ rdf:type owl:Restriction ;
+                                 owl:onProperty :substation ;
+                                 owl:someValuesFrom xsd:string
                                ] ;
                rdfs:label "Stranded Event" ;
                skos:definition "Represents stranded mode of transportations." .
