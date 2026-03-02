@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
 from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
+from .iris import aff_pop_iri, agri_iri, airport_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, flight_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
 
 @dataclass
 class Event:
@@ -991,10 +991,10 @@ STRANDED_MAPPING = {
     "STATION": "station",
     "SUBSTATION": "substation",
     "PORT_TERMINAL": "portOrTerminalName",
-    "PASSENGER": "passengers",
-    "ROLLING_CARGOES": "rollingCargoes",
-    "VESSELS_BUS_LINER": "vessels",
-    "MBCA_MOTOR_BANCA": "motorBancas",
+    "PASSENGER": "strandedPassengers",
+    "ROLLING_CARGOES": "strandedRollingCargoes",
+    "VESSELS_BUS_LINER": "strandedVessels",
+    "MBCA_MOTOR_BANCA": "strandedMotorBancas",
     "REMARKS": "remarks"
 }
 
@@ -1007,10 +1007,10 @@ class Stranded:
     station: str | None
     substation: str | None
     portOrTerminalName: str | None
-    passengers: int
-    rollingCargoes: int
-    vessels: int
-    motorBancas: int
+    strandedPassengers: int
+    strandedRollingCargoes: int
+    strandedVessels: int
+    strandedMotorBancas: int
     remarks: str | None
 
 def stranded_mapping(g: Graph, hs: List[Stranded], event_iri: URIRef):
@@ -1031,14 +1031,14 @@ def stranded_mapping(g: Graph, hs: List[Stranded], event_iri: URIRef):
             
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
-            elif f.name == "passengers":
-                g.add((uri, SKG.passengers, Literal(value, datatype=XSD.int)))
-            elif f.name == "rollingCargoes":
-                g.add((uri, SKG.rollingCargoes, Literal(value, datatype=XSD.int)))
-            elif f.name == "vessels":
-                g.add((uri, SKG.vessels, Literal(value, datatype=XSD.int)))
-            elif f.name == "motorBancas":
-                g.add((uri, SKG.motorBancas, Literal(value, datatype=XSD.int)))
+            elif f.name == "strandedPassengers":
+                g.add((uri, SKG.strandedPassengers, Literal(value, datatype=XSD.int)))
+            elif f.name == "strandedRollingCargoes":
+                g.add((uri, SKG.strandedRollingCargoes, Literal(value, datatype=XSD.int)))
+            elif f.name == "strandedVessels":
+                g.add((uri, SKG.strandedVessels, Literal(value, datatype=XSD.int)))
+            elif f.name == "strandedMotorBancas":
+                g.add((uri, SKG.strandedMotorBancas, Literal(value, datatype=XSD.int)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
 
@@ -1117,6 +1117,108 @@ def seaport_mapping(g: Graph, hs: List[Seaport], event_iri: URIRef):
 
         g.add((uri, RDF.type, SKG.SeaportDisruption)) # rdf type
         g.add((event_iri, SKG.hasSeaportDisruption, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "cancellationDateTime":
+                g.add((uri, SKG.cancellationDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "resumptionDateTime":
+                g.add((uri, SKG.resumptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+AIRPORT_MAPPING = {
+    "NAME_OF_AIRPORT": "portOrTerminalName",
+    "AIRPORT": "portOrTerminalName",
+    "AIRLINE": "airline",
+    "TYPE": "airportType",
+    "FLIGHT_NO": "flightNo",
+    "ROUTE": "flightRoute",
+    "STATUS": "portStatus",
+    "STRANDED_PASSENGERS": "strandedPassengers",
+    "DATE_REPORTED_Non-Operational__Cancelled_Trips": "cancellationDate",
+    "TIME_REPORTED_Non-Operational__Cancelled_Trips": "cancellationTime",
+    "DATE_REPORTED_Non-Operational": "cancellationDate",
+    "TIME_REPORTED_Non-Operational": "cancellationTime",
+    "DATE_CANCELLED": "cancellationDate",
+    "TIME_CANCELLED": "cancellationTime",
+    "DATE_REPORTED_Operational_Resumed_Trips": "resumptionDate",
+    "TIME_REPORTED_Operational_Resumed_Trips": "resumptionTime",
+    "DATE_REPORTED_Operational": "resumptionDate",
+    "TIME_REPORTED_Operational": "resumptionTime",
+    "DATE_RESUMED": "resumptionDate",
+    "TIME_RESUMED": "resumptionTime",
+    "REMARKS": "remarks"
+}
+
+@dataclass
+class Airport:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    portOrTerminalName: str | None
+    portStatus: str | None
+    strandedPassengers: int | None
+    cancellationDateTime: datetime
+    resumptionDateTime: datetime | None
+    remarks: str | None
+
+@dataclass
+class Flight:
+    id: str
+    hasLocation: URIRef
+    hasBarangay: str | None
+    portOrTerminalName: str | None
+    airline: str | None
+    airportType: str | None
+    flightNo: str | None
+    fligtRoute: str | None
+    cancellationDateTime: datetime
+    resumptionDateTime: datetime | None
+    remarks: str | None
+
+def airport_mapping(g: Graph, hs: List[Airport], event_iri: URIRef):
+
+    for r in hs:
+        uri = airport_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.AirportDisruption)) # rdf type
+        g.add((event_iri, SKG.hasAirportDisruption, uri)) # event link
+
+        for f in fields(r):
+
+            if f.name == "id": continue
+
+            value = getattr(r, f.name)
+            if value is None:
+                continue  
+            
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            elif f.name == "cancellationDateTime":
+                g.add((uri, SKG.cancellationDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "resumptionDateTime":
+                g.add((uri, SKG.resumptionDateTime, Literal(value, datatype=XSD.dateTime)))
+            elif f.name == "strandedPassengers":
+                g.add((uri, SKG.strandedPassengers, Literal(value, datatype=XSD.int)))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value))) 
+
+def flight_mapping(g: Graph, hs: List[Flight], event_iri: URIRef):
+
+    for r in hs:
+        uri = flight_iri(event_iri, r.id)
+
+        g.add((uri, RDF.type, SKG.FlightDisruption)) # rdf type
+        g.add((event_iri, SKG.hasFlightDisruption, uri)) # event link
 
         for f in fields(r):
 

@@ -103,7 +103,7 @@ def normalize_datetime(df: DataFrame, date_col: str, time_col: str | None, datet
                 # fallback: date only
                 pl.col(date_col)
                 .str.strip_chars()
-                .str.strptime(pl.Datetime, 
+                .str.strptime(pl.Date, 
                             date_format, 
                             strict=False),
         
