@@ -475,6 +475,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
             "productionLossVolume",
             "partiallyDamagedCropArea",
             "totallyDamagedCropArea",
+            "agriDamageQuantity"
         ],
     )
  

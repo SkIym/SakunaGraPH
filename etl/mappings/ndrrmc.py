@@ -1098,6 +1098,12 @@ SEAPORT_MAPPING = {
     "TIME_REPORTED_Non-Operational__Cancelled_Trips": "cancellationTime",
     "DATE_REPORTED_Operational_Resumed_Trips": "resumptionDate",
     "TIME_REPORTED_Operational_Resumed_Trips": "resumptionTime",
+    "DATE_REPORTED_Non-Operational": "cancellationDate",
+    "TIME_REPORTED_Non-Operational": "cancellationTime",
+    "DATE_CANCELLED": "cancellationDate",
+    "TIME_CANCELLED": "cancellationTime",
+    "DATE_REPORTED_Operational": "resumptionDate",
+    "TIME_REPORTED_Operational": "resumptionTime",
     "REMARKS": "remarks"
 }
 
