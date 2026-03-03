@@ -7,7 +7,7 @@
 - PSGC Shapefiles: SHP -> TTL via a mapper
     - To run: `python ./mappers/psgc_datefile_mapper.py`
 - NDRRMC Reports: PDF ->  CSV 
-    - Download from the drive or run `python ./parsers/ndrrmc_parser.py`
+    - Download from the drive or run `python ./parse/ndrrmc-v311.py`
     - Make sure the csv and json files are in etl/data/ndrrmc
 
 ***Transformation***
@@ -15,7 +15,7 @@
 - udfs dir contains the user-defined functions needed for each source
 - basically adheres to the ontology classes and relationships
 - GDA: `python -m morph_kgc ./config.ini`
-- NDRRMC: `python -m ppl.run_ndrrmc`
+- NDRRMC: `python -m pipeline.run_ndrrmc`
 
 ***Loading***
 - load ttl files from transformation stage to graphDB. This hasn't been automated yet.
@@ -27,8 +27,9 @@
 ***NDRRMC***
 
 To do:
+- Implement OCR for image-based / scanned PDFs
 - Manually correct hasType values for major events (the event corresponding to report)
-- Consider casualty counts from summary report (includes casualties not yet validated)
+- Fix casualty type forward filling (move erratic location values and filter by casualty type only)
 
 ***GEOG ARCHIVE***
 
@@ -42,7 +43,7 @@ DONE:
 
 To do:
 
-- Way to link the external geoJSON URI to ??? 
+- Use datafile instead of shapefile
 
 Considerations:
 - Mapping done down to municipal level only

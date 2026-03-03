@@ -1,11 +1,12 @@
 **NDRRMC**
-- in progress
+- for pdf w/ machine-readable text: done
+- to do: ocr for nonreadable/nonselectable text
 
 **DROMIC**
-- not started, but can just modify NDRRMC script
+- in progress
 
 **EM-DAT**
 - not started, only mapper needed
 
 **GEOG ARCHIVE**
-- in progress, only mapper needed
+- done
