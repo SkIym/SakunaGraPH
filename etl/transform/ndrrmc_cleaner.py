@@ -2,6 +2,7 @@
 import polars as pl
 from polars import DataFrame
 import re
+from typing import Sequence
 
 def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, baseline_col: str) -> DataFrame:
     """
@@ -69,56 +70,66 @@ def event_name_expander(name: str) -> str:
     
     return name
 
-def normalize_datetime(df: DataFrame, date_col: str, time_col: str | None, datetime_format: str, date_format: str, new_col: str):
+def normalize_datetime(
+    df: DataFrame,
+    date_col: str,
+    time_col: str | None,
+    datetime_formats: Sequence[str],  
+    date_formats: Sequence[str],      
+    new_col: str
+) -> DataFrame:
     """
-    Normalize date and time values into ISO datetime format
-    
-    :param df: Dataframe
-    :type df: DataFrame
-    :param date_col: name of the column containing the dates
-    :type date_col: str
-    :param time_col: name of the column containing the time
-    :type time_col: str
-    :param datetime_format: format of the datetime to convert
-    :param date_fromat: format of the date to convert (no time)
+    Normalize date and time values into ISO datetime format.
+
+    :param df: DataFrame
+    :param date_col: column containing dates
+    :param time_col: column containing time (optional)
+    :param datetime_formats: list of possible datetime formats
+    :param date_formats: list of possible date-only formats
+    :param new_col: name of the resulting normalized column
     """
+
+    # Forward fill date column (common in reports)
     df = df.with_columns(
         pl.col(date_col).forward_fill()
     )
 
+    # Build datetime parsing attempts
     if time_col:
+        combined = (
+            pl.concat_str([date_col, time_col], separator=" ", ignore_nulls=True)
+            .str.strip_chars()
+        )
+
+        datetime_parsers = [
+            combined.str.strptime(pl.Datetime, fmt, strict=False)
+            for fmt in datetime_formats
+        ]
+
+        date_parsers = [
+            pl.col(date_col)
+              .str.strip_chars()
+              .str.strptime(pl.Date, fmt, strict=False)
+            for fmt in date_formats
+        ]
 
         df = df.with_columns(
             pl.coalesce([
-                # try date + time
-                pl.concat_str(
-                    [date_col, time_col], 
-                    separator=" ", 
-                    ignore_nulls=True)
-                .str.strip_chars()
-                .str.strptime(pl.Datetime, 
-                            datetime_format, 
-                            strict=False),
-
-                # fallback: date only
-                pl.col(date_col)
-                .str.strip_chars()
-                .str.strptime(pl.Date, 
-                            date_format, 
-                            strict=False),
-        
-            ])
-            .alias(new_col)
+                *datetime_parsers,
+                *date_parsers
+            ]).alias(new_col)
         )
 
     else:
-        df = df.with_columns(
+        date_parsers = [
             pl.col(date_col)
-                .str.strip_chars()
-                .str.strptime(pl.Date, 
-                            date_format, 
-                            strict=False)
-                .alias(new_col)
+              .str.strip_chars()
+              .str.strptime(pl.Date, fmt, strict=False)
+            for fmt in date_formats
+        ]
+
+        df = df.with_columns(
+            pl.coalesce(date_parsers).alias(new_col)
         )
 
     return df
@@ -133,7 +144,21 @@ def to_int(df: DataFrame, cols: list[str]):
             .str.replace_all(",", "")
             .str.replace_all(" ", "")
             .str.replace_all(r"[^0-9.\-]", "")
+            .cast(pl.Float64, strict=False)
+            .round(0)
             .cast(pl.Int64, strict=False)
+        for col in cols if col in df.columns
+    )
+
+    return df
+
+def to_str(df: DataFrame, cols: list[str]):
+    """
+    Cast df columns to string
+    """
+    df = df.with_columns(
+        pl.col(col)
+            .cast(pl.Utf8, strict=False)
         for col in cols if col in df.columns
     )
 

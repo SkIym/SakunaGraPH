@@ -296,13 +296,15 @@ class LocationMatcher:
                 else:
 
                     
-                    muni_label = levels.pop()
-                    if prov_label.lower() == "maguindanao":
-                            muni_iri = self.match_municipality(muni_label, None)
+                    if levels:
+                        muni_label = levels.pop()
 
-                            if muni_iri:
-                                matched.append(muni_iri)
-                                continue
+                        if prov_label.lower() == "maguindanao":
+                                muni_iri = self.match_municipality(muni_label, None)
+
+                                if muni_iri:
+                                    matched.append(muni_iri)
+                                    continue
                     
                     # handle city placed in provinces
                     muni_iri = self.match_municipality(prov_label, region_iri)
@@ -313,9 +315,14 @@ class LocationMatcher:
                     # handle outdated province or repated region (NCR) names
                     
                     else:
-                        muni_iri = self.match_municipality(muni_label, region_iri)
 
-                        matched.append(muni_iri if muni_iri else region_iri)
+                        if levels:
+                            muni_label = levels.pop()
+                            muni_iri = self.match_municipality(muni_label, region_iri)
+
+                            matched.append(muni_iri if muni_iri else region_iri)
+                        else:
+                            matched.append(region_iri)
             
             # handle erratic parsed locations
             # e.g. city_muni in region column

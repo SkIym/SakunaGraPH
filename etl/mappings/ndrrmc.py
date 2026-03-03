@@ -145,7 +145,7 @@ class Incident:
 
 INCIDENT_COLUMN_MAPPINGS = {
     "TYPE_OF_INCIDENT": "hasOrigType",
-    "STATUS_for_flooded\nareas": "incidentStatus",
+    "STATUS_for_flooded_areas": "incidentStatus",
     "ACTIONS_TAKEN": "incidentActionsTaken",
     "DESCRIPTION": "incidentDescription",
     "Column_2": "hasType",
@@ -156,6 +156,9 @@ INCIDENT_COLUMN_MAPPINGS = {
     "Column_7": "remarks",
     "Column_8": "incidentStatus",
     "REMARKS": "remarks",
+    "DATE_OF_OCCURENCE": "startDate",
+    "TIME_OF_OCCURENCE": "startTime"
+
 }
 
 def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
@@ -662,7 +665,6 @@ PEVAC_MAPPING = {
     "FAMILIES": "preemptFamilies",
     "TOTAL": "preemptPersons",
     "REMARKS": "remarks",
-    
 }
 
 @dataclass
@@ -1180,7 +1182,7 @@ class Flight:
     airline: str | None
     airportType: str | None
     flightNo: str | None
-    fligtRoute: str | None
+    flightRoute: str | None
     cancellationDateTime: datetime
     resumptionDateTime: datetime | None
     remarks: str | None

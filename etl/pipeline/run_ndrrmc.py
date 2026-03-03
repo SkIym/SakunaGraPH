@@ -2,7 +2,7 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
 from transform.ndrrmc import load_aff_pop, load_agri, load_airport, load_casualties, load_class_suspension, load_comms, load_docalamity, load_events, load_flight, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_seaport, load_stranded_events, load_uuids, load_incidents, load_provenance, load_water, load_work_suspension
 from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, airport_mapping, casualties_mapping, class_mapping, comms_mapping, doc_mapping, event_mapping, flight_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping, seaport_mapping, stranded_mapping, water_mapping, work_mapping
-
+import argparse
 import os
 from typing import Tuple
 
@@ -23,7 +23,6 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     if inci:
         incident_mapping(g, inci, event_iri)
 
-    
     aff_pop = load_aff_pop(event_folder)
     if aff_pop:
         aff_pop_mapping(g, aff_pop, event_iri)
@@ -100,35 +99,47 @@ def process_event(args: Tuple[str, Event]) -> Graph:
 
 
 DATA_DIR = "../data/parsed/ndrrmc"
-OUT_FILE = "../data/rdf/ndrrmc.ttl"
+OUT_DIR = "../data/rdf/"
 
 
-def run():
-    # Base graph
+def run(out_file: str, start: int = 0, count: int | None = None):
     main_graph = create_graph()
 
-    # UUIDs must be done once
     load_uuids(DATA_DIR)
-
     events = load_events(DATA_DIR)
+
+    # ---- batching logic ----
+    if count is None:
+        batch = events[start:]
+    else:
+        batch = events[start:start + count]
+
+    print(f"Processing events {start} → {start + len(batch)}")
 
     with ProcessPoolExecutor() as executor:
         futures = [
             executor.submit(process_event, (DATA_DIR, ev))
-            for ev in events
+            for ev in batch
         ]
 
         for future in as_completed(futures):
             subgraph = future.result()
-            main_graph += subgraph  # safe merge
+            main_graph += subgraph
 
     main_graph.serialize(
-        destination=OUT_FILE,
+        destination=out_file,
         format="turtle"
     )
 
-    print(f"Serialized {len(events)} events → {OUT_FILE}")
+    print(f"Serialized {len(batch)} events → {out_file}")
 
 
 if __name__ == "__main__":
-    run()
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", type=str, default="ndrrmc.ttl")
+    parser.add_argument("--start", type=int, default=0)
+    parser.add_argument("--count", type=int, default=None)
+    args = parser.parse_args()
+
+    run(out_file=OUT_DIR+args.out, start=args.start, count=args.count, )
+    # run()

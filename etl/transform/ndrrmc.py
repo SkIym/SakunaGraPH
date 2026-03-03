@@ -20,7 +20,7 @@ from mappings.ndrrmc import (
 from transform.ndrrmc_cleaner import (
     concat_loc_levels, correct_QTY_Barangay_column, event_name_expander,
     forward_fill_and_collapse, normalize_datetime, remove_summary_rows,
-    replace_column_whitespace_with_underscore, to_float, to_int, to_million_php
+    replace_column_whitespace_with_underscore, to_float, to_int, to_million_php, to_str
 )
 
 T = TypeVar("T")
@@ -36,7 +36,10 @@ def load_csv_df(
     match_location: bool = True,
     schema_overrides: Mapping[str, pl.DataType] | None = None
 ) -> pl.DataFrame:
-    df = pl.read_csv(path, schema_overrides=schema_overrides)
+    df = pl.read_csv(
+        path, 
+        schema_overrides=schema_overrides,
+        infer_schema_length=10000)
     df = correct_QTY_Barangay_column(df)
 
     if replace_ws:
@@ -57,15 +60,24 @@ def load_csv_df(
     return df
 
 def df_to_entities(df: pl.DataFrame, cls: Type[T]) -> list[T]:
-    field_names = {f.name for f in fields(cls)}
-    return [
-        cls(**{
-            k: (None if (v is None or (isinstance(v, str) and v.strip().lower() == "none")) else v)
-            for k, v in row.items()
-            if k in field_names
-        })
-        for row in df.iter_rows(named=True)
-    ]
+    class_fields = fields(cls)
+
+    entities: list[T] = []
+
+    for row in df.to_dicts():
+        data = {}
+
+        for f in class_fields:
+            value = row.get(f.name, None)
+
+            if value is None or (isinstance(value, str) and value.strip().lower() == "none"):
+                data[f.name] = None
+            else:
+                data[f.name] = value
+
+        entities.append(cls(**data))
+
+    return entities
 
 def load_multiple_csvs(
     folder: str,
@@ -262,7 +274,8 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
         target_cols=["Region", "Province", "City_Muni", "Summary_Type"],
         collapse_on="QTY",
         collapse_key="VALIDATED",
-        match_location=True
+        match_location=True,
+        schema_overrides={"AGE": pl.Utf8()}
     )
 
     # Normalize casualty type
@@ -297,6 +310,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
         collapse_on="QTY",
         collapse_key="hasOrigType",
         match_location=True,
+        replace_ws=True
     )
 
     # --- Event context for semantic enrichment ---
@@ -336,10 +350,10 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     # --- Datetime normalization ---
     df = normalize_datetime(
         df,
-        "DATE_OF\nOCCURENCE",
-        "TIME_OF\nOCCURENCE",
-        "%d %B %Y %I:%M %P",
-        "%d %B %Y",
+        "startDate",
+        "startTime",
+        ["%d %B %Y %I:%M %P", "%d-%b-%y %I:%M %P"],
+        ["%d %B %Y", "%d-%b-%y"],
         "startDate",
     )
 
@@ -463,7 +477,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
             "totallyDamagedCropArea",
         ],
     )
-
+ 
     df = df.with_row_index("id", 1)
 
     return df_to_entities(df, Agriculture)
@@ -538,6 +552,8 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
             )
         )
 
+        df = to_str(df, ["hasBarangay", "hasBarangay_right"])
+
         # reconcile barangays (skip duplicates)
         df = df.with_columns(
             pl.when(pl.col("hasBarangay") == pl.col("hasBarangay_right"))
@@ -553,6 +569,15 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
         )
 
     df = df.with_row_index("id", 1)
+
+    missing_cols = [f.name for f in fields(PEvacuation) if f.name not in df.columns]
+        
+   
+    # add missing columns as None
+    df = df.with_columns(
+        [pl.lit(None).alias(col) for col in missing_cols]
+    )
+
     return df_to_entities(df, PEvacuation)
 
 def load_rnb(event_folder_path: str) -> List[RNB] | None:
@@ -583,16 +608,16 @@ def load_rnb(event_folder_path: str) -> List[RNB] | None:
     df = normalize_datetime(df, 
                             "passableDate", 
                             "passableTime", 
-                            "%d %B %Y %I:%M %P", 
-                            "%d %B %Y",
+                            ["%d %B %Y %I:%M %P"], 
+                            ["%d %B %Y"],
                             "passableDateTime")
     
     # normalize not passable datetime
     df = normalize_datetime(df, 
                             "notPassableDate", 
                             "notPassableTime", 
-                            "%d %B %Y %I:%M %P", 
-                            "%d %B %Y",
+                            ["%d %B %Y %I:%M %P"], 
+                            ["%d %B %Y"],
                             "notPassableDateTime")
 
     df = df.with_row_index("id", 1)
@@ -627,16 +652,16 @@ def load_power(event_folder_path: str) -> List[Power] | None:
     df = normalize_datetime(df, 
                             "interruptionDate", 
                             "interruptionTime", 
-                            "%d %B %Y %H:%M", 
-                            "%d %B %Y",
+                            ["%d %B %Y %H:%M"], 
+                            ["%d %B %Y"],
                             "interruptionDateTime")
     
     # normalize restoration datetime
     df = normalize_datetime(df, 
                             "restorationDate", 
                             "restorationTime", 
-                            "%d %B %Y %H:%M", 
-                            "%d %B %Y",
+                            ["%d %B %Y %H:%M"], 
+                            ["%d %B %Y"],
                             "restorationDateTime")
 
     df = df.with_row_index("id", 1)
@@ -671,16 +696,16 @@ def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
     df = normalize_datetime(df, 
                             "interruptionDate", 
                             "interruptionTime", 
-                            "%B %d, %Y %H:%M", 
-                            "%B %d, %Y",
+                            ["%B %d, %Y %H:%M"], 
+                            ["%B %d, %Y"],
                             "interruptionDateTime")
     
     # normalize restoration datetime
     df = normalize_datetime(df, 
                             "restorationDate", 
                             "restorationTime", 
-                            "%B %d, %Y %H:%M", 
-                            "%B %d, %Y",
+                            ["%B %d, %Y %H:%M"], 
+                            ["%B %d, %Y"],
                             "restorationDateTime")
 
     df = df.with_row_index("id", 1)
@@ -714,8 +739,8 @@ def load_docalamity(event_folder_path: str) -> List[DOC] | None:
         df,
         date_col="resolutionDate",
         time_col=None,
-        datetime_format="",
-        date_format="%d %B %Y",
+        datetime_formats=[""],
+        date_formats=["%d %B %Y"],
         new_col="resolutionDate"
     )
 
@@ -753,8 +778,8 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
         df,
         date_col="cancellationDate",
         time_col="cancellationTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        datetime_formats=["%d %B %Y %H:%M"],
+        date_formats=["%d %B %Y"],
         new_col="cancellationDateTime"
     )
 
@@ -762,8 +787,8 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
         df,
         date_col="resumptionDate",
         time_col="resumptionTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        datetime_formats=["%d %B %Y %H:%M"],
+        date_formats=["%d %B %Y"],
         new_col="resumptionDateTime"
     )
 
@@ -799,20 +824,20 @@ def load_work_suspension(event_folder_path: str) -> List[WorkDisruption] | None:
 
     df = normalize_datetime(
         df,
-        date_col="cancellationDate",
-        time_col="cancellationTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        "cancellationDate",
+        "cancellationTime",
+        ["%d %B %Y %H:%M"],
+        ["%d %B %Y"],
         new_col="cancellationDateTime"
     )
 
     df = normalize_datetime(
         df,
-        date_col="resumptionDate",
-        time_col="resumptionTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
-        new_col="resumptionDateTime"
+        "resumptionDate",
+        "resumptionTime",
+        ["%d %B %Y %H:%M"],
+        ["%d %B %Y"],
+        "resumptionDateTime"
     )
 
     df = df.with_row_index("id", 1)
@@ -883,16 +908,16 @@ def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
     df = normalize_datetime(df, 
                             "interruptionDate", 
                             "interruptionTime", 
-                            "%d %B %Y %I:%M %P", 
-                            "%d %B %Y",
+                            ["%d %B %Y %I:%M %P"], 
+                            ["%d %B %Y"],
                             "interruptionDateTime")
     
     # normalize restoration datetime
     df = normalize_datetime(df, 
                             "restorationDate", 
                             "restorationTime", 
-                            "%d %B %Y %I:%M %P", 
-                            "%d %B %Y",
+                            ["%d %B %Y %I:%M %P"], 
+                            ["%d %B %Y"],
                             "restorationDateTime")
 
     df = df.with_row_index("id", 1)
@@ -926,20 +951,20 @@ def load_seaport(event_folder_path: str) -> List[Seaport] | None:
 
     df = normalize_datetime(
         df,
-        date_col="cancellationDate",
-        time_col="cancellationTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
-        new_col="cancellationDateTime"
+        "cancellationDate",
+        "cancellationTime",
+        ["%d %B %Y %H:%M"],
+        ["%d %B %Y"],
+        "cancellationDateTime"
     )
 
     df = normalize_datetime(
         df,
-        date_col="resumptionDate",
-        time_col="resumptionTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
-        new_col="resumptionDateTime"
+        "resumptionDate",
+        "resumptionTime",
+        ["%d %B %Y %H:%M"],
+        ["%d %B %Y"],
+        "resumptionDateTime"
     )
 
     df = df.with_row_index("id", 1)
@@ -976,8 +1001,8 @@ def load_airport(event_folder_path: str) -> List[Airport] | None:
         df,
         date_col="cancellationDate",
         time_col="cancellationTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        datetime_formats=["%d %B %Y %H:%M"],
+        date_formats=["%d %B %Y"],
         new_col="cancellationDateTime"
     )
 
@@ -985,8 +1010,8 @@ def load_airport(event_folder_path: str) -> List[Airport] | None:
         df,
         date_col="resumptionDate",
         time_col="resumptionTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        datetime_formats=["%d %B %Y %H:%M"],
+        date_formats=["%d %B %Y"],
         new_col="resumptionDateTime"
     )
 
@@ -1024,8 +1049,8 @@ def load_flight(event_folder_path: str) -> List[Flight] | None:
         df,
         date_col="cancellationDate",
         time_col="cancellationTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        datetime_formats=["%d %B %Y %H:%M"],
+        date_formats=["%d %B %Y"],
         new_col="cancellationDateTime"
     )
 
@@ -1033,8 +1058,8 @@ def load_flight(event_folder_path: str) -> List[Flight] | None:
         df,
         date_col="resumptionDate",
         time_col="resumptionTime",
-        datetime_format="%d %B %Y %H:%M",
-        date_format="%d %B %Y",
+        datetime_formats=["%d %B %Y %H:%M"],
+        date_formats=["%d %B %Y"],
         new_col="resumptionDateTime"
     )
 
