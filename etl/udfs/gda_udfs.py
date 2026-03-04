@@ -6,7 +6,7 @@ base = "https://sakuna.ph/"
 
 # For matching location IRIs
 lg = Graph()
-lg.parse("../data/rdf/psgc_rdf.ttl")
+lg.parse("../data/rdf/psgc_rdf_v2.ttl")
 
 # IRI : label
 municities: dict[str, str] = {}
@@ -18,6 +18,20 @@ provinces: dict[str, str] = {}
 # provinces_IRI: list[str | None] = []
 
 for s, p, o in lg.triples((None, RDF.type ,URIRef(SKG["Municipality"]))):
+
+    lbl = str(lg.value(subject=s, predicate=RDFS.label))
+
+    municities[str(s)] = lbl
+    municities_parent[str(s)] = str(lg.value(subject=s, predicate=URIRef(SKG["isPartOf"])))
+
+for s, p, o in lg.triples((None, RDF.type ,URIRef(SKG["City"]))):
+
+    lbl = str(lg.value(subject=s, predicate=RDFS.label))
+
+    municities[str(s)] = lbl
+    municities_parent[str(s)] = str(lg.value(subject=s, predicate=URIRef(SKG["isPartOf"])))
+
+for s, p, o in lg.triples((None, RDF.type ,URIRef(SKG["SubMunicipality"]))):
 
     lbl = str(lg.value(subject=s, predicate=RDFS.label))
 
