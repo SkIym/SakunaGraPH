@@ -1,4 +1,5 @@
 
+from attr import dataclass
 import polars as pl
 from polars import DataFrame
 import re
@@ -239,6 +240,43 @@ def replace_column_whitespace_with_underscore(df: DataFrame) -> DataFrame:
     # Replace all whitespace characters with '_'
     return df.rename(lambda c: re.sub(r"\s+", "_", c))
 
+@dataclass
+class MoveArg:
+    source_col: str
+    dest_col: str
+    remain: list[str] | None
+
+def move_col_values(df: DataFrame, arg: MoveArg) -> DataFrame:
+    remain = arg.remain
+    source_col = arg.source_col
+    dest_col = arg.dest_col
+
+    if source_col not in df.columns and dest_col not in df.columns: return df
+
+    if remain:
+
+        pattern = "|".join(remain)
+        df = df.with_columns(
+            pl.when(~pl.col(source_col).str.contains(pattern))
+            .then(pl.col(source_col))
+            .otherwise(pl.col(dest_col))
+            .alias(dest_col),
+
+            pl.when(~pl.col(source_col).str.contains(pattern))
+            .then(pl.lit(None))
+            .otherwise(pl.col(source_col))
+            .alias(source_col),
+        )
+    else:
+        df = df.with_columns(
+            pl.when(pl.col(dest_col).is_null() & (pl.col(source_col).is_not_null() & ~pl.col(source_col).str.contains(r"(?i)total")))
+            .then(pl.col(source_col))
+            .otherwise(pl.col(dest_col))
+            .alias(dest_col)
+
+        )
+
+    return df
 
 # if __name__ == "__main__":
 #     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"

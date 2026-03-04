@@ -1,7 +1,8 @@
+from math import remainder
 import os
 import uuid
 import json
-from typing import Iterable, List, Mapping, Type, TypeVar, Callable
+from typing import Iterable, List, Mapping, Tuple, Type, TypeVar, Callable
 from dataclasses import fields
 from datetime import datetime
 
@@ -18,8 +19,8 @@ from mappings.ndrrmc import (
 )
 
 from transform.ndrrmc_cleaner import (
-    concat_loc_levels, correct_QTY_Barangay_column, event_name_expander,
-    forward_fill_and_collapse, normalize_datetime, remove_summary_rows,
+    MoveArg, concat_loc_levels, correct_QTY_Barangay_column, event_name_expander,
+    forward_fill_and_collapse, move_col_values, normalize_datetime, remove_summary_rows,
     replace_column_whitespace_with_underscore, to_float, to_int, to_million_php, to_str
 )
 
@@ -34,12 +35,16 @@ def load_csv_df(
     collapse_key: str | None = None,
     replace_ws: bool = False,
     match_location: bool = True,
-    schema_overrides: Mapping[str, pl.DataType] | None = None
+    schema_overrides: Mapping[str, pl.DataType] | None = None,
+    move_values: MoveArg | None = None
 ) -> pl.DataFrame:
     df = pl.read_csv(
         path, 
         schema_overrides=schema_overrides,
         infer_schema_length=10000)
+    
+    df = df.filter()
+
     df = correct_QTY_Barangay_column(df)
 
     if replace_ws:
@@ -47,6 +52,11 @@ def load_csv_df(
 
     if mapping:
         df = df.rename(mapping=mapping, strict=False)
+
+    if move_values:
+        df = move_col_values(df, move_values)
+    else:
+        df = move_col_values(df, MoveArg(source_col="Summary_Type", dest_col="City_Muni", remain=None))
 
     if target_cols and collapse_on and collapse_key:
         df = forward_fill_and_collapse(df, target_cols, collapse_on, collapse_key)
@@ -268,9 +278,16 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
 
     if not src_path: return None
 
+    move_arg = MoveArg(
+        source_col="Summary_Type",
+        dest_col="City_Muni",
+        remain=[r"(?i)injured", r"(?i)dead"]
+    )
+
     df = load_csv_df(
         src_path,
         mapping=CASUALTY_MAPPING,
+        move_values=move_arg,
         target_cols=["Region", "Province", "City_Muni", "Summary_Type"],
         collapse_on="QTY",
         collapse_key="VALIDATED",
@@ -290,9 +307,10 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
         "QTY": "casualtyCount"
     })
 
-    # df.write_csv(event_folder_path + "hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     df = df.with_row_index("id", 1)
+
 
     return df_to_entities(df, Casualties)
 
@@ -425,7 +443,7 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Housing)
 
@@ -562,6 +580,7 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
             .otherwise(
                 pl.concat_str(
                     ["hasBarangay", "hasBarangay_right"],
+                    separator=",",
                     ignore_nulls=True,
                 )
             )
@@ -970,7 +989,7 @@ def load_seaport(event_folder_path: str) -> List[Seaport] | None:
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Seaport)
 
@@ -1018,7 +1037,7 @@ def load_airport(event_folder_path: str) -> List[Airport] | None:
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Airport)
 
@@ -1066,7 +1085,7 @@ def load_flight(event_folder_path: str) -> List[Flight] | None:
 
     df = df.with_row_index("id", 1)
 
-    df.write_csv(event_folder_path + "/hakdog.csv")
+    # df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Flight)
 
@@ -1076,6 +1095,6 @@ if __name__ == "__main__":
 
     # load_flight("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
-    load_aff_pop("../data/parsed/ndrrmc/2022 National and Local Elections  pdf1")
+    load_housing("../data/parsed/ndrrmc/TY ODETTE 2021")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")

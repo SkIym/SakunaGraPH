@@ -273,7 +273,7 @@ class LocationMatcher:
                 matched.append(region_iri)
                 continue
             
-            # print(highest, levels)
+            # print(highest, levels, loc)
             prov_label = levels.pop()
             prov_iri = self.match_province(prov_label)
 
