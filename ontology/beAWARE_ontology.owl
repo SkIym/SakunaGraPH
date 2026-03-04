@@ -259,17 +259,6 @@
     
 
 
-    <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact -->
-
-    <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact">
-        <rdfs:domain rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident"/>
-        <rdfs:range rdf:resource="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact"/>
-        <rdfs:label>has incident impact</rdfs:label>
-        <skos:definition>Indicates the impact of the specific incident.</skos:definition>
-    </owl:ObjectProperty>
-    
-
-
     <!-- https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentLocation -->
 
     <owl:ObjectProperty rdf:about="https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentLocation">

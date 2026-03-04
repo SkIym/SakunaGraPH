@@ -3,7 +3,6 @@
 @prefix geo: <http://www.opengis.net/ont/geosparql#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -20,391 +19,13 @@
 #    Datatypes
 #################################################################
 
-###  http://www.opengis.net/ont/geosparql#dggsLiteral
-geo:dggsLiteral rdf:type rdfs:Datatype ;
-                rdfs:isDefinedBy geo: ,
-                                 <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/dggs-literal> ;
-                rdfs:seeAlso <http://www.opengis.net/doc/AS/dggs/2.0> ;
-                skos:definition "A textual serialization of a Discrete Global Grid (DGGS) Geometry object."@en ;
-                skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ,
-                             " \"<https://w3id.org/dggs/auspix> OrdinateList (R3234)\"^^<http://www.opengis.net/ont/geosparql#dggsLiteral>" ;
-                skos:prefLabel "DGGS Literal"@en ;
-                skos:scopeNote "This datatype is not expected to be used directly but to serve as an abstract datatype for a series of specific DGGS literal types, for specific DGGS implementations"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#geoJSONLiteral
-geo:geoJSONLiteral rdf:type rdfs:Datatype ;
-                   rdfs:isDefinedBy geo: ,
-                                    <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geojson-literal> ;
-                   rdfs:seeAlso <https://tools.ietf.org/html/rfc7946> ;
-                   skos:definition "A GeoJSON serialization of a Geometry object."@en ;
-                   skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-                   skos:prefLabel "GeoJSON Literal"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#gmlLiteral
-geo:gmlLiteral rdf:type rdfs:Datatype .
-
-
-###  http://www.opengis.net/ont/geosparql#kmlLiteral
-geo:kmlLiteral rdf:type rdfs:Datatype ;
-               rdfs:isDefinedBy geo: ,
-                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/kml-literal> ;
-               rdfs:seeAlso <https://www.ogc.org/standards/kml/> ;
-               skos:definition "A KML serialization of a Geometry object."@en ;
-               skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-               skos:prefLabel "KML Literal"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#wktLiteral
-geo:wktLiteral rdf:type rdfs:Datatype .
-
-
-###  https://sakuna.ph/:casualtyType
-<https://sakuna.ph/:casualtyType> rdf:type rdfs:Datatype .
+###  https://sakuna.ph/casualtyDataType
+:casualtyDataType rdf:type rdfs:Datatype .
 
 
 #################################################################
 #    Object Properties
 #################################################################
-
-###  http://www.opengis.net/ont/geosparql#asDGGS
-geo:asDGGS rdf:type owl:ObjectProperty ;
-           rdfs:subPropertyOf geo:hasSerialization ;
-           rdfs:domain geo:Geometry .
-
-
-###  http://www.opengis.net/ont/geosparql#asGML
-geo:asGML rdf:type owl:ObjectProperty ;
-          rdfs:subPropertyOf geo:hasSerialization ;
-          rdfs:domain geo:Geometry ;
-          rdfs:range geo:gmlLiteral .
-
-
-###  http://www.opengis.net/ont/geosparql#asGeoJSON
-geo:asGeoJSON rdf:type owl:ObjectProperty ;
-              rdfs:subPropertyOf geo:hasSerialization ;
-              rdfs:domain geo:Geometry .
-
-
-###  http://www.opengis.net/ont/geosparql#asKML
-geo:asKML rdf:type owl:ObjectProperty ;
-          rdfs:subPropertyOf geo:hasSerialization ;
-          rdfs:domain geo:Geometry .
-
-
-###  http://www.opengis.net/ont/geosparql#asWKT
-geo:asWKT rdf:type owl:ObjectProperty ;
-          rdfs:subPropertyOf geo:hasSerialization ;
-          rdfs:domain geo:Geometry ;
-          rdfs:range geo:wktLiteral .
-
-
-###  http://www.opengis.net/ont/geosparql#defaultGeometry
-geo:defaultGeometry rdf:type owl:ObjectProperty ;
-                    owl:equivalentProperty geo:hasDefaultGeometry ;
-                    rdfs:subPropertyOf geo:hasGeometry ;
-                    rdfs:domain geo:Feature ;
-                    rdfs:range geo:Geometry ;
-                    rdfs:isDefinedBy geo: ,
-                                     <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                    skos:definition "The default Geometry to be used in spatial calculations. It is usually the most detailed Geometry."@en ;
-                    skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                                 <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.1> ;
-                    skos:note "Duplicate properties defaultGeometry and hasDefaultGeometry exist because of an inconsistency between ontology and documentation in GeoSPARQL 1.0. Only hasDefaultGeometry is described in the documention."@en ;
-                    skos:prefLabel "default geometry"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#ehInside
-geo:ehInside rdf:type owl:ObjectProperty ;
-             rdfs:domain geo:SpatialObject ;
-             rdfs:range geo:SpatialObject ;
-             rdfs:isDefinedBy geo: ,
-                              <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/eh-spatial-relations> ,
-                              <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/eh-spatial-relations> ;
-             rdfs:seeAlso <http://dbpedia.org/resource/DE-9IM> ;
-             skos:definition "States that the subject SpatialObject is spatially inside the object SpatialObject. DE-9IM: TFF*FFT**"@en ;
-             skos:prefLabel "inside"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#hasBoundingBox
-geo:hasBoundingBox rdf:type owl:ObjectProperty ;
-                   rdfs:subPropertyOf geo:hasGeometry ;
-                   rdfs:domain geo:Feature ;
-                   rdfs:range geo:Geometry ;
-                   rdfs:isDefinedBy geo: ,
-                                    <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                   skos:definition "The minimum or smallest bounding or enclosing box of a given Feature."@en ;
-                   skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ;
-                   skos:prefLabel "has bounding box"@en ;
-                   skos:scopeNote "The target is a Geometry that defines a rectilinear region whose edges are aligned with the axes of the coordinate reference system, which exactly contains the Feature, for example an instance of http://www.opengis.net/ont/sf#envelope."@en .
-
-
-###  http://www.opengis.net/ont/geosparql#hasCentroid
-geo:hasCentroid rdf:type owl:ObjectProperty ;
-                rdfs:subPropertyOf geo:hasGeometry ;
-                rdfs:domain geo:Feature ;
-                rdfs:range geo:Geometry ;
-                rdfs:isDefinedBy geo: ,
-                                 <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                skos:definition "The arithmetic mean position of all the Geometry points of a given Feature."@en ;
-                skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ;
-                skos:prefLabel "has centroid"@en ;
-                skos:scopeNote "The target Geometry shall describe a point, for example an instance of http://www.opengis.net/ont/sf#Point."@en .
-
-
-###  http://www.opengis.net/ont/geosparql#hasDefaultGeometry
-geo:hasDefaultGeometry rdf:type owl:ObjectProperty ;
-                       rdfs:subPropertyOf geo:hasGeometry ;
-                       rdfs:domain geo:Feature ;
-                       rdfs:range geo:Geometry ;
-                       rdfs:isDefinedBy geo: ,
-                                        <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/feature-properties> ,
-                                        <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                       skos:definition "The default Geometry to be used in spatial calculations. It is usually the most detailed Geometry."@en ;
-                       skos:note "Duplicate properties defaultGeometry and hasDefaultGeometry exist because of an inconsistency between ontology and documentation in GeoSPARQL 1.0. Only hasDefaultGeometry is described in the documention."@en ;
-                       skos:prefLabel "has default geometry"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#hasGeometry
-geo:hasGeometry rdf:type owl:ObjectProperty ;
-                rdfs:domain geo:Feature ;
-                rdfs:range geo:Geometry ;
-                rdfs:isDefinedBy geo: ,
-                                 <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/feature-properties> ,
-                                 <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/feature-properties> ;
-                skos:definition "A spatial representation for a given Feature."@en ;
-                skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2> ;
-                skos:prefLabel "has geometry"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#hasSerialization
-geo:hasSerialization rdf:type owl:ObjectProperty ;
-                     rdfs:domain geo:Geometry .
-
-
-###  http://www.w3.org/ns/prov#actedOnBehalfOf
-prov:actedOnBehalfOf rdf:type owl:ObjectProperty ;
-                     rdfs:subPropertyOf prov:wasInfluencedBy ;
-                     rdfs:domain prov:Agent ;
-                     rdfs:range prov:Agent ;
-                     rdfs:comment "An object property to express the accountability of an agent towards another agent. The subordinate agent acted on behalf of the responsible agent in an actual activity. "@en ;
-                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                     rdfs:label "actedOnBehalfOf" ;
-                     prov:category "starting-point" ;
-                     prov:component "agents-responsibility" ;
-                     prov:inverse "hadDelegate" ;
-                     prov:qualifiedForm prov:Delegation ,
-                                        prov:qualifiedDelegation .
-
-
-###  http://www.w3.org/ns/prov#generated
-prov:generated owl:inverseOf prov:wasGeneratedBy .
-
-
-###  http://www.w3.org/ns/prov#influenced
-prov:influenced owl:inverseOf prov:wasInfluencedBy .
-
-
-###  http://www.w3.org/ns/prov#invalidated
-prov:invalidated owl:inverseOf prov:wasInvalidatedBy .
-
-
-###  http://www.w3.org/ns/prov#wasAssociatedWith
-prov:wasAssociatedWith rdf:type owl:ObjectProperty ;
-                       rdfs:subPropertyOf prov:wasInfluencedBy ;
-                       rdfs:domain prov:Activity ;
-                       rdfs:range prov:Agent ;
-                       rdfs:comment "An prov:Agent that had some (unspecified) responsibility for the occurrence of this prov:Activity."@en ;
-                       rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                       rdfs:label "wasAssociatedWith" ;
-                       prov:category "starting-point" ;
-                       prov:component "agents-responsibility" ;
-                       prov:inverse "wasAssociateFor" ;
-                       prov:qualifiedForm prov:Association ,
-                                          prov:qualifiedAssociation .
-
-
-###  http://www.w3.org/ns/prov#wasAttributedTo
-prov:wasAttributedTo rdf:type owl:ObjectProperty ;
-                     rdfs:subPropertyOf prov:wasInfluencedBy ;
-                     rdfs:domain prov:Entity ;
-                     rdfs:range prov:Agent ;
-                     rdfs:comment "Attribution is the ascribing of an entity to an agent."@en ;
-                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                     rdfs:label "wasAttributedTo" ;
-                     prov:category "starting-point" ;
-                     prov:component "agents-responsibility" ;
-                     prov:definition "Attribution is the ascribing of an entity to an agent."@en ;
-                     prov:inverse "contributed" ;
-                     prov:qualifiedForm prov:Attribution ,
-                                        prov:qualifiedAttribution .
-
-[ rdf:type owl:Axiom ;
-   owl:annotatedSource prov:wasAttributedTo ;
-   owl:annotatedProperty rdfs:subPropertyOf ;
-   owl:annotatedTarget prov:wasInfluencedBy ;
-   rdfs:comment "Attribution is a particular case of trace (see http://www.w3.org/TR/prov-dm/#concept-trace), in the sense that it links an entity to the agent that ascribed it." ;
-   prov:definition "IF wasAttributedTo(e2,ag1,aAttr) holds, THEN wasInfluencedBy(e2,ag1) also holds. "
- ] .
-
-
-###  http://www.w3.org/ns/prov#wasDerivedFrom
-prov:wasDerivedFrom rdf:type owl:ObjectProperty ;
-                    rdfs:subPropertyOf prov:wasInfluencedBy ;
-                    rdfs:domain prov:Entity ;
-                    rdfs:range prov:Entity ;
-                    rdfs:comment "The more specific subproperties of prov:wasDerivedFrom (i.e., prov:wasQuotedFrom, prov:wasRevisionOf, prov:hadPrimarySource) should be used when applicable."@en ;
-                    rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                    rdfs:label "wasDerivedFrom" ;
-                    prov:category "starting-point" ;
-                    prov:component "derivations" ;
-                    prov:definition "A derivation is a transformation of an entity into another, an update of an entity resulting in a new one, or the construction of a new entity based on a pre-existing entity."@en ;
-                    prov:inverse "hadDerivation" ;
-                    prov:qualifiedForm prov:Derivation ,
-                                       prov:qualifiedDerivation .
-
-[ rdf:type owl:Axiom ;
-   owl:annotatedSource prov:wasDerivedFrom ;
-   owl:annotatedProperty rdfs:subPropertyOf ;
-   owl:annotatedTarget prov:wasInfluencedBy ;
-   rdfs:comment "Derivation is a particular case of trace (see http://www.w3.org/TR/prov-dm/#term-trace), since it links an entity to another entity that contributed to its existence."
- ] .
-
-
-###  http://www.w3.org/ns/prov#wasEndedBy
-prov:wasEndedBy rdf:type owl:ObjectProperty ;
-                rdfs:subPropertyOf prov:wasInfluencedBy ;
-                rdfs:domain prov:Activity ;
-                rdfs:range prov:Entity ;
-                rdfs:comment "End is when an activity is deemed to have ended. An end may refer to an entity, known as trigger, that terminated the activity."@en ;
-                rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                rdfs:label "wasEndedBy" ;
-                prov:category "expanded" ;
-                prov:component "entities-activities" ;
-                prov:inverse "ended" ;
-                prov:qualifiedForm prov:End ,
-                                   prov:qualifiedEnd .
-
-
-###  http://www.w3.org/ns/prov#wasGeneratedBy
-prov:wasGeneratedBy rdf:type owl:ObjectProperty ;
-                    rdfs:subPropertyOf prov:wasInfluencedBy ;
-                    rdfs:domain prov:Entity ;
-                    rdfs:range prov:Activity ;
-                    rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                    rdfs:label "wasGeneratedBy" ;
-                    prov:category "starting-point" ;
-                    prov:component "entities-activities" ;
-                    prov:inverse "generated" ;
-                    prov:qualifiedForm prov:Generation ,
-                                       prov:qualifiedGeneration .
-
-
-###  http://www.w3.org/ns/prov#wasInfluencedBy
-prov:wasInfluencedBy rdf:type owl:ObjectProperty ;
-                     rdfs:domain _:genid3 ;
-                     rdfs:range _:genid8 ;
-                     rdfs:comment "Because prov:wasInfluencedBy is a broad relation, its more specific subproperties (e.g. prov:wasInformedBy, prov:actedOnBehalfOf, prov:wasEndedBy, etc.) should be used when applicable."@en ,
-                                  "This property has multiple RDFS domains to suit multiple OWL Profiles. See <a href=\"#owl-profile\">PROV-O OWL Profile</a>." ;
-                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                     rdfs:label "wasInfluencedBy" ;
-                     prov:category "qualified" ;
-                     prov:component "agents-responsibility" ;
-                     prov:editorialNote """The sub-properties of prov:wasInfluencedBy can be elaborated in more detail using the Qualification Pattern. For example, the binary relation :baking prov:used :spoon can be qualified by asserting :baking prov:qualifiedUsage [ a prov:Usage; prov:entity :spoon; prov:atLocation :kitchen ] .
-
-Subproperties of prov:wasInfluencedBy may also be asserted directly without being qualified.
-
-prov:wasInfluencedBy should not be used without also using one of its subproperties. 
-"""@en ;
-                     prov:inverse "influenced" ;
-                     prov:qualifiedForm prov:Influence ,
-                                        prov:qualifiedInfluence ;
-                     prov:sharesDefinitionWith prov:Influence .
-
-_:genid3 rdf:type owl:Class ;
-          owl:unionOf ( prov:Activity
-                        prov:Agent
-                        prov:Entity
-                      ) .
-
-_:genid8 rdf:type owl:Class ;
-          owl:unionOf ( prov:Activity
-                        prov:Agent
-                        prov:Entity
-                      ) .
-
-[ rdf:type owl:Axiom ;
-   owl:annotatedSource prov:wasInfluencedBy ;
-   owl:annotatedProperty rdfs:range ;
-   owl:annotatedTarget _:genid8 ;
-   prov:definition "influencer: an identifier (o1) for an ancestor entity, activity, or agent that the former depends on;" ;
-   prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-influence"
- ] .
-
-[ rdf:type owl:Axiom ;
-   owl:annotatedSource prov:wasInfluencedBy ;
-   owl:annotatedProperty rdfs:domain ;
-   owl:annotatedTarget _:genid3 ;
-   prov:definition "influencee: an identifier (o2) for an entity, activity, or agent; " ;
-   prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-influence"
- ] .
-
-
-###  http://www.w3.org/ns/prov#wasInformedBy
-prov:wasInformedBy rdf:type owl:ObjectProperty ;
-                   rdfs:subPropertyOf prov:wasInfluencedBy ;
-                   rdfs:domain prov:Activity ;
-                   rdfs:range prov:Activity ;
-                   rdfs:comment "An activity a2 is dependent on or informed by another activity a1, by way of some unspecified entity that is generated by a1 and used by a2."@en ;
-                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                   rdfs:label "wasInformedBy" ;
-                   prov:category "starting-point" ;
-                   prov:component "entities-activities" ;
-                   prov:inverse "informed" ;
-                   prov:qualifiedForm prov:Communication ,
-                                      prov:qualifiedCommunication .
-
-
-###  http://www.w3.org/ns/prov#wasInvalidatedBy
-prov:wasInvalidatedBy rdf:type owl:ObjectProperty ;
-                      rdfs:subPropertyOf prov:wasInfluencedBy ;
-                      rdfs:domain prov:Entity ;
-                      rdfs:range prov:Activity ;
-                      rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                      rdfs:label "wasInvalidatedBy" ;
-                      prov:category "expanded" ;
-                      prov:component "entities-activities" ;
-                      prov:inverse "invalidated" ;
-                      prov:qualifiedForm prov:Invalidation ,
-                                         prov:qualifiedInvalidation .
-
-
-###  http://www.w3.org/ns/prov#wasStartedBy
-prov:wasStartedBy rdf:type owl:ObjectProperty ;
-                  rdfs:subPropertyOf prov:wasInfluencedBy ;
-                  rdfs:domain prov:Activity ;
-                  rdfs:range prov:Entity ;
-                  rdfs:comment "Start is when an activity is deemed to have started. A start may refer to an entity, known as trigger, that initiated the activity."@en ;
-                  rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                  rdfs:label "wasStartedBy" ;
-                  prov:category "expanded" ;
-                  prov:component "entities-activities" ;
-                  prov:inverse "started" ;
-                  prov:qualifiedForm prov:Start ,
-                                     prov:qualifiedStart .
-
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterLocation
 baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
@@ -423,15 +44,6 @@ baw:hasDisasterOccurrence rdf:type owl:ObjectProperty ;
                           rdfs:range :DisasterEvent ;
                           rdfs:label "has disaster occurrence" ;
                           skos:definition "Links a natural disaster type to a natural disaster." .
-
-
-###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentImpact
-baw:hasIncidentImpact rdf:type owl:ObjectProperty ;
-                      rdfs:subPropertyOf :hasImpact ;
-                      rdfs:domain baw:Incident ;
-                      rdfs:range baw:Impact ;
-                      rdfs:label "has incident impact" ;
-                      skos:definition "Indicates the impact of the specific incident." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentLocation
@@ -478,7 +90,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/fromSource
 :fromSource rdf:type owl:ObjectProperty ;
-            rdfs:subPropertyOf owl:topObjectProperty ;
             rdfs:domain [ rdf:type owl:Class ;
                           owl:unionOf ( :DisasterEvent
                                         :Impact
@@ -552,7 +163,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasImpact
 :hasImpact rdf:type owl:ObjectProperty ;
-           rdfs:subPropertyOf owl:topObjectProperty ;
            rdfs:domain :DisasterEvent ;
            rdfs:range :Impact ;
            rdfs:label "has disaster impact"@en .
@@ -566,7 +176,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasLocation
 :hasLocation rdf:type owl:ObjectProperty ;
-             rdfs:subPropertyOf owl:topObjectProperty ;
              rdfs:domain [ rdf:type owl:Class ;
                            owl:unionOf ( :DisasterEvent
                                          :Impact
@@ -648,7 +257,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasRelatedIncident
 :hasRelatedIncident rdf:type owl:ObjectProperty ;
-                    rdfs:subPropertyOf owl:topObjectProperty ;
                     owl:inverseOf :isRelatedTo ;
                     rdfs:domain :MajorEvent ;
                     rdfs:range :Incident ;
@@ -669,7 +277,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasResponse
 :hasResponse rdf:type owl:ObjectProperty ;
-             rdfs:subPropertyOf owl:topObjectProperty ;
              rdfs:domain :DisasterEvent ;
              rdfs:range :Response ;
              rdfs:label "has response"@en .
@@ -693,17 +300,8 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                   rdfs:label "has stranded event" .
 
 
-###  https://sakuna.ph/hasSubtype
-:hasSubtype rdf:type owl:ObjectProperty ;
-            rdfs:subPropertyOf :hasType ;
-            rdfs:domain :DisasterEvent ;
-            rdfs:range :DisasterType ;
-            rdfs:label "has disaster subtype"@en .
-
-
 ###  https://sakuna.ph/hasType
 :hasType rdf:type owl:ObjectProperty ;
-         rdfs:subPropertyOf owl:topObjectProperty ;
          rdfs:domain :DisasterEvent ;
          rdfs:range :DisasterType ;
          rdfs:label "has disaster type"@en .
@@ -722,9 +320,8 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 
 ###  https://sakuna.ph/isPartOf
-:isPartOf rdf:type owl:ObjectProperty ;
-          rdfs:subPropertyOf owl:topObjectProperty ;
-          rdf:type owl:TransitiveProperty ;
+:isPartOf rdf:type owl:ObjectProperty ,
+                   owl:TransitiveProperty ;
           rdfs:domain [ rdf:type owl:Class ;
                         owl:unionOf ( :Barangay
                                       :IslandGroup
@@ -746,7 +343,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/isRelatedTo
 :isRelatedTo rdf:type owl:ObjectProperty ;
-             rdfs:subPropertyOf owl:topObjectProperty ;
              rdfs:domain :Incident ;
              rdfs:range :MajorEvent ;
              rdfs:label "is related to"@en .
@@ -755,90 +351,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 #################################################################
 #    Data properties
 #################################################################
-
-###  http://www.opengis.net/ont/geosparql#asDGGS
-geo:asDGGS rdf:type owl:DatatypeProperty ;
-           rdfs:range geo:dggsLiteral .
-
-
-###  http://www.opengis.net/ont/geosparql#asGML
-geo:asGML rdf:type owl:DatatypeProperty .
-
-
-###  http://www.opengis.net/ont/geosparql#asGeoJSON
-geo:asGeoJSON rdf:type owl:DatatypeProperty ;
-              rdfs:range geo:geoJSONLiteral .
-
-
-###  http://www.opengis.net/ont/geosparql#asKML
-geo:asKML rdf:type owl:DatatypeProperty ;
-          rdfs:range geo:kmlLiteral .
-
-
-###  http://www.opengis.net/ont/geosparql#asWKT
-geo:asWKT rdf:type owl:DatatypeProperty .
-
-
-###  http://www.opengis.net/ont/geosparql#hasSerialization
-geo:hasSerialization rdf:type owl:DatatypeProperty ;
-                     rdfs:range rdfs:Literal .
-
-
-###  http://www.w3.org/ns/prov#endedAtTime
-prov:endedAtTime rdf:type owl:DatatypeProperty ;
-                 rdfs:domain prov:Activity ;
-                 rdfs:range xsd:dateTime ;
-                 rdfs:comment "The time at which an activity ended. See also prov:startedAtTime."@en ;
-                 rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                 rdfs:label "endedAtTime" ;
-                 prov:category "starting-point" ;
-                 prov:component "entities-activities" ;
-                 prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedEnd o prov:atTime) rdfs:subPropertyOf prov:endedAtTime."@en ;
-                 prov:qualifiedForm prov:End ,
-                                    prov:atTime .
-
-
-###  http://www.w3.org/ns/prov#generatedAtTime
-prov:generatedAtTime rdf:type owl:DatatypeProperty ;
-                     rdfs:domain prov:Entity ;
-                     rdfs:range xsd:dateTime ;
-                     rdfs:comment "The time at which an entity was completely created and is available for use."@en ;
-                     rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                     rdfs:label "generatedAtTime" ;
-                     prov:category "expanded" ;
-                     prov:component "entities-activities" ;
-                     prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedGeneration o prov:atTime) rdfs:subPropertyOf prov:generatedAtTime."@en ;
-                     prov:qualifiedForm prov:Generation ,
-                                        prov:atTime .
-
-
-###  http://www.w3.org/ns/prov#invalidatedAtTime
-prov:invalidatedAtTime rdf:type owl:DatatypeProperty ;
-                       rdfs:domain prov:Entity ;
-                       rdfs:range xsd:dateTime ;
-                       rdfs:comment "The time at which an entity was invalidated (i.e., no longer usable)."@en ;
-                       rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                       rdfs:label "invalidatedAtTime" ;
-                       prov:category "expanded" ;
-                       prov:component "entities-activities" ;
-                       prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedInvalidation o prov:atTime) rdfs:subPropertyOf prov:invalidatedAtTime."@en ;
-                       prov:qualifiedForm prov:Invalidation ,
-                                          prov:atTime .
-
-
-###  http://www.w3.org/ns/prov#startedAtTime
-prov:startedAtTime rdf:type owl:DatatypeProperty ;
-                   rdfs:domain prov:Activity ;
-                   rdfs:range xsd:dateTime ;
-                   rdfs:comment "The time at which an activity started. See also prov:endedAtTime."@en ;
-                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                   rdfs:label "startedAtTime" ;
-                   prov:category "starting-point" ;
-                   prov:component "entities-activities" ;
-                   prov:editorialNote "It is the intent that the property chain holds: (prov:qualifiedStart o prov:atTime) rdfs:subPropertyOf prov:startedAtTime."@en ;
-                   prov:qualifiedForm prov:Start ,
-                                      prov:atTime .
-
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd
 baw:hasDisasterEnd rdf:type owl:DatatypeProperty ;
@@ -1065,8 +577,8 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/casualtyType
 :casualtyType rdf:type owl:DatatypeProperty ;
               rdfs:domain :Casualties ;
-              rdfs:range <https://sakuna.ph/:casualtyType> ;
-              rdfs:label "type of casualty"@en .
+              rdfs:range :casualtyDataType ;
+              rdfs:label "type of casualty" .
 
 
 ###  https://sakuna.ph/commercialDamageAmount
@@ -1853,130 +1365,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 #################################################################
 
 ###  http://www.opengis.net/ont/geosparql#Feature
-geo:Feature rdf:type owl:Class ;
-            rdfs:subClassOf geo:SpatialObject ;
-            owl:disjointWith geo:Geometry ;
-            rdfs:isDefinedBy geo: ,
-                             <http://www.opengis.net/spec/geosparql/1.0/req/core/feature-class> ,
-                             <http://www.opengis.net/spec/geosparql/1.1/req/core/feature-class> ;
-            skos:definition "A discrete spatial phenomenon in a universe of discourse."@en ;
-            skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.1> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.7> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.9> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
-                         <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-            skos:note "A Feature represents a uniquely identifiable phenomenon, for example a river or an apple. While such phenomena (and therefore the Features used to represent them) are bounded, their boundaries may be crisp (e.g., the declared boundaries of a state), vague (e.g., the delineation of a valley versus its neighboring mountains), and change with time (e.g., a storm front). While discrete in nature, Features may be created from continuous observations, such as an isochrone that determines the region that can be reached by ambulance within 5 minutes."@en ;
-            skos:prefLabel "Feature"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#Geometry
-geo:Geometry rdf:type owl:Class ;
-             rdfs:subClassOf geo:SpatialObject ;
-             rdfs:isDefinedBy geo: ,
-                              <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-class> ,
-                              <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-class> ;
-             skos:definition "A coherent set of direct positions in space. The positions are held within a Spatial Reference System (SRS)."@en ;
-             skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.1> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ,
-                          <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-             skos:note "Geometry can be used as a representation of the shape, extent or location of a Feature and may exist as a self-contained entity."@en ;
-             skos:prefLabel "Geometry"@en .
-
-
-###  http://www.opengis.net/ont/geosparql#SpatialObject
-geo:SpatialObject rdf:type owl:Class .
-
-
-###  http://www.w3.org/ns/prov#Activity
-prov:Activity rdf:type owl:Class ;
-              owl:disjointWith prov:Entity ;
-              rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-              rdfs:label "Activity" ;
-              prov:category "starting-point" ;
-              prov:component "entities-activities" ;
-              prov:constraints "http://www.w3.org/TR/2013/REC-prov-constraints-20130430/#prov-dm-constraints-fig"^^xsd:anyURI ;
-              prov:definition "An activity is something that occurs over a period of time and acts upon or with entities; it may include consuming, processing, transforming, modifying, relocating, using, or generating entities." ;
-              prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-Activity"^^xsd:anyURI ;
-              prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Activity"^^xsd:anyURI .
-
-
-###  http://www.w3.org/ns/prov#Agent
-prov:Agent rdf:type owl:Class ;
-           owl:disjointWith prov:InstantaneousEvent ;
-           rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-           rdfs:label "Agent" ;
-           prov:category "starting-point" ;
-           prov:component "agents-responsibility" ;
-           prov:definition "An agent is something that bears some form of responsibility for an activity taking place, for the existence of an entity, or for another agent's activity. "@en ;
-           prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-           prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Agent"^^xsd:anyURI .
-
-
-###  http://www.w3.org/ns/prov#Entity
-prov:Entity rdf:type owl:Class ;
-            owl:disjointWith prov:InstantaneousEvent ;
-            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-            rdfs:label "Entity" ;
-            prov:category "starting-point" ;
-            prov:component "entities-activities" ;
-            prov:constraints "http://www.w3.org/TR/2013/REC-prov-constraints-20130430/#prov-dm-constraints-fig"^^xsd:anyURI ;
-            prov:definition "An entity is a physical, digital, conceptual, or other kind of thing with some fixed aspects; entities may be real or imaginary. "@en ;
-            prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-entity"^^xsd:anyURI ;
-            prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-Entity"^^xsd:anyURI .
-
-
-###  http://www.w3.org/ns/prov#Organization
-prov:Organization rdf:type owl:Class ;
-                  rdfs:subClassOf prov:Agent ;
-                  rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                  rdfs:label "Organization" ;
-                  prov:category "expanded" ;
-                  prov:component "agents-responsibility" ;
-                  prov:definition "An organization is a social or legal institution such as a company, society, etc." ;
-                  prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-                  prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
-
-
-###  http://www.w3.org/ns/prov#Person
-prov:Person rdf:type owl:Class ;
-            rdfs:subClassOf prov:Agent ;
-            rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-            rdfs:label "Person" ;
-            prov:category "expanded" ;
-            prov:component "agents-responsibility" ;
-            prov:definition "Person agents are people."@en ;
-            prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-            prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
-
-
-###  http://www.w3.org/ns/prov#SoftwareAgent
-prov:SoftwareAgent rdf:type owl:Class ;
-                   rdfs:subClassOf prov:Agent ;
-                   rdfs:isDefinedBy <http://www.w3.org/ns/prov-o#> ;
-                   rdfs:label "SoftwareAgent" ;
-                   prov:category "expanded" ;
-                   prov:component "agents-responsibility" ;
-                   prov:definition "A software agent is running software."@en ;
-                   prov:dm "http://www.w3.org/TR/2013/REC-prov-dm-20130430/#term-agent"^^xsd:anyURI ;
-                   prov:n "http://www.w3.org/TR/2013/REC-prov-n-20130430/#expression-types"^^xsd:anyURI .
+geo:Feature rdf:type owl:Class .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact
@@ -2270,7 +1659,7 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                             ] ,
                             [ rdf:type owl:Restriction ;
                               owl:onProperty :casualtyType ;
-                              owl:someValuesFrom <https://sakuna.ph/:casualtyType>
+                              owl:someValuesFrom :casualtyDataType
                             ] ;
             rdfs:label "Casualties"@en ;
             skos:definition "Represents the number of deaths, injured, and missing due to a disaster." .
@@ -2459,10 +1848,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  owl:someValuesFrom :Response
                                ] ,
                                [ rdf:type owl:Restriction ;
-                                 owl:onProperty :hasSubtype ;
-                                 owl:someValuesFrom :DisasterType
-                               ] ,
-                               [ rdf:type owl:Restriction ;
                                  owl:onProperty :hasType ;
                                  owl:someValuesFrom :DisasterType
                                ] ,
@@ -2502,6 +1887,11 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 :DisasterType rdf:type owl:Class ;
               rdfs:label "Disaster Type" ;
               skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
+
+
+###  https://sakuna.ph/DisasterTypeScheme
+:DisasterTypeScheme rdf:type owl:Class ;
+                    rdfs:label "Disaster Type Scheme" .
 
 
 ###  https://sakuna.ph/Drought
@@ -2753,10 +2143,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
 ###  https://sakuna.ph/Incident
 :Incident rdf:type owl:Class ;
           rdfs:subClassOf :DisasterEvent ,
-                          [ rdf:type owl:Restriction ;
-                            owl:onProperty :isRelatedTo ;
-                            owl:someValuesFrom :MajorEvent
-                          ] ,
                           [ rdf:type owl:Restriction ;
                             owl:onProperty :casualtyCause ;
                             owl:someValuesFrom xsd:string
@@ -3656,86 +3042,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                   rdfs:subClassOf :Infestation ;
                   rdfs:label "Worms Infestation"@en ;
                   skos:definition "Infestation of worms." .
-
-
-#################################################################
-#    Annotations
-#################################################################
-
-geo:asDGGS rdfs:isDefinedBy geo: ,
-                            <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-dggs-literal> ;
-           skos:definition "The Discrete Global Grid System (DGGS) serialization of a Geometry"@en ;
-           skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-           skos:prefLabel "as DGGS"@en .
-
-
-geo:asGML rdfs:isDefinedBy geo: ,
-                           <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-as-gml-literal> ,
-                           <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-gml-literal> ;
-          skos:definition "The GML serialization of a Geometry"@en ;
-          skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-          skos:prefLabel "as GML"@en .
-
-
-geo:asGeoJSON rdfs:isDefinedBy geo: ,
-                               <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-geojson-literal> ;
-              rdfs:seeAlso <https://tools.ietf.org/html/rfc7946> ;
-              skos:definition "The GeoJSON serialization of a Geometry"@en ;
-              skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-              skos:prefLabel "as GeoJSON"@en .
-
-
-geo:asKML rdfs:isDefinedBy geo: ,
-                           <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-kml-literal> ;
-          rdfs:seeAlso <https://www.ogc.org/standards/kml> ;
-          skos:definition "The KML serialization of a Geometry"@en ;
-          skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-          skos:prefLabel "as KML"@en .
-
-
-geo:asWKT rdfs:isDefinedBy geo: ,
-                           <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-as-wkt-literal> ,
-                           <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-as-wkt-literal> ;
-          skos:definition "The WKT serialization of a Geometry"@en ;
-          skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.2> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.3> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.4> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.5> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.6> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.2.8> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.1> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.2> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.1.3.3> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.2> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.1> ,
-                       <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.4> ;
-          skos:prefLabel "as WKT"@en .
-
-
-geo:gmlLiteral rdfs:isDefinedBy geo: ,
-                                <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/gml-literal> ,
-                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/gml-literal> ;
-               rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=20509> ;
-               skos:definition "A GML serialization of a Geometry object."@en ;
-               skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.4> ;
-               skos:prefLabel "GML Literal"@en .
-
-
-geo:hasSerialization rdfs:isDefinedBy geo: ,
-                                      <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/geometry-properties> ,
-                                      <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/geometry-properties> ;
-                     skos:definition "Connects a Geometry object with its text-based serialization."@en ;
-                     skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.1.2.3> ;
-                     skos:prefLabel "has serialization"@en .
-
-
-geo:wktLiteral rdfs:isDefinedBy geo: ,
-                                <http://www.opengis.net/spec/geosparql/1.0/req/geometry-extension/wkt-literal> ,
-                                <http://www.opengis.net/spec/geosparql/1.1/req/geometry-extension/wkt-literal> ;
-               rdfs:seeAlso <https://portal.ogc.org/files/?artifact_id=25355> ;
-               skos:definition "A Well-known Text serialization of a Geometry object."@en ;
-               skos:example <http://www.opengis.net/spec/geosparql/1.1/specification.html#C.2.2.2> ;
-               skos:prefLabel "Well-known Text Literal"@en .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
