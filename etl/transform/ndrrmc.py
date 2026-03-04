@@ -7,7 +7,7 @@ from dataclasses import fields
 from datetime import datetime
 
 import polars as pl
-from semantic_processing.location_matcher import LOCATION_MATCHER
+from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 
 from mappings.ndrrmc import (
@@ -443,7 +443,7 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
 
     df = df.with_row_index("id", 1)
 
-    # df.write_csv(event_folder_path + "/hakdog.csv")
+    df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, Housing)
 

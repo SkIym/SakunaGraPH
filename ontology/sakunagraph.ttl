@@ -3,6 +3,7 @@
 @prefix geo: <http://www.opengis.net/ont/geosparql#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
@@ -370,13 +371,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      skos:definition "Indicates the start of the disaster." .
 
 
-###  https://sakuna.ph/admLevel
-:admLevel rdf:type owl:DatatypeProperty ;
-          rdfs:domain :Location ;
-          rdfs:range xsd:string ;
-          rdfs:label "adminstration level" .
-
-
 ###  https://sakuna.ph/affectedBarangays
 :affectedBarangays rdf:type owl:DatatypeProperty ;
                    rdfs:domain :AffectedPopulation ;
@@ -581,6 +575,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
               rdfs:label "type of casualty" .
 
 
+###  https://sakuna.ph/cityClass
+:cityClass rdf:type owl:DatatypeProperty ;
+           rdfs:domain :Location ;
+           rdfs:range xsd:string ;
+           rdfs:label "city class" .
+
+
 ###  https://sakuna.ph/commercialDamageAmount
 :commercialDamageAmount rdf:type owl:DatatypeProperty ;
                         rdfs:domain :InfrastructureDamage ;
@@ -604,6 +605,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Assistance ;
                  rdfs:range xsd:decimal ;
                  rdfs:label "AID contribution"@en .
+
+
+###  https://sakuna.ph/correspondenceCode
+:correspondenceCode rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :Location ;
+                    rdfs:range xsd:string ;
+                    rdfs:label "correspondence code" .
 
 
 ###  https://sakuna.ph/cpi
@@ -751,6 +759,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      rdfs:label "general total damage amount"@en .
 
 
+###  https://sakuna.ph/geographicLevel
+:geographicLevel rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Location ;
+                 rdfs:range xsd:string ;
+                 rdfs:label "geographic level" .
+
+
 ###  https://sakuna.ph/hasBarangay
 :hasBarangay rdf:type owl:DatatypeProperty ;
              rdfs:domain [ rdf:type owl:Class ;
@@ -785,6 +800,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      rdfs:domain :Incident ;
                      rdfs:range xsd:string ;
                      rdfs:label "incident description"@en .
+
+
+###  https://sakuna.ph/incomeClass
+:incomeClass rdf:type owl:DatatypeProperty ;
+             rdfs:domain :Location ;
+             rdfs:range xsd:string ;
+             rdfs:label "income class" .
 
 
 ###  https://sakuna.ph/infraDamageAmount
@@ -922,6 +944,12 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
           rdfs:label "latitude"@en .
 
 
+###  https://sakuna.ph/locationStatus
+:locationStatus rdf:type owl:DatatypeProperty ;
+                rdfs:comment "Capital or Poblacion" ;
+                rdfs:label "location status" .
+
+
 ###  https://sakuna.ph/longitude
 :longitude rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
@@ -1012,6 +1040,20 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                rdfs:label "policy changes" .
 
 
+###  https://sakuna.ph/population2024
+:population2024 rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Location ;
+                rdfs:range xsd:int ;
+                rdfs:label "population as of 2024" .
+
+
+###  https://sakuna.ph/populationNote
+:populationNote rdf:type owl:DatatypeProperty ;
+                rdfs:domain :Location ;
+                rdfs:range xsd:string ;
+                rdfs:label "population note" .
+
+
 ###  https://sakuna.ph/portOrTerminalName
 :portOrTerminalName rdf:type owl:DatatypeProperty ;
                     rdfs:domain [ rdf:type owl:Class ;
@@ -1098,10 +1140,11 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                       rdfs:label "production loss volume"@en .
 
 
-###  https://sakuna.ph/psgc
-:psgc rdf:type owl:DatatypeProperty ;
-      rdfs:domain :Location ;
-      rdfs:range xsd:int .
+###  https://sakuna.ph/psgcCode
+:psgcCode rdf:type owl:DatatypeProperty ;
+          rdfs:domain :Location ;
+          rdfs:range xsd:string ;
+          rdfs:label "psgc code" .
 
 
 ###  https://sakuna.ph/reference
@@ -1358,6 +1401,13 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                               rdfs:domain :AgricultureDamage ;
                               rdfs:range xsd:int ;
                               rdfs:label "totally damaged infrastructure"@en .
+
+
+###  https://sakuna.ph/urbanRural
+:urbanRural rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Location ;
+            rdfs:range xsd:string ;
+            rdfs:label "urban or rural" .
 
 
 #################################################################
@@ -1670,6 +1720,13 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                rdfs:subClassOf :IndustrialAccident ;
                rdfs:label "Chemical Spill"@en ;
                skos:definition "Accident release occurring during the production, transportation, or handling of hazardous chemical substances." .
+
+
+###  https://sakuna.ph/City
+:City rdf:type owl:Class ;
+      rdfs:subClassOf :Location ;
+      rdfs:label "City" ;
+      skos:definition "adm level 3" .
 
 
 ###  https://sakuna.ph/ClassSuspension
@@ -2362,7 +2419,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                 owl:someValuesFrom :Province
                               ] ;
               rdfs:label "Municipality"@en ;
-              skos:altLabel "City" ;
               skos:definition "adm level 3" .
 
 
@@ -2871,6 +2927,12 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                ] ;
                rdfs:label "Stranded Event" ;
                skos:definition "Represents stranded mode of transportations." .
+
+
+###  https://sakuna.ph/SubMunicipality
+:SubMunicipality rdf:type owl:Class ;
+                 rdfs:subClassOf :Location ;
+                 rdfs:label "SubMunicipality" .
 
 
 ###  https://sakuna.ph/SuddenSubsidenceDry
