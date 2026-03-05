@@ -105,10 +105,10 @@ LEVEL_LABEL: dict[str, str] = {
 # ─────────────────────────────────────────────────────────────────────────────
 
 def location_uri(code: str, level: str) -> URIRef:
-    if level == "Reg":
-        slug = REGION_SLUGS.get(code.zfill(10))
-        if slug:
-            return SKG[slug]
+    # if level == "Reg":
+    #     slug = REGION_SLUGS.get(code.zfill(10))
+    #     if slug:
+    #         return SKG[slug]
     return SKG[code.zfill(10)]
 
 
@@ -252,7 +252,7 @@ def build_tbox(g: Graph) -> None:
 # ABox population
 # ─────────────────────────────────────────────────────────────────────────────
 
-def build_abox(g: Graph, df: pl.DataFrame) -> tuple[int, int]:
+def build_abox(g: Graph, df: pl.DataFrame, include_barangay: bool = True) -> tuple[int, int]:
     """
     Add one RDF individual per PSGC row plus isPartOf triples.
     Returns (individuals_added, isPartOf_triples_added).
@@ -271,10 +271,17 @@ def build_abox(g: Graph, df: pl.DataFrame) -> tuple[int, int]:
     for row in df.iter_rows(named=True):
         code  = row["psgc_code"]
         level = row.get("geo_level")
+
+        if level is None:
+            continue
+
+        if level == "Bgy" and not include_barangay:
+            continue
+
         name  = (row.get("name") or "").strip()
 
         uri = location_uri(code, level)
-        cls = LEVEL_CLASS.get(level, SKG["AdministrativeUnit"])
+        cls = LEVEL_CLASS.get(level, SKG["Location"])
 
         # ── Type ─────────────────────────────────────────────────────────────
         g.add((uri, RDF.type, cls))
@@ -378,6 +385,7 @@ def main() -> None:
     parser.add_argument("--output", "-o", default="psgc.ttl")
     parser.add_argument("--format", "-f", default="turtle",
                         choices=["turtle", "xml", "n3", "nt", "json-ld"])
+    parser.add_argument("--barangay", action=argparse.BooleanOptionalAction)
     args = parser.parse_args()
 
     xlsx_path = Path(args.input)
@@ -402,8 +410,8 @@ def main() -> None:
 
     print(f"\n[3/4] Building RDF graph …")
     g = init_graph()
-    build_tbox(g)
-    ind_n, part_n = build_abox(g, df)
+    # build_tbox(g)
+    ind_n, part_n = build_abox(g, df, args.barangay)
     print(f"      {ind_n:,} individuals | {part_n:,} isPartOf triples | {len(g):,} total triples")
 
     print(f"\n[4/4] Serialising → {out_path} ({args.format}) …")

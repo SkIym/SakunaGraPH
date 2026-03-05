@@ -6,7 +6,7 @@ base = "https://sakuna.ph/"
 
 # For matching location IRIs
 lg = Graph()
-lg.parse("../data/rdf/psgc_rdf_v2.ttl")
+lg.parse("../data/rdf/psgc.ttl")
 
 # IRI : label
 municities: dict[str, str] = {}
@@ -99,8 +99,8 @@ def match_locs_to_IRI(locations: str):
             continue
 
         if highest_level in ["4", "Region 4", "IIII", 4]:
-            text = base + "Region_IV-A"
-            text2 = base + "Region_IV-B"
+            text = base + "0400000000"
+            text2 = base + "1700000000"
             loc_IRIs.extend([text, text2])
             continue
         
@@ -158,136 +158,136 @@ def match_locs_to_IRI(locations: str):
 
 region_map = {
     # Region I – Ilocos Region
-    "I": "Region_I",
-    "1": "Region_I",
-    "Region I": "Region_I",
-    "Region 1": "Region_I",
-    "Ilocos": "Region_I",
-    "Ilocos Region": "Region_I",
+    "I": "0100000000",
+    "1": "0100000000",
+    "Region I": "0100000000",
+    "Region 1": "0100000000",
+    "Ilocos": "0100000000",
+    "Ilocos Region": "0100000000",
 
     # Region II – Cagayan Valley
-    "II": "Region_II",
-    "2": "Region_II",
-    "Region II": "Region_II",
-    "Region 2": "Region_II",
-    "Cagayan Valley": "Region_II",
+    "II": "0200000000",
+    "2": "0200000000",
+    "Region II": "0200000000",
+    "Region 2": "0200000000",
+    "Cagayan Valley": "0200000000",
 
     # Region III – Central Luzon
-    "III": "Region_III",
-    "3": "Region_III",
-    "Region III": "Region_III",
-    "Region 3": "Region_III",
-    "Central Luzon": "Region_III",
+    "III": "0300000000",
+    "3": "0300000000",
+    "Region III": "0300000000",
+    "Region 3": "0300000000",
+    "Central Luzon": "0300000000",
 
     # Region IV-A – CALABARZON
-    "IV-A": "Region_IV-A",
-    "4A": "Region_IV-A",
-    "IVA": "Region_IV-A",
-    "4-A": "Region_IV-A",
-    "Region IV-A": "Region_IV-A",
-    "Region 4A": "Region_IV-A",
-    "Region IVA": "Region_IV-A",
-    "Region 4-A": "Region_IV-A",
-    "CALABARZON": "Region_IV-A",
-    "Calabarzon": "Region_IV-A",
+    "IV-A": "0400000000",
+    "4A": "0400000000",
+    "IVA": "0400000000",
+    "4-A": "0400000000",
+    "Region IV-A": "0400000000",
+    "Region 4A": "0400000000",
+    "Region IVA": "0400000000",
+    "Region 4-A": "0400000000",
+    "CALABARZON": "0400000000",
+    "Calabarzon": "0400000000",
 
     # Region IV-B – MIMAROPA
-    "IV-B": "Region_IV-B",
-    "4B": "Region_IV-B",
-    "IVB": "Region_IV-B",
-    "4-B": "Region_IV-B",
-    "Region IV-B": "Region_IV-B",
-    "Region 4B": "Region_IV-B",
-    "Region IVB": "Region_IV-B",
-    "Region 4-B": "Region_IV-B",
-    "MIMAROPA": "Region_IV-B",
-    "Mimaropa": "Region_IV-B",
+    "IV-B": "1700000000",
+    "4B": "1700000000",
+    "IVB": "1700000000",
+    "4-B": "1700000000",
+    "Region IV-B": "1700000000",
+    "Region 4B": "1700000000",
+    "Region IVB": "1700000000",
+    "Region 4-B": "1700000000",
+    "MIMAROPA": "1700000000",
+    "Mimaropa": "1700000000",
 
     # Region V – Bicol Region
-    "V": "Region_V",
-    "5": "Region_V",
-    "Region V": "Region_V",
-    "Region 5": "Region_V",
-    "Bicol": "Region_V",
-    "Bicol Region": "Region_V",
+    "V": "0500000000",
+    "5": "0500000000",
+    "Region V": "0500000000",
+    "Region 5": "0500000000",
+    "Bicol": "0500000000",
+    "Bicol Region": "0500000000",
 
     # Region VI – Western Visayas
-    "VI": "Region_VI",
-    "6": "Region_VI",
-    "Region VI": "Region_VI",
-    "Region 6": "Region_VI",
-    "Western Visayas": "Region_VI",
+    "VI": "0600000000",
+    "6": "0600000000",
+    "Region VI": "0600000000",
+    "Region 6": "0600000000",
+    "Western Visayas": "0600000000",
 
     # Region VII – Central Visayas
-    "VII": "Region_VII",
-    "7": "Region_VII",
-    "Region VII": "Region_VII",
-    "Region 7": "Region_VII",
-    "Central Visayas": "Region_VII",
+    "VII": "0700000000",
+    "7": "0700000000",
+    "Region VII": "0700000000",
+    "Region 7": "0700000000",
+    "Central Visayas": "0700000000",
 
     # Region VIII – Eastern Visayas
-    "VIII": "Region_VIII",
-    "8": "Region_VIII",
-    "Region VIII": "Region_VIII",
-    "Region 8": "Region_VIII",
-    "Eastern Visayas": "Region_VIII",
+    "VIII": "0800000000",
+    "8": "0800000000",
+    "Region VIII": "0800000000",
+    "Region 8": "0800000000",
+    "Eastern Visayas": "0800000000",
 
     # Region IX – Zamboanga Peninsula
-    "IX": "Region_IX",
-    "9": "Region_IX",
-    "Region IX": "Region_IX",
-    "Region 9": "Region_IX",
-    "Zamboanga Peninsula": "Region_IX",
+    "IX": "0900000000",
+    "9": "0900000000",
+    "Region IX": "0900000000",
+    "Region 9": "0900000000",
+    "Zamboanga Peninsula": "0900000000",
 
     # Region X – Northern Mindanao
-    "X": "Region_X",
-    "10": "Region_X",
-    "Region X": "Region_X",
-    "Region 10": "Region_X",
-    "Northern Mindanao": "Region_X",
+    "X": "1000000000",
+    "10": "1000000000",
+    "Region X": "1000000000",
+    "Region 10": "1000000000",
+    "Northern Mindanao": "1000000000",
 
     # Region XI – Davao Region
-    "XI": "Region_XI",
-    "11": "Region_XI",
-    "Region XI": "Region_XI",
-    "Region 11": "Region_XI",
-    "Davao": "Region_XI",
-    "Davao Region": "Region_XI",
+    "XI": "1100000000",
+    "11": "1100000000",
+    "Region XI": "1100000000",
+    "Region 11": "1100000000",
+    "Davao": "1100000000",
+    "Davao Region": "1100000000",
 
     # Region XII – SOCCSKSARGEN
-    "XII": "Region_XII",
-    "12": "Region_XII",
-    "Region XII": "Region_XII",
-    "Region 12": "Region_XII",
-    "SOCCSKSARGEN": "Region_XII",
-    "Soccsksargen": "Region_XII",
+    "XII": "1200000000",
+    "12": "1200000000",
+    "Region XII": "1200000000",
+    "Region 12": "1200000000",
+    "SOCCSKSARGEN": "1200000000",
+    "Soccsksargen": "1200000000",
 
     # Region XIII – Caraga
-    "XIII": "Region_XIII",
-    "13": "Region_XIII",
-    "Region XIII": "Region_XIII",
-    "Region 13": "Region_XIII",
-    "Caraga": "Region_XIII",
-    "CARAGA": "Region_XIII",
+    "XIII": "1600000000",
+    "13": "1600000000",
+    "Region XIII": "1600000000",
+    "Region 13": "1600000000",
+    "Caraga": "1600000000",
+    "CARAGA": "1600000000",
 
     # NCR – National Capital Region
-    "NCR": "National_Capital_Region",
-    "Region NCR": "National_Capital_Region",
-    "National Capital Region": "National_Capital_Region",
-    "National Capital Region (NCR)": "National_Capital_Region",
-    "Metro Manila": "National_Capital_Region",
+    "NCR": "1300000000",
+    "Region NCR": "1300000000",
+    "National Capital Region": "1300000000",
+    "National Capital Region (NCR)": "1300000000",
+    "Metro Manila": "1300000000",
 
     # CAR – Cordillera Administrative Region
-    "CAR": "Cordillera_Administrative_Region",
-    "Region CAR": "Cordillera_Administrative_Region",
-    "Cordillera": "Cordillera_Administrative_Region",
-    "Cordillera Administrative Region": "Cordillera_Administrative_Region",
+    "CAR": "1400000000",
+    "Region CAR": "1400000000",
+    "Cordillera": "1400000000",
+    "Cordillera Administrative Region": "1400000000",
 
     # BARMM – Bangsamoro
-    "BARMM": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
-    "ARMM": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
-    "Bangsamoro": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
-    "Bangsamoro Autonomous Region in Muslim Mindanao": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao"
+    "BARMM": "1900000000",
+    "ARMM": "1900000000",
+    "Bangsamoro": "1900000000",
+    "Bangsamoro Autonomous Region in Muslim Mindanao": "1900000000"
 }
 
 @udf(
