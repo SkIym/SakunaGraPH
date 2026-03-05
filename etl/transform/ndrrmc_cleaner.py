@@ -62,7 +62,8 @@ def event_name_expander(name: str) -> str:
         "TC": "Tropical cyclone",
         "TD": "Tropical depression",
         "TS": "Tropical storm",
-        "LPA": "Low pressure area"
+        "LPA": "Low pressure area",
+        "TY": "Typhoon"
     }
 
     for a in abbr.keys():

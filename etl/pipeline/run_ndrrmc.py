@@ -136,10 +136,19 @@ def run(out_file: str, start: int = 0, count: int | None = None):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--out", type=str, default="ndrrmc.ttl")
+    parser.add_argument("--out", type=str, default="ndrrmc")
     parser.add_argument("--start", type=int, default=0)
-    parser.add_argument("--count", type=int, default=None)
+    parser.add_argument("--count", type=int, default=10)
     args = parser.parse_args()
 
-    run(out_file=OUT_DIR+args.out, start=args.start, count=args.count, )
+
+    index = 1
+    file_conv = 0
+    file_no = 89
+    while file_conv < file_no:
+
+        run(out_file=OUT_DIR+args.out+"-"+str(index)+".ttl", start=args.start+file_conv, count=args.count, )
+
+        index+=1
+        file_conv += 10
     # run()

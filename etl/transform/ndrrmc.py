@@ -383,6 +383,8 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     # --- Row index ---
     df = df.with_row_index("id", 1)
 
+    df.write_csv(event_folder_path + "/hakdog.csv")
+
     # --- Materialize Incident entities ---
     return df_to_entities(df, Incident)
 
@@ -1095,6 +1097,6 @@ if __name__ == "__main__":
 
     # load_flight("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
-    load_housing("../data/parsed/ndrrmc/TY ODETTE 2021")
+    load_incidents("../data/parsed/ndrrmc/El Nino 2023")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")
