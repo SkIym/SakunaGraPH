@@ -11,7 +11,7 @@ from .iris import aff_pop_iri, agri_iri, airport_iri, casualties_iri, class_dis_
 @dataclass
 class Event:
     eventName: str
-    hasType: str
+    hasDisasterType: str
     startDate: datetime | None
     endDate: datetime | None
     id: str
@@ -32,8 +32,8 @@ def event_mapping(g: Graph, ev: Event) -> URIRef:
     ))
     g.add((
         uri,
-        URIRef(SKG["hasType"]),
-        URIRef(SKG[ev.hasType])
+        URIRef(SKG["hasDisasterType"]),
+        URIRef(SKG[ev.hasDisasterType])
     ))
 
     if ev.startDate:
@@ -140,7 +140,7 @@ class Incident:
     endDate: datetime
     hasLocation: URIRef
     hasBarangay: str | None
-    hasType: str
+    hasDisasterType: str
     remarks: str | None
 
 INCIDENT_COLUMN_MAPPINGS = {
@@ -148,7 +148,7 @@ INCIDENT_COLUMN_MAPPINGS = {
     "STATUS_for_flooded_areas": "incidentStatus",
     "ACTIONS_TAKEN": "incidentActionsTaken",
     "DESCRIPTION": "incidentDescription",
-    "Column_2": "hasType",
+    "Column_2": "hasDisasterType",
     "Column_3": "startDate",
     "Column_4": "startTime",
     "Column_5": "incidentDescription",
@@ -219,8 +219,8 @@ def incident_mapping(g: Graph, inci: List[Incident], event_iri: URIRef):
         # --- Classification / location ---
         g.add((
             uri,
-            SKG.hasType,
-            URIRef(SKG[i.hasType])
+            SKG.hasDisasterType,
+            URIRef(SKG[i.hasDisasterType])
         ))
 
         g.add((

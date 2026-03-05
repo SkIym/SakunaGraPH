@@ -40,7 +40,7 @@ baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterOccurrence
 baw:hasDisasterOccurrence rdf:type owl:ObjectProperty ;
                           owl:inverseOf baw:isOfDisasterType ,
-                                        :hasType ;
+                                        :hasDisasterType ;
                           rdfs:domain :DisasterType ;
                           rdfs:range :DisasterEvent ;
                           rdfs:label "has disaster occurrence" ;
@@ -85,7 +85,7 @@ baw:isLocationOfIncident rdf:type owl:ObjectProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType
 baw:isOfDisasterType rdf:type owl:ObjectProperty ;
-                     owl:equivalentProperty :hasType ;
+                     owl:equivalentProperty :hasDisasterType ;
                      rdfs:label "is of disaster type" .
 
 
@@ -154,6 +154,19 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 :hasDeclarationOfCalamity rdf:type owl:ObjectProperty ;
                           rdfs:subPropertyOf :hasResponse ;
                           rdfs:label "has declaration of calamity" .
+
+
+###  https://sakuna.ph/hasDisasterSubtype
+:hasDisasterSubtype rdf:type owl:ObjectProperty ;
+                    rdfs:subPropertyOf :hasDisasterType ;
+                    rdfs:label "has disaster subtype" .
+
+
+###  https://sakuna.ph/hasDisasterType
+:hasDisasterType rdf:type owl:ObjectProperty ;
+                 rdfs:domain :DisasterEvent ;
+                 rdfs:range :DisasterType ;
+                 rdfs:label "has disaster type"@en .
 
 
 ###  https://sakuna.ph/hasHousingDamage
@@ -299,13 +312,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 :hasStrandedEvent rdf:type owl:ObjectProperty ;
                   rdfs:subPropertyOf :hasImpact ;
                   rdfs:label "has stranded event" .
-
-
-###  https://sakuna.ph/hasType
-:hasType rdf:type owl:ObjectProperty ;
-         rdfs:domain :DisasterEvent ;
-         rdfs:range :DisasterType ;
-         rdfs:label "has disaster type"@en .
 
 
 ###  https://sakuna.ph/hasWaterDisruption
@@ -1881,6 +1887,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  owl:someValuesFrom :Source
                                ] ,
                                [ rdf:type owl:Restriction ;
+                                 owl:onProperty :hasDisasterType ;
+                                 owl:someValuesFrom :DisasterType
+                               ] ,
+                               [ rdf:type owl:Restriction ;
                                  owl:onProperty :hasImpact ;
                                  owl:someValuesFrom :Impact
                                ] ,
@@ -1903,10 +1913,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :hasResponse ;
                                  owl:someValuesFrom :Response
-                               ] ,
-                               [ rdf:type owl:Restriction ;
-                                 owl:onProperty :hasType ;
-                                 owl:someValuesFrom :DisasterType
                                ] ,
                                [ rdf:type owl:Restriction ;
                                  owl:onProperty :endDate ;

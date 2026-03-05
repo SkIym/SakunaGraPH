@@ -150,7 +150,7 @@ def load_events(folder_path: str) -> list[Event]:
             startDate=datetime.fromisoformat(meta["startDate"]) if meta.get("startDate") else None,
             endDate=datetime.fromisoformat(meta["endDate"]) if meta.get("endDate") else None,
             remarks=meta.get("remarks"),
-            hasType=pred,
+            hasDisasterType=pred,
         ))
 
     return events
@@ -362,7 +362,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
 
     predictions = DISASTER_CLASSIFIER.classify(type_texts)
     df = df.with_columns(
-        pl.Series("hasType", [pred for pred, _ in predictions])
+        pl.Series("hasDisasterType", [pred for pred, _ in predictions])
     )
 
     # --- Datetime normalization ---

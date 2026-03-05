@@ -153,7 +153,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :hasType ;
+        rr:predicate :hasDisasterType ;
         rr:objectMap [
             rml:functionExecution <#TypeExecution>;
             rml:termType rml:IRI;
@@ -199,7 +199,7 @@
     ] ;
 
     rr:predicateObjectMap [
-        rr:predicate :hasSubtype ;
+        rr:predicate :hasDisasterSubtype ;
         rr:objectMap [
             rml:functionExecution <#SubtypeExecution>;
             rml:termType rml:IRI;
@@ -575,7 +575,7 @@
     ] ;
 
     rr:predicateObjectMap [
-        rr:predicate :hasType ;
+        rr:predicate :hasDisasterType ;
         rr:objectMap [
             rml:functionExecution <#TypeExecution>;
             rml:termType rml:IRI;

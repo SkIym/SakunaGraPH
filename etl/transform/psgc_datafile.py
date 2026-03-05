@@ -25,7 +25,6 @@ Usage:
   python psgc_to_rdf.py --input data.xlsx --output psgc.ttl
 """
 
-import re
 import argparse
 from pathlib import Path
 
