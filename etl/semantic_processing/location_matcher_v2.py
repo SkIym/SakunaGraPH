@@ -15,93 +15,105 @@ class LocationMatcher:
         # Region normalization map
         # -------------------------
         self.region_map = {
-            "I": "Region_I",
-            "1": "Region_I",
-            "Region I": "Region_I",
-            "Region 1": "Region_I",
-            "Ilocos": "Region_I",
-            "Ilocos Region": "Region_I",
+            "i": "0100000000",
+            "1": "0100000000",
+            "region i": "0100000000",
+            "region 1": "0100000000",
+            "ilocos": "0100000000",
+            "ilocos region": "0100000000",
 
-            "II": "Region_II",
-            "2": "Region_II",
-            "Region II": "Region_II",
-            "Region 2": "Region_II",
-            "Cagayan Valley": "Region_II",
+            "ii": "0200000000",
+            "2": "0200000000",
+            "region ii": "0200000000",
+            "region 2": "0200000000",
+            "cagayan valley": "0200000000",
 
-            "III": "Region_III",
-            "3": "Region_III",
-            "Region III": "Region_III",
-            "Region 3": "Region_III",
-            "Central Luzon": "Region_III",
+            "iii": "0300000000",
+            "3": "0300000000",
+            "region iii": "0300000000",
+            "region 3": "0300000000",
+            "central luzon": "0300000000",
 
-            "IV-A": "Region_IV-A",
-            "4A": "Region_IV-A",
-            "IVA": "Region_IV-A",
-            "Region IV-A": "Region_IV-A",
-            "CALABARZON": "Region_IV-A",
+            "iv-a": "0400000000-A",
+            "4a": "0400000000-A",
+            "iva": "0400000000-A",
+            "region iv-a": "0400000000-A",
+            "calabarzon": "0400000000-A",
 
-            "IV-B": "Region_IV-B",
-            "4B": "Region_IV-B",
-            "IVB": "Region_IV-B",
-            "Region IV-B": "Region_IV-B",
-            "MIMAROPA": "Region_IV-B",
+            "iv-b": "1700000000",
+            "4b": "1700000000",
+            "ivb": "1700000000",
+            "region iv-b": "1700000000",
+            "mimaropa": "1700000000",
 
-            "V": "Region_V",
-            "5": "Region_V",
-            "Region V": "Region_V",
-            "Bicol": "Region_V",
+            "v": "0500000000",
+            "5": "0500000000",
+            "region v": "0500000000",
+            "region 5": "0500000000",
+            "bicol": "0500000000",
 
-            "VI": "Region_VI",
-            "6": "Region_VI",
-            "Region VI": "Region_VI",
-            "Western Visayas": "Region_VI",
+            "vi": "0600000000",
+            "6": "0600000000",
+            "region vi": "0600000000",
+            "region 6": "0600000000",
+            "western visayas": "0600000000",
 
-            "VII": "Region_VII",
-            "7": "Region_VII",
-            "Region VII": "Region_VII",
-            "Central Visayas": "Region_VII",
+            "vii": "0700000000",
+            "7": "0700000000",
+            "region vii": "0700000000",
+            "region 7": "0700000000",
+            "central visayas": "0700000000",
 
-            "VIII": "Region_VIII",
-            "8": "Region_VIII",
-            "Region VIII": "Region_VIII",
-            "Eastern Visayas": "Region_VIII",
+            "viii": "0800000000",
+            "8": "0800000000",
+            "region viii": "0800000000",
+            "region 8": "0800000000",
+            "eastern visayas": "0800000000",
 
-            "IX": "Region_IX",
-            "9": "Region_IX",
-            "Region IX": "Region_IX",
-            "Zamboanga Peninsula": "Region_IX",
+            "ix": "0900000000",
+            "9": "0900000000",
+            "region ix": "0900000000",
+            "region 9": "0900000000",
+            "zamboanga peninsula": "0900000000",
 
-            "X": "Region_X",
-            "10": "Region_X",
-            "Region X": "Region_X",
-            "Northern Mindanao": "Region_X",
+            "x": "1000000000",
+            "10": "1000000000",
+            "region x": "1000000000",
+            "region 10": "1000000000",
+            "northern mindanao": "1000000000",
 
-            "XI": "Region_XI",
-            "11": "Region_XI",
-            "Region XI": "Region_XI",
-            "Davao": "Region_XI",
+            "xi": "1100000000",
+            "11": "1100000000",
+            "region xi": "1100000000",
+            "davao": "1100000000",
+            "region 11": "1100000000",
 
-            "XII": "Region_XII",
-            "12": "Region_XII",
-            "Region XII": "Region_XII",
-            "SOCCSKSARGEN": "Region_XII",
+            "xii": "1200000000",
+            "12": "1200000000",
+            "region xii": "1200000000",
+            "region 12": "1200000000",
+            "soccsksargen": "1200000000",
 
-            "XIII": "Region_XIII",
-            "13": "Region_XIII",
-            "Region XIII": "Region_XIII",
-            "CARAGA": "Region_XIII",
-            "RTR": "Region_XIII",
+            "xiii": "1600000000",
+            "13": "1600000000",
+            "region xiii": "1600000000",
+            "region 13": "1600000000",
+            "caraga": "1600000000",
+            "rtr": "1600000000",
 
-            "NCR": "National_Capital_Region",
-            "Metro Manila": "National_Capital_Region",
-            "National Capital Region": "National_Capital_Region",
+            "ncr": "1300000000",
+            "metro manila": "1300000000",
+            "national capital region": "1300000000",
 
-            "CAR": "Cordillera_Administrative_Region",
-            "Cordillera": "Cordillera_Administrative_Region",
+            "car": "1400000000",
+            "cordillera": "1400000000",
 
-            "BARMM": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
-            "ARMM": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
-            "Bangsamoro": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
+            "barmm": "1900000000",
+            "armm": "1900000000",
+            "bangsamoro": "1900000000",
+
+            "nir": "1800000000",
+            "negros island region": "1800000000"
         }
 
         self.SKG = Namespace("https://sakuna.ph/")
@@ -218,7 +230,9 @@ class LocationMatcher:
         city      = candidate + " city"
         city_of   = "city of " + candidate
 
+
         candidates = self._municipalities_in_region(region_iri)
+        print(candidates)
         if not candidates:
             return None
 
@@ -243,6 +257,8 @@ class LocationMatcher:
         Matches region. Returns loc if found, else none.
         
         """
+        label = label.lower()
+
         if label in self.region_map:
             return self.base + self.region_map[label]
 
@@ -324,8 +340,8 @@ class LocationMatcher:
 
             if highest in {"4", "Region 4", "IV"}:
                 matched.extend([
-                    self.base + "Region_IV-A",
-                    self.base + "Region_IV-B"
+                    self.base + "0400000000-A",
+                    self.base + "1700000000"
                 ])
                 continue
 
@@ -340,7 +356,7 @@ class LocationMatcher:
 
             # Get prov level
             if region_iri:
-            
+                
                 # Get municity level
                 if prov_iri and levels:
                     muni_label = levels.pop()
@@ -364,6 +380,8 @@ class LocationMatcher:
                                 if muni_iri:
                                     matched.append(muni_iri)
                                     continue
+
+                    print(region_iri, prov_label, levels)
 
                     # handle city placed in provinces slot — search region-wide
                     muni_iri = self._fuzzy_match_municipality_in_region(prov_label, region_iri)
@@ -431,19 +449,19 @@ if __name__ == "__main__":
 
     tests: list[tuple[str, str | None, str]] = [
         # ── Region only ───────────────────────────────────────────────────────
-        ("NCR",                               BASE + "National_Capital_Region",                         "NCR acronym"),
-        ("Metro Manila",                      BASE + "National_Capital_Region",                         "Metro Manila alias for NCR"),
-        ("National Capital Region",           BASE + "National_Capital_Region",                         "NCR full name"),
-        ("CAR",                               BASE + "Cordillera_Administrative_Region",                "CAR acronym"),
-        ("Cordillera",                        BASE + "Cordillera_Administrative_Region",                "Cordillera alias"),
-        ("BARMM",                             BASE + "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao", "BARMM acronym"),
-        ("ARMM",                              BASE + "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao", "ARMM legacy acronym"),
-        ("XI",                                BASE + "Region_XI",                                       "Roman numeral region"),
-        ("Davao",                             BASE + "Region_XI",                                       "Region XI by common name"),
-        ("CALABARZON",                        BASE + "Region_IV-A",                                     "Region IV-A by name"),
-        ("MIMAROPA",                          BASE + "Region_IV-B",                                     "Region IV-B by name"),
-        ("CARAGA",                            BASE + "Region_XIII",                                     "Region XIII by name"),
-        ("RTR",                               BASE + "Region_XIII",                                     "Region XIII RTR alias"),
+        ("NCR",                               BASE + "1300000000",                         "NCR acronym"),
+        ("Metro Manila",                      BASE + "1300000000",                         "Metro Manila alias for NCR"),
+        ("National Capital Region",           BASE + "1300000000",                         "NCR full name"),
+        ("CAR",                               BASE + "1400000000",                "CAR acronym"),
+        ("Cordillera",                        BASE + "1400000000",                "Cordillera alias"),
+        ("BARMM",                             BASE + "1900000000", "BARMM acronym"),
+        ("ARMM",                              BASE + "1900000000", "ARMM legacy acronym"),
+        ("XI",                                BASE + "1100000000",                                       "Roman numeral region"),
+        ("Davao",                             BASE + "1100000000",                                       "Region XI by common name"),
+        ("CALABARZON",                        BASE + "0400000000-A",                                     "Region IV-A by name"),
+        ("MIMAROPA",                          BASE + "1700000000",                                     "Region IV-B by name"),
+        ("CARAGA",                            BASE + "1600000000",                                     "Region XIII by name"),
+        ("RTR",                               BASE + "1600000000",                                     "Region XIII RTR alias"),
 
         # ── Ambiguous Region IV → two IRIs appended ───────────────────────────
         ("4",                                 "DUAL", "Bare '4' → both IV-A and IV-B"),
@@ -499,7 +517,7 @@ if __name__ == "__main__":
         results = matcher.match([inp])
 
         if expected == "DUAL":
-            ok      = len(results) == 2 and results[0] == BASE + "Region_IV-A" and results[1] == BASE + "Region_IV-B"
+            ok      = len(results) == 2 and results[0] == BASE + "0400000000-A" and results[1] == BASE + "1700000000"
             display = f"...IV-A  +  ...IV-B" if ok else str(results)
         elif expected is None:
             ok      = bool(results) and results[0] not in ("", "Fix location columns please")
