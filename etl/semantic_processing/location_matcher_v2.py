@@ -51,6 +51,7 @@ class LocationMatcher:
             "region v": "0500000000",
             "region 5": "0500000000",
             "bicol": "0500000000",
+            "bicol region": "0500000000",
 
             "vi": "0600000000",
             "6": "0600000000",

@@ -9,6 +9,8 @@ from typing import Any, List
 import polars as pl
 from polars import DataFrame
 
+from semantic_processing.location_matcher_single import canonicalize_column
+
 EMDAT_SUBTYPE_TO_URI = {
 
     # ── Epidemic ──────────────────────────────────────────────────────────────
@@ -116,6 +118,37 @@ EMDAT_SUBTYPE_TO_URI = {
 
 }
 
+def clean_loc(df: DataFrame, col: str):
+
+    df = df.with_columns(
+        pl.col(col)
+            # strip noise words and artifacts
+            .str.replace_all(r"\(\d+\)\s|(?i)provinces*|(?i)is\.|(?i)isl\.|\)|regions*\s*|municipality|municipalities|(?i)near|(?i)Mt\.|\bkm\b|\btown\b|(?i)island|(?i)area|(?i)between|districts*|strait|\s*\-\s*[A-Za-z]*", "")
+            .str.strip_chars()
+            # separators → |
+            .str.replace_all(r"\s\(|\band\b", ",")
+            .str.replace_all(r"(?i)cty", "City")
+            .str.replace_all(r",|;", "|")
+            # spelling fixes
+            .str.replace_all(r"Manilla|Manille", "Manila")
+            # geographic normalizations
+            .str.replace_all(r"(?i)panay", "Western Visayas")
+            .str.replace_all(r"(?i)nationwide|(?i)all country", "Philippines")
+            .str.replace_all(r"(?i)\bCentral\b|(?i)visayan", "Visayas")
+            # abbreviation expansions
+            .str.replace_all(r"(?i)W\.", "")
+            .str.replace_all(r"(?i)E\.", "")
+            .str.replace_all(r"(?i)N\.", "")
+            .str.replace_all(r"(?i)S\.", "")
+            .str.replace_all(r"(?i)\bCtr\.\b", "Central")
+            .str.replace_all(r"West Luzon|Luzon*", "Luzon")
+            .str.replace_all(r"Visayas\sLuzon", "Visayas|Luzon")
+            .str.replace_all("city", "City")
+            .str.replace_all("Bagio", "Baguio")
+    )
+
+    return df
+
 def load_emdat(path: str | Path) -> pl.DataFrame:
     """
     Load the EM-DAT Data sheet with Polars.
@@ -149,9 +182,23 @@ def load_emdat(path: str | Path) -> pl.DataFrame:
         .fill_null(pl.lit("Philippines"))
     )
 
+
+    df = clean_loc(df, "Location")
+
+    canon_loc_df = canonicalize_column(
+        df=df.select("Location"),
+        col="Location",
+        threshold=80
+    )
+
+    # add canonicalized loc values
+    df = df.with_columns(
+        hasLocation=canon_loc_df.select("Location_iri").to_series()
+    )
     
 
     df.write_csv("sam.csv")
+    canon_loc_df.write_csv("sam_loc.csv")
     return df
 
 
