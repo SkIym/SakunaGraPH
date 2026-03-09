@@ -116,6 +116,13 @@ EMDAT_SUBTYPE_TO_URI = {
     "road":                             "Road",
     "water":                            "Water",
 
+    "tsunami/tidal wave": "Tsunami",
+    "transport accident": "Transport",
+    "flood": "Flood",
+    "lightening": "Thunderstorms",
+    "earthquake": "Earthquake",
+    "storm": "Storm"
+
 }
 
 def clean_loc(df: DataFrame, col: str):
@@ -171,6 +178,18 @@ def load_emdat(path: str | Path) -> pl.DataFrame:
     df = df.with_columns(
         hasDisasterType=pl.col("Disaster Subtype").str.to_lowercase().map_elements(
             lambda s: EMDAT_SUBTYPE_TO_URI.get(s),
+            return_dtype=pl.String
+        )
+    )
+
+
+    # match associated types as disaster subtype
+    df = df.with_columns(
+        hasDisasterSubtype=pl.col("Associated Types").map_elements(
+            lambda s: "|".join(filter(None, [
+                EMDAT_SUBTYPE_TO_URI.get(part.strip().lower())
+                for part in s.split("|")
+            ])) if s is not None else None,
             return_dtype=pl.String
         )
     )
