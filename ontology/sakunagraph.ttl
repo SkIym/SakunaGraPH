@@ -8,6 +8,7 @@
 @prefix prov: <http://www.w3.org/ns/prov#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix schema: <https://schema.org/> .
 @base <https://sakuna.ph/> .
 
 <https://sakuna.ph/> rdf:type owl:Ontology ;
@@ -1089,7 +1090,8 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                    rdfs:domain :Recovery ;
                    rdfs:range xsd:decimal ;
                    rdfs:comment "Cost of Structure Built post-disaster" ;
-                   rdfs:label "post-disaster structure cost" .
+                   rdfs:label "post-disaster structure cost" ;
+                   skos:altLabel "reconstruction cost" .
 
 
 ###  https://sakuna.ph/postTraining
