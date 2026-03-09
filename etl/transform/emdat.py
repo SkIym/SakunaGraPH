@@ -1,14 +1,11 @@
 # EMDAT XLSX MAPPER HERE
 import argparse
-import re
-import unicodedata
-from datetime import datetime, date
 from pathlib import Path
-from typing import Any, List
-
+import os
 import polars as pl
 from polars import DataFrame
-
+import datetime
+from mappings.emdat import Source
 from semantic_processing.location_matcher_single import canonicalize_column
 
 EMDAT_SUBTYPE_TO_URI = {
@@ -125,6 +122,26 @@ EMDAT_SUBTYPE_TO_URI = {
 
 }
 
+COLUMN_MAPPINGS = {
+    "Magnitude": "hasMagnitude",
+    "Magnitude Scale": "hasMagnitudeScale",
+    "Latitude": "latitude",
+    "Longitude": "longitude",
+    "Total Deaths": "dead",
+    "No. Injured": "injured",
+    "No. Affected": "affectedPersons",
+    "No. Homeless": "displacedPersons",
+    "Reconstruction Costs, Adjusted ('000 US$)": "postStructureCost",
+    "Insured Damage, Adjusted ('000 US$)": "insuredDamage",
+    "Total Damage, Adjusted ('000 US$)":
+    "generalDamageAmount",
+    "CPI": "cpi",
+    "Entry Date": "entryDate",
+    "Last Update": "lastUpdateDate",
+    "DisNo.": "id",
+    "Event Name": "eventName"
+}
+
 def clean_loc(df: DataFrame, col: str):
 
     df = df.with_columns(
@@ -156,6 +173,27 @@ def clean_loc(df: DataFrame, col: str):
 
     return df
 
+def normalize_date(df: DataFrame, start_cols: list[str], end_cols: list[str]):
+
+    def parse_date(cols: list[str], alias: str) -> pl.Expr:
+        combined = (
+            pl.concat_str(cols, separator="-", ignore_nulls=True)
+            .str.strip_chars_end("-") 
+
+        )
+        return pl.coalesce([
+            combined.str.to_date("%Y-%m-%d", strict=False),
+            combined.str.to_date("%Y-%m", strict=False),
+            combined.str.to_date("%Y", strict=False),
+        ]).alias(alias)
+
+    df = df.with_columns(
+        parse_date(start_cols, "startDate"),
+        parse_date(end_cols, "endDate"),
+    )
+
+    return df
+
 def load_emdat(path: str | Path) -> pl.DataFrame:
     """
     Load the EM-DAT Data sheet with Polars.
@@ -168,6 +206,9 @@ def load_emdat(path: str | Path) -> pl.DataFrame:
         sheet_name="EM-DAT Data",
         infer_schema_length=0,
     )
+
+    df = df.rename(mapping=COLUMN_MAPPINGS)
+
     # Strip leading/trailing whitespace from string columns
     df = df.with_columns(
         [pl.col(c).str.strip_chars() for c in df.columns if df[c].dtype == pl.Utf8]
@@ -214,11 +255,38 @@ def load_emdat(path: str | Path) -> pl.DataFrame:
     df = df.with_columns(
         hasLocation=canon_loc_df.select("Location_iri").to_series()
     )
+
+    # normalize start and end dates
+    df = normalize_date(df, ["Start Year", "Start Month", "Start Day"], ["End Year", "End Month", "End Day"])
     
+    # normalize entry and last update dates
+    df = df.with_columns(
+        pl.col('entryDate').str.to_date("%Y-%m-%d").alias('entryDate'),
+        pl.col('lastUpdateDate').str.to_date("%Y-%m-%d").alias('lastUpdateDate'),
+
+    )
+
+
 
     df.write_csv("sam.csv")
-    canon_loc_df.write_csv("sam_loc.csv")
+    # canon_loc_df.write_csv("sam_loc.csv")
     return df
+
+
+def load_source(path: str) -> Source:
+
+    name, ext = os.path.splitext(os.path.basename(path))
+
+    ext = ext.replace(".", "")
+
+    mod_timestamp = os.path.getmtime(path)
+    mod_date = datetime.datetime.fromtimestamp(mod_timestamp)
+
+    return Source(
+        format=ext,
+        reportName=name,
+        obtainedDate=mod_date,
+    )                
 
 
 def main():

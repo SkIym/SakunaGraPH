@@ -10,6 +10,7 @@ def prov_iri(report: str) -> URIRef:
     return URIRef(SKG[report
                       .replace(" ", "_")
                       .replace(".pdf", "")
+                      .replace(".xlsx", "")
                       .replace("-", "")])
 
 def incident_iri(event_id: URIRef, incident_id: str) -> URIRef:
