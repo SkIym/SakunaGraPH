@@ -5,7 +5,8 @@ TO DO:
 - add hasEventRole that has Major or Incident range (refer to first bullet point)
 - convert string-typed categorical data properties to object properites poiting to skos concepts (castualtyType, AGENCY! (dswd, ocd, etc.))
 - Remove owl:someValuesFrom restrictions (subclass of data prop restricis in protege), clutters the file :<
-
+- implement QUDT for monetary amount (proper currency tagging)
+-
 
 DONE:
 - rename IRIs
