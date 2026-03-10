@@ -7,6 +7,7 @@
 @prefix rml: <http://w3id.org/rml/> .
 @prefix rr: <http://www.w3.org/ns/r2rml#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
 
 <#MainLogicalSource>
     a rml:LogicalSource;
@@ -511,7 +512,7 @@
     ];
 
     rr:predicateObjectMap [
-        rr:predicate :fromSource ;
+        rr:predicate prov:wasDerivedFrom ;
         rr:objectMap [
             rr:constant :GDA;
         ];

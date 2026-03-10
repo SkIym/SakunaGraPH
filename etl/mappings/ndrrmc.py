@@ -79,7 +79,7 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
 
     g.add((
         event_iri,
-        URIRef(SKG["fromSource"]),
+        URIRef(PROV["wasDerivedFrom"]),
         uri
     ))
 

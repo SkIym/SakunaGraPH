@@ -85,19 +85,6 @@
                                                                                                       rdfs:label "is of disaster type" .
 
 
-###  https://sakuna.ph/fromSource
-:fromSource rdf:type owl:ObjectProperty ;
-            rdfs:domain [ rdf:type owl:Class ;
-                          owl:unionOf ( :DisasterEvent
-                                        :Impact
-                                        :Preparedness
-                                        :Response
-                                      )
-                        ] ;
-            rdfs:range :Source ;
-            rdfs:label "from source"@en .
-
-
 ###  https://sakuna.ph/hasAffectedPopulation
 :hasAffectedPopulation rdf:type owl:ObjectProperty ;
                        rdfs:subPropertyOf :hasImpact ;
@@ -1895,10 +1882,6 @@
 ###  https://sakuna.ph/DisasterEvent
 :DisasterEvent rdf:type owl:Class ;
                rdfs:subClassOf [ rdf:type owl:Restriction ;
-                                 owl:onProperty :fromSource ;
-                                 owl:someValuesFrom :Source
-                               ] ,
-                               [ rdf:type owl:Restriction ;
                                  owl:onProperty :hasDisasterType ;
                                  owl:someValuesFrom :DisasterType
                                ] ,
@@ -2184,10 +2167,6 @@
 ###  https://sakuna.ph/Impact
 :Impact rdf:type owl:Class ;
         rdfs:subClassOf [ rdf:type owl:Restriction ;
-                          owl:onProperty :fromSource ;
-                          owl:someValuesFrom :Source
-                        ] ,
-                        [ rdf:type owl:Restriction ;
                           owl:onProperty :hasLocation ;
                           owl:someValuesFrom :Location
                         ] ,
@@ -2541,10 +2520,6 @@
                                     owl:someValuesFrom xsd:string
                                   ] ;
               rdfs:subClassOf [ rdf:type owl:Restriction ;
-                                owl:onProperty :fromSource ;
-                                owl:someValuesFrom :Source
-                              ] ,
-                              [ rdf:type owl:Restriction ;
                                 owl:onProperty :hasLocation ;
                                 owl:someValuesFrom :Location
                               ] ,
@@ -2694,10 +2669,6 @@
 ###  https://sakuna.ph/Response
 :Response rdf:type owl:Class ;
           rdfs:subClassOf [ rdf:type owl:Restriction ;
-                            owl:onProperty :fromSource ;
-                            owl:someValuesFrom :Source
-                          ] ,
-                          [ rdf:type owl:Restriction ;
                             owl:onProperty :hasLocation ;
                             owl:someValuesFrom :Location
                           ] ,
