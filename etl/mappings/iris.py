@@ -28,6 +28,9 @@ def relief_iri(event_id: URIRef, r_id: str) -> URIRef:
 def assistance_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/assistance/{r_id}")
 
+def recovery_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/recovery/{r_id}")
+
 def infra_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/infrastructure_damage/{r_id}")
 
@@ -72,3 +75,6 @@ def airport_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def flight_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/flight_disruption/{r_id}")
+
+def damage_gen_iri(event_id: URIRef, r_id: str) -> URIRef:
+    return URIRef(event_id + f"/damage_general/{r_id}")

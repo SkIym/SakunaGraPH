@@ -3,8 +3,9 @@ from datetime import datetime, date
 from polars import DataFrame
 from rdflib import RDF, XSD, Literal, URIRef, Graph
 from .graph import PROV, SKG
-from .iris import assistance_iri, event_iri, prov_iri
-from typing import Type, TypeVar
+from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_iri, prov_iri, recovery_iri
+from typing import Type, TypeVar, Literal as TypingLiteral
+
 
 T = TypeVar("T")
 
@@ -146,3 +147,79 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
 
+def recovery_mapping(rs: list[Recovery], g: Graph):
+
+    for r in rs:
+
+        event_uri = event_iri(r.id)
+        uri = recovery_iri(event_uri, "1")
+
+        g.add((uri, RDF.type, SKG.Recovery)) # rdf type
+        g.add((event_uri, SKG.hasRecovery, uri)) # link event
+
+        if r.postStructureCost:
+            g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
+
+def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
+
+    for r in rs:
+
+        event_uri = event_iri(r.id)
+        uri = damage_gen_iri(event_uri, "1")
+
+        g.add((uri, RDF.type, SKG.DamageGeneral)) # rdf type
+        g.add((event_uri, SKG.hasDamageGeneral, uri)) # link event
+
+        if r.insuredDamage:
+            g.add((uri, SKG.insuredDamage, Literal(r.insuredDamage, datatype=XSD.decimal)))
+
+        if r.generalDamageAmount:
+            g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
+        
+        if r.cpi:
+            g.add((uri, SKG.cpi, Literal(r.cpi, datatype=XSD.decimal)))
+
+CasualtDatatype = TypingLiteral["DEAD", "INJURED", "MISSING"]
+
+def casualties_mapping(rs: list[Casualties], g: Graph):
+
+    for r in rs:
+
+        event_uri = event_iri(r.id)
+
+        id = 0
+
+        if r.dead:
+            uri = casualties_iri(event_uri, str(id+1))
+
+            g.add((uri, RDF.type, SKG.Casualties)) # rdf type
+            g.add((event_uri, SKG.hasCasualties, uri)) # link event
+            g.add((uri, SKG.casualtyCount, Literal(r.dead)))
+            g.add((uri, SKG.casualtyType, Literal("DEAD", datatype=SKG.casualtyDatatype)))
+
+            id += 1
+        
+        if r.injured:
+            uri = casualties_iri(event_uri, str(id+1))
+
+            g.add((uri, RDF.type, SKG.Casualties)) # rdf type
+            g.add((event_uri, SKG.hasCasualties, uri)) # link event
+            g.add((uri, SKG.casualtyCount, Literal(r.injured)))
+            g.add((uri, SKG.casualtyType, Literal("INJURED", datatype=SKG.casualtyDatatype)))
+
+def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph):
+
+    for r in rs:
+
+        event_uri = event_iri(r.id)
+        uri = aff_pop_iri(event_uri, "1")
+
+        g.add((uri, RDF.type, SKG.AffectedPopulation)) # rdf type
+        g.add((event_uri, SKG.hasAffectedPopulation, uri)) # link event
+
+        if r.affectedPersons:
+            g.add((uri, SKG.affectedPersons, Literal(r.affectedPersons)))
+
+        if r.displacedPersons:
+            g.add((uri, SKG.displacedPersons, Literal(r.displacedPersons)))
+        

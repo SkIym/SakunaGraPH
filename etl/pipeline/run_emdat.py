@@ -1,7 +1,7 @@
 
 from rdflib import URIRef
 
-from mappings.emdat import Assistance, Event, assistance_mapping, event_mapping, source_mapping
+from mappings.emdat import AffectedPopulation, Assistance, Casualties, DamageGeneral, Event, Recovery, aff_pop_mapping, assistance_mapping, casualties_mapping, damage_gen_mapping, event_mapping, recovery_mapping, source_mapping
 from mappings.graph import create_graph, Graph
 from transform.emdat import transform_emdat, load_source
 import os
@@ -16,6 +16,10 @@ def process_event(input_path: str, g: Graph, src_uri: URIRef):
 
     event_mapping(entities[Event], g, src_uri)
     assistance_mapping(entities[Assistance], g)
+    recovery_mapping(entities[Recovery], g)
+    damage_gen_mapping(entities[DamageGeneral], g)
+    casualties_mapping(entities[Casualties], g)
+    aff_pop_mapping(entities[AffectedPopulation], g)
 
 
 def run(out_file: str):
