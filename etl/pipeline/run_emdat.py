@@ -1,12 +1,22 @@
 
-from mappings.emdat import source_mapping
-from mappings.graph import create_graph
-from transform.emdat import load_source
+from rdflib import URIRef
+
+from mappings.emdat import Assistance, Event, assistance_mapping, event_mapping, source_mapping
+from mappings.graph import create_graph, Graph
+from transform.emdat import transform_emdat, load_source
 import os
 import argparse
 
 DATA_DIR = "../data/raw/emdat"
 OUT_DIR = "../data/rdf/"
+
+def process_event(input_path: str, g: Graph, src_uri: URIRef):
+    
+    entities = transform_emdat(input_path)
+
+    event_mapping(entities[Event], g, src_uri)
+    assistance_mapping(entities[Assistance], g)
+
 
 def run(out_file: str):
     g = create_graph()
@@ -24,9 +34,9 @@ def run(out_file: str):
     path = max(files, key=os.path.getmtime)
 
     src = load_source(path)
-    source_mapping(g, src)
+    src_uri = source_mapping(g, src)
 
-    # events = load_events(DATA_DIR)
+    process_event(path, g, src_uri)
 
     g.serialize(
         destination=OUT_DIR+out_file,

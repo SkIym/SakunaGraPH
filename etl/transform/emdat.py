@@ -1,12 +1,16 @@
 # EMDAT XLSX MAPPER HERE
 import argparse
-from pathlib import Path
 import os
 import polars as pl
 from polars import DataFrame
 import datetime
-from mappings.emdat import Source
+from transform.ndrrmc_cleaner import to_float, to_int
+from mappings.emdat import Assistance, Event, Recovery, Source, DamageGeneral, Casualties, AffectedPopulation
 from semantic_processing.location_matcher_single import canonicalize_column
+from dataclasses import fields
+from typing import TypeVar, Any, cast
+
+T = TypeVar("T")
 
 EMDAT_SUBTYPE_TO_URI = {
 
@@ -123,6 +127,8 @@ EMDAT_SUBTYPE_TO_URI = {
 }
 
 COLUMN_MAPPINGS = {
+    "AID Contribution ('000 US$)": "contributionAID",
+    "OFDA/BHA Response": "internationalOrgsPresent",
     "Magnitude": "hasMagnitude",
     "Magnitude Scale": "hasMagnitudeScale",
     "Latitude": "latitude",
@@ -141,6 +147,7 @@ COLUMN_MAPPINGS = {
     "DisNo.": "id",
     "Event Name": "eventName"
 }
+
 
 def clean_loc(df: DataFrame, col: str):
 
@@ -194,20 +201,7 @@ def normalize_date(df: DataFrame, start_cols: list[str], end_cols: list[str]):
 
     return df
 
-def load_emdat(path: str | Path) -> pl.DataFrame:
-    """
-    Load the EM-DAT Data sheet with Polars.
-
-    The file uses a header row; all columns are read as strings initially
-    so we can apply our own type coercions in transform_row().
-    """
-    df = pl.read_excel(
-        source=str(path),
-        sheet_name="EM-DAT Data",
-        infer_schema_length=0,
-    )
-
-    df = df.rename(mapping=COLUMN_MAPPINGS)
+def clean_columns(df: DataFrame) -> DataFrame:
 
     # Strip leading/trailing whitespace from string columns
     df = df.with_columns(
@@ -266,12 +260,59 @@ def load_emdat(path: str | Path) -> pl.DataFrame:
 
     )
 
+    df = to_float(df, ["contributionAID", "postStructureCost", "generalDamageAmount", "cpi"])
+
+    df = to_int(df, ["dead", "injured", "affectedPersons", "displacedPersons"])
+
+
+    return df
+
+def transform_emdat(input_path: str) -> dict[type, list[Any]]:
+    """
+    Load the EM-DAT Data sheet with Polars.
+
+    The file uses a header row; all columns are read as strings initially
+    so we can apply our own type coercions in transform_row().
+    """
+    df = pl.read_excel(
+        source=str(input_path),
+        sheet_name="EM-DAT Data",
+        infer_schema_length=0,
+    )
+
+    df = df.rename(mapping=COLUMN_MAPPINGS)
+    df = clean_columns(df)
+
+    # events = df_to_entities(df, Event)
+
+    clss: list[type] = [Event, Assistance, Recovery, DamageGeneral, Casualties, AffectedPopulation]
+
+
+    entities: dict[type, list[Any]] = {}
+    for cls in clss: entities[cls] = []
+
+    for row in df.to_dicts():
+    
+        for cls in clss:
+            data: dict[str, Any] = {}
+            class_fields = fields(cls)
+
+            for f in class_fields:
+                value = row.get(f.name, None)
+
+                if value is None or (isinstance(value, str) and value.strip().lower() == "none"):
+                    data[f.name] = None
+                else:
+                    data[f.name] = value 
+
+            # skip empty entities
+            if any(v is not None and v != "" for v in data.values()):
+                entities[cls].append(cls(**data))
 
 
     df.write_csv("sam.csv")
     # canon_loc_df.write_csv("sam_loc.csv")
-    return df
-
+    return entities
 
 def load_source(path: str) -> Source:
 
@@ -289,6 +330,7 @@ def load_source(path: str) -> Source:
     )                
 
 
+
 def main():
     parser = argparse.ArgumentParser(
         description="Transform EM-DAT XLSX to SakunaGraPH-conformant RDF."
@@ -299,7 +341,6 @@ def main():
         help="Path to the EM-DAT .xlsx file.",
     )
     args = parser.parse_args()
-    load_emdat(args.input)
 
 
 if __name__ == "__main__":
