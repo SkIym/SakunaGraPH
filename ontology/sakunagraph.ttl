@@ -16,8 +16,8 @@
 #    Datatypes
 #################################################################
 
-###  https://sakuna.ph/casualtyDataType
-:casualtyDataType rdf:type rdfs:Datatype .
+###  https://sakuna.ph/casualtyDatatype
+:casualtyDatatype rdf:type rdfs:Datatype .
 
 
 #################################################################
@@ -572,7 +572,7 @@
 ###  https://sakuna.ph/casualtyType
 :casualtyType rdf:type owl:DatatypeProperty ;
               rdfs:domain :Casualties ;
-              rdfs:range :casualtyDataType ;
+              rdfs:range :casualtyDatatype ;
               rdfs:label "type of casualty" .
 
 
@@ -1714,7 +1714,7 @@
                             ] ,
                             [ rdf:type owl:Restriction ;
                               owl:onProperty :casualtyType ;
-                              owl:someValuesFrom :casualtyDataType
+                              owl:someValuesFrom :casualtyDatatype
                             ] ;
             rdfs:label "Casualties"@en ;
             <http://www.w3.org/2004/02/skos/core#definition> "Represents the number of deaths, injured, and missing due to a disaster." .

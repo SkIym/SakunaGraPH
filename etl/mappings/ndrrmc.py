@@ -324,7 +324,7 @@ def aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef):
                 URIRef(ap.hasLocation)
         ))
 
-CasualtyType = TypingLiteral["DEAD", "INJURED", "MISSING"]
+CasualtDatatype = TypingLiteral["DEAD", "INJURED", "MISSING"]
        
 CASUALTY_MAPPING = {
     
@@ -336,7 +336,7 @@ CASUALTY_MAPPING = {
 @dataclass
 class Casualties:
     id: str
-    casualtyType: CasualtyType
+    casualtyType: CasualtDatatype
     casualtyCount: int
     hasLocation: URIRef
     hasBarangay: str | None
@@ -366,7 +366,7 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
         g.add((
             uri,
             SKG.casualtyType,
-            Literal(c.casualtyType, datatype=SKG.casualtyType)
+            Literal(c.casualtyType, datatype=SKG.casualtyDatatype)
         ))
 
         g.add((
