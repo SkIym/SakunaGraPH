@@ -4,11 +4,12 @@ import os
 import polars as pl
 from polars import DataFrame
 import datetime
+from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from transform.ndrrmc_cleaner import to_float, to_int
 from mappings.emdat import Assistance, Event, Recovery, Source, DamageGeneral, Casualties, AffectedPopulation
 from semantic_processing.location_matcher_single import canonicalize_column
 from dataclasses import fields
-from typing import TypeVar, Any, cast
+from typing import TypeVar, Any
 
 T = TypeVar("T")
 
@@ -145,7 +146,8 @@ COLUMN_MAPPINGS = {
     "Entry Date": "entryDate",
     "Last Update": "lastUpdateDate",
     "DisNo.": "id",
-    "Event Name": "eventName"
+    "Event Name": "eventName",
+    "Location": "hasLocation"
 }
 
 
@@ -231,23 +233,30 @@ def clean_columns(df: DataFrame) -> DataFrame:
 
     # fill empty location values with Philippines
     df = df.with_columns(
-        pl.col('Location')
+        pl.col('hasLocation')
         .replace("", None)
         .fill_null(pl.lit("Philippines"))
     )
 
 
-    df = clean_loc(df, "Location")
+    df = clean_loc(df, "hasLocation")
+
+    # df = df.with_columns(
+    #     hasLocation=pl.col("hasLocation").map_elements(
+    #         lambda cell: "|".join(LOCATION_MATCHER.match_cell(cell)),
+    #         return_dtype=pl.String
+    #     )
+    # )
 
     canon_loc_df = canonicalize_column(
-        df=df.select("Location"),
-        col="Location",
+        df=df.select("hasLocation"),
+        col="hasLocation",
         threshold=80
     )
 
     # add canonicalized loc values
     df = df.with_columns(
-        hasLocation=canon_loc_df.select("Location_iri").to_series()
+        hasLocation=canon_loc_df.select("hasLocation_iri").to_series()
     )
 
     # normalize start and end dates

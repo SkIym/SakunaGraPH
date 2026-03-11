@@ -34,11 +34,11 @@ class LocationMatcher:
             "region 3": "0300000000",
             "central luzon": "0300000000",
 
-            "iv-a": "0400000000-A",
-            "4a": "0400000000-A",
-            "iva": "0400000000-A",
-            "region iv-a": "0400000000-A",
-            "calabarzon": "0400000000-A",
+            "iv-a": "0400000000",
+            "4a": "0400000000",
+            "iva": "0400000000",
+            "region iv-a": "0400000000",
+            "calabarzon": "0400000000",
 
             "iv-b": "1700000000",
             "4b": "1700000000",
@@ -233,7 +233,7 @@ class LocationMatcher:
 
 
         candidates = self._municipalities_in_region(region_iri)
-        print(candidates)
+        # print(candidates)
         if not candidates:
             return None
 
@@ -335,100 +335,120 @@ class LocationMatcher:
             levels = [lvl.strip() for lvl in loc.split(",")]
             highest = levels.pop()
 
+            # Nation-wide / island-group passthrough
             if highest in {"Philippines", "Luzon", "Visayas", "Mindanao"}:
                 matched.append(highest)
                 continue
 
+            # Ambiguous Region IV → both IV-A and IV-B
             if highest in {"4", "Region 4", "IV"}:
-                matched.extend([
-                    self.base + "0400000000-A",
-                    self.base + "1700000000"
-                ])
+                matched.extend([self.base + "0400000000-A", self.base + "1700000000"])
                 continue
 
+            # Single-tier: try region → province → municipality in order
+            if not levels:
+                region_iri = self.match_region(highest)
+                if region_iri:
+                    matched.append(region_iri)
+                    continue
+
+                prov_iri = self.match_province(highest)
+                if prov_iri:
+                    matched.append(prov_iri)
+                    continue
+
+                muni_iri = self.match_municipality(highest, None)
+                matched.append(muni_iri if muni_iri else highest)
+                continue
+
+            # Multi-tier: try highest as region
             region_iri = self.match_region(highest)
 
-            if region_iri and not levels:
-                matched.append(region_iri)
-                continue
-            
-            prov_label = levels.pop()
-            prov_iri = self.match_province(prov_label)
+            # highest is not a region — treat as province or municipality
+            if not region_iri:
+                prov_iri = self.match_province(highest)
 
-            # Get prov level
-            if region_iri:
-                
-                # Get municity level
                 if prov_iri and levels:
+                    # Province + municipality
                     muni_label = levels.pop()
                     muni_iri = self.match_municipality(muni_label, prov_iri)
 
-                    matched.append(muni_iri if muni_iri else prov_iri)
-
-                # If no municity match, use province
-                elif prov_iri:
-                    matched.append(prov_iri)
-
-                # If no province match, use region
-                else:
-
-                    if levels:
-                        muni_label = levels.pop()
-
-                        if prov_label.lower() == "maguindanao":
-                                muni_iri = self.match_municipality(muni_label, None)
-
-                                if muni_iri:
-                                    matched.append(muni_iri)
-                                    continue
-
-                    print(region_iri, prov_label, levels)
-
-                    # handle city placed in provinces slot — search region-wide
-                    muni_iri = self._fuzzy_match_municipality_in_region(prov_label, region_iri)
-
-                    if muni_iri:
-                        matched.append(muni_iri)
-
-                    # handle outdated province or repeated region (NCR) names
-                    else:
-                        if levels:
-                            muni_label = levels.pop()
-                            muni_iri = self._fuzzy_match_municipality_in_region(muni_label, region_iri)
-
-                            matched.append(muni_iri if muni_iri else region_iri)
-                        else:
-                            matched.append(region_iri)
-            
-            # handle erratic parsed locations
-            # e.g. city_muni in region column
-            else:
-                
-                if prov_iri and levels:
-                    muni_label = levels.pop()
-                    muni_iri = self.match_municipality(muni_label, prov_iri)
-
-                    if not muni_iri or self.municipalities_parent[muni_iri] != prov_iri:
+                    # Fallback: try highest as the municipality (city in province slot)
+                    if not muni_iri or self.municipalities_parent.get(muni_iri) != prov_iri:
                         muni_iri = self.match_municipality(highest, prov_iri)
 
                     matched.append(muni_iri if muni_iri else prov_iri)
-                elif prov_iri:
-                    muni_label = highest.lower()
-                    muni_iri = self.match_municipality(muni_label, prov_iri)
-                    matched.append(muni_iri if muni_iri else prov_iri)
-                elif levels:
-                    muni_label = levels.pop()
-                    muni_iri = self.match_municipality(muni_label, "")
-                    matched.append(muni_iri if muni_iri else "")
-                elif highest:
-                    muni_iri = self.match_municipality(highest, "")
-                    matched.append(muni_iri if muni_iri else "")
-                else:
-                    print(prov_iri, highest, levels)
-                    matched.append("Fix location columns please")
 
+                elif prov_iri:
+                    # Province only — try highest as municipality label
+                    muni_iri = self.match_municipality(highest.lower(), prov_iri)
+                    matched.append(muni_iri if muni_iri else prov_iri)
+
+                elif levels:
+                    # No province match — try next level as municipality
+                    muni_label = levels.pop()
+                    muni_iri = self.match_municipality(muni_label, None)
+                    matched.append(muni_iri if muni_iri else "")
+
+                else:
+                    # Last resort: try highest as municipality
+                    muni_iri = self.match_municipality(highest, None)
+                    matched.append(muni_iri if muni_iri else "")
+
+                continue
+
+            # highest is a region — pop next level as province
+            prov_label = levels.pop()
+            prov_iri = self.match_province(prov_label)
+
+            if prov_iri and levels:
+                # Region + province + municipality
+                muni_label = levels.pop()
+                muni_iri = self.match_municipality(muni_label, prov_iri)
+                matched.append(muni_iri if muni_iri else prov_iri)
+
+            elif prov_iri:
+                # Region + province only
+                matched.append(prov_iri)
+
+            else:
+                # prov_label didn't match — could be a city in the province slot,
+                # an outdated province name, or a repeated region alias (e.g. NCR)
+
+                # Special case: Maguindanao split-province legacy
+                if levels and prov_label.lower() == "maguindanao":
+                    muni_label = levels.pop()
+                    muni_iri = self.match_municipality(muni_label, None)
+                    if muni_iri:
+                        matched.append(muni_iri)
+                        continue
+
+                # Try prov_label as a city/municipality scoped to region
+                muni_iri = self._fuzzy_match_municipality_in_region(prov_label, region_iri)
+                if muni_iri:
+                    matched.append(muni_iri)
+                    continue
+
+                # Try next level scoped to region, fall back to region itself
+                if levels:
+                    muni_label = levels.pop()
+                    muni_iri = self._fuzzy_match_municipality_in_region(muni_label, region_iri)
+                    matched.append(muni_iri if muni_iri else region_iri)
+                else:
+                    matched.append(region_iri)
 
         return matched
+    
+    def match_cell(self, cell: str) -> list[str]:
+        """
+        Parse a pipe-delimited multi-location cell and return all matched IRIs.
+
+        Example:
+            "Davao City, Davao del Sur, XI | Cebu City, VII"
+            → [<iri for Davao City>, <iri for Cebu City>]
+        """
+        locations = [loc.strip() for loc in cell.split("|") if loc.strip()]
+        return self.match(locations)
 
 LOCATION_MATCHER = LocationMatcher(
     # graph_path="../data/rdf/psgc_rdf.ttl"
@@ -506,6 +526,7 @@ if __name__ == "__main__":
         ("Bulacan, Central Luzon",            None, "Province + region common name"),
         ("Zamboanga, Zamboanga Peninsula",    None, "Region by full name"),
 
+        ("Brgy Sabang, Puerto Galera, Oriental Mindoro", None, "Puerto Galera"),
     ]
 
     # ── Runner ────────────────────────────────────────────────────────────────
