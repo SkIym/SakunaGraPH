@@ -1,4 +1,5 @@
 import argparse
+import math
 import re
 import uuid
 from pathlib import Path
@@ -97,8 +98,7 @@ EXPORT_SPECS: dict[str, Any] = {
     "gda_evac.csv": {
         "cols": ["id", "evacuationPlan", "evacuationCenters"],
         "dropna": {"subset": ["evacuationPlan", "evacuationCenters"], "how": "all"},
-        "astype": {"evacuationCenters": "Int64"},
-        "float_format": "%.0f",
+        "astype": {"evacuationCenters": "Int64"}
     },
     "gda_rescue.csv": {
         "cols": ["id", "rescueEquipment", "rescueUnit"],
@@ -271,7 +271,7 @@ EXPORT_SPECS: dict[str, Any] = {
 DASH = r"[-–—]"
 
 # Null-like sentinel values to replace with NaN
-NULL_VALUES = ["-", "Not applicable", "n.a.", "Not indicated", np.nan]
+NULL_VALUES = ["","-", "Not applicable", "n.a.", "Not indicated", np.nan, pd.NA]
 
 
 def normalize_one_date(text: str) -> str | None:
@@ -436,7 +436,6 @@ def to_type_iri(dtype: str | None) -> list[str]:
     print(cleaned_iris)
     return cleaned_iris
 
-
 def export_slices(df: pd.DataFrame, specs: dict[str, Any], out_dir: str | Path = "../data/parsed/gda") -> None:
     """Write each slice defined in *specs* as a CSV file under *out_dir*."""
     out_dir = Path(out_dir)
@@ -506,6 +505,10 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
         lambda cell: "|".join(LOCATION_MATCHER.match_cell(cell))
     )
 
+    # general damage amount values if no other were reported (exclude totals)
+    cols = ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
+    df.loc[df[cols].notna().any(axis=1), "generalDamageAmount"] = None
+
     # Explode compound sub-type incidents into a separate table
     incidents: dict[str, list[Any]] = {"id": [], "hasType": [], "hasLocation": [], "sub_id": []}
 
@@ -534,6 +537,8 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     for cls in clss: entities[cls] = []
 
     df = df.loc[:, ~df.columns.duplicated()]
+
+    # main csv to entities
     for row in df.to_dict(orient="records"):
     
         for cls in clss:
@@ -543,14 +548,42 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
             for f in class_fields:
                 value = row.get(f.name, None)
 
-                if value is None or (isinstance(value, str) and value.strip().lower() == "none"):
+                if (
+                    value is None
+                    or (isinstance(value, float) and math.isnan(value))
+                    or (isinstance(value, str) and value.strip().lower() in ("none", "nan", ""))
+                    or value is pd.NA
+                ):
                     data[f.name] = None
                 else:
-                    data[f.name] = value 
-
+                    data[f.name] = value
             # skip empty entities
             if any(v is not None and v != "" for k, v in data.items() if k != "id"):
                 entities[cls].append(cls(**data))
+
+    # incidents
+
+    incidents_df = pd.DataFrame(incidents)
+    entities[Incident] = []
+    for row in incidents_df.to_dict(orient="records"):
+        data: dict[str, Any] = {}
+
+        for f in fields(Incident):
+            value = row.get(f.name, None)
+
+            if (
+                    value is None
+                    or (isinstance(value, float) and math.isnan(value))
+                    or (isinstance(value, str) and value.strip().lower() in ("none", "nan", ""))
+                    or value is pd.NA
+                ):
+                data[f.name] = None
+            else:
+                data[f.name] = value
+
+        if any(v is not None and v != "" for k, v in data.items() if k != "id"):
+            entities[Incident].append(Incident(**data))
+    
 
     df.to_csv(out_dir / "gda.csv")
 

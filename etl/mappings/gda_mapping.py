@@ -266,7 +266,7 @@ def evacuation_mapping(rs: list[Evacuation], g: Graph) -> None:
         if r.evacuationPlan:
             g.add((uri, SKG.evacuationPlan, Literal(r.evacuationPlan)))
         if r.evacuationCenters is not None:
-            g.add((uri, SKG.evacuationCenters, Literal(r.evacuationCenters, datatype=XSD.int)))
+            g.add((uri, SKG.evacuationCenters, Literal(int(r.evacuationCenters), datatype=XSD.int)))
 
 
 # ---------------------------------------------------------------------------
@@ -282,9 +282,9 @@ def rescue_mapping(rs: list[Rescue], g: Graph) -> None:
         g.add((event_uri, SKG.hasRescue, uri))
 
         if r.rescueEquipment:
-            g.add((uri, SKG.agencyLGUsPresent, Literal(r.rescueEquipment)))
+            g.add((uri, SKG.rescueEquipment, Literal(r.rescueEquipment)))
         if r.rescueUnit:
-            g.add((uri, SKG.agencyLGUsPresent, Literal(r.rescueUnit)))
+            g.add((uri, SKG.rescueUnit, Literal(r.rescueUnit)))
 
 
 # ---------------------------------------------------------------------------
@@ -293,14 +293,23 @@ def rescue_mapping(rs: list[Rescue], g: Graph) -> None:
 
 def calamity_mapping(rs: list[DeclarationOfCalamity], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "declaration_of_calamity")
+        
+        value = r.declarationOfCalamity
 
-        g.add((uri, RDF.type, SKG.DeclarationOfCalamity))
-        g.add((event_uri, SKG.hasDeclarationOfCalamity, uri))
+        if value:
 
-        if r.declarationOfCalamity:
-            g.add((uri, SKG.declarationType, Literal(r.declarationOfCalamity)))
+            if "calamity" in value.lower():
+                event_uri = _event_uri(r.id)
+                uri = _sub_uri(r.id, "declaration_of_calamity")
+                g.add((uri, RDF.type, SKG.DeclarationOfCalamity))
+                g.add((event_uri, SKG.hasDeclarationOfCalamity, uri))
+                g.add((uri, SKG.declarationType, Literal(r.declarationOfCalamity)))
+            else:
+                event_uri = _event_uri(r.id)
+                uri = _sub_uri(r.id, "preparedness")
+                g.add((uri, RDF.type, SKG.Preparedness))
+                g.add((event_uri, SKG.hasPreparedness, uri))
+                g.add((uri, SKG.announcementsReleased, Literal(r.declarationOfCalamity)))
 
 
 # ---------------------------------------------------------------------------
@@ -322,9 +331,9 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph) -> None:
         if r.affectedPersons is not None:
             g.add((uri, SKG.affectedPersons, Literal(r.affectedPersons, datatype=XSD.int)))
         if r.displacedFamilies is not None:
-            g.add((uri, SKG.displacedFamilies, Literal(r.displacedFamilies, datatype=XSD.int)))
+            g.add((uri, SKG.displacedFamilies, Literal(int(r.displacedFamilies), datatype=XSD.int)))
         if r.displacedPersons is not None:
-            g.add((uri, SKG.displacedPersons, Literal(r.displacedPersons, datatype=XSD.int)))
+            g.add((uri, SKG.displacedPersons, Literal(int(r.displacedPersons), datatype=XSD.int)))
 
 
 # ---------------------------------------------------------------------------
@@ -334,17 +343,31 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph) -> None:
 def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
     for r in rs:
         event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "casualties")
-
-        g.add((uri, RDF.type, SKG.Casualties))
-        g.add((event_uri, SKG.hasCasualties, uri))
-
+        
+        index = 0
         if r.dead is not None:
-            g.add((uri, SKG.dead, Literal(r.dead, datatype=XSD.int)))
+            uri = casualties_iri(event_uri, str(index+1))
+            g.add((uri, RDF.type, SKG.Casualties))
+            g.add((event_uri, SKG.hasCasualties, uri))
+            g.add((uri, SKG.casualtyCount, Literal(r.dead, datatype=XSD.int)))
+            g.add((uri, SKG.casualtyType, Literal("DEAD", datatype=SKG.casualtyDatatype)))
+            index+=1
+
         if r.injured is not None:
-            g.add((uri, SKG.injured, Literal(r.injured, datatype=XSD.int)))
+            uri = casualties_iri(event_uri, str(index+1))
+            g.add((uri, RDF.type, SKG.Casualties))
+            g.add((event_uri, SKG.hasCasualties, uri))
+            g.add((uri, SKG.casualtyCount, Literal(r.injured, datatype=XSD.int)))
+            g.add((uri, SKG.casualtyType, Literal("INJURED", datatype=SKG.casualtyDatatype)))
+            index+=1
+
         if r.missing is not None:
-            g.add((uri, SKG.missing, Literal(r.missing, datatype=XSD.int)))
+            uri = casualties_iri(event_uri, str(index+1))
+            g.add((uri, RDF.type, SKG.Casualties))
+            g.add((event_uri, SKG.hasCasualties, uri))
+            g.add((uri, SKG.casualtyCount, Literal(r.missing, datatype=XSD.int)))
+            g.add((uri, SKG.casualtyType, Literal("MISSING", datatype=SKG.casualtyDatatype)))
+            index+=1
 
 
 # ---------------------------------------------------------------------------
@@ -362,7 +385,7 @@ def housing_damage_mapping(rs: list[HousingDamage], g: Graph) -> None:
         if r.totallyDamagedHouses is not None:
             g.add((uri, SKG.totallyDamagedHouses, Literal(r.totallyDamagedHouses, datatype=XSD.int)))
         if r.partiallyDamagedHouses is not None:
-            g.add((uri, SKG.partiallyDamagedHouses, Literal(r.partiallyDamagedHouses, datatype=XSD.int)))
+            g.add((uri, SKG.partiallyDamagedHouses, Literal(int(r.partiallyDamagedHouses), datatype=XSD.int)))
 
 
 # ---------------------------------------------------------------------------
@@ -472,7 +495,8 @@ def seaport_disruption_mapping(rs: list[SeaportDisruption], g: Graph) -> None:
 # ---------------------------------------------------------------------------
 
 def _augment_water_source(source_type: str, affected: str | None) -> str | None:
-    """Mirrors the :augmentWaterSource RML function."""
+    
+    affected = str(affected)
     if affected and affected.strip().lower() not in ("", "no", "false", "0"):
         return f"{source_type} affected"
     return None
