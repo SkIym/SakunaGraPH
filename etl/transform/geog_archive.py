@@ -1,9 +1,22 @@
+import argparse
 import re
+import uuid
+from pathlib import Path
+import numpy as np
 import pandas as pd
 from dateutil.parser import parse
-import uuid
-import numpy as np
-pd.set_option('future.no_silent_downcasting', True)
+from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
+
+from mappings.gda_mapping import (
+    Assistance, AffectedPopulation, Casualties, CommunicationLineDisruption,
+    DeclarationOfCalamity, DamageGeneral, Evacuation, Event, HousingDamage,
+    Incident, InfrastructureDamage, PowerDisruption, Preparedness, Recovery,
+    Relief, Rescue, RoadAndBridgesDamage, SeaportDisruption,
+    WaterDisruption
+)
+from typing import Any, cast
+pd.set_option("future.no_silent_downcasting", True)
+from dataclasses import fields
 
 COLUMN_MAPPING = {
     "M or I": "eventClass",
@@ -12,7 +25,7 @@ COLUMN_MAPPING = {
     "Date/Period": "date",
     "Latitude": "latitude",
     "Longitude": "longitude",
-    "Main Area/s Affected / Location": "hasLocation",  
+    "Main Area/s Affected / Location": "hasLocation",
     "Additional Perils/Disaster Sub-Type Occurences (Compound Disaster, e.g. Typhoon Haiyan = rain + wind + storm surge)": "hasSubtype",
     "PREPAREDNESS_Announcements_Local Agencies / Government Units Concerned": "agencyLGUsPresentPreparedness",
     "PREPAREDNESS_Announcements_Warnings Released / Status Alert or Alert/ State of Calamity": "declarationOfCalamity",
@@ -47,16 +60,15 @@ COLUMN_MAPPING = {
     "RESPONSE AND RECOVERY_NGO-LGU Support Units Present": "agencyLGUsPresentAssistance",
     "RESPONSE AND RECOVERY_International Organizations Present": "internationalOrgsPresent",
     "RESPONSE AND RECOVERY_Amount of Donation from International Organizations (including local NGOs)": "amountNGOs",
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Canned Goods, Rice, etc._Cost": "itemCostGoods",    # itemTypeOrNeeds: Canned Goods, Rice
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Canned Goods, Rice, etc._Quantity": "itemQtyGoods", # itemTypeOrNeeds: Canned Goods, Rice
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Water_Cost": "itemCostWater",    # itemTypeOrNeeds: Water
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Water_Quantity": "itemQtyWater", # itemTypeOrNeeds: Water
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Clothing_Cost": "itemCostClothing",    # itemTypeOrNeeds: Clothing
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Clothing_Quantity": "itemQtyClothing", # itemTypeOrNeeds: Clothing
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Medicine_Cost": "itemCostMedicine",    # itemTypeOrNeeds: Medicine
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Medicine_Quantity": "itemQtyMedicine", # itemTypeOrNeeds: Medicine
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Items Not Specified (Cost)": "itemCostOthers1", # itemTypeOrNeeds: Others
-    "RESPONSE AND RECOVERY_Supply of Relief Goods_Total Cost": "itemCostOthers2", # itemTypeOrNeeds: Others
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Canned Goods, Rice, etc._Cost": "itemCostGoods",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Canned Goods, Rice, etc._Quantity": "itemQtyGoods",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Water_Cost": "itemCostWater",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Water_Quantity": "itemQtyWater",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Clothing_Cost": "itemCostClothing",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Clothing_Quantity": "itemQtyClothing",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Medicine_Cost": "itemCostMedicine",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Medicine_Quantity": "itemQtyMedicine",
+    "RESPONSE AND RECOVERY_Supply of Relief Goods_Items Not Specified (Cost)": "itemCostOthers1",
     "RESPONSE AND RECOVERY_Supply of Relief Goods_Total Cost": "itemCostOthers2",
     "RESPONSE AND RECOVERY_Search, Rescue and Retrieval": "srrDone",
     "RESPONSE AND RECOVERY_City-Municipal Policy Changes": "policyChanges",
@@ -64,67 +76,44 @@ COLUMN_MAPPING = {
     "RESPONSE AND RECOVERY_Post-Disaster Training": "postTraining",
     "REFERENCES (Authors. Year. Title. Journal/Book/Newspaper. Publisher, Place published. Pages. Website, Date Accessed)": "reference",
     "Detailed Description of Disaster Event": "otherDescription",
-    "Comments/Notes": "remarks"
+    "Comments/Notes": "remarks",
 }
 
-
-COLUMNS_TO_CLEAN = {
-    "date": "normalize_date",
-    "location": "resolve_location",
-}
-
-EXPORT_SPECS = {
+EXPORT_SPECS: dict[str, Any] = {
     "gda_prep.csv": {
         "cols": ["id", "agencyLGUsPresentPreparedness", "declarationOfCalamity"],
         "dropna": {
             "subset": ["agencyLGUsPresentPreparedness", "declarationOfCalamity"],
-            "how": "all"
+            "how": "all",
         },
         "contains": {
             "column": "declarationOfCalamity",
             "pattern": "Calamity",
             "case": False,
-            "exclude": True
+            "exclude": True,
         },
-        "rename": {
-            "declarationOfCalamity" : "announcementsReleased"
-        }
+        "rename": {"declarationOfCalamity": "announcementsReleased"},
     },
-
     "gda_evac.csv": {
         "cols": ["id", "evacuationPlan", "evacuationCenters"],
-        "dropna": {
-            "subset": ["evacuationPlan", "evacuationCenters"],
-            "how": "all"
-        },
-        "astype": {
-            "evacuationCenters": "Int64"
-        },
-        "float_format": "%.0f"
+        "dropna": {"subset": ["evacuationPlan", "evacuationCenters"], "how": "all"},
+        "astype": {"evacuationCenters": "Int64"},
+        "float_format": "%.0f",
     },
-
     "gda_rescue.csv": {
         "cols": ["id", "rescueEquipment", "rescueUnit"],
-        "dropna": {
-            "subset": ["rescueEquipment", "rescueUnit"],
-            "how": "all"
-        }
+        "dropna": {"subset": ["rescueEquipment", "rescueUnit"], "how": "all"},
     },
-
     "gda_calamity.csv": {
         "cols": ["id", "declarationOfCalamity"],
-        "dropna": {
-            "subset": ["declarationOfCalamity"],
-            "how": "any"
-        },
+        "dropna": {"subset": ["declarationOfCalamity"], "how": "any"},
         "contains": {
             "column": "declarationOfCalamity",
             "pattern": "Calamity",
             "case": False,
-            "exclude": False
-        }
+            "exclude": False,
+        },
     },
-
     "gda_aff_pop.csv": {
         "cols": [
             "id",
@@ -142,458 +131,441 @@ EXPORT_SPECS = {
                 "displacedFamilies",
                 "displacedPersons",
             ],
-            "how": "all"
+            "how": "all",
         },
-        "float_format": "%.0f"
+        "float_format": "%.0f",
     },
-
     "gda_casualties.csv": {
         "cols": ["id", "dead", "injured", "missing"],
-        "dropna": {
-            "subset": ["dead", "injured", "missing"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
+        "dropna": {"subset": ["dead", "injured", "missing"], "how": "all"},
+        "float_format": "%.0f",
     },
-
     "gda_housing.csv": {
         "cols": ["id", "totallyDamagedHouses", "partiallyDamagedHouses"],
         "dropna": {
             "subset": ["totallyDamagedHouses", "partiallyDamagedHouses"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_infra.csv": {
-        "cols": ["id", "infraDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"],
-        "dropna": {
-            "subset": ["infraDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"],
-            "how": "all"
-        }
-    },
-
-    "gda_dmg_general.csv": {
-        "cols": ["id", "generalDamageAmount"],
-        "dropna": {
-            "subset": ["generalDamageAmount"],
-            "how": "any"
-        },
-        "onlyIfMissing": ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
-    },
-
-    "gda_power.csv": {
-        "cols": ["id", "powerAffected"],
-        "dropna": {
-            "subset": ["powerAffected"],
-            "how": "any"
-        }
-    },
-
-    "gda_comms.csv": {
-        "cols": ["id", "communicationAffected"],
-        "dropna": {
-            "subset": ["communicationAffected"],
-            "how": "any"
-        }
-    },
-
-    "gda_rnb.csv": {
-        "cols": ["id", "roadBridgeAffected"],
-        "dropna": {
-            "subset": ["roadBridgeAffected"],
-            "how": "any"
-        }
-    },
-
-    "gda_seaports.csv": {
-        "cols": ["id", "seaportsAffected"],
-        "dropna": {
-            "subset": ["seaportsAffected"],
-            "how": "any"
-        }
-    },
-
-    "gda_airports.csv": {
-        "cols": ["id", "airportsAffected"],
-        "dropna": {
-            "subset": ["airportsAffected"],
-            "how": "any"
-        }
-    },
-
-    "gda_water.csv": {
-        "cols": ["id", "areDamsAffected", "isTapAffected"],
-        "dropna": {
-            "subset": ["areDamsAffected", "isTapAffected"],
-            "how": "all"
-        }
-    },
-
-    "gda_assistance.csv": {
-        "cols": ["id", "allocatedFunds", "agencyLGUsPresentAssistance", "internationalOrgsPresent", "amountNGOs"],
-        "dropna": {
-            "subset": ["allocatedFunds", "agencyLGUsPresentAssistance", "internationalOrgsPresent", "amountNGOs"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_relief_goods.csv": {
-        "cols": ["id", "itemCostGoods", "itemQtyGoods"],
-        "dropna": {
-            "subset": ["itemCostGoods", "itemQtyGoods"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_relief_water.csv": {
-        "cols": ["id", "itemCostWater", "itemQtyWater"],
-        "dropna": {
-            "subset": ["itemCostWater", "itemQtyWater"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_relief_clothing.csv": {
-        "cols": ["id", "itemCostClothing", "itemQtyClothing"],
-        "dropna": {
-            "subset": ["itemCostClothing", "itemQtyClothing"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_relief_med.csv": {
-        "cols": ["id", "itemCostMedicine", "itemQtyMedicine"],
-        "dropna": {
-            "subset": ["itemCostMedicine", "itemQtyMedicine"],
-            "how": "all"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_relief_unspecified.csv": {
-        "cols": ["id", "itemCostOthers1"],
-        "dropna": {
-            "subset": ["itemCostOthers1"],
-            "how": "any"
-        },
-        "float_format": "%.0f"
-    },
-
-    "gda_relief_general.csv": {
-        "cols": ["id", "itemCostOthers2"],
-        "dropna": {
-            "subset": ["itemCostOthers2"],
-            "how": "any"
+            "how": "all",
         },
         "float_format": "%.0f",
-        "onlyIfMissing": ["itemCostOthers1", "itemCostClothing", "itemCostMedicine", "itemCostGoods", "itemCostWater"]
     },
-
+    "gda_infra.csv": {
+        "cols": [
+            "id",
+            "infraDamageAmount",
+            "commercialDamageAmount",
+            "socialDamageAmount",
+            "crossSectoralDamageAmount",
+        ],
+        "dropna": {
+            "subset": [
+                "infraDamageAmount",
+                "commercialDamageAmount",
+                "socialDamageAmount",
+                "crossSectoralDamageAmount",
+            ],
+            "how": "all",
+        },
+    },
+    "gda_dmg_general.csv": {
+        "cols": ["id", "generalDamageAmount"],
+        "dropna": {"subset": ["generalDamageAmount"], "how": "any"},
+        "onlyIfMissing": [
+            "infraDamageAmount",
+            "agricultureDamageAmount",
+            "commercialDamageAmount",
+            "socialDamageAmount",
+            "crossSectoralDamageAmount",
+        ],
+    },
+    "gda_power.csv": {
+        "cols": ["id", "powerAffected"],
+        "dropna": {"subset": ["powerAffected"], "how": "any"},
+    },
+    "gda_comms.csv": {
+        "cols": ["id", "communicationAffected"],
+        "dropna": {"subset": ["communicationAffected"], "how": "any"},
+    },
+    "gda_rnb.csv": {
+        "cols": ["id", "roadBridgeAffected"],
+        "dropna": {"subset": ["roadBridgeAffected"], "how": "any"},
+    },
+    "gda_seaports.csv": {
+        "cols": ["id", "seaportsAffected"],
+        "dropna": {"subset": ["seaportsAffected"], "how": "any"},
+    },
+    "gda_airports.csv": {
+        "cols": ["id", "airportsAffected"],
+        "dropna": {"subset": ["airportsAffected"], "how": "any"},
+    },
+    "gda_water.csv": {
+        "cols": ["id", "areDamsAffected", "isTapAffected"],
+        "dropna": {"subset": ["areDamsAffected", "isTapAffected"], "how": "all"},
+    },
+    "gda_assistance.csv": {
+        "cols": [
+            "id",
+            "allocatedFunds",
+            "agencyLGUsPresentAssistance",
+            "internationalOrgsPresent",
+            "amountNGOs",
+        ],
+        "dropna": {
+            "subset": [
+                "allocatedFunds",
+                "agencyLGUsPresentAssistance",
+                "internationalOrgsPresent",
+                "amountNGOs",
+            ],
+            "how": "all",
+        },
+        "float_format": "%.0f",
+    },
+    "gda_relief_goods.csv": {
+        "cols": ["id", "itemCostGoods", "itemQtyGoods"],
+        "dropna": {"subset": ["itemCostGoods", "itemQtyGoods"], "how": "all"},
+        "float_format": "%.0f",
+    },
+    "gda_relief_water.csv": {
+        "cols": ["id", "itemCostWater", "itemQtyWater"],
+        "dropna": {"subset": ["itemCostWater", "itemQtyWater"], "how": "all"},
+        "float_format": "%.0f",
+    },
+    "gda_relief_clothing.csv": {
+        "cols": ["id", "itemCostClothing", "itemQtyClothing"],
+        "dropna": {"subset": ["itemCostClothing", "itemQtyClothing"], "how": "all"},
+        "float_format": "%.0f",
+    },
+    "gda_relief_med.csv": {
+        "cols": ["id", "itemCostMedicine", "itemQtyMedicine"],
+        "dropna": {"subset": ["itemCostMedicine", "itemQtyMedicine"], "how": "all"},
+        "float_format": "%.0f",
+    },
+    "gda_relief_unspecified.csv": {
+        "cols": ["id", "itemCostOthers1"],
+        "dropna": {"subset": ["itemCostOthers1"], "how": "any"},
+        "float_format": "%.0f",
+    },
+    "gda_relief_general.csv": {
+        "cols": ["id", "itemCostOthers2"],
+        "dropna": {"subset": ["itemCostOthers2"], "how": "any"},
+        "float_format": "%.0f",
+        "onlyIfMissing": [
+            "itemCostOthers1",
+            "itemCostClothing",
+            "itemCostMedicine",
+            "itemCostGoods",
+            "itemCostWater",
+        ],
+    },
     "gda_recovery.csv": {
         "cols": ["id", "srrDone", "policyChanges", "postStructureCost", "postTraining"],
         "dropna": {
             "subset": ["srrDone", "policyChanges", "postStructureCost", "postTraining"],
-            "how": "all"
+            "how": "all",
         },
         "float_format": "%.0f",
-    }
-
-
-
+    },
 }
 
+# Matches hyphen, en dash, and em dash
+DASH = r"[-–—]"
 
-DASH = r"[-–—]"   # hyphen, en dash, em dash
+# Null-like sentinel values to replace with NaN
+NULL_VALUES = ["-", "Not applicable", "n.a.", "Not indicated", np.nan]
 
-def normalize_one_date(text):
-    """Parse a single date fragment → YYYY-MM-DD or None."""
-    try:
-        return parse(text, dayfirst=False).strftime("%Y-%m-%d")
-    except:
+
+def normalize_one_date(text: str) -> str | None:
+    """Parse a single date fragment and return 'YYYY-MM-DD', or None on failure."""
+    for dayfirst in (False, True):
         try:
-            return parse(text, dayfirst=True).strftime("%Y-%m-%d")
-        except:
-            return None
+            return parse(text, dayfirst=dayfirst).strftime("%Y-%m-%d")
+        except Exception:
+            continue
+    return None
 
-def clean_date_range(value):
+def clean_date_range(value: str) -> tuple[str | None, str | None]:
     """
-    Handles normalized dates, date ranges, ambiguous ranges, 
-    long-form dates, month ranges, year ranges, etc.
-    """
+    Normalise a raw date cell into a (startDate, endDate) pair.
 
+    Handles: ISO dates, timestamps, year ranges, long date ranges,
+    month-month-year ranges, month-year–month-year ranges,
+    day-day month-year ranges, and single dates.
+    """
     if pd.isna(value):
         return (None, None)
 
     text = str(value).strip()
 
-    # --------------------------------------------------------
-    # ⚡ CASE 0 — Already normalized machine date "YYYY-MM-DD"
-    # --------------------------------------------------------
+    # Already a clean ISO date
     if re.match(r"^\d{4}-\d{2}-\d{2}$", text):
         return (text, text)
 
-    # machine timestamp "YYYY-MM-DD HH:MM:SS"
+    # ISO timestamp — keep date part only
     if re.match(r"^\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}$", text):
-        only_date = text.split()[0]
-        return (only_date, only_date)
+        return (text.split()[0], text.split()[0])
 
-    # strip known bad timezone names
+    # Strip timezone abbreviations and time components
     text = re.sub(r"\b[A-Z]{2,4}\b", "", text).strip()
-
-    # strip time
     text = re.sub(r"\b\d{1,2}:\d{2}(:\d{2})?\s*(AM|PM|am|pm)?\b", "", text).strip()
-    
-    # --------------------------------------------------------
-    # 1: YEAR RANGE: "1918–1919"
-    # --------------------------------------------------------
-    yr_rng = re.match(rf"^\s*(\d{{4}})\s*{DASH}\s*(\d{{4}})\s*$", text)
-    if yr_rng:
-        y1, y2 = yr_rng.groups()
+
+    # Year range: "1918–1919"
+    m = re.match(rf"^\s*(\d{{4}})\s*{DASH}\s*(\d{{4}})\s*$", text)
+    if m:
+        y1, y2 = m.groups()
         return (f"{y1}-01-01", f"{y2}-12-31")
 
-    # --------------------------------------------------------
-    # 2: LONG DATE RANGE:  
-    #    "August 10, 2008 – July 14, 2009"
-    # --------------------------------------------------------
-    long_range = re.match(
+    # Long date range: "August 10, 2008 – July 14, 2009"
+    m = re.match(
         rf"^\s*([A-Za-z]+\s+\d{{1,2}},?\s*\d{{4}})\s*{DASH}\s*([A-Za-z]+\s+\d{{1,2}},?\s*\d{{4}})\s*$",
-        text
+        text,
     )
-    if long_range:
-        left, right = long_range.groups()
+    if m:
+        left, right = m.groups()
         return (normalize_one_date(left), normalize_one_date(right))
 
-    # --------------------------------------------------------
-    # 3: MONTH–MONTH YEAR: "April–June 1957"
-    # --------------------------------------------------------
-    my_rng = re.match(rf"^\s*([A-Za-z]+)\s*{DASH}\s*([A-Za-z]+)\s+(\d{{4}})", text)
-    if my_rng:
-        m1, m2, year = my_rng.groups()
+    # Month–Month Year: "April–June 1957"
+    m = re.match(rf"^\s*([A-Za-z]+)\s*{DASH}\s*([A-Za-z]+)\s+(\d{{4}})", text)
+    if m:
+        m1, m2, year = m.groups()
         start = normalize_one_date(f"1 {m1} {year}")
-        end   = normalize_one_date(f"1 {m2} {year}")
-
+        end = normalize_one_date(f"1 {m2} {year}")
         if end:
             end = (pd.to_datetime(end) + pd.tseries.offsets.MonthEnd()).strftime("%Y-%m-%d")
         return (start, end)
-    
-    # --------------------------------------------------------
-    # 3: MONTH–MONTH YEAR: "April–June 1957"
-    # --------------------------------------------------------
-    my_rng = re.match(rf"^\s*([A-Za-z]+)\s*{DASH}\s*([A-Za-z]+)\s+(\d{{4}})", text)
-    if my_rng:
-        m1, m2, year = my_rng.groups()
-        start = normalize_one_date(f"1 {m1} {year}")
-        end   = normalize_one_date(f"1 {m2} {year}")
 
-        if end:
-            end = (pd.to_datetime(end) + pd.tseries.offsets.MonthEnd()).strftime("%Y-%m-%d")
-        return (start, end)
-    
-    # --------------------------------------------------------
-    # 3.5: MONTH YEAR–MONTH YEAR: "April 1965–June 1957"
-    # --------------------------------------------------------
-    my_rng = re.match(rf"^\s*([A-Za-z]+)\s*(\d{{4}})\s*{DASH}\s*([A-Za-z]+)\s+(\d{{4}})", text)
-    if my_rng:
-        m1, y1, m2, y2 = my_rng.groups()
+    # Month Year–Month Year: "April 1965–June 1957"
+    m = re.match(rf"^\s*([A-Za-z]+)\s*(\d{{4}})\s*{DASH}\s*([A-Za-z]+)\s+(\d{{4}})", text)
+    if m:
+        m1, y1, m2, y2 = m.groups()
         start = normalize_one_date(f"1 {m1} {y1}")
-        end   = normalize_one_date(f"1 {m2} {y2}")
-
+        end = normalize_one_date(f"1 {m2} {y2}")
         if end:
             end = (pd.to_datetime(end) + pd.tseries.offsets.MonthEnd()).strftime("%Y-%m-%d")
         return (start, end)
 
-    # --------------------------------------------------------
-    # 4: DAY–DAY MONTH YEAR (2–7 July 2001)
-    # --------------------------------------------------------
-    day_month_year = re.match(
+    # Day–Day Month Year: "2–7 July 2001"
+    m = re.match(
         rf"^\s*(\d{{1,2}})\s*{DASH}\s*(\d{{1,2}})\s+([A-Za-z]+)\s*,?\s*(\d{{4}})\s*$",
-        text
+        text,
     )
-    if day_month_year:
-        d1, d2, month, year = day_month_year.groups()
+    if m:
+        d1, d2, month, year = m.groups()
         return (
             normalize_one_date(f"{d1} {month} {year}"),
-            normalize_one_date(f"{d2} {month} {year}")
+            normalize_one_date(f"{d2} {month} {year}"),
         )
 
-    # --------------------------------------------------------
-    # 5: MONTH DAY–DAY YEAR (Nov 12–15 2003)
-    # --------------------------------------------------------
-    month_day_day = re.match(
+    # Month Day–Day Year: "Nov 12–15 2003"
+    m = re.match(
         rf"^\s*([A-Za-z]+)\s+(\d{{1,2}})\s*{DASH}\s*(\d{{1,2}})\s*,?\s*(\d{{4}})\s*$",
-        text
+        text,
     )
-    if month_day_day:
-        month, d1, d2, year = month_day_day.groups()
+    if m:
+        month, d1, d2, year = m.groups()
         return (
             normalize_one_date(f"{d1} {month} {year}"),
-            normalize_one_date(f"{d2} {month} {year}")
+            normalize_one_date(f"{d2} {month} {year}"),
         )
 
-    # --------------------------------------------------------
-    # 6: Month Day – Month Day Year  
-    #    ("August 31 – September 4, 1984")
-    # --------------------------------------------------------
-    month_to_month = re.match(
+    # Month Day – Month Day Year: "August 31 – September 4, 1984"
+    m = re.match(
         rf"^\s*([A-Za-z]+\s+\d{{1,2}})\s*{DASH}\s*([A-Za-z]+\s+\d{{1,2}})\s*,?\s*(\d{{4}})\s*$",
         text,
     )
-    if month_to_month:
-        left, right, year = month_to_month.groups()
+    if m:
+        left, right, year = m.groups()
         return (
             normalize_one_date(f"{left} {year}"),
-            normalize_one_date(f"{right} {year}")
+            normalize_one_date(f"{right} {year}"),
         )
 
-    # --------------------------------------------------------
-    # 7: YEAR ONLY
-    # --------------------------------------------------------
+    # Year only: "1984"
     if re.match(r"^\d{4}$", text):
-        year = text
-        return (f"{year}-01-01", f"{year}-12-31")
-    
-    # --------------------------------------------------------
-    # 8: SINGLE DATE (fallback)
-    # --------------------------------------------------------
+        return (f"{text}-01-01", f"{text}-12-31")
+
+    # Single date fallback
     single = normalize_one_date(text)
-    if single:
-        return (single, single)
-    
-    
+    return (single, single) if single else (None, None)
 
-    return (None, None)
+def load_with_tiered_headers(path: str | Path) -> pd.DataFrame:
+    """
+    Load an XLSX file with 3–4 tier headers.
 
-def export_slices(df, specs, out_dir="../data/parsed/gda"):
+    Stops merging header levels when a level is unnamed (i.e. from merged cells).
+    """
+    df = pd.read_excel(path, header=[3, 4, 5, 6])
+
+    new_cols = []
+    for col_tuple in df.columns:
+        parts = []
+        for level in col_tuple:
+            s = str(level).strip()
+            if s.lower().startswith("unnamed") or s in ("", "nan"):
+                break
+            parts.append(s)
+        new_cols.append("_".join(parts))
+
+    df.columns = new_cols
+    return df
+
+def to_type_iri(dtype: str | None) -> list[str]:
+
+    if dtype is None: return []
+
+    # Subtype incidents are handled separately
+    if "[" in dtype:
+        return []
+
+    types = dtype.split("|")
+    cleaned_iris: list[str] = []
+
+    for t in types:
+        fixed_iri = (
+            t.strip()
+            .replace(" ", "") 
+            .replace("(", "")
+            .replace(")", "")
+            .replace("Misc", "Miscellaneous")
+            .replace("Flashflood", "FlashFlood")
+            .replace("Earthquake", "")
+        )
+
+        if fixed_iri:
+            cleaned_iris.append(fixed_iri)
+
+    print(cleaned_iris)
+    return cleaned_iris
+
+
+def export_slices(df: pd.DataFrame, specs: dict[str, Any], out_dir: str | Path = "../data/parsed/gda") -> None:
+    """Write each slice defined in *specs* as a CSV file under *out_dir*."""
+    out_dir = Path(out_dir)
+    out_dir.mkdir(parents=True, exist_ok=True)
+
     for filename, spec in specs.items():
-        tmp = df[spec["cols"]].copy()
-
-
         if "onlyIfMissing" in spec:
-            tmp = df[df[spec["onlyIfMissing"]].isna().all(axis=1)]
+            tmp = df[df[spec["onlyIfMissing"]].isna().all(axis=1)][spec["cols"]].copy()
+        else:
             tmp = df[spec["cols"]].copy()
 
-        # dropna handling
         if "dropna" in spec:
             tmp = tmp.dropna(
                 subset=spec["dropna"]["subset"],
                 how=spec["dropna"].get("how", "any"),
             )
 
-        # string contains filter
         if "contains" in spec:
             c = spec["contains"]
-            mask = tmp[c["column"]].str.contains(
-                c["pattern"],
-                case=c.get("case", True),
-                na=False,
-            )
-
+            mask = tmp[c["column"]].str.contains(c["pattern"], case=c.get("case", True), na=False)
             if c.get("exclude", False):
                 mask = ~mask
-
             tmp = tmp[mask]
-        
+
         if "rename" in spec:
-            r: dict[str, str] = spec["rename"]
-            tmp.rename(columns=r, inplace=True)
+            tmp.rename(columns=spec["rename"], inplace=True)
 
-
-        # astype conversions
         for col, dtype in spec.get("astype", {}).items():
-            tmp.loc[:, col] = tmp[col].astype(dtype)
+            tmp[col] = tmp[col].astype(dtype)
 
-        # write CSV
-        tmp.to_csv(
-            f"{out_dir}/{filename}",
-            index=False,
-            float_format=spec.get("float_format"),
-        )
+        tmp.to_csv(out_dir / filename, index=False, float_format=spec.get("float_format"))
 
-def load_with_tiered_headers(path):
-    """
-    Load XLSX with 3–4 tier headers.
-    Automatically stops merging deeper levels when columns become 'Unnamed' (merged rows problem).
-    """
-    df = pd.read_excel(path, header=[3,4,5,6])
+def transform_gda(path: str) -> dict[type, list[Any]]:
+    raw_path = Path("../data/raw/static/geog-archive-cleaned.xlsx")
+    out_dir = Path("../data/parsed/gda")
 
-    new_cols = []
-    for col_tuple in df.columns:
+    df = load_with_tiered_headers(raw_path)
+    df = df.rename(columns=COLUMN_MAPPING)
+    df = df[list(COLUMN_MAPPING.values())]
 
-        cleaned = []
-        for level in col_tuple:
-            s = str(level).strip()
+    # Drop entirely empty rows/columns and rows missing key fields
+    df = df.dropna(how="all")
+    df = df.dropna(axis=1, how="all")
+    df = df.dropna(subset=["date", "hasLocation"])
 
-            if s.lower().startswith("unnamed") or s == "" or s == "nan":
-                break  
+    # Normalise sentinel null values
+    for sentinel in NULL_VALUES:
+        df = df.replace(sentinel, None).infer_objects(copy=False)
 
-            cleaned.append(s)
-
-        merged = "_".join(cleaned)
-
-        new_cols.append(merged)
-
-    df.columns = new_cols
-    return df
-
-df = load_with_tiered_headers("../data/raw/static/geog-archive-cleaned.xlsx")
-df = df.rename(columns=COLUMN_MAPPING)
-
-# print("\n=== XLSX column names ===")
-# for col in df.columns:
-#     print(col)
-
-df = df[list(COLUMN_MAPPING.values())]
-df = df.dropna(how='all')
-df = df.dropna(axis=1, how='all')
-df = df.dropna(subset=['date', 'hasLocation'])
-df = df.replace("-", np.nan).infer_objects(copy=False)
-df = df.replace("Not applicable", np.nan).infer_objects(copy=False)
-df = df.replace("n.a.", np.nan).infer_objects(copy=False)
-df = df.replace("Not indicated", np.nan).infer_objects(copy=False)
-
-
-if "date" in df.columns:
+    # Parse dates
     df[["startDate", "endDate"]] = df["date"].apply(lambda v: pd.Series(clean_date_range(v)))
 
-df = df.dropna(subset=['startDate'])
-df['eventName'] = df['eventName'].str.replace('\"', "") 
+    df = df.dropna(subset=["startDate"])
 
-df['id'] = [uuid.uuid4().hex for _ in range(len(df))]
+    df["eventName"] = df["eventName"].str.replace('"', "", regex=False)
+    df["id"] = [uuid.uuid4().hex for _ in range(len(df))]
 
-incidents: dict[str, list[str | int]] = {
-    "id": [],
-    "hasLocation": [],
-    "hasType": [],
-    "sub_id": []
-}
+    df["hasType"] = df["hasType"].apply(
+        lambda t: "|".join(to_type_iri(t))
+    )
 
-# explode subtype incidents
+    df["hasSubtype"] = df["hasSubtype"].apply(
+        lambda t: "|".join(to_type_iri(t))
+    )
+    # match locations
+    df["hasLocation"] = df["hasLocation"].astype(str).apply(
+        lambda cell: "|".join(LOCATION_MATCHER.match_cell(cell))
+    )
 
-for i, row in df.iterrows():
+    # Explode compound sub-type incidents into a separate table
+    incidents: dict[str, list[Any]] = {"id": [], "hasType": [], "hasLocation": [], "sub_id": []}
+
+    for _, row in df.iterrows():
+        subtypes = row["hasSubtype"]
+        if isinstance(subtypes, str) and "[" in subtypes:
+            for cnt, instance in enumerate(subtypes.split(";"), start=1):
+                has_type, has_location = (
+                    instance.strip().replace("[", "").replace("]", "").split(":")
+                )
+                incidents["id"].append(row["id"])
+                incidents["hasType"].append(has_type)
+                incidents["hasLocation"].append(has_location)
+                incidents["sub_id"].append(cnt)
+
+    pd.DataFrame(incidents).to_csv(out_dir / "gda_incidents.csv")
+
+    export_slices(df, EXPORT_SPECS, out_dir)
+
+    clss: list[type] = [Assistance, AffectedPopulation, Casualties, CommunicationLineDisruption,
+    DeclarationOfCalamity, DamageGeneral, Evacuation, Event, HousingDamage, InfrastructureDamage, PowerDisruption, Preparedness, Recovery,
+    Relief, Rescue, RoadAndBridgesDamage, SeaportDisruption,
+    WaterDisruption]
+
+    entities: dict[type, list[Any]] = {}
+    for cls in clss: entities[cls] = []
+
+    df = df.loc[:, ~df.columns.duplicated()]
+    for row in df.to_dict(orient="records"):
     
-    subtypes: str = row['hasSubtype']
-    cnt = 0
-    if type(subtypes) == str and "[" in subtypes:
-        instances = subtypes.split(";")
-        for instance in instances:
-            cnt += 1
-            [hasType, hasLocation] = instance.strip().replace("[", '').replace("]", '').split(":")
-            # print(hasType, hasLocation)
-            incidents["id"].append(row["id"])
-            incidents["hasType"].append(hasType)
-            incidents["hasLocation"].append(hasLocation)
-            incidents["sub_id"].append(cnt)
+        for cls in clss:
+            data: dict[str, Any] = {}
+            class_fields = fields(cls)
+
+            for f in class_fields:
+                value = row.get(f.name, None)
+
+                if value is None or (isinstance(value, str) and value.strip().lower() == "none"):
+                    data[f.name] = None
+                else:
+                    data[f.name] = value 
+
+            # skip empty entities
+            if any(v is not None and v != "" for k, v in data.items() if k != "id"):
+                entities[cls].append(cls(**data))
+
+    df.to_csv(out_dir / "gda.csv")
+
+    return entities
 
 
-inci_df = pd.DataFrame(incidents)
-inci_df.to_csv("../data/parsed/gda/gda_incidents.csv")
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Transform EM-DAT XLSX to SakunaGraPH-conformant RDF."
+    )
+    parser.add_argument(
+        "--input", "-i",
+        default="../data/raw/static/geog-archive-cleaned.xlsx",
+        help="Path to the GDA .xlsx file.",
+    )
+    args = parser.parse_args()
 
-# export csv slices for subject mapping
-export_slices(df, EXPORT_SPECS)
-
-df.to_csv('../data/parsed/gda/gda.csv')
+    transform_gda(args.input)
