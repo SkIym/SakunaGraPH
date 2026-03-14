@@ -337,7 +337,7 @@ class LocationMatcher:
 
             # Nation-wide / island-group passthrough
             if highest in {"Philippines", "Luzon", "Visayas", "Mindanao"}:
-                matched.append(highest)
+                matched.append(self.base + highest)
                 continue
 
             # Ambiguous Region IV → both IV-A and IV-B
