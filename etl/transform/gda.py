@@ -414,7 +414,7 @@ def to_type_iri(dtype: str | None) -> list[str]:
 
     # Subtype incidents are handled separately
     if "[" in dtype:
-        return []
+        return dtype
 
     types = dtype.split("|")
     cleaned_iris: list[str] = []
@@ -433,7 +433,7 @@ def to_type_iri(dtype: str | None) -> list[str]:
         if fixed_iri:
             cleaned_iris.append(fixed_iri)
 
-    print(cleaned_iris)
+    # print(cleaned_iris)
     return cleaned_iris
 
 def export_slices(df: pd.DataFrame, specs: dict[str, Any], out_dir: str | Path = "../data/parsed/gda") -> None:
@@ -497,6 +497,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
         lambda t: "|".join(to_type_iri(t))
     )
 
+    df["hasSubtypeRaw"] = df["hasSubtype"]
     df["hasSubtype"] = df["hasSubtype"].apply(
         lambda t: "|".join(to_type_iri(t))
     )
@@ -513,15 +514,16 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     incidents: dict[str, list[Any]] = {"id": [], "hasType": [], "hasLocation": [], "sub_id": []}
 
     for _, row in df.iterrows():
-        subtypes = row["hasSubtype"]
+        subtypes = row["hasSubtypeRaw"]
         if isinstance(subtypes, str) and "[" in subtypes:
             for cnt, instance in enumerate(subtypes.split(";"), start=1):
                 has_type, has_location = (
                     instance.strip().replace("[", "").replace("]", "").split(":")
                 )
+
                 incidents["id"].append(row["id"])
-                incidents["hasType"].append(has_type)
-                incidents["hasLocation"].append(has_location)
+                incidents["hasType"].append("|".join(to_type_iri(has_type)))
+                incidents["hasLocation"].append("|".join(LOCATION_MATCHER.match_cell(has_location)))
                 incidents["sub_id"].append(cnt)
 
     pd.DataFrame(incidents).to_csv(out_dir / "gda_incidents.csv")
@@ -579,9 +581,11 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
                 ):
                 data[f.name] = None
             else:
+                print(value)
                 data[f.name] = value
 
         if any(v is not None and v != "" for k, v in data.items() if k != "id"):
+            print(Incident(**data))
             entities[Incident].append(Incident(**data))
     
 
