@@ -89,6 +89,13 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                      rdfs:label "is of disaster type" .
 
 
+###  https://sakuna.ph/contributingOrg
+:contributingOrg rdf:type owl:ObjectProperty ;
+                 rdfs:domain :Assistance ;
+                 rdfs:range prov:Organization ;
+                 rdfs:label "contributing org" .
+
+
 ###  https://sakuna.ph/hasAffectedPopulation
 :hasAffectedPopulation rdf:type owl:ObjectProperty ;
                        rdfs:subPropertyOf :hasImpact ;
@@ -609,7 +616,22 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
                  rdfs:domain :Assistance ;
                  rdfs:range xsd:decimal ;
-                 rdfs:label "AID contribution"@en .
+                 rdfs:label "AID contribution"@en ;
+                 skos:definition "Aggregate international aid contributed for immediate relief, as reported in EM-DAT / OCHA FTS. Not attributed to a specific organization." .
+
+
+###  https://sakuna.ph/contributionAmount
+:contributionAmount rdf:type owl:DatatypeProperty ;
+                    rdfs:domain :Assistance ;
+                    rdfs:range xsd:decimal ;
+                    rdfs:label "contribution amount" .
+
+
+###  https://sakuna.ph/contributionType
+:contributionType rdf:type owl:DatatypeProperty ;
+                  rdfs:domain :Assistance ;
+                  rdfs:range xsd:string ;
+                  rdfs:label "contribution type" .
 
 
 ###  https://sakuna.ph/correspondenceCode
@@ -888,7 +910,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/itemCost
 :itemCost rdf:type owl:DatatypeProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain :Relief ;
+          rdfs:domain :Assistance ;
           rdfs:range xsd:decimal ;
           rdfs:label "item cost" ;
           skos:note "In M Php" .
@@ -897,7 +919,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/itemCostPerUnit
 :itemCostPerUnit rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
-                 rdfs:domain :Relief ;
+                 rdfs:domain :Assistance ;
                  rdfs:range xsd:decimal ;
                  rdfs:label "item cost per unit"@en .
 
@@ -905,22 +927,15 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/itemQuantity
 :itemQuantity rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
-              rdfs:domain :Relief ;
+              rdfs:domain :Assistance ;
               rdfs:range xsd:decimal ;
               rdfs:label "item quantity"@en .
-
-
-###  https://sakuna.ph/itemSource
-:itemSource rdf:type owl:DatatypeProperty ;
-            rdfs:domain :Relief ;
-            rdfs:range xsd:string ;
-            rdfs:label "item source" .
 
 
 ###  https://sakuna.ph/itemTypeOrNeeds
 :itemTypeOrNeeds rdf:type owl:DatatypeProperty ;
                  rdfs:subPropertyOf owl:topDataProperty ;
-                 rdfs:domain :Relief ;
+                 rdfs:domain :Assistance ;
                  rdfs:range xsd:string ;
                  rdfs:label "item type or needs"@en .
 
@@ -928,7 +943,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/itemUnit
 :itemUnit rdf:type owl:DatatypeProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain :Relief ;
+          rdfs:domain :Assistance ;
           rdfs:range xsd:string ;
           rdfs:label "item unit"@en .
 
@@ -1569,39 +1584,47 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :Assistance rdf:type owl:Class ;
             rdfs:subClassOf :Response ,
                             [ rdf:type owl:Restriction ;
+                              owl:onProperty :contributingOrg ;
+                              owl:someValuesFrom prov:Organization
+                            ] ,
+                            [ rdf:type owl:Restriction ;
                               owl:onProperty :agencyLGUsPresent ;
                               owl:someValuesFrom xsd:string
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :allocatedFunds ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :amountDSWD ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :amountLGU ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :amountNGOs ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :amountOCD ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :amountOtherGOs ;
-                              owl:someValuesFrom xsd:decimal
                             ] ,
                             [ rdf:type owl:Restriction ;
                               owl:onProperty :contributionAID ;
                               owl:someValuesFrom xsd:decimal
                             ] ,
                             [ rdf:type owl:Restriction ;
+                              owl:onProperty :contributionAmount ;
+                              owl:someValuesFrom xsd:decimal
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :contributionType ;
+                              owl:someValuesFrom xsd:string
+                            ] ,
+                            [ rdf:type owl:Restriction ;
                               owl:onProperty :internationalOrgsPresent ;
+                              owl:someValuesFrom xsd:string
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :itemCost ;
+                              owl:someValuesFrom xsd:decimal
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :itemCostPerUnit ;
+                              owl:someValuesFrom xsd:decimal
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :itemQuantity ;
+                              owl:someValuesFrom xsd:decimal
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :itemTypeOrNeeds ;
+                              owl:someValuesFrom xsd:string
+                            ] ,
+                            [ rdf:type owl:Restriction ;
+                              owl:onProperty :itemUnit ;
                               owl:someValuesFrom xsd:string
                             ] ,
                             [ rdf:type owl:Restriction ;
@@ -1822,6 +1845,14 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :DisasterType rdf:type owl:Class ;
               rdfs:label "Disaster Type" ;
               skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
+
+
+###  https://sakuna.ph/DisasterTypeScheme
+:DisasterTypeScheme rdf:type owl:Class ;
+                    rdfs:subClassOf [ rdf:type owl:Restriction ;
+                                      owl:onProperty :contributionAID ;
+                                      owl:someValuesFrom xsd:decimal
+                                    ] .
 
 
 ###  https://sakuna.ph/FlightDisruption
@@ -2129,37 +2160,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
         skos:definition "adm level 1" .
 
 
-###  https://sakuna.ph/Relief
-:Relief rdf:type owl:Class ;
-        rdfs:subClassOf :Response ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemCost ;
-                          owl:someValuesFrom xsd:decimal
-                        ] ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemCostPerUnit ;
-                          owl:someValuesFrom xsd:decimal
-                        ] ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemQuantity ;
-                          owl:someValuesFrom xsd:decimal
-                        ] ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemSource ;
-                          owl:someValuesFrom xsd:string
-                        ] ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemTypeOrNeeds ;
-                          owl:someValuesFrom xsd:string
-                        ] ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :itemUnit ;
-                          owl:someValuesFrom xsd:string
-                        ] ;
-        rdfs:label "Relief" ;
-        skos:definition "Represents the relief items provided after a disaster event." .
-
-
 ###  https://sakuna.ph/Rescue
 :Rescue rdf:type owl:Class ;
         rdfs:subClassOf :Preparedness ,
@@ -2393,13 +2393,9 @@ baw:NaturalDisaster rdf:type owl:Class ;
 #    Individuals
 #################################################################
 
-:DisasterTypeScheme
-    rdf:type skos:ConceptScheme, :DisasterTypeScheme ;
-    rdfs:label "Disaster Type Scheme" ;
-    skos:prefLabel "SakunaGraPH Disaster Type Classification Scheme"@en ;
-    skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
-    skos:hasTopConcept :Natural ;
-    skos:hasTopConcept :Technological .
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType
+baw:NaturalDisasterType rdf:type owl:NamedIndividual .
+
 
 ###  https://sakuna.ph/Air
 :Air rdf:type owl:NamedIndividual ,
@@ -2570,7 +2566,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 ###  https://sakuna.ph/DisasterTypeScheme
 :DisasterTypeScheme rdf:type owl:NamedIndividual ,
                              skos:Concept ,
-                             owl:Class ,
+                             skos:ConceptScheme ,
                              :DisasterTypeScheme ;
                     skos:hasTopConcept :Natural ,
                                        :Technological .
