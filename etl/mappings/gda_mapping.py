@@ -1,7 +1,8 @@
 from dataclasses import dataclass, fields
 from datetime import date
-from rdflib import RDF, XSD, Literal, URIRef, Graph
-from .graph import PROV, SKG
+from rdflib import RDF, XSD, BNode, Literal, URIRef, Graph
+from regex import M
+from .graph import PROV, QUDT, SKG, add_monetary
 from .iris import (
     event_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
     damage_gen_iri, recovery_iri
@@ -140,14 +141,13 @@ class Assistance:
     agencyLGUsPresentAssistance: str | None
     internationalOrgsPresent: str | None
     amountNGOs: float | None             # stored in millions
-
-
+    
 @dataclass
-class Relief:
+class Relief:  
     id: str
     itemType: str                        # e.g. "Goods", "Water", "Clothing" …
-    itemCost: float | None               # stored in millions
-    itemQty: str | None
+    itemCost: float | None  = None             # stored in millions
+    itemQty: str | None = None
 
 
 @dataclass
@@ -401,13 +401,25 @@ def infra_damage_mapping(rs: list[InfrastructureDamage], g: Graph) -> None:
         g.add((event_uri, SKG.hasInfrastructureDamage, uri))
 
         if r.infraDamageAmount is not None:
-            g.add((uri, SKG.infraDamageAmount, Literal(r.infraDamageAmount, datatype=XSD.decimal)))
+            # g.add((uri, SKG.infraDamageAmount, Literal(r.infraDamageAmount, datatype=XSD.decimal)))
+
+            add_monetary(g, uri, SKG.infraDamageAmount, _to_millions(r.infraDamageAmount), SKG.PHP_millions)
+            
         if r.commercialDamageAmount is not None:
-            g.add((uri, SKG.commercialDamageAmount, Literal(r.commercialDamageAmount, datatype=XSD.decimal)))
+            # g.add((uri, SKG.commercialDamageAmount, Literal(r.commercialDamageAmount, datatype=XSD.decimal)))
+
+            add_monetary(g, uri, SKG.commercialDamageAmount, _to_millions(r.commercialDamageAmount), SKG.PHP_millions)
+
+
         if r.socialDamageAmount is not None:
-            g.add((uri, SKG.socialDamageAmount, Literal(r.socialDamageAmount, datatype=XSD.decimal)))
+            # g.add((uri, SKG.socialDamageAmount, Literal(r.socialDamageAmount, datatype=XSD.decimal)))
+
+            add_monetary(g, uri, SKG.socialDamageAmount, _to_millions(r.socialDamageAmount), SKG.PHP_millions)
+
         if r.crossSectoralDamageAmount is not None:
-            g.add((uri, SKG.crossSectoralDamageAmount, Literal(r.crossSectoralDamageAmount, datatype=XSD.decimal)))
+            # g.add((uri, SKG.crossSectoralDamageAmount, Literal(r.crossSectoralDamageAmount, datatype=XSD.decimal)))
+
+            add_monetary(g, uri, SKG.crossSectoralDamageAmount, _to_millions(r.crossSectoralDamageAmount), SKG.PHP_millions)
 
 
 # ---------------------------------------------------------------------------
@@ -423,7 +435,9 @@ def damage_gen_mapping(rs: list[DamageGeneral], g: Graph) -> None:
         g.add((event_uri, SKG.hasDamageGeneral, uri))
 
         if r.generalDamageAmount is not None:
-            g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
+            # g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
+
+            add_monetary(g, uri, SKG.generalDamageAmount, _to_millions(r.generalDamageAmount), SKG.PHP_millions)
 
 
 # ---------------------------------------------------------------------------
@@ -518,6 +532,16 @@ def water_disruption_mapping(rs: list[WaterDisruption], g: Graph) -> None:
         if tap_desc:
             g.add((uri, SKG.affectedDescription, Literal(tap_desc)))
 
+def _to_millions(val: float):
+
+    fl_val = float(val)
+    if fl_val == 0: return fl_val
+
+    conv = val
+    if fl_val > 1000: 
+        conv = fl_val / 1000000
+
+    return conv
 
 # ---------------------------------------------------------------------------
 # Assistance mapping
@@ -526,23 +550,44 @@ def water_disruption_mapping(rs: list[WaterDisruption], g: Graph) -> None:
 def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
     for r in rs:
         event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "assistance")
-
-        g.add((uri, RDF.type, SKG.Assistance))
-        g.add((event_uri, SKG.hasAssistance, uri))
+        
 
         if r.allocatedFunds is not None:
-            g.add((uri, SKG.allocatedFunds, Literal(r.allocatedFunds, datatype=XSD.decimal)))
+
+            uri = _sub_uri(r.id, "assistance/allocated")
+
+            g.add((uri, RDF.type, SKG.Assistance))
+            g.add((event_uri, SKG.hasAssistance, uri))
+
+            add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.allocatedFunds), SKG.PHP_millions)
+
+            # g.add((uri, SKG.allocatedFunds, Literal(r.allocatedFunds, datatype=XSD.decimal)))
+
+        muri = _sub_uri(r.id, "assistance")
+
+        g.add((muri, RDF.type, SKG.Assistance))
+        g.add((event_uri, SKG.hasAssistance, muri))
+
         if r.agencyLGUsPresentAssistance:
-            g.add((uri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
+            g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
+
+
         if r.internationalOrgsPresent:
-            g.add((uri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
+            g.add((muri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
+
+
         if r.amountNGOs is not None:
-            g.add((uri, SKG.amountNGOs, Literal(r.amountNGOs, datatype=XSD.decimal)))
+            uri = _sub_uri(r.id, "assistance/ngo+international")
+
+            g.add((uri, RDF.type, SKG.Assistance))
+            g.add((event_uri, SKG.hasAssistance, uri))
+
+            # g.add((uri, SKG.amountNGOs, Literal(r.amountNGOs, datatype=XSD.decimal)))
+            add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.amountNGOs), SKG.PHP_millions)
 
 
 # ---------------------------------------------------------------------------
-# Relief mapping  (goods / water / clothing / medicine / unspecified / general)
+# Assistance mapping  (goods / water / clothing / medicine / unspecified / general)
 # ---------------------------------------------------------------------------
 
 _RELIEF_ITEM_TYPE_LABELS: dict[str, str] = {
@@ -558,17 +603,20 @@ _RELIEF_ITEM_TYPE_LABELS: dict[str, str] = {
 def relief_mapping(rs: list[Relief], g: Graph) -> None:
     for r in rs:
         event_uri = _event_uri(r.id)
-        # slug matches the RML template suffix, e.g. "relief/goods"
-        uri = _sub_uri(r.id, f"relief/{r.itemType.lower()}")
+        # slug matches the RML template suffix, e.g. "assistance/goods"
+        uri = _sub_uri(r.id, f"assistance/{r.itemType.lower()}")
 
-        g.add((uri, RDF.type, SKG.Relief))
-        g.add((event_uri, SKG.hasRelief, uri))
+        g.add((uri, RDF.type, SKG.Assistance))
+        g.add((event_uri, SKG.hasAssistance, uri))
 
         label = _RELIEF_ITEM_TYPE_LABELS.get(r.itemType.lower(), r.itemType)
         g.add((uri, SKG.itemTypeOrNeeds, Literal(label)))
 
         if r.itemCost is not None:
-            g.add((uri, SKG.itemCost, Literal(r.itemCost, datatype=XSD.decimal)))
+
+            add_monetary(g, uri, SKG.itemCost, _to_millions(r.itemCost), SKG.PHP_millions)
+
+            # g.add((uri, SKG.itemCost, Literal(r.itemCost, datatype=XSD.decimal)))
         if r.itemQty:
             g.add((uri, SKG.itemQty, Literal(r.itemQty)))
 
@@ -592,4 +640,6 @@ def recovery_mapping(rs: list[Recovery], g: Graph) -> None:
         if r.postTraining:
             g.add((uri, SKG.postTraining, Literal(r.postTraining)))
         if r.postStructureCost is not None:
-            g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
+            add_monetary(g, uri, SKG.postStructureCost, _to_millions(r.postStructureCost), SKG.PHP_millions)
+
+            # g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))

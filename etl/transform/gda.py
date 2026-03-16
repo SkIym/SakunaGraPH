@@ -11,11 +11,11 @@ from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.gda_mapping import (
     Assistance, AffectedPopulation, Casualties, CommunicationLineDisruption,
     DeclarationOfCalamity, DamageGeneral, Evacuation, Event, HousingDamage,
-    Incident, InfrastructureDamage, PowerDisruption, Preparedness, Recovery,
-    Relief, Rescue, RoadAndBridgesDamage, SeaportDisruption,
+    Incident, InfrastructureDamage, PowerDisruption, Preparedness, Recovery, Relief,
+    Rescue, RoadAndBridgesDamage, SeaportDisruption,
     WaterDisruption
 )
-from typing import Any, cast
+from typing import Any
 pd.set_option("future.no_silent_downcasting", True)
 from dataclasses import fields
 
@@ -468,6 +468,15 @@ def export_slices(df: pd.DataFrame, specs: dict[str, Any], out_dir: str | Path =
 
         tmp.to_csv(out_dir / filename, index=False, float_format=spec.get("float_format"))
 
+def _null(value: Any) -> bool:
+    
+    return (
+        value is None
+        or value is pd.NA
+        or (isinstance(value, float) and math.isnan(value))
+        or (isinstance(value, str) and value.strip().lower() in ("none", "nan", ""))
+    )
+
 def transform_gda(path: str) -> dict[type, list[Any]]:
     raw_path = Path("../data/raw/static/geog-archive-cleaned.xlsx")
     out_dir = Path("../data/parsed/gda")
@@ -532,7 +541,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
 
     clss: list[type] = [Assistance, AffectedPopulation, Casualties, CommunicationLineDisruption,
     DeclarationOfCalamity, DamageGeneral, Evacuation, Event, HousingDamage, InfrastructureDamage, PowerDisruption, Preparedness, Recovery,
-    Relief, Rescue, RoadAndBridgesDamage, SeaportDisruption,
+    Rescue, RoadAndBridgesDamage, SeaportDisruption,
     WaterDisruption]
 
     entities: dict[type, list[Any]] = {}
@@ -550,12 +559,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
             for f in class_fields:
                 value = row.get(f.name, None)
 
-                if (
-                    value is None
-                    or (isinstance(value, float) and math.isnan(value))
-                    or (isinstance(value, str) and value.strip().lower() in ("none", "nan", ""))
-                    or value is pd.NA
-                ):
+                if _null(value):
                     data[f.name] = None
                 else:
                     data[f.name] = value
@@ -573,21 +577,49 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
         for f in fields(Incident):
             value = row.get(f.name, None)
 
-            if (
-                    value is None
-                    or (isinstance(value, float) and math.isnan(value))
-                    or (isinstance(value, str) and value.strip().lower() in ("none", "nan", ""))
-                    or value is pd.NA
-                ):
+            if _null(value):
                 data[f.name] = None
             else:
-                print(value)
+                # print(value)
                 data[f.name] = value
 
         if any(v is not None and v != "" for k, v in data.items() if k != "id"):
-            print(Incident(**data))
+            # print(Incident(**data))
             entities[Incident].append(Incident(**data))
     
+    # relief — one Relief entity per type per row
+    _RELIEF_COLS: list[tuple[str, str, str | None]] = [
+        ("goods",       "itemCostGoods",    "itemQtyGoods"),
+        ("water",       "itemCostWater",    "itemQtyWater"),
+        ("clothing",    "itemCostClothing", "itemQtyClothing"),
+        ("medicine",    "itemCostMedicine", "itemQtyMedicine"),
+        ("unspecified", "itemCostOthers1",  None),
+        ("general",     "itemCostOthers2",  None),
+    ]
+
+    _GENERAL_GUARD_COLS = [
+        "itemCostOthers1", "itemCostClothing",
+        "itemCostMedicine", "itemCostGoods", "itemCostWater",
+    ]
+
+    entities[Relief] = []
+    for row in df.to_dict(orient="records"):
+        for item_type, cost_col, qty_col in _RELIEF_COLS:
+            cost = row.get(cost_col) 
+            qty  = row.get(qty_col) if qty_col else None
+
+            if item_type == "general" and any(not _null(row.get(c)) for c in _GENERAL_GUARD_COLS):
+                continue
+
+            if _null(cost) and _null(qty):
+                continue
+
+            entities[Relief].append(Relief(
+                id=row["id"],
+                itemType=item_type,
+                itemCost=None if _null(cost) else cost,
+                itemQty=None if _null(qty) else str(qty),
+            ))
 
     df.to_csv(out_dir / "gda.csv")
 
