@@ -3414,7 +3414,7 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 #################################################################
 
 :DisasterTypeScheme rdfs:label "Disaster Type Scheme" ;
-                    skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
+                    skos:defiition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
                     skos:prefLabel "SakunaGraPH Disaster Type Classification Scheme"@en .
 
 
