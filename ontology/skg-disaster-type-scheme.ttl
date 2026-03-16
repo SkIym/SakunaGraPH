@@ -1,0 +1,842 @@
+@prefix : <https://sakuna.ph/> .
+@prefix baw: <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<https://sakuna.ph/>
+    rdf:type owl:Ontology ;
+    rdfs:label "SakunaGraPH Disaster Type SKOS Scheme" .
+
+#################################################################
+#    Concept Scheme
+#################################################################
+
+:DisasterTypeScheme
+    rdf:type skos:ConceptScheme, :DisasterTypeScheme ;
+    rdfs:label "Disaster Type Scheme" ;
+    skos:prefLabel "SakunaGraPH Disaster Type Classification Scheme"@en ;
+    skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
+    skos:hasTopConcept :Natural ;
+    skos:hasTopConcept :Technological .
+
+#################################################################
+#    Top-Level Concepts
+#################################################################
+
+:Natural
+    rdf:type skos:Concept, :DisasterType ;
+    skos:closeMatch baw:NaturalDisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:topConceptOf :DisasterTypeScheme ;
+    skos:prefLabel "Natural"@en ;
+    skos:definition "Naturally occurring disastrous events" ;
+    skos:narrower :Biological ,
+                  :Climatological ,
+                  :Extraterrestrial ,
+                  :Geophysical ,
+                  :Hydrological ,
+                  :Meteorological .
+
+:Technological
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:topConceptOf :DisasterTypeScheme ;
+    skos:prefLabel "Technological"@en ;
+    skos:definition "Man-made events causing impact and technological incidents." ;
+    skos:example "Armed conflict, chemical spill, or industrial fires." ;
+    skos:narrower :ArmedConflict ,
+                  :IndustrialAccident ,
+                  :MiscellaneousAccident ,
+                  :Transport .
+
+#################################################################
+#    Natural > Biological
+#################################################################
+
+:Biological
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Biological"@en ;
+    skos:definition "A hazard caused by exposure to living organisms and/or their toxic substances (e.g., venom, or mold) or vector-borne diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, algae blooms, and mosquitoes carrying agents that causes disease such as parasites, bacteria, or viruses (e.g., malaria)." ;
+    skos:broader :Natural ;
+    skos:narrower :AnimalAccident ,
+                  :Epidemic ,
+                  :Infestation .
+
+:AnimalAccident
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Animal Accident"@en ;
+    skos:definition "Animal accident: Human encounters with dangerous or exotic animals in both urban and rural environments." ;
+    skos:broader :Biological .
+
+:Epidemic
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Epidemic"@en ;
+    skos:definition "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." ;
+    skos:broader :Biological ;
+    skos:narrower :BacterialDisease ,
+                  :FungalDisase ,
+                  :InfectiousDiseaseGeneral ,
+                  :ParasiticDisease ,
+                  :PrionDisease ,
+                  :ViralDisease .
+
+:BacterialDisease
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Bacterial Disease"@en ;
+    skos:definition "Bacterial disease: An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), gastroentritis due to unclean water, and cholera, pertussis, among others." ;
+    skos:broader :Epidemic .
+
+:FungalDisase
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Fungal Disease" ;
+    skos:definition "Fungal Disease: An unusual increase in the number of cases caused by exposure to fungi either through skin contact, ingestion, or inhalation of spores. Examples are fungal pneumonia, fungal meningitis, etc." ;
+    skos:broader :Epidemic .
+
+:InfectiousDiseaseGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Infectious Disease (General)"@en ;
+    skos:definition "Infectious disease (general): Either an unusual, often sudden, increase in the number of cases or outbreak of an infectious disease that already existed in the region (e.g., flu, or E. coli, gastroentritis or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." ;
+    skos:broader :Epidemic .
+
+:ParasiticDisease
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Parasitic Disease"@en ;
+    skos:definition "Parasitic disease: An unusual increase in the number of cases caused by exposure to a parasite, i.e., an organism living on or in a host. Exposure to parasites occurs mostly through contaminated water, food, or contact with insects, animals, etc. Examples are malaria, Chagas disease, giardiasis, and Trichinellosis." ;
+    skos:broader :Epidemic .
+
+:PrionDisease
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Prion Disease"@en ;
+    skos:definition "Prion disease: A type of biological hazard caused by prion proteins. Prion diseases or transmissible spongiform encephalopathies (TSEs) are a family of rare progressive neurodegenerative disorders that affect both humans and animals. They are characterized by long incubation periods and neural loss. Examples are Bovine Spongiform Encephalopathy (BSE), Creutzfeldt-Jakob Disease (CJD), Kuru, etc." ;
+    skos:broader :Epidemic .
+
+:ViralDisease
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Viral Disease"@en ;
+    skos:definition "Viral disease: An unusual increase in the number of cases caused by exposure to virus either through skin contact, ingestion, or inhalation. Common viral illnesses include colds, the flu, COVID-19, norovirus (\"stomach flu\"), HPV (warts) and herpes simplex virus (cold sores)" ;
+    skos:broader :Epidemic .
+
+:Infestation
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Infestation"@en ;
+    skos:definition "The pervasive influx, swarming and/or hatching of insects, worms, or other animals affecting humans, animals, crops, and perishable goods." ;
+    skos:broader :Biological ;
+    skos:narrower :GrasshopperInfestation ,
+                  :InfestationGeneral ,
+                  :LocustInfestation ,
+                  :WormsInfestation .
+
+:GrasshopperInfestation
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Grasshopper Infestation"@en ;
+    skos:definition "Infestation of grasshoppers (insects)." ;
+    skos:broader :Infestation .
+
+:InfestationGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Infestation (General)"@en ;
+    skos:definition "General infestation incidents." ;
+    skos:broader :Infestation .
+
+:LocustInfestation
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Locust Infestation"@en ;
+    skos:definition "Infestation of locusts (insects)." ;
+    skos:broader :Infestation .
+
+:WormsInfestation
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Worms Infestation"@en ;
+    skos:definition "Infestation of worms." ;
+    skos:broader :Infestation .
+
+#################################################################
+#    Natural > Climatological
+#################################################################
+
+:Climatological
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Climatological"@en ;
+    skos:definition "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to multi-decadal climate variability." ;
+    skos:broader :Natural ;
+    skos:narrower :Drought ,
+                  :Glacial ,
+                  :Wildfire .
+
+:Drought
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Drought"@en ;
+    skos:definition "Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." ;
+    skos:broader :Climatological .
+
+:Glacial
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Glacial"@en ;
+    skos:definition "Glacial: Occurs when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." ;
+    skos:broader :Climatological .
+
+:Wildfire
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Wildfire"@en ;
+    skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." ;
+    skos:broader :Climatological ;
+    skos:narrower :ForestFire ,
+                  :LandFire ,
+                  :WildfireGeneral .
+
+:ForestFire
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Forest Fire"@en ;
+    skos:definition "Forest Fire: A type of wildfire in a wooded area or forest. Can be due to El Nino." ;
+    skos:broader :Wildfire .
+
+:LandFire
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Land Fire"@en ;
+    skos:definition "Land Fire: A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment. Can be due to El Nino." ;
+    skos:broader :Wildfire .
+
+:WildfireGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Wildfire (General)"@en ;
+    skos:definition "Wildfire (general): Any type of fire  in a natural setting such as a grassland, mountain, brush land or tundra, which consumes natural fuels such as tress and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions. Can affect animals, trees, and properties. Can be due to El Nino." ;
+    skos:broader :Wildfire .
+
+#################################################################
+#    Natural > Extraterrestrial
+#################################################################
+
+:Extraterrestrial
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Extraterrestrial"@en ;
+    skos:definition "A hazard caused by asteroids, meteoroids, and comets as they pass near to the Earth, enter the Earth's atmosphere, and/or strike the Earth, and by changes in interplanetary conditions that effect the Earth's magnetosphere, ionosphere, and thermosphere." ;
+    skos:broader :Natural ;
+    skos:narrower :SpaceImpact ,
+                  :SpaceWeather .
+
+:SpaceImpact
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Space Impact"@en ;
+    skos:definition "Space impact: A type of extra-terrestrial hazard caused by the collision a meteoroid, asteroid, or comet with the Earth." ;
+    skos:broader :Extraterrestrial .
+
+:SpaceWeather
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Space Weather"@en ;
+    skos:definition "Space weather: A general term for extra-terrestrial weather conditions driven by solar eruptions such as geomagnetic storms, radio disturbances, and solar energetic particles." ;
+    skos:broader :Extraterrestrial .
+
+#################################################################
+#    Natural > Geophysical
+#################################################################
+
+:Geophysical
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Geophysical"@en ;
+    skos:definition "A hazard originating from solid earth. This term is used interchangeably with the term geological hazard." ;
+    skos:broader :Natural ;
+    skos:narrower :Earthquake ,
+                  :MassMovementDry ,
+                  :VolcanicActivity .
+
+:Earthquake
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Earthquake"@en ;
+    skos:definition "Sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking." ;
+    skos:broader :Geophysical ;
+    skos:narrower :GroundMovement ,
+                  :Tsunami .
+
+:GroundMovement
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Ground Movement"@en ;
+    skos:definition "Ground movement: Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions. Often described with magnitudes, intensities, and epicenters." ;
+    skos:broader :Earthquake .
+
+:Tsunami
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Tsunami"@en ;
+    skos:definition "Tsunami: A series of waves (with long wavelengths when traveling across the deep ocean) that are generated by a displacement of massive amounts of water through underwater earthquakes, volcanic eruptions, or landslides. Tsunami waves travel at very high speed across the ocean, but as they begin to reach shallow water they slow down, and the wave grows steeper." ;
+    skos:broader :Earthquake .
+
+:MassMovementDry
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Mass Movement (Dry)"@en ;
+    skos:definition "Any type of downslope movement of earth materials under hydrological dry conditions." ;
+    skos:broader :Geophysical ;
+    skos:narrower :AvalancheDry ,
+                  :LandslideDry ,
+                  :RockfallDry ,
+                  :SuddenSubsidenceDry .
+
+:AvalancheDry
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Avalanche (Dry)"@en ;
+    skos:definition "Avalanche (dry): A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Debris Avalanche: The sudden and very rapid downslope movement of a mixed mass of rock and soil. There are two general types of debris avalanches. A cold debris avalanche usually results from an unstable slope suddenly collapsing whereas a hot debris avalanche results from volcanic activity leading to slope instability and collapse." ;
+    skos:broader :MassMovementDry .
+
+:LandslideDry
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Landslide (Dry)"@en ;
+    skos:definition "Landslide (dry): Any kind of moderate to rapid soil movement, can be and often induced by an earthquake (under dry conditions) bringing damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often due to earthquakes and affecting houses." ;
+    skos:broader :MassMovementDry .
+
+:RockfallDry
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Rockfall (Dry)"@en ;
+    skos:definition "Rockfall (dry): A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions. Also called rock slide under dry conditions. Can be due to earthquakes. Can occur near roads." ;
+    skos:broader :MassMovementDry .
+
+:SuddenSubsidenceDry
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Sudden Subsidence (Dry)"@en ;
+    skos:definition "Sudden subsidence (dry): Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger. Can involve liquefaction and can be due to earthquakes." ;
+    skos:broader :MassMovementDry .
+
+:VolcanicActivity
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Volcanic Activity"@en ;
+    skos:definition "A type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." ;
+    skos:broader :Geophysical ;
+    skos:narrower :Ashfall ,
+                  :Lahar ,
+                  :LavaFlow ,
+                  :PyroclasticFlow ,
+                  :VolcanicActivityGeneral .
+
+:Ashfall
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Ashfall"@en ;
+    skos:definition "Ashfall: Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." ;
+    skos:broader :VolcanicActivity .
+
+:Lahar
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Lahar"@en ;
+    skos:definition "Lahar: Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." ;
+    skos:broader :VolcanicActivity .
+
+:LavaFlow
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Lava Flow"@en ;
+    skos:definition "Lava Flow: The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." ;
+    skos:broader :VolcanicActivity .
+
+:PyroclasticFlow
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Pyroclastic Flow"@en ;
+    skos:definition "Pyroclastic Flow: Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." ;
+    skos:broader :VolcanicActivity .
+
+:VolcanicActivityGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Volcanic Activity (General)"@en ;
+    skos:definition "Volcanic activity (general): A type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material. Explosive eruptions in volcanoes." ;
+    skos:broader :VolcanicActivity .
+
+#################################################################
+#    Natural > Hydrological
+#################################################################
+
+:Hydrological
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Hydrological"@en ;
+    skos:definition "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater." ;
+    skos:broader :Natural ;
+    skos:narrower :Flood ,
+                  :MassMovementWet ,
+                  :WaveAction .
+
+:Flood
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Flood"@en ;
+    skos:definition "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." ;
+    skos:broader :Hydrological ;
+    skos:narrower :CoastalFlood ,
+                  :FlashFlood ,
+                  :FloodGeneral ,
+                  :IceJamFlood ,
+                  :RiverineFlood .
+
+:CoastalFlood
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Coastal Flood"@en ;
+    skos:definition "Coastal flood: Flood along the coast caused by tidal changes or storms. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+    skos:broader :Flood .
+
+:FlashFlood
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Flash Flood"@en ;
+    skos:definition "Flash flood: Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+    skos:broader :Flood .
+
+:FloodGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Flood (General)"@en ;
+    skos:definition "Flood (General): A general term for flooded areas (subsided, receding, or still flooded) or floodwaters and the overflow of water levels. Barangays and sitios affected, damaged and normally flooded in ft. Involves flooding in roads, zones, and areas in the country, affecting families and households. Can involve overflow or box of culverts, knee, waist, and gutter-deep levels of water. Sheet flooding. Can be due to heavy rains, monsoons, tropical storms, tropical cyclones, tropical depressions, and low pressure areas." ;
+    skos:broader :Flood .
+
+:IceJamFlood
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Ice Jam Flood"@en ;
+    skos:definition "Ice Jam: The accumulation of floating ice restricting or blocking a river's flow and drainage. Ice jams tend to develop near river bends and obstructions (e.g., bridges)." ;
+    skos:broader :Flood .
+
+:RiverineFlood
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Riverine Flood"@en ;
+    skos:definition "Riverine flood: A type of flooding resulting due to the river (swollen river) or overflowing of a stream, creek, or  channel onto normally dry land in the floodplain adjacent to the channel." ;
+    skos:broader :Flood .
+
+:MassMovementWet
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Mass Movement (Wet)"@en ;
+    skos:definition "Types of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces." ;
+    skos:broader :Hydrological ;
+    skos:narrower :AvalancheWet ,
+                  :LandslideWet ,
+                  :Mudslide ,
+                  :RockfallWet ,
+                  :SuddenSubsidenceWet .
+
+:AvalancheWet
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Avalanche (Wet)"@en ;
+    skos:definition "Avalanche (wet): A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Snow Avalanche: Rapid downslope movement of a mix of snow and ice." ;
+    skos:broader :MassMovementWet .
+
+:LandslideWet
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Landslide (Wet)"@en ;
+    skos:definition "Landslide (wet): Any kind of moderate to rapid soil movement, can be induced by rain (under wet conditions) bringing damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.  Often due to rain and affecting houses." ;
+    skos:broader :MassMovementWet .
+
+:Mudslide
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Mudslide"@en ;
+    skos:definition "Mudslide: A form of mass wasting involving fast-moving flow of debris and dirt that has become liquified by the addition of water. Also called a mudflow. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+    skos:broader :MassMovementWet .
+
+:RockfallWet
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Rockfall (Wet)"@en ;
+    skos:definition "Rockfall (wet): A quantity of rock or boulders that has fallen from a cliff face, mountain or from the roof or walls of mine or quarry workings under wet conditions or rain. Also called rock slide under wet conditions. Can be due to tropical cyclones, tropical storms, tropical depressions, shear line, monsoons. Sometimes reported to hit structures." ;
+    skos:broader :MassMovementWet .
+
+:SuddenSubsidenceWet
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Sudden Subsidence (Wet)"@en ;
+    skos:definition "Sudden subsidence (wet): Sinking of the ground like liquefaction near rivers or seas due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain). Can be due to tropical cyclones, stroms, depressions as well." ;
+    skos:broader :MassMovementWet .
+
+:WaveAction
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Wave Action"@en ;
+    skos:definition "Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." ;
+    skos:broader :Hydrological ;
+    skos:narrower :RogueWave ,
+                  :Seiche ,
+                  :WaveActionGeneral .
+
+:RogueWave
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Rogue Wave"@en ;
+    skos:definition "Rouge wave: An unusual single crest of an ocean wave far out at sea that is much higher and/or steeper than other waves in the prevailing swell system." ;
+    skos:broader :WaveAction .
+
+:Seiche
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Seiche"@en ;
+    skos:definition "Seiche: A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." ;
+    skos:broader :WaveAction .
+
+:WaveActionGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Wave Action (General)" ;
+    skos:definition "Wave action (general): Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." ;
+    skos:broader :WaveAction .
+
+#################################################################
+#    Natural > Meteorological
+#################################################################
+
+:Meteorological
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Meteorological"@en ;
+    skos:definition "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from minutes to days." ;
+    skos:broader :Natural ;
+    skos:narrower :ExtremeTemperature ,
+                  :Fog ,
+                  :Storm .
+
+:ExtremeTemperature
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Extreme Temperature"@en ;
+    skos:definition "A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions." ;
+    skos:broader :Meteorological ;
+    skos:narrower :ColdWave ,
+                  :HeatWave ,
+                  :SevereWinterConditions .
+
+:ColdWave
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Cold Wave"@en ;
+    skos:definition "Cold wave: A period of abnormally cold weather. Typically, a cold wave lasts for two or more days and may be aggravated by high winds. The exact temperature criteria for what constitutes a cold wave may vary by location." ;
+    skos:broader :ExtremeTemperature .
+
+:HeatWave
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Heat Wave"@en ;
+    skos:definition "Heat wave: A period of abnormally hot and/or unusually humid weather. Typically, a heat wave lasts for two or more days. The exact temperature criteria for what constitutes a heat wave may vary by location." ;
+    skos:broader :ExtremeTemperature .
+
+:SevereWinterConditions
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Severe Winter Conditions"@en ;
+    skos:definition "Severe winter conditions: Damage caused by snow and ice. Winter damage refers to damage to buildings, infrastructure, traffic (esp. navigation) inflicted by snow and ice in the form of snow pressure, freezing rain, frozen waterways etc." ;
+    skos:broader :ExtremeTemperature .
+
+:Fog
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Fog"@en ;
+    skos:definition "Fog: Water droplets that are suspended in the air near the Earth's surface. Fog is, in fact, simply a cloud that is in contact with the ground." ;
+    skos:broader :Meteorological .
+
+:Storm
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Storm"@en ;
+    skos:broader :Meteorological ;
+    skos:narrower :BlizzardStorm ,
+                  :Derecho ,
+                  :ExtratropicalStorm ,
+                  :Hail ,
+                  :SandStorm ,
+                  :SevereWeather ,
+                  :StormGeneral ,
+                  :StormSurge ,
+                  :Thunderstorms ,
+                  :Tornado ,
+                  :TropicalCyclone .
+
+:BlizzardStorm
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Blizzard Storm"@en ;
+    skos:definition "Blizzard storm: A low-pressure system in winter months with significant accumulations of snow, freezing rain, sleet, or ice. A blizzard is a severe snowstorm with winds exceeding 35 mph (56 km/h) for three or more hours, producing reduced visibility (less than 0.25 miles (400 m))." ;
+    skos:broader :Storm .
+
+:Derecho
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Derecho"@en ;
+    skos:definition "Derecho: Windstorms associated with a convection.. Derechos include downburst and straight-line winds." ;
+    skos:broader :Storm .
+
+:ExtratropicalStorm
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Extratropical Storm"@en ;
+    skos:definition "Extratropical storm: A type of cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor'easter)." ;
+    skos:broader :Storm .
+
+:Hail
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Hail"@en ;
+    skos:definition "Hail: Solid precipitation in the form of irregular pellets or balls of ice more than 5 mm in diameter." ;
+    skos:broader :Storm .
+
+:SandStorm
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Sand Storm"@en ;
+    skos:definition "Sand storm: Strong winds carrying particles of sand aloft, but generally confined to less than 50 feet (15 m), especially common in arid and semi-arid environments. A dust storm is also characterized by strong winds but carries smaller particles of dust rather than sand over an extensive area." ;
+    skos:broader :Storm .
+
+:SevereWeather
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Severe Weather"@en ;
+    skos:definition "Severe weather, heavy rains and strong winds bringing damage." ;
+    skos:broader :Storm .
+
+:StormGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Storm (General)"@en ;
+    skos:definition "Storm general: Can be storms brought by monsoons (southwest monsoons) and shear lines." ;
+    skos:broader :Storm .
+
+:StormSurge
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Storm Surge"@en ;
+    skos:definition "Storm Surge: An abnormal surge or rise in sea level. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+    skos:broader :Storm .
+
+:Thunderstorms
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Thunderstorms"@en ;
+    skos:definition "Thunderstorms: Lightnings produced by a thunderstorm and followed by the sound of thunder." ;
+    skos:broader :Storm .
+
+:Tornado
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Tornado"@en ;
+    skos:definition "Tornadoes and whirlwinds. A violently rotating column of air that reaches the ground or open water (waterspout)." ;
+    skos:broader :Storm .
+
+:TropicalCyclone
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Tropical Cyclone"@en ;
+    skos:definition "Tropical Cyclone: Can be called typhoons, super typhoons, tropical storms, tropical depressions, and low pressure areas. Sometimes called TS, TC, TD, LPA plus the name. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean). A tropical cyclone originates over tropical or subtropical waters." ;
+    skos:broader :Storm .
+
+#################################################################
+#    Technological > Armed Conflict
+#################################################################
+
+:ArmedConflict
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Armed Conflict"@en ;
+    skos:definition "Ambush/shooting, grenade/bombing incidents, can also involve civil disturbances, violence, and gun fires or armed scandals that can be due to national and local elections and holidays, for example. Often involves victims, killings, and results to deaths or injury." ;
+    skos:broader :Technological .
+
+#################################################################
+#    Technological > Industrial Accident
+#################################################################
+
+:IndustrialAccident
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Industrial Accident"@en ;
+    skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." ;
+    skos:broader :Technological ;
+    skos:narrower :ChemicalSpill ,
+                  :CollapseIndustrial ,
+                  :ExplosionIndustrial ,
+                  :FireIndustrial ,
+                  :GasLeak ,
+                  :IndustrialAccidentGeneral ,
+                  :OilSpill ,
+                  :Poisoning ,
+                  :Radiation .
+
+:ChemicalSpill
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Chemical Spill"@en ;
+    skos:definition "Chemical spill: Accident release occurring during the production, transportation, or handling of hazardous chemical substances." ;
+    skos:broader :IndustrialAccident .
+
+:CollapseIndustrial
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Collapse (Industrial)"@en ;
+    skos:definition "Collapse (industrial): Accident involving the fall or collapse of a building or structure. Can involve fallen industrial or commercial structures like billboards, towers, stores. Can be due to typhoons, ropical storms, tropical cyclones, tropical depressions." ;
+    skos:broader :IndustrialAccident .
+
+:ExplosionIndustrial
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Explosion (Industrial)"@en ;
+    skos:definition "Explosion (industrial): Explosions involving buildings or structures. Can involve industrial structures." ;
+    skos:broader :IndustrialAccident .
+
+:FireIndustrial
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Fire (Industrial)"@en ;
+    skos:definition "Fire (industrial): Fire incidents involving industrial buildings or structures." ;
+    skos:broader :IndustrialAccident .
+
+:GasLeak
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Gas Leak"@en ;
+    skos:definition "Gas leak incidents." ;
+    skos:broader :IndustrialAccident .
+
+:IndustrialAccidentGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Industrial Accident (General)"@en ;
+    skos:definition "Industrial accident (general): Any form of general industrial accidents." ;
+    skos:broader :IndustrialAccident .
+
+:OilSpill
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Oil Spill"@en ;
+    skos:definition "Oil spill: Accident release occurring during the production, transportation, or handling of oil." ;
+    skos:broader :IndustrialAccident .
+
+:Poisoning
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Poisoning"@en ;
+    skos:definition "Poisoning of atmosphere or water courses due to industrial sources of contamination." ;
+    skos:broader :IndustrialAccident .
+
+:Radiation
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Radiation"@en ;
+    skos:definition "Radiation: Exposure to harmful radiation or reactive substances." ;
+    skos:broader :IndustrialAccident .
+
+#################################################################
+#    Technological > Miscellaneous Accident
+#################################################################
+
+:MiscellaneousAccident
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Miscellaneous Accident"@en ;
+    skos:definition "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." ;
+    skos:broader :Technological ;
+    skos:narrower :CollapseMiscellaneous ,
+                  :ExplosionMiscellaneous ,
+                  :FireMiscellaneous ,
+                  :MiscellaneousAccidentGeneral .
+
+:CollapseMiscellaneous
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Collapse (Misc)"@en ;
+    skos:definition "Collapse of a building or structure. Can involve fallen debris, fallen tree/s, uprooted trees, toppled posts, and soil collapse. Can be due to typhoons, strong winds, tropical storms, tropical cyclones, tropical depressions." ;
+    skos:broader :MiscellaneousAccident .
+
+:ExplosionMiscellaneous
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Explosion (Misc)"@en ;
+    skos:definition "Explosion (miscellaneous): Non-industrial explosions involving buildings or structures. Grenade/bomb explosions. Can be due to elections and holidays." ;
+    skos:broader :MiscellaneousAccident .
+
+:FireMiscellaneous
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Fire (Misc)"@en ;
+    skos:definition "Fire (miscellaneous): Non-industrial fire incidents. Can involve residential structures." ;
+    skos:broader :MiscellaneousAccident .
+
+:MiscellaneousAccidentGeneral
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Miscellaneous Accident (General)"@en ;
+    skos:definition "Miscellaneous accident (general): Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents and food poisoning. Does not include transport or vehicular accidents." ;
+    skos:broader :MiscellaneousAccident .
+
+#################################################################
+#    Technological > Transport
+#################################################################
+
+:Transport
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Transport"@en ;
+    skos:definition "Disaster type term used to describe technological transport accidents involving mechanized modes of transport. It comprises four disaster subtypes (i.e., Air, Water, Rail, and Road)." ;
+    skos:broader :Technological ;
+    skos:narrower :Air ,
+                  :Rail ,
+                  :Road ,
+                  :Water .
+
+:Air
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Air"@en ;
+    skos:definition "Air: Transport accidents involving airplanes, helicopters, airships, and balloons." ;
+    skos:broader :Transport .
+
+:Rail
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Rail"@en ;
+    skos:definition "Rail: Transport accidents involving trains." ;
+    skos:broader :Transport .
+
+:Road
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Road"@en ;
+    skos:definition "Road: Transport or vehicular accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall, earthquakes, or certain special events like holidays. Can involve road cuts and collisions." ;
+    skos:broader :Transport .
+
+:Water
+    rdf:type skos:Concept, :DisasterType ;
+    skos:inScheme :DisasterTypeScheme ;
+    skos:prefLabel "Water" ;
+    skos:definition "Water: Transport or maritime accidents or incidents involving sailing boats (motorbancas), ferries, cruise ships, and other vessels. Can be due to weather conditions, strong winds, typhoons, tropical storms, cyclones, and depressions." ;
+    skos:broader :Transport .

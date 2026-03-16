@@ -61,7 +61,6 @@ baw:hasIncidentLocation rdf:type owl:ObjectProperty ;
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentOccurrence
 baw:hasIncidentOccurrence rdf:type owl:ObjectProperty ;
                           rdfs:subPropertyOf baw:hasDisasterOccurrence ;
-                          rdfs:domain :DisasterType ;
                           rdfs:range baw:Incident ;
                           rdfs:label "has incident occurrence" ;
                           skos:definition "Links an incident type to an incident." .
@@ -949,7 +948,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/latitude
 :latitude rdf:type owl:DatatypeProperty ;
           rdfs:subPropertyOf owl:topDataProperty ;
-          rdfs:domain :Earthquake ;
           rdfs:range xsd:decimal ;
           rdfs:label "latitude"@en .
 
@@ -963,7 +961,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/longitude
 :longitude rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:domain :Earthquake ;
            rdfs:range xsd:decimal ;
            rdfs:label "longitude"@en .
 
@@ -971,7 +968,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 ###  https://sakuna.ph/magnitude
 :magnitude rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:domain :Earthquake ;
            rdfs:range xsd:decimal ;
            rdfs:label "magnitude"@en .
 
@@ -1455,14 +1451,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
                     skos:definition "Represents the actual manifestation of a natural disaster type. An instance of a natural disaster has specific climate conditions with specific values (e.g. temperature = 45) plus some other properties (e.g. start/end time)." .
 
 
-###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType
-baw:NaturalDisasterType rdf:type owl:Class ;
-                        owl:equivalentClass :Natural ;
-                        rdfs:label "Natural Disaster Type" ;
-                        skos:definition "Represents the various types of natural disasters." ;
-                        skos:example "Floods, forest fires, storms or earthquakes etc." .
-
-
 ###  https://sakuna.ph/AffectedPopulation
 :AffectedPopulation rdf:type owl:Class ;
                     rdfs:subClassOf :Impact ,
@@ -1549,13 +1537,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                    skos:definition "Represents damage on agriculture, farmers, fisherfolks, and crops." .
 
 
-###  https://sakuna.ph/Air
-:Air rdf:type owl:Class ;
-     rdfs:subClassOf :Transport ;
-     rdfs:label "Air"@en ;
-     skos:definition "Air: Transport accidents involving airplanes, helicopters, airships, and balloons." .
-
-
 ###  https://sakuna.ph/AirportDisruption
 :AirportDisruption rdf:type owl:Class ;
                    rdfs:subClassOf :Impact ,
@@ -1582,27 +1563,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                    rdfs:label "Airport Disruption" ;
                    skos:altLabel "Flight Disruption" ;
                    skos:definition "Represents disruptions on airports." .
-
-
-###  https://sakuna.ph/AnimalAccident
-:AnimalAccident rdf:type owl:Class ;
-                rdfs:subClassOf :Biological ;
-                rdfs:label "Animal Accident"@en ;
-                skos:definition "Animal accident: Human encounters with dangerous or exotic animals in both urban and rural environments." .
-
-
-###  https://sakuna.ph/ArmedConflict
-:ArmedConflict rdf:type owl:Class ;
-               rdfs:subClassOf :Technological ;
-               rdfs:label "Armed Conflict"@en ;
-               skos:definition "Ambush/shooting, grenade/bombing incidents, can also involve civil disturbances, violence, and gun fires or armed scandals that can be due to national and local elections and holidays, for example. Often involves victims, killings, and results to deaths or injury." .
-
-
-###  https://sakuna.ph/Ashfall
-:Ashfall rdf:type owl:Class ;
-         rdfs:subClassOf :VolcanicActivity ;
-         rdfs:label "Ashfall"@en ;
-         skos:definition "Ashfall: Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." .
 
 
 ###  https://sakuna.ph/Assistance
@@ -1656,27 +1616,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
             skos:definition "Represents the monetary assistance provided during or after a disaster event." .
 
 
-###  https://sakuna.ph/AvalancheDry
-:AvalancheDry rdf:type owl:Class ;
-              rdfs:subClassOf :MassMovementDry ;
-              rdfs:label "Avalanche (Dry)"@en ;
-              skos:definition "Avalanche (dry): A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Debris Avalanche: The sudden and very rapid downslope movement of a mixed mass of rock and soil. There are two general types of debris avalanches. A cold debris avalanche usually results from an unstable slope suddenly collapsing whereas a hot debris avalanche results from volcanic activity leading to slope instability and collapse." .
-
-
-###  https://sakuna.ph/AvalancheWet
-:AvalancheWet rdf:type owl:Class ;
-              rdfs:subClassOf :MassMovementWet ;
-              rdfs:label "Avalanche (Wet)"@en ;
-              skos:definition "Avalanche (wet): A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Snow Avalanche: Rapid downslope movement of a mix of snow and ice." .
-
-
-###  https://sakuna.ph/BacterialDisease
-:BacterialDisease rdf:type owl:Class ;
-                  rdfs:subClassOf :Epidemic ;
-                  rdfs:label "Bacterial Disease"@en ;
-                  skos:definition "Bacterial disease: An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), gastroentritis due to unclean water, and cholera, pertussis, among others." .
-
-
 ###  https://sakuna.ph/Barangay
 :Barangay rdf:type owl:Class ;
           rdfs:subClassOf :Location ,
@@ -1686,20 +1625,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                           ] ;
           rdfs:label "Barangay"@en ;
           skos:definition "adm level 4" .
-
-
-###  https://sakuna.ph/Biological
-:Biological rdf:type owl:Class ;
-            rdfs:subClassOf :Natural ;
-            rdfs:label "Biological"@en ;
-            skos:definition "A hazard caused by exposure to living organisms and/or their toxic substances (e.g., venom, or mold) or vector-borne diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, algae blooms, and mosquitoes carrying agents that causes disease such as parasites, bacteria, or viruses (e.g., malaria)." .
-
-
-###  https://sakuna.ph/BlizzardStorm
-:BlizzardStorm rdf:type owl:Class ;
-               rdfs:subClassOf :Storm ;
-               rdfs:label "Blizzard Storm"@en ;
-               skos:definition "Blizzard storm: A low-pressure system in winter months with significant accumulations of snow, freezing rain, sleet, or ice. A blizzard is a severe snowstorm with winds exceeding 35 mph (56 km/h) for three or more hours, producing reduced visibility (less than 0.25 miles (400 m))." .
 
 
 ###  https://sakuna.ph/Casualties
@@ -1723,13 +1648,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                             ] ;
             rdfs:label "Casualties"@en ;
             skos:definition "Represents the number of deaths, injured, and missing due to a disaster." .
-
-
-###  https://sakuna.ph/ChemicalSpill
-:ChemicalSpill rdf:type owl:Class ;
-               rdfs:subClassOf :IndustrialAccident ;
-               rdfs:label "Chemical Spill"@en ;
-               skos:definition "Chemical spill: Accident release occurring during the production, transportation, or handling of hazardous chemical substances." .
 
 
 ###  https://sakuna.ph/City
@@ -1768,41 +1686,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                  ] ;
                  rdfs:label "Class Suspension"@en ;
                  skos:definition "Represents education operational disruptions." .
-
-
-###  https://sakuna.ph/Climatological
-:Climatological rdf:type owl:Class ;
-                rdfs:subClassOf :Natural ;
-                rdfs:label "Climatological"@en ;
-                skos:definition "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to multi-decadal climate variability." .
-
-
-###  https://sakuna.ph/CoastalFlood
-:CoastalFlood rdf:type owl:Class ;
-              rdfs:subClassOf :Flood ;
-              rdfs:label "Coastal Flood"@en ;
-              skos:definition "Coastal flood: Flood along the coast caused by tidal changes or storms. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." .
-
-
-###  https://sakuna.ph/ColdWave
-:ColdWave rdf:type owl:Class ;
-          rdfs:subClassOf :ExtremeTemperature ;
-          rdfs:label "Cold Wave"@en ;
-          skos:definition "Cold wave: A period of abnormally cold weather. Typically, a cold wave lasts for two or more days and may be aggravated by high winds. The exact temperature criteria for what constitutes a cold wave may vary by location." .
-
-
-###  https://sakuna.ph/CollapseIndustrial
-:CollapseIndustrial rdf:type owl:Class ;
-                    rdfs:subClassOf :IndustrialAccident ;
-                    rdfs:label "Collapse (Industrial)"@en ;
-                    skos:definition "Collapse (industrial): Accident involving the fall or collapse of a building or structure. Can involve fallen industrial or commercial structures like billboards, towers, stores. Can be due to typhoons, ropical storms, tropical cyclones, tropical depressions." .
-
-
-###  https://sakuna.ph/CollapseMiscellaneous
-:CollapseMiscellaneous rdf:type owl:Class ;
-                       rdfs:subClassOf :MiscellaneousAccident ;
-                       rdfs:label "Collapse (Misc)"@en ;
-                       skos:definition "Collapse of a building or structure. Can involve fallen debris, fallen tree/s, uprooted trees, toppled posts, and soil collapse. Can be due to typhoons, strong winds, tropical storms, tropical cyclones, tropical depressions." .
 
 
 ###  https://sakuna.ph/CommunicationLineDisruption
@@ -1877,20 +1760,9 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                        skos:definition "Represents events of state of calamity declaration." .
 
 
-###  https://sakuna.ph/Derecho
-:Derecho rdf:type owl:Class ;
-         rdfs:subClassOf :Storm ;
-         rdfs:label "Derecho"@en ;
-         skos:definition "Derecho: Windstorms associated with a convection.. Derechos include downburst and straight-line winds." .
-
-
 ###  https://sakuna.ph/DisasterEvent
 :DisasterEvent rdf:type owl:Class ;
                rdfs:subClassOf [ rdf:type owl:Restriction ;
-                                 owl:onProperty :hasDisasterType ;
-                                 owl:someValuesFrom :DisasterType
-                               ] ,
-                               [ rdf:type owl:Restriction ;
                                  owl:onProperty :hasImpact ;
                                  owl:someValuesFrom :Impact
                                ] ,
@@ -1952,188 +1824,10 @@ baw:NaturalDisasterType rdf:type owl:Class ;
               skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
 
 
-###  https://sakuna.ph/DisasterTypeScheme
-:DisasterTypeScheme rdf:type owl:Class ;
-                    rdfs:label "Disaster Type Scheme" .
-
-
-###  https://sakuna.ph/Drought
-:Drought rdf:type owl:Class ;
-         rdfs:subClassOf :Climatological ;
-         rdfs:label "Drought"@en ;
-         skos:definition "Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." .
-
-
-###  https://sakuna.ph/Earthquake
-:Earthquake rdf:type owl:Class ;
-            rdfs:subClassOf :Geophysical ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :latitude ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :longitude ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :magnitude ;
-                              owl:someValuesFrom xsd:decimal
-                            ] ;
-            rdfs:label "Earthquake"@en ;
-            skos:definition "Sudden movement of a block of the Earth’s crust along a geological fault and associated ground shaking." .
-
-
-###  https://sakuna.ph/Epidemic
-:Epidemic rdf:type owl:Class ;
-          rdfs:subClassOf :Biological ;
-          rdfs:label "Epidemic"@en ;
-          skos:definition "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
-
-
-###  https://sakuna.ph/ExplosionIndustrial
-:ExplosionIndustrial rdf:type owl:Class ;
-                     rdfs:subClassOf :IndustrialAccident ;
-                     rdfs:label "Explosion (Industrial)"@en ;
-                     skos:definition "Explosion (industrial): Explosions involving buildings or structures. Can involve industrial structures." .
-
-
-###  https://sakuna.ph/ExplosionMiscellaneous
-:ExplosionMiscellaneous rdf:type owl:Class ;
-                        rdfs:subClassOf :MiscellaneousAccident ;
-                        rdfs:label "Explosion (Misc)"@en ;
-                        skos:definition "Explosion (miscellaneous): Non-industrial explosions involving buildings or structures. Grenade/bomb explosions. Can be due to elections and holidays." .
-
-
-###  https://sakuna.ph/Extraterrestrial
-:Extraterrestrial rdf:type owl:Class ;
-                  rdfs:subClassOf :Natural ;
-                  rdfs:label "Extraterrestrial"@en ;
-                  skos:definition "A hazard caused by asteroids, meteoroids, and comets as they pass near to the Earth, enter the Earth’s atmosphere, and/or strike the Earth, and by changes in interplanetary conditions that effect the Earth’s magnetosphere, ionosphere, and thermosphere." .
-
-
-###  https://sakuna.ph/ExtratropicalStorm
-:ExtratropicalStorm rdf:type owl:Class ;
-                    rdfs:subClassOf :Storm ;
-                    rdfs:label "Extratropical Storm"@en ;
-                    skos:definition "Extratropical storm: A type of cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor’easter)." .
-
-
-###  https://sakuna.ph/ExtremeTemperature
-:ExtremeTemperature rdf:type owl:Class ;
-                    rdfs:subClassOf :Meteorological ;
-                    rdfs:label "Extreme Temperature"@en ;
-                    skos:definition "A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions." .
-
-
-###  https://sakuna.ph/FireIndustrial
-:FireIndustrial rdf:type owl:Class ;
-                rdfs:subClassOf :IndustrialAccident ;
-                rdfs:label "Fire (Industrial)"@en ;
-                skos:definition "Fire (industrial): Fire incidents involving industrial buildings or structures." .
-
-
-###  https://sakuna.ph/FireMiscellaneous
-:FireMiscellaneous rdf:type owl:Class ;
-                   rdfs:subClassOf :MiscellaneousAccident ;
-                   rdfs:label "Fire (Misc)"@en ;
-                   skos:definition "Fire (miscellaneous): Non-industrial fire incidents. Can involve residential structures." .
-
-
-###  https://sakuna.ph/FlashFlood
-:FlashFlood rdf:type owl:Class ;
-            rdfs:subClassOf :Flood ;
-            rdfs:label "Flash Flood"@en ;
-            skos:definition "Flash flood: Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." .
-
-
 ###  https://sakuna.ph/FlightDisruption
 :FlightDisruption rdf:type owl:Class ;
                   rdfs:subClassOf :Impact ;
                   rdfs:label "Flight Disruption" .
-
-
-###  https://sakuna.ph/Flood
-:Flood rdf:type owl:Class ;
-       rdfs:subClassOf :Hydrological ;
-       rdfs:label "Flood"@en ;
-       skos:definition "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." .
-
-
-###  https://sakuna.ph/FloodGeneral
-:FloodGeneral rdf:type owl:Class ;
-              rdfs:subClassOf :Flood ;
-              rdfs:label "Flood (General)"@en ;
-              skos:definition "Flood (General): A general term for flooded areas (subsided, receding, or still flooded) or floodwaters and the overflow of water levels. Barangays and sitios affected, damaged and normally flooded in ft. Involves flooding in roads, zones, and areas in the country, affecting families and households. Can involve overflow or box of culverts, knee, waist, and gutter-deep levels of water. Sheet flooding. Can be due to heavy rains, monsoons, tropical storms, tropical cyclones, tropical depressions, and low pressure areas." .
-
-
-###  https://sakuna.ph/Fog
-:Fog rdf:type owl:Class ;
-     rdfs:subClassOf :Meteorological ;
-     rdfs:label "Fog"@en ;
-     skos:definition "Fog: Water droplets that are suspended in the air near the Earth’s surface. Fog is, in fact, simply a cloud that is in contact with the ground." .
-
-
-###  https://sakuna.ph/ForestFire
-:ForestFire rdf:type owl:Class ;
-            rdfs:subClassOf :Wildfire ;
-            rdfs:label "Forest Fire"@en ;
-            skos:definition "Forest Fire: A type of wildfire in a wooded area or forest. Can be due to El Nino." .
-
-
-###  https://sakuna.ph/FungalDisase
-:FungalDisase rdf:type owl:Class ;
-              rdfs:subClassOf :Epidemic ;
-              rdfs:label "Fungal Disease" ;
-              skos:definition "Fungal Disease: An unusual increase in the number of cases caused by exposure to fungi either through skin contact, ingestion, or inhalation of spores. Examples are fungal pneumonia, fungal meningitis, etc." .
-
-
-###  https://sakuna.ph/GasLeak
-:GasLeak rdf:type owl:Class ;
-         rdfs:subClassOf :IndustrialAccident ;
-         rdfs:label "Gas Leak"@en ;
-         skos:definition "Gas leak incidents." .
-
-
-###  https://sakuna.ph/Geophysical
-:Geophysical rdf:type owl:Class ;
-             rdfs:subClassOf :Natural ;
-             rdfs:label "Geophysical"@en ;
-             skos:definition "A hazard originating from solid earth. This term is used interchangeably with the term geological hazard." .
-
-
-###  https://sakuna.ph/Glacial
-:Glacial rdf:type owl:Class ;
-         rdfs:subClassOf :Climatological ;
-         rdfs:label "Glacial"@en ;
-         skos:definition "Glacial: Occurs when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." .
-
-
-###  https://sakuna.ph/GrasshopperInfestation
-:GrasshopperInfestation rdf:type owl:Class ;
-                        rdfs:subClassOf :Infestation ;
-                        rdfs:label "Grasshopper Infestation"@en ;
-                        skos:definition "Infestation of grasshoppers (insects)." .
-
-
-###  https://sakuna.ph/GroundMovement
-:GroundMovement rdf:type owl:Class ;
-                rdfs:subClassOf :Earthquake ;
-                rdfs:label "Ground Movement"@en ;
-                skos:definition "Ground movement: Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions. Often described with magnitudes, intensities, and epicenters." .
-
-
-###  https://sakuna.ph/Hail
-:Hail rdf:type owl:Class ;
-      rdfs:subClassOf :Storm ;
-      rdfs:label "Hail"@en ;
-      skos:definition "Hail: Solid precipitation in the form of irregular pellets or balls of ice more than 5 mm in diameter." .
-
-
-###  https://sakuna.ph/HeatWave
-:HeatWave rdf:type owl:Class ;
-          rdfs:subClassOf :ExtremeTemperature ;
-          rdfs:label "Heat Wave"@en ;
-          skos:definition "Heat wave: A period of abnormally hot and/or unusually humid weather. Typically, a heat wave lasts for two or more days. The exact temperature criteria for what constitutes a heat wave may vary by location." .
 
 
 ###  https://sakuna.ph/HousingDamage
@@ -2153,20 +1847,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                                ] ;
                rdfs:label "Housing Damage"@en ;
                skos:definition "Represents impact on housing." .
-
-
-###  https://sakuna.ph/Hydrological
-:Hydrological rdf:type owl:Class ;
-              rdfs:subClassOf :Natural ;
-              rdfs:label "Hydrological"@en ;
-              skos:definition "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater." .
-
-
-###  https://sakuna.ph/IceJamFlood
-:IceJamFlood rdf:type owl:Class ;
-             rdfs:subClassOf :Flood ;
-             rdfs:label "Ice Jam Flood"@en ;
-             skos:definition "Ice Jam: The accumulation of floating ice restricting or blocking a river’s flow and drainage. Ice jams tend to develop near river bends and obstructions (e.g., bridges)." .
 
 
 ###  https://sakuna.ph/Impact
@@ -2220,41 +1900,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
           owl:disjointWith :MajorEvent ;
           rdfs:label "Incident"@en ;
           skos:definition "A localized or small-scale disaster event, often reported at the municipal or barangay level and is related with a bigger, major event." .
-
-
-###  https://sakuna.ph/IndustrialAccident
-:IndustrialAccident rdf:type owl:Class ;
-                    rdfs:subClassOf :Technological ;
-                    rdfs:label "Industrial Accident"@en ;
-                    skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." .
-
-
-###  https://sakuna.ph/IndustrialAccidentGeneral
-:IndustrialAccidentGeneral rdf:type owl:Class ;
-                           rdfs:subClassOf :IndustrialAccident ;
-                           rdfs:label "Industrial Accident (General)"@en ;
-                           skos:definition "Industrial accident (general): Any form of general industrial accidents." .
-
-
-###  https://sakuna.ph/InfectiousDiseaseGeneral
-:InfectiousDiseaseGeneral rdf:type owl:Class ;
-                          rdfs:subClassOf :Epidemic ;
-                          rdfs:label "Infectious Disease (General)"@en ;
-                          skos:definition "Infectious disease (general): Either an unusual, often sudden, increase in the number of cases or outbreak of an infectious disease that already existed in the region (e.g., flu, or E. coli, gastroentritis or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." .
-
-
-###  https://sakuna.ph/Infestation
-:Infestation rdf:type owl:Class ;
-             rdfs:subClassOf :Biological ;
-             rdfs:label "Infestation"@en ;
-             skos:definition "The pervasive influx, swarming and/or hatching of insects, worms, or other animals affecting humans, animals, crops, and perishable goods." .
-
-
-###  https://sakuna.ph/InfestationGeneral
-:InfestationGeneral rdf:type owl:Class ;
-                    rdfs:subClassOf :Infestation ;
-                    rdfs:label "Infestation (General)"@en ;
-                    skos:definition "General infestation incidents." .
 
 
 ###  https://sakuna.ph/InfrastructureDamage
@@ -2314,53 +1959,11 @@ baw:NaturalDisasterType rdf:type owl:Class ;
              rdfs:label "Island Group" .
 
 
-###  https://sakuna.ph/Lahar
-:Lahar rdf:type owl:Class ;
-       rdfs:subClassOf :VolcanicActivity ;
-       rdfs:label "Lahar"@en ;
-       skos:definition "Lahar: Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." .
-
-
-###  https://sakuna.ph/LandFire
-:LandFire rdf:type owl:Class ;
-          rdfs:subClassOf :Wildfire ;
-          rdfs:label "Land Fire"@en ;
-          skos:definition "Land Fire: A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment. Can be due to El Nino." .
-
-
-###  https://sakuna.ph/LandslideDry
-:LandslideDry rdf:type owl:Class ;
-              rdfs:subClassOf :MassMovementDry ;
-              rdfs:label "Landslide (Dry)"@en ;
-              skos:definition "Landslide (dry): Any kind of moderate to rapid soil movement, can be and often induced by an earthquake (under dry conditions) bringing damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often due to earthquakes and affecting houses." .
-
-
-###  https://sakuna.ph/LandslideWet
-:LandslideWet rdf:type owl:Class ;
-              rdfs:subClassOf :MassMovementWet ;
-              rdfs:label "Landslide (Wet)"@en ;
-              skos:definition "Landslide (wet): Any kind of moderate to rapid soil movement, can be induced by rain (under wet conditions) bringing damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.  Often due to rain and affecting houses." .
-
-
-###  https://sakuna.ph/LavaFlow
-:LavaFlow rdf:type owl:Class ;
-          rdfs:subClassOf :VolcanicActivity ;
-          rdfs:label "Lava Flow"@en ;
-          skos:definition "Lava Flow: The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." .
-
-
 ###  https://sakuna.ph/Location
 :Location rdf:type owl:Class ;
           rdfs:subClassOf geo:Feature ;
           rdfs:label "Location"@en ;
           skos:definition "Represents tiered locations (administrative levels) in the Philippines." .
-
-
-###  https://sakuna.ph/LocustInfestation
-:LocustInfestation rdf:type owl:Class ;
-                   rdfs:subClassOf :Infestation ;
-                   rdfs:label "Locust Infestation"@en ;
-                   skos:definition "Infestation of locusts (insects)." .
 
 
 ###  https://sakuna.ph/MajorEvent
@@ -2374,48 +1977,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
             skos:definition "A large-scale or aggregated event spanning days that may encompass multiple locations and related incidents." .
 
 
-###  https://sakuna.ph/MassMovementDry
-:MassMovementDry rdf:type owl:Class ;
-                 rdfs:subClassOf :Geophysical ;
-                 rdfs:label "Mass Movement (Dry)"@en ;
-                 skos:definition "Any type of downslope movement of earth materials under hydrological dry conditions." .
-
-
-###  https://sakuna.ph/MassMovementWet
-:MassMovementWet rdf:type owl:Class ;
-                 rdfs:subClassOf :Hydrological ;
-                 rdfs:label "Mass Movement (Wet)"@en ;
-                 skos:definition "Types of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces." .
-
-
-###  https://sakuna.ph/Meteorological
-:Meteorological rdf:type owl:Class ;
-                rdfs:subClassOf :Natural ;
-                rdfs:label "Meteorological"@en ;
-                skos:definition "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from minutes to days." .
-
-
-###  https://sakuna.ph/MiscellaneousAccident
-:MiscellaneousAccident rdf:type owl:Class ;
-                       rdfs:subClassOf :Technological ;
-                       rdfs:label "Miscellaneous Accident"@en ;
-                       skos:definition "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." .
-
-
-###  https://sakuna.ph/MiscellaneousAccidentGeneral
-:MiscellaneousAccidentGeneral rdf:type owl:Class ;
-                              rdfs:subClassOf :MiscellaneousAccident ;
-                              rdfs:label "Miscellaneous Accident (General)"@en ;
-                              skos:definition "Miscellaneous accident (general): Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents and food poisoning. Does not include transport or vehicular accidents." .
-
-
-###  https://sakuna.ph/Mudslide
-:Mudslide rdf:type owl:Class ;
-          rdfs:subClassOf :MassMovementWet ;
-          rdfs:label "Mudslide"@en ;
-          skos:definition "Mudslide: A form of mass wasting involving fast-moving flow of debris and dirt that has become liquified by the addition of water. Also called a mudflow. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." .
-
-
 ###  https://sakuna.ph/Municipality
 :Municipality rdf:type owl:Class ;
               rdfs:subClassOf :Location ,
@@ -2425,35 +1986,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                               ] ;
               rdfs:label "Municipality"@en ;
               skos:definition "adm level 3" .
-
-
-###  https://sakuna.ph/Natural
-:Natural rdf:type owl:Class ;
-         rdfs:subClassOf :DisasterType ;
-         owl:disjointWith :Technological ;
-         rdfs:label "Natural"@en ;
-         skos:definition "Naturally occurring disastrous events" .
-
-
-###  https://sakuna.ph/OilSpill
-:OilSpill rdf:type owl:Class ;
-          rdfs:subClassOf :IndustrialAccident ;
-          rdfs:label "Oil Spill"@en ;
-          skos:definition "Oil spill: Accident release occurring during the production, transportation, or handling of oil." .
-
-
-###  https://sakuna.ph/ParasiticDisease
-:ParasiticDisease rdf:type owl:Class ;
-                  rdfs:subClassOf :Epidemic ;
-                  rdfs:label "Parasitic Disease"@en ;
-                  skos:definition "Parasitic disease: An unusual increase in the number of cases caused by exposure to a parasite, i.e., an organism living on or in a host. Exposure to parasites occurs mostly through contaminated water, food, or contact with insects, animals, etc. Examples are malaria, Chagas disease, giardiasis, and Trichinellosis." .
-
-
-###  https://sakuna.ph/Poisoning
-:Poisoning rdf:type owl:Class ;
-           rdfs:subClassOf :IndustrialAccident ;
-           rdfs:label "Poisoning"@en ;
-           skos:definition "Poisoning of atmosphere or water courses due to industrial sources of contamination." .
 
 
 ###  https://sakuna.ph/PowerDisruption
@@ -2552,13 +2084,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
               skos:definition "Represents preparations done by government or non-government units before a disaster event." .
 
 
-###  https://sakuna.ph/PrionDisease
-:PrionDisease rdf:type owl:Class ;
-              rdfs:subClassOf :Epidemic ;
-              rdfs:label "Prion Disease"@en ;
-              skos:definition "Prion disease: A type of biological hazard caused by prion proteins. Prion diseases or transmissible spongiform encephalopathies (TSEs) are a family of rare progressive neurodegenerative disorders that affect both humans and animals. They are characterized by long incubation periods and neural loss. Examples are Bovine Spongiform Encephalopathy (BSE), Creutzfeldt-Jakob Disease (CJD), Kuru, etc." .
-
-
 ###  https://sakuna.ph/Province
 :Province rdf:type owl:Class ;
           rdfs:subClassOf :Location ,
@@ -2568,27 +2093,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                           ] ;
           rdfs:label "Province"@en ;
           skos:definition "adm level 2" .
-
-
-###  https://sakuna.ph/PyroclasticFlow
-:PyroclasticFlow rdf:type owl:Class ;
-                 rdfs:subClassOf :VolcanicActivity ;
-                 rdfs:label "Pyroclastic Flow"@en ;
-                 skos:definition "Pyroclastic Flow: Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." .
-
-
-###  https://sakuna.ph/Radiation
-:Radiation rdf:type owl:Class ;
-           rdfs:subClassOf :IndustrialAccident ;
-           rdfs:label "Radiation"@en ;
-           skos:definition "Radiation: Exposure to harmful radiation or reactive substances." .
-
-
-###  https://sakuna.ph/Rail
-:Rail rdf:type owl:Class ;
-      rdfs:subClassOf :Transport ;
-      rdfs:label "Rail"@en ;
-      skos:definition "Rail: Transport accidents involving trains." .
 
 
 ###  https://sakuna.ph/Recovery
@@ -2701,20 +2205,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
           skos:definition "Represents the responses taken to a disaster." .
 
 
-###  https://sakuna.ph/RiverineFlood
-:RiverineFlood rdf:type owl:Class ;
-               rdfs:subClassOf :Flood ;
-               rdfs:label "Riverine Flood"@en ;
-               skos:definition "Riverine flood: A type of flooding resulting due to the river (swollen river) or overflowing of a stream, creek, or  channel onto normally dry land in the floodplain adjacent to the channel." .
-
-
-###  https://sakuna.ph/Road
-:Road rdf:type owl:Class ;
-      rdfs:subClassOf :Transport ;
-      rdfs:label "Road"@en ;
-      skos:definition "Road: Transport or vehicular accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall, earthquakes, or certain special events like holidays. Can involve road cuts and collisions." .
-
-
 ###  https://sakuna.ph/RoadAndBridgesDamage
 :RoadAndBridgesDamage rdf:type owl:Class ;
                       rdfs:subClassOf :Impact ,
@@ -2750,34 +2240,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                       skos:definition "Represents land transportation disruptions." .
 
 
-###  https://sakuna.ph/RockfallDry
-:RockfallDry rdf:type owl:Class ;
-             rdfs:subClassOf :MassMovementDry ;
-             rdfs:label "Rockfall (Dry)"@en ;
-             skos:definition "Rockfall (dry): A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions. Also called rock slide under dry conditions. Can be due to earthquakes. Can occur near roads." .
-
-
-###  https://sakuna.ph/RockfallWet
-:RockfallWet rdf:type owl:Class ;
-             rdfs:subClassOf :MassMovementWet ;
-             rdfs:label "Rockfall (Wet)"@en ;
-             skos:definition "Rockfall (wet): A quantity of rock or boulders that has fallen from a cliff face, mountain or from the roof or walls of mine or quarry workings under wet conditions or rain. Also called rock slide under wet conditions. Can be due to tropical cyclones, tropical storms, tropical depressions, shear line, monsoons. Sometimes reported to hit structures." .
-
-
-###  https://sakuna.ph/RogueWave
-:RogueWave rdf:type owl:Class ;
-           rdfs:subClassOf :WaveAction ;
-           rdfs:label "Rogue Wave"@en ;
-           skos:definition "Rouge wave: An unusual single crest of an ocean wave far out at sea that is much higher and/or steeper than other waves in the prevailing swell system." .
-
-
-###  https://sakuna.ph/SandStorm
-:SandStorm rdf:type owl:Class ;
-           rdfs:subClassOf :Storm ;
-           rdfs:label "Sand Storm"@en ;
-           skos:definition "Sand storm: Strong winds carrying particles of sand aloft, but generally confined to less than 50 feet (15 m), especially common in arid and semi-arid environments. A dust storm is also characterized by strong winds but carries smaller particles of dust rather than sand over an extensive area." .
-
-
 ###  https://sakuna.ph/SeaportDisruption
 :SeaportDisruption rdf:type owl:Class ;
                    rdfs:subClassOf :Impact ,
@@ -2805,27 +2267,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                    skos:definition "Represents seaport disruptions." .
 
 
-###  https://sakuna.ph/Seiche
-:Seiche rdf:type owl:Class ;
-        rdfs:subClassOf :WaveAction ;
-        rdfs:label "Seiche"@en ;
-        skos:definition "Seiche: A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." .
-
-
-###  https://sakuna.ph/SevereWeather
-:SevereWeather rdf:type owl:Class ;
-               rdfs:subClassOf :Storm ;
-               rdfs:label "Severe Weather"@en ;
-               skos:definition "Severe weather, heavy rains and strong winds bringing damage." .
-
-
-###  https://sakuna.ph/SevereWinterConditions
-:SevereWinterConditions rdf:type owl:Class ;
-                        rdfs:subClassOf :ExtremeTemperature ;
-                        rdfs:label "Severe Winter Conditions"@en ;
-                        skos:definition "Severe winter conditions: Damage caused by snow and ice. Winter damage refers to damage to buildings, infrastructure, traffic (esp. navigation) inflicted by snow and ice in the form of snow pressure, freezing rain, frozen waterways etc." .
-
-
 ###  https://sakuna.ph/Source
 :Source rdf:type owl:Class ;
         rdfs:subClassOf prov:Entity ,
@@ -2851,40 +2292,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                         ] ;
         rdfs:label "Source" ;
         skos:definition "Represents the source that provided the disaster data." .
-
-
-###  https://sakuna.ph/SpaceImpact
-:SpaceImpact rdf:type owl:Class ;
-             rdfs:subClassOf :Extraterrestrial ;
-             rdfs:label "Space Impact"@en ;
-             skos:definition "Space impact: A type of extra-terrestrial hazard caused by the collision a meteoroid, asteroid, or comet with the Earth." .
-
-
-###  https://sakuna.ph/SpaceWeather
-:SpaceWeather rdf:type owl:Class ;
-              rdfs:subClassOf :Extraterrestrial ;
-              rdfs:label "Space Weather"@en ;
-              skos:definition "Space weather: A general term for extra-terrestrial weather conditions driven by solar eruptions such as geomagnetic storms, radio disturbances, and solar energetic particles." .
-
-
-###  https://sakuna.ph/Storm
-:Storm rdf:type owl:Class ;
-       rdfs:subClassOf :Meteorological ;
-       rdfs:label "Storm"@en .
-
-
-###  https://sakuna.ph/StormGeneral
-:StormGeneral rdf:type owl:Class ;
-              rdfs:subClassOf :Storm ;
-              rdfs:label "Storm (General)"@en ;
-              skos:definition "Storm general: Can be storms brought by monsoons (southwest monsoons) and shear lines." .
-
-
-###  https://sakuna.ph/StormSurge
-:StormSurge rdf:type owl:Class ;
-            rdfs:subClassOf :Storm ;
-            rdfs:label "Storm Surge"@en ;
-            skos:definition "Storm Surge: An abnormal surge or rise in sea level. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." .
 
 
 ###  https://sakuna.ph/StrandedEvent
@@ -2932,92 +2339,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                  rdfs:label "SubMunicipality" .
 
 
-###  https://sakuna.ph/SuddenSubsidenceDry
-:SuddenSubsidenceDry rdf:type owl:Class ;
-                     rdfs:subClassOf :MassMovementDry ;
-                     rdfs:label "Sudden Subsidence (Dry)"@en ;
-                     skos:definition "Sudden subsidence (dry): Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger. Can involve liquefaction and can be due to earthquakes." .
-
-
-###  https://sakuna.ph/SuddenSubsidenceWet
-:SuddenSubsidenceWet rdf:type owl:Class ;
-                     rdfs:subClassOf :MassMovementWet ;
-                     rdfs:label "Sudden Subsidence (Wet)"@en ;
-                     skos:definition "Sudden subsidence (wet): Sinking of the ground like liquefaction near rivers or seas due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain). Can be due to tropical cyclones, stroms, depressions as well." .
-
-
-###  https://sakuna.ph/Technological
-:Technological rdf:type owl:Class ;
-               rdfs:subClassOf :DisasterType ;
-               rdfs:label "Technological"@en ;
-               skos:definition "Man-made events causing impact and technological incidents." ;
-               skos:example "Armed conflict, chemical spill, or industrial fires." .
-
-
-###  https://sakuna.ph/Thunderstorms
-:Thunderstorms rdf:type owl:Class ;
-               rdfs:subClassOf :Storm ;
-               rdfs:label "Thunderstorms"@en ;
-               skos:definition "Thunderstorms: Lightnings produced by a thunderstorm and followed by the sound of thunder." ;
-               prov:sharesDefinitionWith "Lightning" .
-
-
-###  https://sakuna.ph/Tornado
-:Tornado rdf:type owl:Class ;
-         rdfs:subClassOf :Storm ;
-         rdfs:label "Tornado"@en ;
-         skos:definition "Tornadoes and whirlwinds. A violently rotating column of air that reaches the ground or open water (waterspout)." .
-
-
-###  https://sakuna.ph/Transport
-:Transport rdf:type owl:Class ;
-           rdfs:subClassOf :Technological ;
-           rdfs:label "Transport"@en ;
-           skos:definition "Disaster type term used to describe technological transport accidents involving mechanized modes of transport. It comprises four disaster subtypes (i.e., Air, Water, Rail, and Road)." .
-
-
-###  https://sakuna.ph/TropicalCyclone
-:TropicalCyclone rdf:type owl:Class ;
-                 rdfs:subClassOf :Storm ;
-                 rdfs:label "Tropical Cyclone"@en ;
-                 skos:definition "Tropical Cyclone: Can be called typhoons, super typhoons, tropical storms, tropical depressions, and low pressure areas. Sometimes called TS, TC, TD, LPA plus the name. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean). A tropical cyclone originates over tropical or subtropical waters." .
-
-
-###  https://sakuna.ph/Tsunami
-:Tsunami rdf:type owl:Class ;
-         rdfs:subClassOf :Earthquake ;
-         rdfs:label "Tsunami"@en ;
-         skos:definition "Tsunami: A series of waves (with long wavelengths when traveling across the deep ocean) that are generated by a displacement of massive amounts of water through underwater earthquakes, volcanic eruptions, or landslides. Tsunami waves travel at very high speed across the ocean, but as they begin to reach shallow water they slow down, and the wave grows steeper." .
-
-
-###  https://sakuna.ph/ViralDisease
-:ViralDisease rdf:type owl:Class ;
-              rdfs:subClassOf :Epidemic ;
-              rdfs:label "Viral Disease"@en ;
-              skos:definition "Viral disease: An unusual increase in the number of cases caused by exposure to virus either through skin contact, ingestion, or inhalation. Common viral illnesses include colds, the flu, COVID-19, norovirus (“stomach flu”), HPV (warts) and herpes simplex virus (cold sores)" .
-
-
-###  https://sakuna.ph/VolcanicActivity
-:VolcanicActivity rdf:type owl:Class ;
-                  rdfs:subClassOf :Geophysical ;
-                  rdfs:label "Volcanic Activity"@en ;
-                  skos:definition "A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." .
-
-
-###  https://sakuna.ph/VolcanicActivityGeneral
-:VolcanicActivityGeneral rdf:type owl:Class ;
-                         rdfs:subClassOf :VolcanicActivity ;
-                         rdfs:label "Volcanic Activity (General)"@en ;
-                         skos:definition "Volcanic activity (general): A type of volcanic event near an opening/vent in the Earth’s surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material. Explosive eruptions in volcanoes." .
-
-
-###  https://sakuna.ph/Water
-:Water rdf:type owl:Class ;
-       rdfs:subClassOf :Transport ;
-       rdfs:label "Water" ;
-       skos:definition "Water: Transport or maritime accidents or incidents involving sailing boats (motorbancas), ferries, cruise ships, and other vessels. Can be due to weather conditions, strong winds, typhoons, tropical storms, cyclones, and depressions." .
-
-
 ###  https://sakuna.ph/WaterDisruption
 :WaterDisruption rdf:type owl:Class ;
                  rdfs:subClassOf :Impact ,
@@ -3045,34 +2366,6 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                  skos:definition "Represents clean water disruptions." .
 
 
-###  https://sakuna.ph/WaveAction
-:WaveAction rdf:type owl:Class ;
-            rdfs:subClassOf :Hydrological ;
-            rdfs:label "Wave Action"@en ;
-            skos:definition "Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." .
-
-
-###  https://sakuna.ph/WaveActionGeneral
-:WaveActionGeneral rdf:type owl:Class ;
-                   rdfs:subClassOf :WaveAction ;
-                   rdfs:comment "Wave action (general): Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." ;
-                   rdfs:label "Wave Action (General)" .
-
-
-###  https://sakuna.ph/Wildfire
-:Wildfire rdf:type owl:Class ;
-          rdfs:subClassOf :Climatological ;
-          rdfs:label "Wildfire"@en ;
-          skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." .
-
-
-###  https://sakuna.ph/WildfireGeneral
-:WildfireGeneral rdf:type owl:Class ;
-                 rdfs:subClassOf :Wildfire ;
-                 rdfs:label "Wildfire (General)"@en ;
-                 skos:definition "Wildfire (general): Any type of fire  in a natural setting such as a grassland, mountain, brush land or tundra, which consumes natural fuels such as tress and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions. Can affect animals, trees, and properties. Can be due to El Nino." .
-
-
 ###  https://sakuna.ph/WorkSuspension
 :WorkSuspension rdf:type owl:Class ;
                 rdfs:subClassOf :Impact ,
@@ -3096,11 +2389,1100 @@ baw:NaturalDisasterType rdf:type owl:Class ;
                 skos:definition "Represents work operational disruptions." .
 
 
+#################################################################
+#    Individuals
+#################################################################
+
+:DisasterTypeScheme
+    rdf:type skos:ConceptScheme, :DisasterTypeScheme ;
+    rdfs:label "Disaster Type Scheme" ;
+    skos:prefLabel "SakunaGraPH Disaster Type Classification Scheme"@en ;
+    skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
+    skos:hasTopConcept :Natural ;
+    skos:hasTopConcept :Technological .
+
+###  https://sakuna.ph/Air
+:Air rdf:type owl:NamedIndividual ,
+              skos:Concept ,
+              :DisasterType ;
+     skos:broader :Transport ;
+     skos:inScheme :DisasterTypeScheme ;
+     skos:definition "Air: Transport accidents involving airplanes, helicopters, airships, and balloons." ;
+     skos:prefLabel "Air"@en .
+
+
+###  https://sakuna.ph/AnimalAccident
+:AnimalAccident rdf:type owl:NamedIndividual ,
+                         skos:Concept ,
+                         :DisasterType ;
+                skos:broader :Biological ;
+                skos:inScheme :DisasterTypeScheme ;
+                skos:definition "Animal accident: Human encounters with dangerous or exotic animals in both urban and rural environments." ;
+                skos:prefLabel "Animal Accident"@en .
+
+
+###  https://sakuna.ph/ArmedConflict
+:ArmedConflict rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:broader :Technological ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:definition "Ambush/shooting, grenade/bombing incidents, can also involve civil disturbances, violence, and gun fires or armed scandals that can be due to national and local elections and holidays, for example. Often involves victims, killings, and results to deaths or injury." ;
+               skos:prefLabel "Armed Conflict"@en .
+
+
+###  https://sakuna.ph/Ashfall
+:Ashfall rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :VolcanicActivity ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Ashfall: Fine (less than 4 mm in diameter) unconsolidated volcanic debris blown into the atmosphere during an eruption; can remain airborne for long periods of time and travel a considerable distance from the source." ;
+         skos:prefLabel "Ashfall"@en .
+
+
+###  https://sakuna.ph/AvalancheDry
+:AvalancheDry rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :MassMovementDry ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Avalanche (dry): A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Debris Avalanche: The sudden and very rapid downslope movement of a mixed mass of rock and soil. There are two general types of debris avalanches. A cold debris avalanche usually results from an unstable slope suddenly collapsing whereas a hot debris avalanche results from volcanic activity leading to slope instability and collapse." ;
+              skos:prefLabel "Avalanche (Dry)"@en .
+
+
+###  https://sakuna.ph/AvalancheWet
+:AvalancheWet rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :MassMovementWet ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Avalanche (wet): A large mass of loosened earth material, snow, or ice that slides, flows, or falls rapidly down a mountainside under the force of gravity. Snow Avalanche: Rapid downslope movement of a mix of snow and ice." ;
+              skos:prefLabel "Avalanche (Wet)"@en .
+
+
+###  https://sakuna.ph/BacterialDisease
+:BacterialDisease rdf:type owl:NamedIndividual ,
+                           skos:Concept ,
+                           :DisasterType ;
+                  skos:broader :Epidemic ;
+                  skos:inScheme :DisasterTypeScheme ;
+                  skos:definition "Bacterial disease: An unusual increase in the number of cases caused by exposure to bacteria either through skin contact, ingestion, or inhalation. Examples include salmonella, Methicillin-Resistant Staphylococcus Aureus (MRSA), gastroentritis due to unclean water, and cholera, pertussis, among others." ;
+                  skos:prefLabel "Bacterial Disease"@en .
+
+
+###  https://sakuna.ph/Biological
+:Biological rdf:type owl:NamedIndividual ,
+                     skos:Concept ,
+                     :DisasterType ;
+            skos:broader :Natural ;
+            skos:inScheme :DisasterTypeScheme ;
+            skos:narrower :AnimalAccident ,
+                          :Epidemic ,
+                          :Infestation ;
+            skos:definition "A hazard caused by exposure to living organisms and/or their toxic substances (e.g., venom, or mold) or vector-borne diseases that they may carry. Examples are venomous wildlife and insects, poisonous plants, algae blooms, and mosquitoes carrying agents that causes disease such as parasites, bacteria, or viruses (e.g., malaria)." ;
+            skos:prefLabel "Biological"@en .
+
+
+###  https://sakuna.ph/BlizzardStorm
+:BlizzardStorm rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:broader :Storm ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:definition "Blizzard storm: A low-pressure system in winter months with significant accumulations of snow, freezing rain, sleet, or ice. A blizzard is a severe snowstorm with winds exceeding 35 mph (56 km/h) for three or more hours, producing reduced visibility (less than 0.25 miles (400 m))." ;
+               skos:prefLabel "Blizzard Storm"@en .
+
+
+###  https://sakuna.ph/ChemicalSpill
+:ChemicalSpill rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:broader :IndustrialAccident ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:definition "Chemical spill: Accident release occurring during the production, transportation, or handling of hazardous chemical substances." ;
+               skos:prefLabel "Chemical Spill"@en .
+
+
+###  https://sakuna.ph/Climatological
+:Climatological rdf:type owl:NamedIndividual ,
+                         skos:Concept ,
+                         :DisasterType ;
+                skos:broader :Natural ;
+                skos:inScheme :DisasterTypeScheme ;
+                skos:narrower :Drought ,
+                              :Glacial ,
+                              :Wildfire ;
+                skos:definition "A hazard caused by long-lived, meso- to macro-scale atmospheric processes ranging from intra-seasonal to multi-decadal climate variability." ;
+                skos:prefLabel "Climatological"@en .
+
+
+###  https://sakuna.ph/CoastalFlood
+:CoastalFlood rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Flood ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Coastal flood: Flood along the coast caused by tidal changes or storms. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+              skos:prefLabel "Coastal Flood"@en .
+
+
+###  https://sakuna.ph/ColdWave
+:ColdWave rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :ExtremeTemperature ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:definition "Cold wave: A period of abnormally cold weather. Typically, a cold wave lasts for two or more days and may be aggravated by high winds. The exact temperature criteria for what constitutes a cold wave may vary by location." ;
+          skos:prefLabel "Cold Wave"@en .
+
+
+###  https://sakuna.ph/CollapseIndustrial
+:CollapseIndustrial rdf:type owl:NamedIndividual ,
+                             skos:Concept ,
+                             :DisasterType ;
+                    skos:broader :IndustrialAccident ;
+                    skos:inScheme :DisasterTypeScheme ;
+                    skos:definition "Collapse (industrial): Accident involving the fall or collapse of a building or structure. Can involve fallen industrial or commercial structures like billboards, towers, stores. Can be due to typhoons, ropical storms, tropical cyclones, tropical depressions." ;
+                    skos:prefLabel "Collapse (Industrial)"@en .
+
+
+###  https://sakuna.ph/CollapseMiscellaneous
+:CollapseMiscellaneous rdf:type owl:NamedIndividual ,
+                                skos:Concept ,
+                                :DisasterType ;
+                       skos:broader :MiscellaneousAccident ;
+                       skos:inScheme :DisasterTypeScheme ;
+                       skos:definition "Collapse of a building or structure. Can involve fallen debris, fallen tree/s, uprooted trees, toppled posts, and soil collapse. Can be due to typhoons, strong winds, tropical storms, tropical cyclones, tropical depressions." ;
+                       skos:prefLabel "Collapse (Misc)"@en .
+
+
+###  https://sakuna.ph/Derecho
+:Derecho rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :Storm ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Derecho: Windstorms associated with a convection.. Derechos include downburst and straight-line winds." ;
+         skos:prefLabel "Derecho"@en .
+
+
+###  https://sakuna.ph/DisasterTypeScheme
+:DisasterTypeScheme rdf:type owl:NamedIndividual ,
+                             skos:Concept ,
+                             owl:Class ,
+                             :DisasterTypeScheme ;
+                    skos:hasTopConcept :Natural ,
+                                       :Technological .
+
+
+###  https://sakuna.ph/Drought
+:Drought rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :Climatological ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." ;
+         skos:prefLabel "Drought"@en .
+
+
+###  https://sakuna.ph/Earthquake
+:Earthquake rdf:type owl:NamedIndividual ,
+                     skos:Concept ,
+                     :DisasterType ;
+            skos:broader :Geophysical ;
+            skos:inScheme :DisasterTypeScheme ;
+            skos:narrower :GroundMovement ,
+                          :Tsunami ;
+            skos:definition "Sudden movement of a block of the Earth's crust along a geological fault and associated ground shaking." ;
+            skos:prefLabel "Earthquake"@en .
+
+
+###  https://sakuna.ph/Epidemic
+:Epidemic rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :Biological ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:narrower :BacterialDisease ,
+                        :FungalDisase ,
+                        :InfectiousDiseaseGeneral ,
+                        :ParasiticDisease ,
+                        :PrionDisease ,
+                        :ViralDisease ;
+          skos:definition "Either an unusual, often sudden, increase in the number of cases of an infectious disease that already existed in the region (e.g., flu, or E. coli) or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." ;
+          skos:prefLabel "Epidemic"@en .
+
+
+###  https://sakuna.ph/ExplosionIndustrial
+:ExplosionIndustrial rdf:type owl:NamedIndividual ,
+                              skos:Concept ,
+                              :DisasterType ;
+                     skos:broader :IndustrialAccident ;
+                     skos:inScheme :DisasterTypeScheme ;
+                     skos:definition "Explosion (industrial): Explosions involving buildings or structures. Can involve industrial structures." ;
+                     skos:prefLabel "Explosion (Industrial)"@en .
+
+
+###  https://sakuna.ph/ExplosionMiscellaneous
+:ExplosionMiscellaneous rdf:type owl:NamedIndividual ,
+                                 skos:Concept ,
+                                 :DisasterType ;
+                        skos:broader :MiscellaneousAccident ;
+                        skos:inScheme :DisasterTypeScheme ;
+                        skos:definition "Explosion (miscellaneous): Non-industrial explosions involving buildings or structures. Grenade/bomb explosions. Can be due to elections and holidays." ;
+                        skos:prefLabel "Explosion (Misc)"@en .
+
+
+###  https://sakuna.ph/Extraterrestrial
+:Extraterrestrial rdf:type owl:NamedIndividual ,
+                           skos:Concept ,
+                           :DisasterType ;
+                  skos:broader :Natural ;
+                  skos:inScheme :DisasterTypeScheme ;
+                  skos:narrower :SpaceImpact ,
+                                :SpaceWeather ;
+                  skos:definition "A hazard caused by asteroids, meteoroids, and comets as they pass near to the Earth, enter the Earth's atmosphere, and/or strike the Earth, and by changes in interplanetary conditions that effect the Earth's magnetosphere, ionosphere, and thermosphere." ;
+                  skos:prefLabel "Extraterrestrial"@en .
+
+
+###  https://sakuna.ph/ExtratropicalStorm
+:ExtratropicalStorm rdf:type owl:NamedIndividual ,
+                             skos:Concept ,
+                             :DisasterType ;
+                    skos:broader :Storm ;
+                    skos:inScheme :DisasterTypeScheme ;
+                    skos:definition "Extratropical storm: A type of cyclonic system in the middle and high latitudes (also called a mid-latitude cyclone) that primarily gets its energy from the horizontal temperature contrasts (fronts) in the atmosphere. When associated with cold fronts, extra-tropical cyclones may be particularly damaging (e.g., European winter/windstorm, or Nor'easter)." ;
+                    skos:prefLabel "Extratropical Storm"@en .
+
+
+###  https://sakuna.ph/ExtremeTemperature
+:ExtremeTemperature rdf:type owl:NamedIndividual ,
+                             skos:Concept ,
+                             :DisasterType ;
+                    skos:broader :Meteorological ;
+                    skos:inScheme :DisasterTypeScheme ;
+                    skos:narrower :ColdWave ,
+                                  :HeatWave ,
+                                  :SevereWinterConditions ;
+                    skos:definition "A general term for temperature variations above (extreme heat) or below (extreme cold) normal conditions." ;
+                    skos:prefLabel "Extreme Temperature"@en .
+
+
+###  https://sakuna.ph/FireIndustrial
+:FireIndustrial rdf:type owl:NamedIndividual ,
+                         skos:Concept ,
+                         :DisasterType ;
+                skos:broader :IndustrialAccident ;
+                skos:inScheme :DisasterTypeScheme ;
+                skos:definition "Fire (industrial): Fire incidents involving industrial buildings or structures." ;
+                skos:prefLabel "Fire (Industrial)"@en .
+
+
+###  https://sakuna.ph/FireMiscellaneous
+:FireMiscellaneous rdf:type owl:NamedIndividual ,
+                            skos:Concept ,
+                            :DisasterType ;
+                   skos:broader :MiscellaneousAccident ;
+                   skos:inScheme :DisasterTypeScheme ;
+                   skos:definition "Fire (miscellaneous): Non-industrial fire incidents. Can involve residential structures." ;
+                   skos:prefLabel "Fire (Misc)"@en .
+
+
+###  https://sakuna.ph/FlashFlood
+:FlashFlood rdf:type owl:NamedIndividual ,
+                     skos:Concept ,
+                     :DisasterType ;
+            skos:broader :Flood ;
+            skos:inScheme :DisasterTypeScheme ;
+            skos:definition "Flash flood: Heavy or excessive rainfall in a short period of time that produces immediate runoff, creating flooding conditions within minutes or a few hours during or after the rainfall. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+            skos:prefLabel "Flash Flood"@en .
+
+
+###  https://sakuna.ph/Flood
+:Flood rdf:type owl:NamedIndividual ,
+                skos:Concept ,
+                :DisasterType ;
+       skos:broader :Hydrological ;
+       skos:inScheme :DisasterTypeScheme ;
+       skos:narrower :CoastalFlood ,
+                     :FlashFlood ,
+                     :FloodGeneral ,
+                     :IceJamFlood ,
+                     :RiverineFlood ;
+       skos:definition "A general term for the overflow of water from a stream channel onto normally dry land in the floodplain (riverine flooding), higher-than-normal levels along the coast (coastal flooding) and in lakes or reservoirs as well as ponding of water at or near the point where the rain fell (flash floods)." ;
+       skos:prefLabel "Flood"@en .
+
+
+###  https://sakuna.ph/FloodGeneral
+:FloodGeneral rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Flood ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Flood (General): A general term for flooded areas (subsided, receding, or still flooded) or floodwaters and the overflow of water levels. Barangays and sitios affected, damaged and normally flooded in ft. Involves flooding in roads, zones, and areas in the country, affecting families and households. Can involve overflow or box of culverts, knee, waist, and gutter-deep levels of water. Sheet flooding. Can be due to heavy rains, monsoons, tropical storms, tropical cyclones, tropical depressions, and low pressure areas." ;
+              skos:prefLabel "Flood (General)"@en .
+
+
+###  https://sakuna.ph/Fog
+:Fog rdf:type owl:NamedIndividual ,
+              skos:Concept ,
+              :DisasterType ;
+     skos:broader :Meteorological ;
+     skos:inScheme :DisasterTypeScheme ;
+     skos:definition "Fog: Water droplets that are suspended in the air near the Earth's surface. Fog is, in fact, simply a cloud that is in contact with the ground." ;
+     skos:prefLabel "Fog"@en .
+
+
+###  https://sakuna.ph/ForestFire
+:ForestFire rdf:type owl:NamedIndividual ,
+                     skos:Concept ,
+                     :DisasterType ;
+            skos:broader :Wildfire ;
+            skos:inScheme :DisasterTypeScheme ;
+            skos:definition "Forest Fire: A type of wildfire in a wooded area or forest. Can be due to El Nino." ;
+            skos:prefLabel "Forest Fire"@en .
+
+
+###  https://sakuna.ph/FungalDisase
+:FungalDisase rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Epidemic ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Fungal Disease: An unusual increase in the number of cases caused by exposure to fungi either through skin contact, ingestion, or inhalation of spores. Examples are fungal pneumonia, fungal meningitis, etc." ;
+              skos:prefLabel "Fungal Disease" .
+
+
+###  https://sakuna.ph/GasLeak
+:GasLeak rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :IndustrialAccident ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Gas leak incidents." ;
+         skos:prefLabel "Gas Leak"@en .
+
+
+###  https://sakuna.ph/Geophysical
+:Geophysical rdf:type owl:NamedIndividual ,
+                      skos:Concept ,
+                      :DisasterType ;
+             skos:broader :Natural ;
+             skos:inScheme :DisasterTypeScheme ;
+             skos:narrower :Earthquake ,
+                           :MassMovementDry ,
+                           :VolcanicActivity ;
+             skos:definition "A hazard originating from solid earth. This term is used interchangeably with the term geological hazard." ;
+             skos:prefLabel "Geophysical"@en .
+
+
+###  https://sakuna.ph/Glacial
+:Glacial rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :Climatological ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Glacial: Occurs when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." ;
+         skos:prefLabel "Glacial"@en .
+
+
+###  https://sakuna.ph/GrasshopperInfestation
+:GrasshopperInfestation rdf:type owl:NamedIndividual ,
+                                 skos:Concept ,
+                                 :DisasterType ;
+                        skos:broader :Infestation ;
+                        skos:inScheme :DisasterTypeScheme ;
+                        skos:definition "Infestation of grasshoppers (insects)." ;
+                        skos:prefLabel "Grasshopper Infestation"@en .
+
+
+###  https://sakuna.ph/GroundMovement
+:GroundMovement rdf:type owl:NamedIndividual ,
+                         skos:Concept ,
+                         :DisasterType ;
+                skos:broader :Earthquake ;
+                skos:inScheme :DisasterTypeScheme ;
+                skos:definition "Ground movement: Surface displacement of earthen materials due to ground shaking triggered by earthquakes or volcanic eruptions. Often described with magnitudes, intensities, and epicenters." ;
+                skos:prefLabel "Ground Movement"@en .
+
+
+###  https://sakuna.ph/Hail
+:Hail rdf:type owl:NamedIndividual ,
+               skos:Concept ,
+               :DisasterType ;
+      skos:broader :Storm ;
+      skos:inScheme :DisasterTypeScheme ;
+      skos:definition "Hail: Solid precipitation in the form of irregular pellets or balls of ice more than 5 mm in diameter." ;
+      skos:prefLabel "Hail"@en .
+
+
+###  https://sakuna.ph/HeatWave
+:HeatWave rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :ExtremeTemperature ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:definition "Heat wave: A period of abnormally hot and/or unusually humid weather. Typically, a heat wave lasts for two or more days. The exact temperature criteria for what constitutes a heat wave may vary by location." ;
+          skos:prefLabel "Heat Wave"@en .
+
+
+###  https://sakuna.ph/Hydrological
+:Hydrological rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Natural ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:narrower :Flood ,
+                            :MassMovementWet ,
+                            :WaveAction ;
+              skos:definition "A hazard caused by the occurrence, movement, and distribution of surface and subsurface freshwater and saltwater." ;
+              skos:prefLabel "Hydrological"@en .
+
+
+###  https://sakuna.ph/IceJamFlood
+:IceJamFlood rdf:type owl:NamedIndividual ,
+                      skos:Concept ,
+                      :DisasterType ;
+             skos:broader :Flood ;
+             skos:inScheme :DisasterTypeScheme ;
+             skos:definition "Ice Jam: The accumulation of floating ice restricting or blocking a river's flow and drainage. Ice jams tend to develop near river bends and obstructions (e.g., bridges)." ;
+             skos:prefLabel "Ice Jam Flood"@en .
+
+
+###  https://sakuna.ph/IndustrialAccident
+:IndustrialAccident rdf:type owl:NamedIndividual ,
+                             skos:Concept ,
+                             :DisasterType ;
+                    skos:broader :Technological ;
+                    skos:inScheme :DisasterTypeScheme ;
+                    skos:narrower :ChemicalSpill ,
+                                  :CollapseIndustrial ,
+                                  :ExplosionIndustrial ,
+                                  :FireIndustrial ,
+                                  :GasLeak ,
+                                  :IndustrialAccidentGeneral ,
+                                  :OilSpill ,
+                                  :Poisoning ,
+                                  :Radiation ;
+                    skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." ;
+                    skos:prefLabel "Industrial Accident"@en .
+
+
+###  https://sakuna.ph/IndustrialAccidentGeneral
+:IndustrialAccidentGeneral rdf:type owl:NamedIndividual ,
+                                    skos:Concept ,
+                                    :DisasterType ;
+                           skos:broader :IndustrialAccident ;
+                           skos:inScheme :DisasterTypeScheme ;
+                           skos:definition "Industrial accident (general): Any form of general industrial accidents." ;
+                           skos:prefLabel "Industrial Accident (General)"@en .
+
+
+###  https://sakuna.ph/InfectiousDiseaseGeneral
+:InfectiousDiseaseGeneral rdf:type owl:NamedIndividual ,
+                                   skos:Concept ,
+                                   :DisasterType ;
+                          skos:broader :Epidemic ;
+                          skos:inScheme :DisasterTypeScheme ;
+                          skos:definition "Infectious disease (general): Either an unusual, often sudden, increase in the number of cases or outbreak of an infectious disease that already existed in the region (e.g., flu, or E. coli, gastroentritis or the appearance of an infectious disease previously absent from the region (e.g., plague, or polio)." ;
+                          skos:prefLabel "Infectious Disease (General)"@en .
+
+
+###  https://sakuna.ph/Infestation
+:Infestation rdf:type owl:NamedIndividual ,
+                      skos:Concept ,
+                      :DisasterType ;
+             skos:broader :Biological ;
+             skos:inScheme :DisasterTypeScheme ;
+             skos:narrower :GrasshopperInfestation ,
+                           :InfestationGeneral ,
+                           :LocustInfestation ,
+                           :WormsInfestation ;
+             skos:definition "The pervasive influx, swarming and/or hatching of insects, worms, or other animals affecting humans, animals, crops, and perishable goods." ;
+             skos:prefLabel "Infestation"@en .
+
+
+###  https://sakuna.ph/InfestationGeneral
+:InfestationGeneral rdf:type owl:NamedIndividual ,
+                             skos:Concept ,
+                             :DisasterType ;
+                    skos:broader :Infestation ;
+                    skos:inScheme :DisasterTypeScheme ;
+                    skos:definition "General infestation incidents." ;
+                    skos:prefLabel "Infestation (General)"@en .
+
+
+###  https://sakuna.ph/Lahar
+:Lahar rdf:type owl:NamedIndividual ,
+                skos:Concept ,
+                :DisasterType ;
+       skos:broader :VolcanicActivity ;
+       skos:inScheme :DisasterTypeScheme ;
+       skos:definition "Lahar: Hot or cold mixture of earthen material flowing down the slope of a volcano either during or between volcanic eruptions." ;
+       skos:prefLabel "Lahar"@en .
+
+
+###  https://sakuna.ph/LandFire
+:LandFire rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :Wildfire ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:definition "Land Fire: A type of wildfire in a brush, bush, pasture, grassland, or other treeless natural environment. Can be due to El Nino." ;
+          skos:prefLabel "Land Fire"@en .
+
+
+###  https://sakuna.ph/LandslideDry
+:LandslideDry rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :MassMovementDry ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Landslide (dry): Any kind of moderate to rapid soil movement, can be and often induced by an earthquake (under dry conditions) bringing damage. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face. Often due to earthquakes and affecting houses." ;
+              skos:prefLabel "Landslide (Dry)"@en .
+
+
+###  https://sakuna.ph/LandslideWet
+:LandslideWet rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :MassMovementWet ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Landslide (wet): Any kind of moderate to rapid soil movement, can be induced by rain (under wet conditions) bringing damage. Can be due to tropical cyclones, stroms, depressions. A landslide is the movement of soil or rock controlled by gravity and the speed of the movement usually ranges between slow and rapid, but it is not very slow. It can be superficial or deep, but the materials must make up a mass that is a portion of the slope or the slope itself. The movement has to be downward and outward with a free face.  Often due to rain and affecting houses." ;
+              skos:prefLabel "Landslide (Wet)"@en .
+
+
+###  https://sakuna.ph/LavaFlow
+:LavaFlow rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :VolcanicActivity ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:definition "Lava Flow: The ejected magma that moves as a liquid mass downslope from a volcano during an eruption." ;
+          skos:prefLabel "Lava Flow"@en .
+
+
+###  https://sakuna.ph/LocustInfestation
+:LocustInfestation rdf:type owl:NamedIndividual ,
+                            skos:Concept ,
+                            :DisasterType ;
+                   skos:broader :Infestation ;
+                   skos:inScheme :DisasterTypeScheme ;
+                   skos:definition "Infestation of locusts (insects)." ;
+                   skos:prefLabel "Locust Infestation"@en .
+
+
+###  https://sakuna.ph/MassMovementDry
+:MassMovementDry rdf:type owl:NamedIndividual ,
+                          skos:Concept ,
+                          :DisasterType ;
+                 skos:broader :Geophysical ;
+                 skos:inScheme :DisasterTypeScheme ;
+                 skos:narrower :AvalancheDry ,
+                               :LandslideDry ,
+                               :RockfallDry ,
+                               :SuddenSubsidenceDry ;
+                 skos:definition "Any type of downslope movement of earth materials under hydrological dry conditions." ;
+                 skos:prefLabel "Mass Movement (Dry)"@en .
+
+
+###  https://sakuna.ph/MassMovementWet
+:MassMovementWet rdf:type owl:NamedIndividual ,
+                          skos:Concept ,
+                          :DisasterType ;
+                 skos:broader :Hydrological ;
+                 skos:inScheme :DisasterTypeScheme ;
+                 skos:narrower :AvalancheWet ,
+                               :LandslideWet ,
+                               :Mudslide ,
+                               :RockfallWet ,
+                               :SuddenSubsidenceWet ;
+                 skos:definition "Types of mass movement that occur when heavy rain or rapid snow/ice melt send large amounts of vegetation, mud, or rock down a slope driven by gravitational forces." ;
+                 skos:prefLabel "Mass Movement (Wet)"@en .
+
+
+###  https://sakuna.ph/Meteorological
+:Meteorological rdf:type owl:NamedIndividual ,
+                         skos:Concept ,
+                         :DisasterType ;
+                skos:broader :Natural ;
+                skos:inScheme :DisasterTypeScheme ;
+                skos:narrower :ExtremeTemperature ,
+                              :Fog ,
+                              :Storm ;
+                skos:definition "A hazard caused by short-lived, micro- to meso-scale extreme weather and atmospheric conditions that last from minutes to days." ;
+                skos:prefLabel "Meteorological"@en .
+
+
+###  https://sakuna.ph/MiscellaneousAccident
+:MiscellaneousAccident rdf:type owl:NamedIndividual ,
+                                skos:Concept ,
+                                :DisasterType ;
+                       skos:broader :Technological ;
+                       skos:inScheme :DisasterTypeScheme ;
+                       skos:narrower :CollapseMiscellaneous ,
+                                     :ExplosionMiscellaneous ,
+                                     :FireMiscellaneous ,
+                                     :MiscellaneousAccidentGeneral ;
+                       skos:definition "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." ;
+                       skos:prefLabel "Miscellaneous Accident"@en .
+
+
+###  https://sakuna.ph/MiscellaneousAccidentGeneral
+:MiscellaneousAccidentGeneral rdf:type owl:NamedIndividual ,
+                                       skos:Concept ,
+                                       :DisasterType ;
+                              skos:broader :MiscellaneousAccident ;
+                              skos:inScheme :DisasterTypeScheme ;
+                              skos:definition "Miscellaneous accident (general): Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents and food poisoning. Does not include transport or vehicular accidents." ;
+                              skos:prefLabel "Miscellaneous Accident (General)"@en .
+
+
+###  https://sakuna.ph/Mudslide
+:Mudslide rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :MassMovementWet ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:definition "Mudslide: A form of mass wasting involving fast-moving flow of debris and dirt that has become liquified by the addition of water. Also called a mudflow. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+          skos:prefLabel "Mudslide"@en .
+
+
+###  https://sakuna.ph/Natural
+:Natural rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:closeMatch baw:NaturalDisasterType ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:narrower :Biological ,
+                       :Climatological ,
+                       :Extraterrestrial ,
+                       :Geophysical ,
+                       :Hydrological ,
+                       :Meteorological ;
+         skos:topConceptOf :DisasterTypeScheme ;
+         skos:definition "Naturally occurring disastrous events" ;
+         skos:prefLabel "Natural"@en .
+
+
+###  https://sakuna.ph/OilSpill
+:OilSpill rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :IndustrialAccident ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:definition "Oil spill: Accident release occurring during the production, transportation, or handling of oil." ;
+          skos:prefLabel "Oil Spill"@en .
+
+
+###  https://sakuna.ph/ParasiticDisease
+:ParasiticDisease rdf:type owl:NamedIndividual ,
+                           skos:Concept ,
+                           :DisasterType ;
+                  skos:broader :Epidemic ;
+                  skos:inScheme :DisasterTypeScheme ;
+                  skos:definition "Parasitic disease: An unusual increase in the number of cases caused by exposure to a parasite, i.e., an organism living on or in a host. Exposure to parasites occurs mostly through contaminated water, food, or contact with insects, animals, etc. Examples are malaria, Chagas disease, giardiasis, and Trichinellosis." ;
+                  skos:prefLabel "Parasitic Disease"@en .
+
+
+###  https://sakuna.ph/Poisoning
+:Poisoning rdf:type owl:NamedIndividual ,
+                    skos:Concept ,
+                    :DisasterType ;
+           skos:broader :IndustrialAccident ;
+           skos:inScheme :DisasterTypeScheme ;
+           skos:definition "Poisoning of atmosphere or water courses due to industrial sources of contamination." ;
+           skos:prefLabel "Poisoning"@en .
+
+
+###  https://sakuna.ph/PrionDisease
+:PrionDisease rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Epidemic ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Prion disease: A type of biological hazard caused by prion proteins. Prion diseases or transmissible spongiform encephalopathies (TSEs) are a family of rare progressive neurodegenerative disorders that affect both humans and animals. They are characterized by long incubation periods and neural loss. Examples are Bovine Spongiform Encephalopathy (BSE), Creutzfeldt-Jakob Disease (CJD), Kuru, etc." ;
+              skos:prefLabel "Prion Disease"@en .
+
+
+###  https://sakuna.ph/PyroclasticFlow
+:PyroclasticFlow rdf:type owl:NamedIndividual ,
+                          skos:Concept ,
+                          :DisasterType ;
+                 skos:broader :VolcanicActivity ;
+                 skos:inScheme :DisasterTypeScheme ;
+                 skos:definition "Pyroclastic Flow: Extremely hot gases, ash, and other materials with a temperature of more than 1,000 degrees Celsius that rapidly flow down the flank of a volcano (at more than 700 km/h) during an eruption." ;
+                 skos:prefLabel "Pyroclastic Flow"@en .
+
+
+###  https://sakuna.ph/Radiation
+:Radiation rdf:type owl:NamedIndividual ,
+                    skos:Concept ,
+                    :DisasterType ;
+           skos:broader :IndustrialAccident ;
+           skos:inScheme :DisasterTypeScheme ;
+           skos:definition "Radiation: Exposure to harmful radiation or reactive substances." ;
+           skos:prefLabel "Radiation"@en .
+
+
+###  https://sakuna.ph/Rail
+:Rail rdf:type owl:NamedIndividual ,
+               skos:Concept ,
+               :DisasterType ;
+      skos:broader :Transport ;
+      skos:inScheme :DisasterTypeScheme ;
+      skos:definition "Rail: Transport accidents involving trains." ;
+      skos:prefLabel "Rail"@en .
+
+
+###  https://sakuna.ph/RiverineFlood
+:RiverineFlood rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:broader :Flood ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:definition "Riverine flood: A type of flooding resulting due to the river (swollen river) or overflowing of a stream, creek, or  channel onto normally dry land in the floodplain adjacent to the channel." ;
+               skos:prefLabel "Riverine Flood"@en .
+
+
+###  https://sakuna.ph/Road
+:Road rdf:type owl:NamedIndividual ,
+               skos:Concept ,
+               :DisasterType ;
+      skos:broader :Transport ;
+      skos:inScheme :DisasterTypeScheme ;
+      skos:definition "Road: Transport or vehicular accidents involving motor vehicles on roads and tracks. Can be due to heavy rainfall, earthquakes, or certain special events like holidays. Can involve road cuts and collisions." ;
+      skos:prefLabel "Road"@en .
+
+
+###  https://sakuna.ph/RockfallDry
+:RockfallDry rdf:type owl:NamedIndividual ,
+                      skos:Concept ,
+                      :DisasterType ;
+             skos:broader :MassMovementDry ;
+             skos:inScheme :DisasterTypeScheme ;
+             skos:definition "Rockfall (dry): A quantity of rock that has fallen from a cliff face or from the roof or walls of mine or quarry workings under dry conditions. Also called rock slide under dry conditions. Can be due to earthquakes. Can occur near roads." ;
+             skos:prefLabel "Rockfall (Dry)"@en .
+
+
+###  https://sakuna.ph/RockfallWet
+:RockfallWet rdf:type owl:NamedIndividual ,
+                      skos:Concept ,
+                      :DisasterType ;
+             skos:broader :MassMovementWet ;
+             skos:inScheme :DisasterTypeScheme ;
+             skos:definition "Rockfall (wet): A quantity of rock or boulders that has fallen from a cliff face, mountain or from the roof or walls of mine or quarry workings under wet conditions or rain. Also called rock slide under wet conditions. Can be due to tropical cyclones, tropical storms, tropical depressions, shear line, monsoons. Sometimes reported to hit structures." ;
+             skos:prefLabel "Rockfall (Wet)"@en .
+
+
+###  https://sakuna.ph/RogueWave
+:RogueWave rdf:type owl:NamedIndividual ,
+                    skos:Concept ,
+                    :DisasterType ;
+           skos:broader :WaveAction ;
+           skos:inScheme :DisasterTypeScheme ;
+           skos:definition "Rouge wave: An unusual single crest of an ocean wave far out at sea that is much higher and/or steeper than other waves in the prevailing swell system." ;
+           skos:prefLabel "Rogue Wave"@en .
+
+
+###  https://sakuna.ph/SandStorm
+:SandStorm rdf:type owl:NamedIndividual ,
+                    skos:Concept ,
+                    :DisasterType ;
+           skos:broader :Storm ;
+           skos:inScheme :DisasterTypeScheme ;
+           skos:definition "Sand storm: Strong winds carrying particles of sand aloft, but generally confined to less than 50 feet (15 m), especially common in arid and semi-arid environments. A dust storm is also characterized by strong winds but carries smaller particles of dust rather than sand over an extensive area." ;
+           skos:prefLabel "Sand Storm"@en .
+
+
+###  https://sakuna.ph/Seiche
+:Seiche rdf:type owl:NamedIndividual ,
+                 skos:Concept ,
+                 :DisasterType ;
+        skos:broader :WaveAction ;
+        skos:inScheme :DisasterTypeScheme ;
+        skos:definition "Seiche: A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." ;
+        skos:prefLabel "Seiche"@en .
+
+
+###  https://sakuna.ph/SevereWeather
+:SevereWeather rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:broader :Storm ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:definition "Severe weather, heavy rains and strong winds bringing damage." ;
+               skos:prefLabel "Severe Weather"@en .
+
+
+###  https://sakuna.ph/SevereWinterConditions
+:SevereWinterConditions rdf:type owl:NamedIndividual ,
+                                 skos:Concept ,
+                                 :DisasterType ;
+                        skos:broader :ExtremeTemperature ;
+                        skos:inScheme :DisasterTypeScheme ;
+                        skos:definition "Severe winter conditions: Damage caused by snow and ice. Winter damage refers to damage to buildings, infrastructure, traffic (esp. navigation) inflicted by snow and ice in the form of snow pressure, freezing rain, frozen waterways etc." ;
+                        skos:prefLabel "Severe Winter Conditions"@en .
+
+
+###  https://sakuna.ph/SpaceImpact
+:SpaceImpact rdf:type owl:NamedIndividual ,
+                      skos:Concept ,
+                      :DisasterType ;
+             skos:broader :Extraterrestrial ;
+             skos:inScheme :DisasterTypeScheme ;
+             skos:definition "Space impact: A type of extra-terrestrial hazard caused by the collision a meteoroid, asteroid, or comet with the Earth." ;
+             skos:prefLabel "Space Impact"@en .
+
+
+###  https://sakuna.ph/SpaceWeather
+:SpaceWeather rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Extraterrestrial ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Space weather: A general term for extra-terrestrial weather conditions driven by solar eruptions such as geomagnetic storms, radio disturbances, and solar energetic particles." ;
+              skos:prefLabel "Space Weather"@en .
+
+
+###  https://sakuna.ph/Storm
+:Storm rdf:type owl:NamedIndividual ,
+                skos:Concept ,
+                :DisasterType ;
+       skos:broader :Meteorological ;
+       skos:inScheme :DisasterTypeScheme ;
+       skos:narrower :BlizzardStorm ,
+                     :Derecho ,
+                     :ExtratropicalStorm ,
+                     :Hail ,
+                     :SandStorm ,
+                     :SevereWeather ,
+                     :StormGeneral ,
+                     :StormSurge ,
+                     :Thunderstorms ,
+                     :Tornado ,
+                     :TropicalCyclone ;
+       skos:prefLabel "Storm"@en .
+
+
+###  https://sakuna.ph/StormGeneral
+:StormGeneral rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Storm ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Storm general: Can be storms brought by monsoons (southwest monsoons) and shear lines." ;
+              skos:prefLabel "Storm (General)"@en .
+
+
+###  https://sakuna.ph/StormSurge
+:StormSurge rdf:type owl:NamedIndividual ,
+                     skos:Concept ,
+                     :DisasterType ;
+            skos:broader :Storm ;
+            skos:inScheme :DisasterTypeScheme ;
+            skos:definition "Storm Surge: An abnormal surge or rise in sea level. Can be due to tropical storms, tropical cyclones, tropical depressions, heavy rain, or low pressure areas." ;
+            skos:prefLabel "Storm Surge"@en .
+
+
+###  https://sakuna.ph/SuddenSubsidenceDry
+:SuddenSubsidenceDry rdf:type owl:NamedIndividual ,
+                              skos:Concept ,
+                              :DisasterType ;
+                     skos:broader :MassMovementDry ;
+                     skos:inScheme :DisasterTypeScheme ;
+                     skos:definition "Sudden subsidence (dry): Sinking of the ground due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under dry conditions as a result of a geophysical trigger. Can involve liquefaction and can be due to earthquakes." ;
+                     skos:prefLabel "Sudden Subsidence (Dry)"@en .
+
+
+###  https://sakuna.ph/SuddenSubsidenceWet
+:SuddenSubsidenceWet rdf:type owl:NamedIndividual ,
+                              skos:Concept ,
+                              :DisasterType ;
+                     skos:broader :MassMovementWet ;
+                     skos:inScheme :DisasterTypeScheme ;
+                     skos:definition "Sudden subsidence (wet): Sinking of the ground like liquefaction near rivers or seas due to groundwater removal, mining, dissolution of limestone (e.g., karst sinkholes), extraction of natural gas, and earthquakes. In this case, the sinking occurs under wet conditions as a result of a hydrological trigger (e.g., rain). Can be due to tropical cyclones, stroms, depressions as well." ;
+                     skos:prefLabel "Sudden Subsidence (Wet)"@en .
+
+
+###  https://sakuna.ph/Technological
+:Technological rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:narrower :ArmedConflict ,
+                             :IndustrialAccident ,
+                             :MiscellaneousAccident ,
+                             :Transport ;
+               skos:topConceptOf :DisasterTypeScheme ;
+               skos:definition "Man-made events causing impact and technological incidents." ;
+               skos:example "Armed conflict, chemical spill, or industrial fires." ;
+               skos:prefLabel "Technological"@en .
+
+
+###  https://sakuna.ph/Thunderstorms
+:Thunderstorms rdf:type owl:NamedIndividual ,
+                        skos:Concept ,
+                        :DisasterType ;
+               skos:broader :Storm ;
+               skos:inScheme :DisasterTypeScheme ;
+               skos:definition "Thunderstorms: Lightnings produced by a thunderstorm and followed by the sound of thunder." ;
+               skos:prefLabel "Thunderstorms"@en .
+
+
+###  https://sakuna.ph/Tornado
+:Tornado rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :Storm ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Tornadoes and whirlwinds. A violently rotating column of air that reaches the ground or open water (waterspout)." ;
+         skos:prefLabel "Tornado"@en .
+
+
+###  https://sakuna.ph/Transport
+:Transport rdf:type owl:NamedIndividual ,
+                    skos:Concept ,
+                    :DisasterType ;
+           skos:broader :Technological ;
+           skos:inScheme :DisasterTypeScheme ;
+           skos:narrower :Air ,
+                         :Rail ,
+                         :Road ,
+                         :Water ;
+           skos:definition "Disaster type term used to describe technological transport accidents involving mechanized modes of transport. It comprises four disaster subtypes (i.e., Air, Water, Rail, and Road)." ;
+           skos:prefLabel "Transport"@en .
+
+
+###  https://sakuna.ph/TropicalCyclone
+:TropicalCyclone rdf:type owl:NamedIndividual ,
+                          skos:Concept ,
+                          :DisasterType ;
+                 skos:broader :Storm ;
+                 skos:inScheme :DisasterTypeScheme ;
+                 skos:definition "Tropical Cyclone: Can be called typhoons, super typhoons, tropical storms, tropical depressions, and low pressure areas. Sometimes called TS, TC, TD, LPA plus the name. It is characterized by a warm-core, non-frontal synoptic-scale cyclone with a low-pressure center, spiral rain bands and strong winds. Depending on their location, tropical cyclones are referred to as hurricanes (Atlantic, Northeast Pacific), typhoons (Northwest Pacific), or cyclones (South Pacific and Indian Ocean). A tropical cyclone originates over tropical or subtropical waters." ;
+                 skos:prefLabel "Tropical Cyclone"@en .
+
+
+###  https://sakuna.ph/Tsunami
+:Tsunami rdf:type owl:NamedIndividual ,
+                  skos:Concept ,
+                  :DisasterType ;
+         skos:broader :Earthquake ;
+         skos:inScheme :DisasterTypeScheme ;
+         skos:definition "Tsunami: A series of waves (with long wavelengths when traveling across the deep ocean) that are generated by a displacement of massive amounts of water through underwater earthquakes, volcanic eruptions, or landslides. Tsunami waves travel at very high speed across the ocean, but as they begin to reach shallow water they slow down, and the wave grows steeper." ;
+         skos:prefLabel "Tsunami"@en .
+
+
+###  https://sakuna.ph/ViralDisease
+:ViralDisease rdf:type owl:NamedIndividual ,
+                       skos:Concept ,
+                       :DisasterType ;
+              skos:broader :Epidemic ;
+              skos:inScheme :DisasterTypeScheme ;
+              skos:definition "Viral disease: An unusual increase in the number of cases caused by exposure to virus either through skin contact, ingestion, or inhalation. Common viral illnesses include colds, the flu, COVID-19, norovirus (\"stomach flu\"), HPV (warts) and herpes simplex virus (cold sores)" ;
+              skos:prefLabel "Viral Disease"@en .
+
+
+###  https://sakuna.ph/VolcanicActivity
+:VolcanicActivity rdf:type owl:NamedIndividual ,
+                           skos:Concept ,
+                           :DisasterType ;
+                  skos:broader :Geophysical ;
+                  skos:inScheme :DisasterTypeScheme ;
+                  skos:narrower :Ashfall ,
+                                :Lahar ,
+                                :LavaFlow ,
+                                :PyroclasticFlow ,
+                                :VolcanicActivityGeneral ;
+                  skos:definition "A type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material." ;
+                  skos:prefLabel "Volcanic Activity"@en .
+
+
+###  https://sakuna.ph/VolcanicActivityGeneral
+:VolcanicActivityGeneral rdf:type owl:NamedIndividual ,
+                                  skos:Concept ,
+                                  :DisasterType ;
+                         skos:broader :VolcanicActivity ;
+                         skos:inScheme :DisasterTypeScheme ;
+                         skos:definition "Volcanic activity (general): A type of volcanic event near an opening/vent in the Earth's surface including volcanic eruptions of lava, ash, hot vapor, gas, and pyroclastic material. Explosive eruptions in volcanoes." ;
+                         skos:prefLabel "Volcanic Activity (General)"@en .
+
+
+###  https://sakuna.ph/Water
+:Water rdf:type owl:NamedIndividual ,
+                skos:Concept ,
+                :DisasterType ;
+       skos:broader :Transport ;
+       skos:inScheme :DisasterTypeScheme ;
+       skos:definition "Water: Transport or maritime accidents or incidents involving sailing boats (motorbancas), ferries, cruise ships, and other vessels. Can be due to weather conditions, strong winds, typhoons, tropical storms, cyclones, and depressions." ;
+       skos:prefLabel "Water" .
+
+
+###  https://sakuna.ph/WaveAction
+:WaveAction rdf:type owl:NamedIndividual ,
+                     skos:Concept ,
+                     :DisasterType ;
+            skos:broader :Hydrological ;
+            skos:inScheme :DisasterTypeScheme ;
+            skos:narrower :RogueWave ,
+                          :Seiche ,
+                          :WaveActionGeneral ;
+            skos:definition "Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." ;
+            skos:prefLabel "Wave Action"@en .
+
+
+###  https://sakuna.ph/WaveActionGeneral
+:WaveActionGeneral rdf:type owl:NamedIndividual ,
+                            skos:Concept ,
+                            :DisasterType ;
+                   skos:broader :WaveAction ;
+                   skos:inScheme :DisasterTypeScheme ;
+                   skos:definition "Wave action (general): Wind-generated surface big waves that can occur near coastal areas or on the surface of any open body of water such as oceans, rivers, or lakes. The size of the wave depends on the strength of the wind and the distance traveled (fetch)." ;
+                   skos:prefLabel "Wave Action (General)" .
+
+
+###  https://sakuna.ph/Wildfire
+:Wildfire rdf:type owl:NamedIndividual ,
+                   skos:Concept ,
+                   :DisasterType ;
+          skos:broader :Climatological ;
+          skos:inScheme :DisasterTypeScheme ;
+          skos:narrower :ForestFire ,
+                        :LandFire ,
+                        :WildfireGeneral ;
+          skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." ;
+          skos:prefLabel "Wildfire"@en .
+
+
+###  https://sakuna.ph/WildfireGeneral
+:WildfireGeneral rdf:type owl:NamedIndividual ,
+                          skos:Concept ,
+                          :DisasterType ;
+                 skos:broader :Wildfire ;
+                 skos:inScheme :DisasterTypeScheme ;
+                 skos:definition "Wildfire (general): Any type of fire  in a natural setting such as a grassland, mountain, brush land or tundra, which consumes natural fuels such as tress and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions. Can affect animals, trees, and properties. Can be due to El Nino." ;
+                 skos:prefLabel "Wildfire (General)"@en .
+
+
 ###  https://sakuna.ph/WormsInfestation
-:WormsInfestation rdf:type owl:Class ;
-                  rdfs:subClassOf :Infestation ;
-                  rdfs:label "Worms Infestation"@en ;
-                  skos:definition "Infestation of worms." .
+:WormsInfestation rdf:type owl:NamedIndividual ,
+                           skos:Concept ,
+                           :DisasterType ;
+                  skos:broader :Infestation ;
+                  skos:inScheme :DisasterTypeScheme ;
+                  skos:definition "Infestation of worms." ;
+                  skos:prefLabel "Worms Infestation"@en .
+
+
+#################################################################
+#    Annotations
+#################################################################
+
+:DisasterTypeScheme rdfs:label "Disaster Type Scheme" ;
+                    skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
+                    skos:prefLabel "SakunaGraPH Disaster Type Classification Scheme"@en .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
