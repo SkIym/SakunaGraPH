@@ -15,7 +15,7 @@ from mappings.ndrrmc import (
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
     POWER_MAPPING, RNB_MAPPING, SEAPORT_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WATER_DISRUPTION, WORK_MAPPING,
     AffectedPopulation, Agriculture, Airport, Casualties, ClassDisruption, CommunicationLines, Event, Flight,
-    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Relief, RNB, Seaport, Stranded, WorkDisruption
+    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, WorkDisruption
 )
 
 from transform.ndrrmc_cleaner import (
@@ -211,7 +211,7 @@ def load_infra(event_folder_path: str) -> list[Infrastructure] | None:
 
     return df_to_entities(df, Infrastructure)
 
-def load_relief(event_folder_path: str) -> list[Relief] | None:
+def load_relief(event_folder_path: str) -> list[Assistance] | None:
 
     src_paths: list[str] = []
     for file in os.listdir(event_folder_path):
@@ -236,6 +236,8 @@ def load_relief(event_folder_path: str) -> list[Relief] | None:
 
         df = to_float(df, ["itemCost", "itemCostPerUnit", "itemQuantity"])
 
+        df = to_million_php(df, ["itemCost"])
+
         df = df.with_row_index("id", index)
         index += len(df)
         dfs.append(df)
@@ -243,8 +245,8 @@ def load_relief(event_folder_path: str) -> list[Relief] | None:
     final_dfs: Iterable[pl.DataFrame] = []
 
     for df in dfs:
-        existing_cols = [f.name for f in fields(Relief) if f.name in df.columns]
-        missing_cols = [f.name for f in fields(Relief) if f.name not in df.columns]
+        existing_cols = [f.name for f in fields(Assistance) if f.name in df.columns]
+        missing_cols = [f.name for f in fields(Assistance) if f.name not in df.columns]
         
         # select existing columns
         df_selected = df.select(existing_cols)
@@ -253,8 +255,8 @@ def load_relief(event_folder_path: str) -> list[Relief] | None:
         for col in missing_cols:
             df_selected = df_selected.with_columns(pl.lit(None).alias(col))
         
-        # reorder columns to match Relief fields
-        df_selected = df_selected.select([f.name for f in fields(Relief)])
+        # reorder columns to match Assistance fields
+        df_selected = df_selected.select([f.name for f in fields(Assistance)])
         
         final_dfs.append(df_selected)
 
@@ -262,7 +264,7 @@ def load_relief(event_folder_path: str) -> list[Relief] | None:
 
     final_df = pl.concat(final_dfs, rechunk=True)
 
-    return df_to_entities(final_df, Relief)
+    return df_to_entities(final_df, Assistance)
 
 def load_casualties(event_folder_path: str) -> list[Casualties] | None:
 

@@ -5,8 +5,8 @@ from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
-from .graph import SKG, Graph, PROV
-from .iris import aff_pop_iri, agri_iri, airport_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, flight_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
+from .graph import CUR, SKG, Graph, PROV, add_monetary
+from .iris import aff_pop_iri, agri_iri, airport_iri, assistance_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, flight_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
 
 @dataclass
 class Event:
@@ -440,7 +440,7 @@ ASSISTANCE_PROVIDED_MAPPING = {
 }
 
 @dataclass
-class Relief:
+class Assistance:
     id: str
     hasLocation: URIRef
     hasBarangay: str | None
@@ -452,13 +452,13 @@ class Relief:
     remarks: str | None
     itemCostPerUnit: float | None
 
-def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
+def relief_mapping(g: Graph, reliefs: List[Assistance], event_iri: URIRef):
 
     for r in reliefs:
-        uri = relief_iri(event_iri, r.id)
+        uri = assistance_iri(event_iri, r.id)
 
-        g.add((uri, RDF.type, SKG.Relief)) # rdf type
-        g.add((event_iri, SKG.hasRelief, uri)) # event link
+        g.add((uri, RDF.type, SKG.Assistance)) # rdf type
+        g.add((event_iri, SKG.hasAssistance, uri)) # event link
 
         for f in fields(r):
 
@@ -474,11 +474,13 @@ def relief_mapping(g: Graph, reliefs: List[Relief], event_iri: URIRef):
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "itemCost":
-                g.add((uri, SKG.itemCost, Literal(value, datatype=XSD.decimal)))
+                # g.add((uri, SKG.itemCost, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.itemCost, value, SKG.PHP_millions)
             elif f.name == "itemQuantity":
                 g.add((uri, SKG.itemQuantity, Literal(value, datatype=XSD.decimal)))
             elif f.name == "itemCostPerUnit" and value > 0:
-                g.add((uri, SKG.itemCostPerUnit, Literal(value, datatype=XSD.decimal)))
+                # g.add((uri, SKG.itemCostPerUnit, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.itemCostPerUnit, value, CUR.PHP)
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
 
@@ -531,7 +533,8 @@ def infra_mapping(g: Graph, infra: List[Infrastructure], event_iri: URIRef):
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "infraDamageAmount":
-                g.add((uri, SKG.infraDamageAmount, Literal(value, datatype=XSD.decimal)))
+                # g.add((uri, SKG.infraDamageAmount, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.infraDamageAmount, value, SKG.PHP_millions)
             elif f.name == "numberInfraDamaged" and value < 2:
                 continue
             else:
@@ -578,7 +581,8 @@ def housing_mapping(g: Graph, hs: List[Housing], event_iri: URIRef):
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "housingDamageAmount":
-                g.add((uri, SKG.housingDamageAmount, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.housingDamageAmount, value, SKG.PHP_millions)
+                # g.add((uri, SKG.housingDamageAmount, Literal(value, datatype=XSD.decimal)))
             elif f.name == "totallyDamagedHouses":
                 g.add((uri, SKG.totallyDamagedHouses, Literal(value, datatype=XSD.int)))
             elif f.name == "partiallyDamagedHouses":                
@@ -647,7 +651,9 @@ def agri_mapping(g: Graph, hs: List[Agriculture], event_iri: URIRef):
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "agriDamageAmount":
-                g.add((uri, SKG.agriDamageAmount, Literal(value, datatype=XSD.decimal)))
+                # g.add((uri, SKG.agriDamageAmount, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.agriDamageAmount, value, SKG.PHP_millions)
+
             elif f.name == "agriDamageQuantity":
                 g.add((uri, SKG.agriDamageQuantity, Literal(value, datatype=XSD.decimal)))
             elif f.name == "totallyDamagedCropArea":
@@ -655,7 +661,9 @@ def agri_mapping(g: Graph, hs: List[Agriculture], event_iri: URIRef):
             elif f.name == "partiallyDamagedCropArea":                
                 g.add((uri, SKG.partiallyDamagedCropArea, Literal(value, datatype=XSD.decimal)))
             elif f.name == "productionLossCost":
-                g.add((uri, SKG.productionLossCost, Literal(value, datatype=XSD.decimal)))
+                # g.add((uri, SKG.productionLossCost, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.productionLossCost, value, SKG.PHP_millions)
+
             elif f.name == "productionLossVolume":                
                 g.add((uri, SKG.productionLossVolume, Literal(value, datatype=XSD.decimal)))
             else:
