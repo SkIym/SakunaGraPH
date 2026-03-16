@@ -2,7 +2,7 @@ from dataclasses import dataclass, fields
 from datetime import datetime, date
 from polars import DataFrame
 from rdflib import RDF, XSD, Literal, URIRef, Graph
-from .graph import PROV, SKG
+from .graph import PROV, SKG, add_monetary
 from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_iri, prov_iri, recovery_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
 
@@ -138,7 +138,8 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
                 continue  
             
             if f.name == "contributionAID":
-                g.add((uri, SKG.contributionAID, Literal(value, datatype=XSD.decimal)))
+                add_monetary(g, uri, SKG.contributionAID, value, SKG.USD_thousands)
+                # g.add((uri, SKG.contributionAID, Literal(value, datatype=XSD.decimal)))
 
             elif f.name == "internationalOrgsPresent":
                 value = str(value)
@@ -158,7 +159,8 @@ def recovery_mapping(rs: list[Recovery], g: Graph):
         g.add((event_uri, SKG.hasRecovery, uri)) # link event
 
         if r.postStructureCost:
-            g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
+            add_monetary(g, uri, SKG.postStructureCost, r.postStructureCost, SKG.USD_thousands)
+            # g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
 
 def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
 
@@ -171,10 +173,12 @@ def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
         g.add((event_uri, SKG.hasDamageGeneral, uri)) # link event
 
         if r.insuredDamage:
-            g.add((uri, SKG.insuredDamage, Literal(r.insuredDamage, datatype=XSD.decimal)))
+            # g.add((uri, SKG.insuredDamageAmount, Literal(r.insuredDamage, datatype=XSD.decimal)))
+            add_monetary(g, uri, SKG.insuredDamageAmount, r.insuredDamage, SKG.USD_thousands)
 
         if r.generalDamageAmount:
-            g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
+            add_monetary(g, uri, SKG.generalDamageAmount, r.generalDamageAmount, SKG.USD_thousands)
+            # g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
         
         if r.cpi:
             g.add((uri, SKG.cpi, Literal(r.cpi, datatype=XSD.decimal)))
