@@ -13,10 +13,13 @@ from thefuzz import fuzz
 ALIASES: dict[str, str] = {
     # Government agencies
     "DSWD": "DSWD",
+    "DWSD": "DSWD",
     "Department of Social Welfare and Development": "DSWD",
     "DPWH": "DPWH",
     "Department of Public Works and Highways": "DPWH",
     "DOH": "DOH",
+    "DOLE": "DOLE",
+    "Department of Labor and Employment": "DOLE",
     "Department of Health": "DOH",
     "DILG": "DILG",
     "Department of the Interior and Local Government": "DILG",
@@ -30,11 +33,17 @@ ALIASES: dict[str, str] = {
     "Department of Energy": "DOE",
     "DOT": "DOT",
     "Department of Tourism": "DOT",
+    "DOTC": "DOTC",
+    "Department of Transportation and Communications": "DOTC",
     "DOST": "DOST",
     "Department of Science and Technology": "DOST",
     "DTI": "DTI",
     "Department of Trade and Industry": "DTI",
-
+    "NHA": "NHA",
+    "National Housing Authority": "NHA",
+    "Philippine General Hospital": "PGH",
+    "PGH": "PGH",
+    
     # Disaster/defense agencies
     "OCD": "OCD",
     "Office of Civil Defense": "OCD",
@@ -44,6 +53,13 @@ ALIASES: dict[str, str] = {
     "Philippine Atmospheric, Geophysical and Astronomical Services Administration": "PAGASA",
     "PHIVOLCS": "PHIVOLCS",
     "Philippine Institute of Volcanology and Seismology": "PHIVOLCS",
+    "NDCC": "NDCC",
+    "RDCC": "RDCC",
+    "National Disaster Coordinating Council": "NDCC",
+    "Regional Disaster Coordinating Council": "RDCC",
+    "CDAG": "CDAG",
+    "Civil Defense Action Group": "CDAG",
+
 
     # Military and uniformed services
     "AFP": "AFP",
@@ -56,16 +72,16 @@ ALIASES: dict[str, str] = {
     "Philippine Coast Guard": "PCG",
 
     # Red Cross / NGOs
-    "PRC": "PhilippineRedCross",
-    "Philippine Red Cross": "PhilippineRedCross",
-    "PNRC": "PhilippineRedCross",
-    "Philippine National Red Cross": "PhilippineRedCross",
+    "PRC": "PNRC",
+    "Philippine Red Cross": "PNRC",
+    "PNRC": "PNRC",
+    "Philippine National Red Cross": "PNRC",
     "ICRC": "ICRC",
     "International Committee of the Red Cross": "ICRC",
 
     # International organizations
-    "UN": "UnitedNations",
-    "United Nations": "UnitedNations",
+    "UN": "UN",
+    "United Nations": "UN",
     "UNICEF": "UNICEF",
     "WHO": "WHO",
     "World Health Organization": "WHO",
@@ -103,7 +119,7 @@ _ALIAS_KEYS_LOWER = {k.lower(): v for k, v in ALIASES.items()}
 # Splitter pattern: commas, semicolons, " and ", slashes, newlines
 _SPLIT_PATTERN = re.compile(r'[,;\n/]+|\band\b', re.IGNORECASE)
 
-FUZZY_THRESHOLD = 85
+FUZZY_THRESHOLD = 79
 
 
 class OrgResolver:
@@ -118,7 +134,7 @@ class OrgResolver:
         """Split a concatenated org string into individual names."""
         if not text:
             return []
-        parts = _SPLIT_PATTERN.split(text)
+        parts = _SPLIT_PATTERN.split(str(text))
         return [p.strip() for p in parts if p and p.strip()]
 
     def resolve(self, name: str) -> str | None:

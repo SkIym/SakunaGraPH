@@ -2,6 +2,8 @@ from dataclasses import dataclass, fields
 from datetime import date
 from rdflib import RDF, RDFS, XSD, BNode, Literal, URIRef, Graph
 from regex import M
+
+from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import PROV, QUDT, SKG, add_monetary
 from .iris import (
     event_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
@@ -291,7 +293,12 @@ def rescue_mapping(rs: list[Rescue], g: Graph) -> None:
         if r.rescueEquipment:
             g.add((uri, SKG.rescueEquipment, Literal(r.rescueEquipment)))
         if r.rescueUnit:
-            g.add((uri, SKG.rescueUnit, Literal(r.rescueUnit)))
+            # g.add((uri, SKG.rescueUnit, Literal(r.rescueUnit)))
+            for slug in ORG_RESOLVER.split_and_resolve(r.rescueUnit):
+                o_uri = org_iri(slug)
+                g.add((o_uri, RDF.type, PROV.Organization))
+                g.add((o_uri, RDFS.label, Literal(slug)))
+                g.add((uri, SKG.rescueUnit, o_uri))
 
 
 # ---------------------------------------------------------------------------
@@ -569,26 +576,28 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.allocatedFunds), SKG.PHP_millions)
 
-        muri = _sub_uri(r.id, "assistance")
 
-        g.add((muri, RDF.type, SKG.Assistance))
-        g.add((event_uri, SKG.hasAssistance, muri))
+        if r.agencyLGUsPresentAssistance or r.internationalOrgsPresent:
+            muri = _sub_uri(r.id, "assistance")
 
-        if r.agencyLGUsPresentAssistance:
-            g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
-            for slug in ORG_RESOLVER.split_and_resolve(r.agencyLGUsPresentAssistance):
-                o_uri = org_iri(slug)
-                g.add((o_uri, RDF.type, PROV.Organization))
-                g.add((o_uri, RDFS.label, Literal(slug)))
-                g.add((muri, SKG.contributingOrg, o_uri))
+            g.add((muri, RDF.type, SKG.Assistance))
+            g.add((event_uri, SKG.hasAssistance, muri))
 
-        if r.internationalOrgsPresent:
-            g.add((muri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
-            for slug in ORG_RESOLVER.split_and_resolve(r.internationalOrgsPresent):
-                o_uri = org_iri(slug)
-                g.add((o_uri, RDF.type, PROV.Organization))
-                g.add((o_uri, RDFS.label, Literal(slug)))
-                g.add((muri, SKG.contributingOrg, o_uri))
+            if r.agencyLGUsPresentAssistance:
+                g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
+                for slug in ORG_RESOLVER.split_and_resolve(r.agencyLGUsPresentAssistance):
+                    o_uri = org_iri(slug)
+                    g.add((o_uri, RDF.type, PROV.Organization))
+                    g.add((o_uri, RDFS.label, Literal(slug)))
+                    g.add((muri, SKG.contributingOrg, o_uri))
+
+            if r.internationalOrgsPresent:
+                g.add((muri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
+                for slug in ORG_RESOLVER.split_and_resolve(r.internationalOrgsPresent):
+                    o_uri = org_iri(slug)
+                    g.add((o_uri, RDF.type, PROV.Organization))
+                    g.add((o_uri, RDFS.label, Literal(slug)))
+                    g.add((muri, SKG.contributingOrg, o_uri))
 
         if r.amountNGOs is not None:
             uri = _sub_uri(r.id, "assistance/ngo+international")
@@ -632,6 +641,12 @@ def relief_mapping(rs: list[Relief], g: Graph) -> None:
             # g.add((uri, SKG.itemCost, Literal(r.itemCost, datatype=XSD.decimal)))
         if r.itemQty:
             g.add((uri, SKG.itemQty, Literal(r.itemQty)))
+            for slug in ORG_RESOLVER.split_and_resolve(r.itemQty):
+                o_uri = org_iri(slug)
+                g.add((o_uri, RDF.type, PROV.Organization))
+                g.add((o_uri, RDFS.label, Literal(slug)))
+                g.add((uri, SKG.contributingOrg, o_uri))
+
 
 
 # ---------------------------------------------------------------------------

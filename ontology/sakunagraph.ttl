@@ -21,6 +21,26 @@
                       rdfs:label "SakunaGraPH" .
 
 #################################################################
+#    Annotation properties
+#################################################################
+
+###  http://qudt.org/schema/qudt/conversionMultiplier
+qudt:conversionMultiplier rdf:type owl:AnnotationProperty .
+
+
+###  http://qudt.org/schema/qudt/conversionOffset
+qudt:conversionOffset rdf:type owl:AnnotationProperty .
+
+
+###  http://qudt.org/schema/qudt/hasQuantityKind
+qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
+
+
+###  http://www.w3.org/2004/02/skos/core#defiition
+skos:defiition rdf:type owl:AnnotationProperty .
+
+
+#################################################################
 #    Datatypes
 #################################################################
 
@@ -92,11 +112,51 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                      rdfs:label "is of disaster type" .
 
 
+###  https://sakuna.ph/agriDamageAmount
+:agriDamageAmount rdf:type owl:ObjectProperty ;
+                  rdfs:domain :AgricultureDamage ;
+                  rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/commercialDamageAmount
+:commercialDamageAmount rdf:type owl:ObjectProperty ;
+                        rdfs:domain :InfrastructureDamage ;
+                        rdfs:range qudt:QuantityValue .
+
+
 ###  https://sakuna.ph/contributingOrg
 :contributingOrg rdf:type owl:ObjectProperty ;
                  rdfs:domain :Assistance ;
                  rdfs:range prov:Organization ;
                  rdfs:label "contributing org" .
+
+
+###  https://sakuna.ph/contributionAID
+:contributionAID rdf:type owl:ObjectProperty ;
+                 rdfs:domain :Assistance ;
+                 rdfs:range qudt:QuantityValue ;
+                 rdfs:label "AID contribution"@en ;
+                 skos:definition "Aggregate international aid contributed for immediate relief, as reported in EM-DAT / OCHA FTS. Not attributed to a specific organization." .
+
+
+###  https://sakuna.ph/contributionAmount
+:contributionAmount rdf:type owl:ObjectProperty ;
+                    rdfs:domain :Assistance ;
+                    rdfs:range qudt:QuantityValue ;
+                    rdfs:label "contribution amount" .
+
+
+###  https://sakuna.ph/crossSectoralDamageAmount
+:crossSectoralDamageAmount rdf:type owl:ObjectProperty ;
+                           rdfs:domain :InfrastructureDamage ;
+                           rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/generalDamageAmount
+:generalDamageAmount rdf:type owl:ObjectProperty ;
+                     rdfs:domain :DamageGeneral ;
+                     rdfs:range qudt:QuantityValue ;
+                     rdfs:label "general total damage amount"@en .
 
 
 ###  https://sakuna.ph/hasAffectedPopulation
@@ -335,6 +395,25 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                    rdfs:label "has work disruption" .
 
 
+###  https://sakuna.ph/housingDamageAmount
+:housingDamageAmount rdf:type owl:ObjectProperty ;
+                     rdfs:domain :HousingDamage ;
+                     rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/infraDamageAmount
+:infraDamageAmount rdf:type owl:ObjectProperty ;
+                   rdfs:domain :InfrastructureDamage ;
+                   rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/insuredDamageAmount
+:insuredDamageAmount rdf:type owl:ObjectProperty ;
+                     rdfs:domain :DamageGeneral ;
+                     rdfs:range qudt:QuantityValue ;
+                     rdfs:label "insured damage"@en .
+
+
 ###  https://sakuna.ph/isPartOf
 :isPartOf rdf:type owl:ObjectProperty ,
                    owl:TransitiveProperty ;
@@ -362,6 +441,45 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
              rdfs:domain :Incident ;
              rdfs:range :MajorEvent ;
              rdfs:label "is related to"@en .
+
+
+###  https://sakuna.ph/itemCost
+:itemCost rdf:type owl:ObjectProperty ;
+          rdfs:domain :Assistance ;
+          rdfs:range qudt:QuantityValue ;
+          rdfs:label "item cost" .
+
+
+###  https://sakuna.ph/itemCostPerUnit
+:itemCostPerUnit rdf:type owl:ObjectProperty ;
+                 rdfs:domain :Assistance ;
+                 rdfs:range qudt:QuantityValue ;
+                 rdfs:label "item cost per unit"@en .
+
+
+###  https://sakuna.ph/postStructureCost
+:postStructureCost rdf:type owl:ObjectProperty ;
+                   rdfs:domain :Recovery ;
+                   rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/productionLossCost
+:productionLossCost rdf:type owl:ObjectProperty ;
+                    rdfs:domain :AgricultureDamage ;
+                    rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/rescueUnit
+:rescueUnit rdf:type owl:ObjectProperty ;
+            rdfs:domain :Rescue ;
+            rdfs:range prov:Organization ;
+            rdfs:label "rescue unit" .
+
+
+###  https://sakuna.ph/socialDamageAmount
+:socialDamageAmount rdf:type owl:ObjectProperty ;
+                    rdfs:domain :InfrastructureDamage ;
+                    rdfs:range qudt:QuantityValue .
 
 
 #################################################################
@@ -393,24 +511,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                    rdfs:label "affected barangays"@en .
 
 
-###  https://sakuna.ph/affectedDescription
-:affectedDescription rdf:type owl:DatatypeProperty ;
-                     rdfs:domain [ rdf:type owl:Class ;
-                                   owl:unionOf ( :AirportDisruption
-                                                 :ClassSuspension
-                                                 :CommunicationLineDisruption
-                                                 :PowerDisruption
-                                                 :RoadAndBridgesDamage
-                                                 :SeaportDisruption
-                                                 :WaterDisruption
-                                                 :WorkSuspension
-                                               )
-                                 ] ;
-                     rdfs:range xsd:string ;
-                     rdfs:label "affected description" ;
-                     skos:definition "General (unprocessed) information about the affected entity." .
-
-
 ###  https://sakuna.ph/affectedFamilies
 :affectedFamilies rdf:type owl:DatatypeProperty ;
                   rdfs:domain :AffectedPopulation ;
@@ -435,14 +535,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                                ] ;
                    rdfs:range xsd:string ;
                    rdfs:label "agency and LGUs present"@en .
-
-
-###  https://sakuna.ph/agriDamageAmount
-:agriDamageAmount rdf:type owl:ObjectProperty ;
-                  rdfs:domain :AgricultureDamage ;
-                  rdfs:range qudt:QuantityValue ;
-                  rdfs:comment "From Department of Geography digitized archives";
-                  rdfs:label "agriculture damage amount"@en .
 
 
 ###  https://sakuna.ph/agriDamageClassification
@@ -589,20 +681,19 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
               rdfs:label "type of casualty" .
 
 
+###  https://sakuna.ph/centralPressure
+:centralPressure rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:range xsd:decimal ;
+                 rdfs:comment "Central pressure in hPa (hectopascals)"@en ;
+                 rdfs:label "central pressure"@en .
+
+
 ###  https://sakuna.ph/cityClass
 :cityClass rdf:type owl:DatatypeProperty ;
            rdfs:domain :Location ;
            rdfs:range xsd:string ;
            rdfs:label "city class" .
-
-
-###  https://sakuna.ph/commercialDamageAmount
-:commercialDamageAmount rdf:type owl:ObjectProperty ;
-                        rdfs:domain :InfrastructureDamage ;
-                        rdfs:range qudt:QuantityValue ;
-                        rdfs:comment "In M PHP" ;
-                        rdfs:label "commercial damage amount"@en ;
-                        skos:altLabel "private damage amount" .
 
 
 ###  https://sakuna.ph/communicationStatus
@@ -611,21 +702,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      rdfs:domain :CommunicationLineDisruption ;
                      rdfs:range xsd:string ;
                      rdfs:label "communication status"@en .
-
-
-###  https://sakuna.ph/contributionAID
-:contributionAID rdf:type owl:ObjectProperty ;
-                 rdfs:domain :Assistance ;
-                 rdfs:range qudt:QuantityValue ;
-                 rdfs:label "AID contribution"@en ;
-                 skos:definition "Aggregate international aid contributed for immediate relief, as reported in EM-DAT / OCHA FTS. Not attributed to a specific organization." .
-
-
-###  https://sakuna.ph/contributionAmount
-:contributionAmount rdf:type owl:ObjectProperty ;
-                    rdfs:domain :Assistance ;
-                    rdfs:range qudt:QuantityValue ;
-                    rdfs:label "contribution amount" .
 
 
 ###  https://sakuna.ph/contributionType
@@ -648,14 +724,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
      rdfs:domain :DamageGeneral ;
      rdfs:range xsd:decimal ;
      rdfs:label "cpi"@en .
-
-
-###  https://sakuna.ph/crossSectoralDamageAmount
-:crossSectoralDamageAmount rdf:type owl:ObjectProperty ;
-                           rdfs:domain :InfrastructureDamage ;
-                           rdfs:range qudt:QuantityValue ;
-                           rdfs:label "cross sectoral damage amount" ;
-                           skos:example "health government, transmission lines" .
 
 
 ###  https://sakuna.ph/declarationType
@@ -701,6 +769,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
           rdfs:label "district"@en .
 
 
+###  https://sakuna.ph/earthquakeDepth
+:earthquakeDepth rdf:type owl:DatatypeProperty ;
+                 rdfs:subPropertyOf owl:topDataProperty ;
+                 rdfs:range xsd:decimal ;
+                 rdfs:comment "Depth of earthquake focus/hypocenter in kilometers"@en ;
+                 rdfs:label "earthquake depth"@en .
+
+
 ###  https://sakuna.ph/endDate
 :endDate rdf:type owl:DatatypeProperty ;
          rdfs:subPropertyOf owl:topDataProperty ;
@@ -715,6 +791,22 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
            rdfs:domain :DisasterEvent ;
            rdfs:range xsd:dateTime ;
            rdfs:label "data entry date"@en .
+
+
+###  https://sakuna.ph/epicenterLatitude
+:epicenterLatitude rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:range xsd:decimal ;
+                   rdfs:comment "Latitude of earthquake epicenter"@en ;
+                   rdfs:label "epicenter latitude"@en .
+
+
+###  https://sakuna.ph/epicenterLongitude
+:epicenterLongitude rdf:type owl:DatatypeProperty ;
+                    rdfs:subPropertyOf owl:topDataProperty ;
+                    rdfs:range xsd:decimal ;
+                    rdfs:comment "Longitude of earthquake epicenter"@en ;
+                    rdfs:label "epicenter longitude"@en .
 
 
 ###  https://sakuna.ph/evacuationCenters
@@ -779,18 +871,19 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                 rdfs:label "from class level"@en .
 
 
-###  https://sakuna.ph/generalDamageAmount
-:generalDamageAmount rdf:type owl:ObjectProperty ;
-                     rdfs:domain :DamageGeneral ;
-                     rdfs:range qudt:QuantityValue ;
-                     rdfs:label "general total damage amount"@en .
-
-
 ###  https://sakuna.ph/geographicLevel
 :geographicLevel rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Location ;
                  rdfs:range xsd:string ;
                  rdfs:label "geographic level" .
+
+
+###  https://sakuna.ph/gustSpeed
+:gustSpeed rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:comment "Maximum gust speed in km/h"@en ;
+           rdfs:label "gust speed"@en .
 
 
 ###  https://sakuna.ph/hasBarangay
@@ -804,14 +897,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                          ] ;
              rdfs:range xsd:string ;
              rdfs:label "has barangay" .
-
-
-###  https://sakuna.ph/housingDamageAmount
-:housingDamageAmount rdf:type owl:ObjectProperty ;
-                     rdfs:domain :HousingDamage ;
-                     rdfs:range qudt:QuantityValue ;
-                     rdfs:comment "In monetary value" ;
-                     rdfs:label "housing damage amount"@en .
 
 
 ###  https://sakuna.ph/incidentActionsTaken
@@ -833,13 +918,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:domain :Location ;
              rdfs:range xsd:string ;
              rdfs:label "income class" .
-
-
-###  https://sakuna.ph/infraDamageAmount
-:infraDamageAmount rdf:type owl:ObjectProperty ;
-                   rdfs:domain :InfrastructureDamage ;
-                   rdfs:range qudt:QuantityValue ;
-                   rdfs:label "infrastructure damage amount"@en .
 
 
 ###  https://sakuna.ph/infraDamageClassification
@@ -877,11 +955,12 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                   rdfs:label "units of infrastructure damage"@en .
 
 
-###  https://sakuna.ph/insuredDamageAmount
-:insuredDamageAmount rdf:type owl:ObjectProperty ;
-               rdfs:domain :DamageGeneral ;
-               rdfs:range qudt:QuantityValue ;
-               rdfs:label "insured damage"@en .
+###  https://sakuna.ph/internationalName
+:internationalName rdf:type owl:DatatypeProperty ;
+                   rdfs:subPropertyOf owl:topDataProperty ;
+                   rdfs:range xsd:string ;
+                   rdfs:comment "International name of the tropical cyclone"@en ;
+                   rdfs:label "international name"@en .
 
 
 ###  https://sakuna.ph/internationalOrgsPresent
@@ -903,20 +982,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                                   ] ;
                       rdfs:range xsd:dateTime ;
                       rdfs:label "interruption datetime"@en .
-
-
-###  https://sakuna.ph/itemCost
-:itemCost rdf:type owl:ObjectProperty ;
-          rdfs:domain :Assistance ;
-          rdfs:range qudt:QuantityValue ;
-          rdfs:label "item cost" .
-
-
-###  https://sakuna.ph/itemCostPerUnit
-:itemCostPerUnit rdf:type owl:ObjectProperty ;
-                 rdfs:domain :Assistance ;
-                 rdfs:range qudt:QuantityValue ;
-                 rdfs:label "item cost per unit"@en .
 
 
 ###  https://sakuna.ph/itemQuantity
@@ -979,78 +1044,16 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :magnitude rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:range xsd:decimal ;
-           rdfs:label "magnitude"@en ;
-           rdfs:comment "Earthquake magnitude (e.g. Richter, Mw)"@en .
+           rdfs:comment "Earthquake magnitude (e.g. Richter, Mw)"@en ;
+           rdfs:label "magnitude"@en .
+
 
 ###  https://sakuna.ph/magnitudeScale
 :magnitudeScale rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:string ;
-           rdfs:label "magnitude scale"@en ;
-           rdfs:comment "Scale used for magnitude measurement (e.g. Richter, Mw, Ms)"@en .
-
-###  https://sakuna.ph/windSpeed
-:windSpeed rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "wind speed"@en ;
-           rdfs:comment "Maximum sustained wind speed in km/h"@en .
-
-###  https://sakuna.ph/gustSpeed
-:gustSpeed rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "gust speed"@en ;
-           rdfs:comment "Maximum gust speed in km/h"@en .
-
-###  https://sakuna.ph/centralPressure
-:centralPressure rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "central pressure"@en ;
-           rdfs:comment "Central pressure in hPa (hectopascals)"@en .
-
-###  https://sakuna.ph/signalNumber
-:signalNumber rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:int ;
-           rdfs:label "signal number"@en ;
-           rdfs:comment "PAGASA Tropical Cyclone Wind Signal number (1-5)"@en .
-
-###  https://sakuna.ph/stormCategory
-:stormCategory rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:string ;
-           rdfs:label "storm category"@en ;
-           rdfs:comment "Storm classification (e.g. Tropical Depression, Tropical Storm, Typhoon, Super Typhoon)"@en .
-
-###  https://sakuna.ph/internationalName
-:internationalName rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:string ;
-           rdfs:label "international name"@en ;
-           rdfs:comment "International name of the tropical cyclone"@en .
-
-###  https://sakuna.ph/earthquakeDepth
-:earthquakeDepth rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "earthquake depth"@en ;
-           rdfs:comment "Depth of earthquake focus/hypocenter in kilometers"@en .
-
-###  https://sakuna.ph/epicenterLatitude
-:epicenterLatitude rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "epicenter latitude"@en ;
-           rdfs:comment "Latitude of earthquake epicenter"@en .
-
-###  https://sakuna.ph/epicenterLongitude
-:epicenterLongitude rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "epicenter longitude"@en ;
-           rdfs:comment "Longitude of earthquake epicenter"@en .
+                rdfs:subPropertyOf owl:topDataProperty ;
+                rdfs:range xsd:string ;
+                rdfs:comment "Scale used for magnitude measurement (e.g. Richter, Mw, Ms)"@en ;
+                rdfs:label "magnitude scale"@en .
 
 
 ###  https://sakuna.ph/noFamiliesAssisted
@@ -1165,15 +1168,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
             rdfs:label "port status"@en .
 
 
-###  https://sakuna.ph/postStructureCost
-:postStructureCost rdf:type owl:ObjectProperty ;
-                   rdfs:domain :Recovery ;
-                   rdfs:range qudt:QuantityValue ;
-                   rdfs:comment "Cost of Structure Built post-disaster" ;
-                   rdfs:label "post-disaster structure cost" ;
-                   skos:altLabel "reconstruction cost" .
-
-
 ###  https://sakuna.ph/postTraining
 :postTraining rdf:type owl:DatatypeProperty ;
               rdfs:domain :Recovery ;
@@ -1210,13 +1204,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                 rdfs:domain :PreemptiveEvacuation ;
                 rdfs:range xsd:int ;
                 rdfs:label "preempt persons" .
-
-
-###  https://sakuna.ph/productionLossCost
-:productionLossCost rdf:type owl:ObjectProperty ;
-                    rdfs:domain :AgricultureDamage ;
-                    rdfs:range qudt:QuantityValue ;
-                    rdfs:label "production loss cost"@en .
 
 
 ###  https://sakuna.ph/productionLossVolume
@@ -1278,13 +1265,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                  rdfs:domain :Rescue ;
                  rdfs:range xsd:string ;
                  rdfs:label "rescue equipment" .
-
-
-###  https://sakuna.ph/rescueUnit
-:rescueUnit rdf:type owl:DatatypeProperty ;
-            rdfs:domain :Rescue ;
-            rdfs:range xsd:string ;
-            rdfs:label "rescue unit" .
 
 
 ###  https://sakuna.ph/resolutionDate
@@ -1371,11 +1351,12 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                  rdfs:label "service provider"@en .
 
 
-###  https://sakuna.ph/socialDamageAmount
-:socialDamageAmount rdf:type owl:ObjectProperty ;
-                    rdfs:domain :InfrastructureDamage ;
-                    rdfs:range qudt:QuantityValue ;
-                    rdfs:label "social damage amount" .
+###  https://sakuna.ph/signalNumber
+:signalNumber rdf:type owl:DatatypeProperty ;
+              rdfs:subPropertyOf owl:topDataProperty ;
+              rdfs:range xsd:int ;
+              rdfs:comment "PAGASA Tropical Cyclone Wind Signal number (1-5)"@en ;
+              rdfs:label "signal number"@en .
 
 
 ###  https://sakuna.ph/srrDone
@@ -1399,6 +1380,14 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
          rdfs:domain :StrandedEvent ;
          rdfs:range xsd:string ;
          rdfs:label "station"@en .
+
+
+###  https://sakuna.ph/stormCategory
+:stormCategory rdf:type owl:DatatypeProperty ;
+               rdfs:subPropertyOf owl:topDataProperty ;
+               rdfs:range xsd:string ;
+               rdfs:comment "Storm classification (e.g. Tropical Depression, Tropical Storm, Typhoon, Super Typhoon)"@en ;
+               rdfs:label "storm category"@en .
 
 
 ###  https://sakuna.ph/strandedMotorBancas
@@ -1497,9 +1486,25 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
             rdfs:label "urban or rural" .
 
 
+###  https://sakuna.ph/windSpeed
+:windSpeed rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:comment "Maximum sustained wind speed in km/h"@en ;
+           rdfs:label "wind speed"@en .
+
+
 #################################################################
 #    Classes
 #################################################################
+
+###  http://qudt.org/schema/qudt/CurrencyUnit
+qudt:CurrencyUnit rdf:type owl:Class .
+
+
+###  http://qudt.org/schema/qudt/QuantityValue
+qudt:QuantityValue rdf:type owl:Class .
+
 
 ###  http://www.opengis.net/ont/geosparql#Feature
 geo:Feature rdf:type owl:Class .
@@ -1621,10 +1626,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :AirportDisruption rdf:type owl:Class ;
                    rdfs:subClassOf :Impact ,
                                    [ rdf:type owl:Restriction ;
-                                     owl:onProperty :affectedDescription ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
                                      owl:onProperty :cancellationDateTime ;
                                      owl:someValuesFrom xsd:dateTime
                                    ] ,
@@ -1697,10 +1698,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :ClassSuspension rdf:type owl:Class ;
                  rdfs:subClassOf :Impact ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :affectedDescription ;
-                                   owl:someValuesFrom xsd:string
-                                 ] ,
-                                 [ rdf:type owl:Restriction ;
                                    owl:onProperty :cancellationDateTime ;
                                    owl:someValuesFrom xsd:dateTime
                                  ] ,
@@ -1727,10 +1724,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 ###  https://sakuna.ph/CommunicationLineDisruption
 :CommunicationLineDisruption rdf:type owl:Class ;
                              rdfs:subClassOf :Impact ,
-                                             [ rdf:type owl:Restriction ;
-                                               owl:onProperty :affectedDescription ;
-                                               owl:someValuesFrom xsd:string
-                                             ] ,
                                              [ rdf:type owl:Restriction ;
                                                owl:onProperty :communicationStatus ;
                                                owl:someValuesFrom xsd:string
@@ -1846,6 +1839,10 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :DisasterType rdf:type owl:Class ;
               rdfs:label "Disaster Type" ;
               skos:definition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." .
+
+
+###  https://sakuna.ph/DisasterTypeScheme
+:DisasterTypeScheme rdf:type owl:Class .
 
 
 ###  https://sakuna.ph/FlightDisruption
@@ -2016,10 +2013,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :PowerDisruption rdf:type owl:Class ;
                  rdfs:subClassOf :Impact ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :affectedDescription ;
-                                   owl:someValuesFrom xsd:string
-                                 ] ,
-                                 [ rdf:type owl:Restriction ;
                                    owl:onProperty :disruptionType ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
@@ -2159,10 +2152,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :rescueEquipment ;
                           owl:someValuesFrom xsd:string
-                        ] ,
-                        [ rdf:type owl:Restriction ;
-                          owl:onProperty :rescueUnit ;
-                          owl:someValuesFrom xsd:string
                         ] ;
         rdfs:label "Rescue" ;
         skos:definition "Represents information on rescue materials prepared." .
@@ -2202,10 +2191,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :RoadAndBridgesDamage rdf:type owl:Class ;
                       rdfs:subClassOf :Impact ,
                                       [ rdf:type owl:Restriction ;
-                                        owl:onProperty :affectedDescription ;
-                                        owl:someValuesFrom xsd:string
-                                      ] ,
-                                      [ rdf:type owl:Restriction ;
                                         owl:onProperty :notPassableDateTime ;
                                         owl:someValuesFrom xsd:dateTime
                                       ] ,
@@ -2236,10 +2221,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 ###  https://sakuna.ph/SeaportDisruption
 :SeaportDisruption rdf:type owl:Class ;
                    rdfs:subClassOf :Impact ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :affectedDescription ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
                                    [ rdf:type owl:Restriction ;
                                      owl:onProperty :cancellationDateTime ;
                                      owl:someValuesFrom xsd:dateTime
@@ -2336,10 +2317,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :WaterDisruption rdf:type owl:Class ;
                  rdfs:subClassOf :Impact ,
                                  [ rdf:type owl:Restriction ;
-                                   owl:onProperty :affectedDescription ;
-                                   owl:someValuesFrom xsd:string
-                                 ] ,
-                                 [ rdf:type owl:Restriction ;
                                    owl:onProperty :disruptionType ;
                                    owl:someValuesFrom xsd:string
                                  ] ,
@@ -2363,10 +2340,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :WorkSuspension rdf:type owl:Class ;
                 rdfs:subClassOf :Impact ,
                                 [ rdf:type owl:Restriction ;
-                                  owl:onProperty :affectedDescription ;
-                                  owl:someValuesFrom xsd:string
-                                ] ,
-                                [ rdf:type owl:Restriction ;
                                   owl:onProperty :cancellationDateTime ;
                                   owl:someValuesFrom xsd:dateTime
                                 ] ,
@@ -2385,6 +2358,14 @@ baw:NaturalDisaster rdf:type owl:Class ;
 #################################################################
 #    Individuals
 #################################################################
+
+###  http://qudt.org/vocab/currency/PHP
+cur:PHP rdf:type owl:NamedIndividual .
+
+
+###  http://qudt.org/vocab/currency/USD
+cur:USD rdf:type owl:NamedIndividual .
+
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType
 baw:NaturalDisasterType rdf:type owl:NamedIndividual .
@@ -2560,6 +2541,7 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 :DisasterTypeScheme rdf:type owl:NamedIndividual ,
                              skos:Concept ,
                              skos:ConceptScheme ,
+                             owl:Class ,
                              :DisasterTypeScheme ;
                     skos:hasTopConcept :Natural ,
                                        :Technological .
@@ -3065,6 +3047,16 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
           skos:prefLabel "Oil Spill"@en .
 
 
+###  https://sakuna.ph/PHP_millions
+:PHP_millions rdf:type owl:NamedIndividual ,
+                       qudt:CurrencyUnit ;
+              skos:broader cur:PHP ;
+              qudt:conversionMultiplier 1000000 ;
+              qudt:conversionOffset 0 ;
+              qudt:hasQuantityKind qkind:Currency ;
+              rdfs:label "Philippine Peso (millions)"@en .
+
+
 ###  https://sakuna.ph/ParasiticDisease
 :ParasiticDisease rdf:type owl:NamedIndividual ,
                            skos:Concept ,
@@ -3364,6 +3356,16 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
          skos:prefLabel "Tsunami"@en .
 
 
+###  https://sakuna.ph/USD_thousands
+:USD_thousands rdf:type owl:NamedIndividual ,
+                        qudt:CurrencyUnit ;
+               skos:broader cur:USD ;
+               qudt:conversionMultiplier 1000 ;
+               qudt:conversionOffset 0 ;
+               qudt:hasQuantityKind qkind:Currency ;
+               rdfs:label "US Dollar (thousands)"@en .
+
+
 ###  https://sakuna.ph/ViralDisease
 :ViralDisease rdf:type owl:NamedIndividual ,
                        skos:Concept ,
@@ -3465,21 +3467,6 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                   skos:prefLabel "Worms Infestation"@en .
 
 
-:PHP_millions rdf:type qudt:CurrencyUnit, owl:NamedIndividual ;
-    qudt:hasQuantityKind qkind:Currency ;
-    qudt:conversionMultiplier 1000000 ;
-    qudt:conversionOffset 0 ;
-    rdfs:label "Philippine Peso (millions)"@en ;
-    skos:broader cur:PHP .
-
-:USD_thousands rdf:type qudt:CurrencyUnit, owl:NamedIndividual ;
-    qudt:hasQuantityKind qkind:Currency ;
-    qudt:conversionMultiplier 1000 ;
-    qudt:conversionOffset 0 ;
-    rdfs:label "US Dollar (thousands)"@en ;
-    skos:broader cur:USD .
-
-
 #################################################################
 #    Annotations
 #################################################################
@@ -3487,6 +3474,37 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 :DisasterTypeScheme rdfs:label "Disaster Type Scheme" ;
                     skos:defiition "Disaster type based on the Emergency Events Database (EM-DAT) classification of disasters." ;
                     skos:prefLabel "SakunaGraPH Disaster Type Classification Scheme"@en .
+
+
+:agriDamageAmount rdfs:comment "From Department of Geography digitized archives" ;
+                  rdfs:label "agriculture damage amount"@en .
+
+
+:commercialDamageAmount rdfs:comment "In M PHP" ;
+                        rdfs:label "commercial damage amount"@en ;
+                        skos:altLabel "private damage amount" .
+
+
+:crossSectoralDamageAmount rdfs:label "cross sectoral damage amount" ;
+                           skos:example "health government, transmission lines" .
+
+
+:housingDamageAmount rdfs:comment "In monetary value" ;
+                     rdfs:label "housing damage amount"@en .
+
+
+:infraDamageAmount rdfs:label "infrastructure damage amount"@en .
+
+
+:postStructureCost rdfs:comment "Cost of Structure Built post-disaster" ;
+                   rdfs:label "post-disaster structure cost" ;
+                   skos:altLabel "reconstruction cost" .
+
+
+:productionLossCost rdfs:label "production loss cost"@en .
+
+
+:socialDamageAmount rdfs:label "social damage amount" .
 
 
 ###  Generated by the OWL API (version 4.5.29.2024-05-13T12:11:03Z) https://github.com/owlcs/owlapi
