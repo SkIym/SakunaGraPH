@@ -1,16 +1,3 @@
-"""Extract and resolve agency/organization names to canonical IRIs.
-
-Splits concatenated organization strings (from NDRRMC, GDA, EM-DAT sources)
-into individual names and resolves them to canonical slugs for IRI generation.
-
-Supports two extraction modes:
-  - Rule-based splitting (split_and_resolve): regex split + fuzzy matching
-  - NER-based extraction (extract_orgs_ner): spaCy NER for ORG entities
-
-Uses a global JSON registry (org_registry.json) shared across all sources.
-Unknown organizations discovered by NER are auto-inserted into the registry.
-"""
-
 import json
 import re
 from pathlib import Path
@@ -167,51 +154,6 @@ class OrgResolver:
             if slug and slug not in seen:
                 results.append(slug)
                 seen.add(slug)
-        return results
-
-    # ── NER-based extraction ─────────────────────────────────────────
-
-    def extract_orgs_ner(self, text: str, auto_insert: bool = True) -> list[str]:
-        """Extract organizations from text using spaCy NER.
-
-        Uses spaCy's named entity recognition to find ORG entities,
-        then resolves each against the registry. Unknown orgs are
-        optionally auto-inserted into the registry.
-
-        Args:
-            text: Free-text input to extract orgs from.
-            auto_insert: If True, insert unrecognized ORG entities
-                into the registry with a generated slug.
-
-        Returns:
-            List of canonical slugs (deduplicated, order-preserved).
-        """
-        if not text or not text.strip():
-            return []
-
-        doc = self.nlp(text)
-        results = []
-        seen = set()
-
-        for ent in doc.ents:
-            if ent.label_ != "ORG":
-                continue
-
-            org_text = ent.text.strip()
-            if not org_text:
-                continue
-
-            # Try to resolve against existing registry
-            slug = self.resolve(org_text)
-
-            if slug is None and auto_insert:
-                slug = _slugify(org_text)
-                self.insert(slug, aliases=[org_text])
-
-            if slug and slug not in seen:
-                results.append(slug)
-                seen.add(slug)
-
         return results
 
 

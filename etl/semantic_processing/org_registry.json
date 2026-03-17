@@ -6,7 +6,7 @@
     "DILG": ["DILG", "Department of the Interior and Local Government"],
     "DA": ["DA", "Department of Agriculture"],
     "DENR": ["DENR", "Department of Environment and Natural Resources"],
-    "DepEd": ["DepEd", "Department of Education"],
+    "DepEd": ["DepEd", "Department of Education", "DEPED"],
     "DOE": ["DOE", "Department of Energy"],
     "DOT": ["DOT", "Department of Tourism"],
     "DOTC": ["DOTC", "Department of Transportation and Communications"],
