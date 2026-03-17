@@ -460,7 +460,7 @@ def power_disruption_mapping(rs: list[PowerDisruption], g: Graph) -> None:
         g.add((event_uri, SKG.hasPowerDisruption, uri))
 
         if r.powerAffected:
-            g.add((uri, SKG.affectedDescription, Literal(r.powerAffected)))
+            g.add((uri, SKG.remarks, Literal(r.powerAffected)))
 
 
 # ---------------------------------------------------------------------------
@@ -476,7 +476,7 @@ def comms_disruption_mapping(rs: list[CommunicationLineDisruption], g: Graph) ->
         g.add((event_uri, SKG.hasCommunicationLineDisruption, uri))
 
         if r.communicationAffected:
-            g.add((uri, SKG.affectedDescription, Literal(r.communicationAffected)))
+            g.add((uri, SKG.remarks, Literal(r.communicationAffected)))
 
 
 # ---------------------------------------------------------------------------
@@ -492,7 +492,7 @@ def rnb_damage_mapping(rs: list[RoadAndBridgesDamage], g: Graph) -> None:
         g.add((event_uri, SKG.hasRoadAndBridgesDamage, uri))
 
         if r.roadBridgeAffected:
-            g.add((uri, SKG.affectedDescription, Literal(r.roadBridgeAffected)))
+            g.add((uri, SKG.remarks, Literal(r.roadBridgeAffected)))
 
 
 # ---------------------------------------------------------------------------
@@ -508,7 +508,7 @@ def seaport_disruption_mapping(rs: list[SeaportDisruption], g: Graph) -> None:
         g.add((event_uri, SKG.hasSeaportDisruption, uri))
 
         if r.seaportsAffected:
-            g.add((uri, SKG.affectedDescription, Literal(r.seaportsAffected)))
+            g.add((uri, SKG.remarks, Literal(r.seaportsAffected)))
 
 
 # ---------------------------------------------------------------------------
@@ -533,11 +533,11 @@ def water_disruption_mapping(rs: list[WaterDisruption], g: Graph) -> None:
 
         dam_desc = _augment_water_source("Dam", r.areDamsAffected)
         if dam_desc:
-            g.add((uri, SKG.affectedDescription, Literal(dam_desc)))
+            g.add((uri, SKG.remarks, Literal(dam_desc)))
 
         tap_desc = _augment_water_source("Tap", r.isTapAffected)
         if tap_desc:
-            g.add((uri, SKG.affectedDescription, Literal(tap_desc)))
+            g.add((uri, SKG.remarks, Literal(tap_desc)))
 
 def _to_millions(val: float):
 
