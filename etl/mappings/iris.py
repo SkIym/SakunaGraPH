@@ -78,3 +78,6 @@ def flight_iri(event_id: URIRef, r_id: str) -> URIRef:
 
 def damage_gen_iri(event_id: URIRef, r_id: str) -> URIRef:
     return URIRef(event_id + f"/damage_general/{r_id}")
+
+def org_iri(slug: str) -> URIRef:
+    return URIRef(SKG[f"org/{slug}"])

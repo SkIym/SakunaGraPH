@@ -8,3 +8,4 @@ openpyxl
 morph-kgc
 thefuzz
 polars
+pytesseract

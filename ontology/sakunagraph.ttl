@@ -979,7 +979,78 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 :magnitude rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:range xsd:decimal ;
-           rdfs:label "magnitude"@en .
+           rdfs:label "magnitude"@en ;
+           rdfs:comment "Earthquake magnitude (e.g. Richter, Mw)"@en .
+
+###  https://sakuna.ph/magnitudeScale
+:magnitudeScale rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:string ;
+           rdfs:label "magnitude scale"@en ;
+           rdfs:comment "Scale used for magnitude measurement (e.g. Richter, Mw, Ms)"@en .
+
+###  https://sakuna.ph/windSpeed
+:windSpeed rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:label "wind speed"@en ;
+           rdfs:comment "Maximum sustained wind speed in km/h"@en .
+
+###  https://sakuna.ph/gustSpeed
+:gustSpeed rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:label "gust speed"@en ;
+           rdfs:comment "Maximum gust speed in km/h"@en .
+
+###  https://sakuna.ph/centralPressure
+:centralPressure rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:label "central pressure"@en ;
+           rdfs:comment "Central pressure in hPa (hectopascals)"@en .
+
+###  https://sakuna.ph/signalNumber
+:signalNumber rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:int ;
+           rdfs:label "signal number"@en ;
+           rdfs:comment "PAGASA Tropical Cyclone Wind Signal number (1-5)"@en .
+
+###  https://sakuna.ph/stormCategory
+:stormCategory rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:string ;
+           rdfs:label "storm category"@en ;
+           rdfs:comment "Storm classification (e.g. Tropical Depression, Tropical Storm, Typhoon, Super Typhoon)"@en .
+
+###  https://sakuna.ph/internationalName
+:internationalName rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:string ;
+           rdfs:label "international name"@en ;
+           rdfs:comment "International name of the tropical cyclone"@en .
+
+###  https://sakuna.ph/earthquakeDepth
+:earthquakeDepth rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:label "earthquake depth"@en ;
+           rdfs:comment "Depth of earthquake focus/hypocenter in kilometers"@en .
+
+###  https://sakuna.ph/epicenterLatitude
+:epicenterLatitude rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:label "epicenter latitude"@en ;
+           rdfs:comment "Latitude of earthquake epicenter"@en .
+
+###  https://sakuna.ph/epicenterLongitude
+:epicenterLongitude rdf:type owl:DatatypeProperty ;
+           rdfs:subPropertyOf owl:topDataProperty ;
+           rdfs:range xsd:decimal ;
+           rdfs:label "epicenter longitude"@en ;
+           rdfs:comment "Longitude of earthquake epicenter"@en .
 
 
 ###  https://sakuna.ph/noFamiliesAssisted

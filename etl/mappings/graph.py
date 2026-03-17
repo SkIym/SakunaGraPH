@@ -1,4 +1,4 @@
-from rdflib import Graph, Namespace, URIRef, BNode, RDF, Literal, XSD
+from rdflib import Graph, Namespace, URIRef, BNode, RDF, RDFS, Literal, XSD, OWL
 
 SKG = Namespace("https://sakuna.ph/")
 PROV = Namespace("http://www.w3.org/ns/prov#")
@@ -11,6 +11,8 @@ def create_graph() -> Graph:
     g.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
     g.bind("qudt", QUDT)
     g.bind("prov", PROV)
+    g.bind("owl", OWL)
+    g.bind("rdfs", RDFS)
     return g
 
 def add_monetary(g: Graph, subject: URIRef, predicate: URIRef, value: float, unit: URIRef) -> None:

@@ -1,11 +1,11 @@
 from dataclasses import dataclass, fields
 from datetime import date
-from rdflib import RDF, XSD, BNode, Literal, URIRef, Graph
+from rdflib import RDF, RDFS, XSD, BNode, Literal, URIRef, Graph
 from regex import M
 from .graph import PROV, QUDT, SKG, add_monetary
 from .iris import (
     event_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
-    damage_gen_iri, recovery_iri
+    damage_gen_iri, org_iri, recovery_iri
 )
 
 
@@ -238,6 +238,8 @@ def incident_mapping(rs: list[Incident], g: Graph) -> None:
 # ---------------------------------------------------------------------------
 
 def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
+    from semantic_processing.org_resolver import ORG_RESOLVER
+
     for r in rs:
         event_uri = _event_uri(r.id)
         uri = _sub_uri(r.id, "preparedness")
@@ -247,6 +249,11 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
 
         if r.agencyLGUsPresentPreparedness:
             g.add((uri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentPreparedness)))
+            for slug in ORG_RESOLVER.split_and_resolve(r.agencyLGUsPresentPreparedness):
+                o_uri = org_iri(slug)
+                g.add((o_uri, RDF.type, PROV.Organization))
+                g.add((o_uri, RDFS.label, Literal(slug)))
+                g.add((uri, SKG.contributingOrg, o_uri))
         if r.announcementsReleased:
             g.add((uri, SKG.announcementsReleased, Literal(r.announcementsReleased)))
 
@@ -548,9 +555,10 @@ def _to_millions(val: float):
 # ---------------------------------------------------------------------------
 
 def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
+    from semantic_processing.org_resolver import ORG_RESOLVER
+
     for r in rs:
         event_uri = _event_uri(r.id)
-        
 
         if r.allocatedFunds is not None:
 
@@ -561,8 +569,6 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.allocatedFunds), SKG.PHP_millions)
 
-            # g.add((uri, SKG.allocatedFunds, Literal(r.allocatedFunds, datatype=XSD.decimal)))
-
         muri = _sub_uri(r.id, "assistance")
 
         g.add((muri, RDF.type, SKG.Assistance))
@@ -570,11 +576,19 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
         if r.agencyLGUsPresentAssistance:
             g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
-
+            for slug in ORG_RESOLVER.split_and_resolve(r.agencyLGUsPresentAssistance):
+                o_uri = org_iri(slug)
+                g.add((o_uri, RDF.type, PROV.Organization))
+                g.add((o_uri, RDFS.label, Literal(slug)))
+                g.add((muri, SKG.contributingOrg, o_uri))
 
         if r.internationalOrgsPresent:
             g.add((muri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
-
+            for slug in ORG_RESOLVER.split_and_resolve(r.internationalOrgsPresent):
+                o_uri = org_iri(slug)
+                g.add((o_uri, RDF.type, PROV.Organization))
+                g.add((o_uri, RDFS.label, Literal(slug)))
+                g.add((muri, SKG.contributingOrg, o_uri))
 
         if r.amountNGOs is not None:
             uri = _sub_uri(r.id, "assistance/ngo+international")
@@ -582,7 +596,6 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
             g.add((uri, RDF.type, SKG.Assistance))
             g.add((event_uri, SKG.hasAssistance, uri))
 
-            # g.add((uri, SKG.amountNGOs, Literal(r.amountNGOs, datatype=XSD.decimal)))
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.amountNGOs), SKG.PHP_millions)
 
 

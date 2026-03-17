@@ -9,6 +9,7 @@ from datetime import datetime
 import polars as pl
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
+from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, AIRPORT_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
@@ -144,13 +145,27 @@ def load_events(folder_path: str) -> list[Event]:
             [event_name + src.get("reportName", "") + text]
         )[0]
 
+        # Extract disaster-specific params from narrative text
+        remarks_text = meta.get("remarks") or ""
+        params = PARAMS_EXTRACTOR.extract(remarks_text)
+
         events.append(Event(
             id=meta.get("id"),
             eventName=meta.get("eventName", folder),
             startDate=datetime.fromisoformat(meta["startDate"]) if meta.get("startDate") else None,
             endDate=datetime.fromisoformat(meta["endDate"]) if meta.get("endDate") else None,
-            remarks=meta.get("remarks"),
+            remarks=remarks_text or None,
             hasDisasterType=pred,
+            windSpeed=params.windSpeed,
+            gustSpeed=params.gustSpeed,
+            centralPressure=params.centralPressure,
+            signalNumber=params.signalNumber,
+            stormCategory=params.stormCategory,
+            internationalName=params.internationalName,
+            magnitude=params.magnitude,
+            earthquakeDepth=params.earthquakeDepth,
+            epicenterLatitude=params.epicenterLatitude,
+            epicenterLongitude=params.epicenterLongitude,
         ))
 
     return events

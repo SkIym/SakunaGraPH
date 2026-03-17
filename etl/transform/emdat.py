@@ -269,7 +269,7 @@ def clean_columns(df: DataFrame) -> DataFrame:
 
     )
 
-    df = to_float(df, ["contributionAID", "postStructureCost", "generalDamageAmount", "cpi"])
+    df = to_float(df, ["contributionAID", "postStructureCost", "generalDamageAmount", "cpi", "hasMagnitude", "latitude", "longitude"])
 
     df = to_int(df, ["dead", "injured", "affectedPersons", "displacedPersons"])
 

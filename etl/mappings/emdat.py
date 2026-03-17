@@ -1,9 +1,9 @@
 from dataclasses import dataclass, fields
 from datetime import datetime, date
 from polars import DataFrame
-from rdflib import RDF, XSD, Literal, URIRef, Graph
+from rdflib import RDF, RDFS, XSD, Literal, URIRef, Graph
 from .graph import PROV, SKG, add_monetary
-from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_iri, prov_iri, recovery_iri
+from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_iri, org_iri, prov_iri, recovery_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
 
 
@@ -14,12 +14,16 @@ class Event:
     eventName: str | None
     hasDisasterType: str
     hasDisasterSubtype: str | None
-    hasLocation: URIRef 
+    hasLocation: URIRef
     startDate: date
     endDate: date
     id: str
     lastUpdateDate: date
     entryDate: date
+    hasMagnitude: float | None = None
+    hasMagnitudeScale: str | None = None
+    latitude: float | None = None
+    longitude: float | None = None
 
 @dataclass
 class Assistance:
@@ -113,11 +117,19 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
                 for s in subtypes:
                     s = s.strip()
                     g.add((uri, SKG.hasDisasterSubtype, URIRef(SKG[s])))
-
+            elif f.name == "hasMagnitude":
+                g.add((uri, SKG.magnitude, Literal(float(value), datatype=XSD.decimal)))
+            elif f.name == "hasMagnitudeScale":
+                g.add((uri, SKG.magnitudeScale, Literal(value)))
+            elif f.name == "latitude":
+                g.add((uri, SKG.epicenterLatitude, Literal(float(value), datatype=XSD.decimal)))
+            elif f.name == "longitude":
+                g.add((uri, SKG.epicenterLongitude, Literal(float(value), datatype=XSD.decimal)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
         
 def assistance_mapping(rs: list[Assistance], g: Graph):
+    from semantic_processing.org_resolver import ORG_RESOLVER
 
     for r in rs:
 
@@ -135,16 +147,21 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
 
             value = getattr(r, f.name)
             if value is None or value == "":
-                continue  
-            
+                continue
+
             if f.name == "contributionAID":
                 add_monetary(g, uri, SKG.contributionAID, value, SKG.USD_thousands)
-                # g.add((uri, SKG.contributionAID, Literal(value, datatype=XSD.decimal)))
 
             elif f.name == "internationalOrgsPresent":
                 value = str(value)
                 if value.lower() == "yes":
                     g.add((uri, SKG.internationalOrgsPresent, Literal("OFDA/BHA")))
+                    # Resolve OFDA/BHA to org IRI
+                    for slug in ORG_RESOLVER.split_and_resolve("OFDA/BHA"):
+                        o_uri = org_iri(slug)
+                        g.add((o_uri, RDF.type, PROV.Organization))
+                        g.add((o_uri, RDFS.label, Literal(slug)))
+                        g.add((uri, SKG.contributingOrg, o_uri))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
 
