@@ -7,5 +7,6 @@ rdflib
 openpyxl
 morph-kgc
 thefuzz
+spacy
 polars
 pytesseract
