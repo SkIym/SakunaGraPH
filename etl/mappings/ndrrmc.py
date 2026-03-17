@@ -495,7 +495,6 @@ INFRA_MAPPING = {
     "NUMBER_OF\r\nDAMAGED": "numberInfraDamaged",
     "COSTPHP": "infraDamageAmount",
     "REMARKS": "remarks",
-    
 
 }
 
