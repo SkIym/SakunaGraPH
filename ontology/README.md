@@ -8,9 +8,7 @@ OWL ontology for modeling Philippine disaster events, their impacts, responses, 
 |------|-------------|
 | `sakunagraph.ttl` | Main ontology (Turtle format) |
 | `sakunaph.owl` | WebProtege export (RDF/XML format) |
-| `skg-disaster-type-scheme.ttl` | SKOS concept scheme for disaster type classification (based on EM-DAT) |
 | `beAWARE_ontology.owl` | Imported base ontology for disaster events and locations |
-| `catalog-v001.xml` | XML catalog for resolving ontology imports locally |
 | `pitfall-scanner-results*.xml` | OOPS! pitfall scanner validation results |
 
 ## Namespace
