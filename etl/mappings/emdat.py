@@ -5,7 +5,7 @@ from rdflib import RDF, RDFS, XSD, Literal, URIRef, Graph
 from .graph import PROV, SKG, add_monetary
 from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_iri, org_iri, prov_iri, recovery_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
-
+from semantic_processing.org_resolver import ORG_RESOLVER
 
 T = TypeVar("T")
 
@@ -129,8 +129,6 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
         
 def assistance_mapping(rs: list[Assistance], g: Graph):
-    from semantic_processing.org_resolver import ORG_RESOLVER
-
     for r in rs:
 
         event_uri = event_iri(r.id)
@@ -157,11 +155,8 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
                 if value.lower() == "yes":
                     g.add((uri, SKG.internationalOrgsPresent, Literal("OFDA/BHA")))
                     # Resolve OFDA/BHA to org IRI
-                    for slug in ORG_RESOLVER.split_and_resolve("OFDA/BHA"):
-                        o_uri = org_iri(slug)
-                        g.add((o_uri, RDF.type, PROV.Organization))
-                        g.add((o_uri, RDFS.label, Literal(slug)))
-                        g.add((uri, SKG.contributingOrg, o_uri))
+                    for org in ORG_RESOLVER.split_and_resolve(str(value)):
+                        g.add((uri, SKG.contributingOrg, org))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
 

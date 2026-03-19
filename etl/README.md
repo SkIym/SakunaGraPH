@@ -9,7 +9,7 @@ Extract-Transform-Load pipeline for converting Philippine disaster data from mul
 | **NDRRMC** | National Disaster Risk Reduction and Management Council situation reports | PDF |
 | **GDA** | Geography Disaster Archive (historical records) | XLSX |
 | **EM-DAT** | Emergency Events Database (international disaster data) | XLSX |
-| **PSGC** | Philippine Standard Geographic Code (geographic hierarchy) | XLSX / SHP |
+| **PSGC** | Philippine Standard Geographic Code (geographic hierarchy) | XLSX |
 | **DROMIC** | DSWD Disaster Response Operations Monitoring and Information Center | PDF (scraped) |
 
 ## Directory Structure
@@ -30,7 +30,7 @@ etl/
 ## Pipeline Overview
 
 ```
-Raw Data (PDF, XLSX, SHP)
+Raw Data (PDF, XLSX)
         │
         ▼
    fetch / parse          Scrape or extract structured data from raw sources
@@ -51,7 +51,7 @@ Raw Data (PDF, XLSX, SHP)
    ../data/rdf/           N-Triples output files
         │
         ▼
-     GraphDB              Load into triplestore (manual)
+     GraphDB              Load into triplestore
 ```
 
 ## Usage
@@ -70,12 +70,6 @@ Raw Data (PDF, XLSX, SHP)
 
 ### GDA
 
-Using morph_kgc with RML mappings:
-```bash
-python -m morph_kgc ./config.ini
-```
-
-Or using the Python pipeline:
 ```bash
 python -m pipeline.run_gda
 ```
@@ -96,14 +90,14 @@ python ./transform/psgc_datafile.py
 ## Key Technologies
 
 - **Data wrangling**: Polars, Pandas
-- **RDF**: rdflib, morph_kgc (RML)
+- **RDF**: rdflib,
 - **NLP**: sentence-transformers, thefuzz
 - **PDF parsing**: pdfplumber
 - **Web scraping**: Selenium
-- **Concurrency**: concurrent.futures (ProcessPoolExecutor)
 
 ## Known Limitations
 
 - OCR for scanned/image-based NDRRMC PDFs is not yet implemented
 - Loading RDF into GraphDB is still manual
-- PSGC mapping goes down to municipal level only
+- PSGC mapping goes down to municipal level only, though PSGC rdf can include barangay level
+- Automatic pipeline not yet implemented

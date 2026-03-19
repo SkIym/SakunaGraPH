@@ -4,6 +4,7 @@ SKG = Namespace("https://sakuna.ph/")
 PROV = Namespace("http://www.w3.org/ns/prov#")
 QUDT   = Namespace("http://qudt.org/schema/qudt/")
 CUR    = Namespace("http://qudt.org/vocab/currency/")
+ORG = Namespace("https://sakuna.ph/org/")
 
 def create_graph() -> Graph:
     g = Graph()

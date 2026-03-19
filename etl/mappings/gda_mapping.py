@@ -240,7 +240,6 @@ def incident_mapping(rs: list[Incident], g: Graph) -> None:
 # ---------------------------------------------------------------------------
 
 def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
-    from semantic_processing.org_resolver import ORG_RESOLVER
 
     for r in rs:
         event_uri = _event_uri(r.id)
@@ -251,11 +250,8 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
 
         if r.agencyLGUsPresentPreparedness:
             g.add((uri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentPreparedness)))
-            for slug in ORG_RESOLVER.split_and_resolve(r.agencyLGUsPresentPreparedness):
-                o_uri = org_iri(slug)
-                g.add((o_uri, RDF.type, PROV.Organization))
-                g.add((o_uri, RDFS.label, Literal(slug)))
-                g.add((uri, SKG.contributingOrg, o_uri))
+            for org in ORG_RESOLVER.split_and_resolve(str(r.agencyLGUsPresentPreparedness)):
+                    g.add((uri, SKG.contributingOrg, org))
         if r.announcementsReleased:
             g.add((uri, SKG.announcementsReleased, Literal(r.announcementsReleased)))
 
@@ -293,12 +289,9 @@ def rescue_mapping(rs: list[Rescue], g: Graph) -> None:
         if r.rescueEquipment:
             g.add((uri, SKG.rescueEquipment, Literal(r.rescueEquipment)))
         if r.rescueUnit:
-            # g.add((uri, SKG.rescueUnit, Literal(r.rescueUnit)))
-            for slug in ORG_RESOLVER.split_and_resolve(r.rescueUnit):
-                o_uri = org_iri(slug)
-                g.add((o_uri, RDF.type, PROV.Organization))
-                g.add((o_uri, RDFS.label, Literal(slug)))
-                g.add((uri, SKG.rescueUnit, o_uri))
+            g.add((uri, SKG.rescueUnit, Literal(r.rescueUnit)))
+            for org in ORG_RESOLVER.split_and_resolve(str(r.rescueUnit)):
+                    g.add((uri, SKG.contributingOrg, org))
 
 
 # ---------------------------------------------------------------------------
@@ -562,7 +555,6 @@ def _to_millions(val: float):
 # ---------------------------------------------------------------------------
 
 def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
-    from semantic_processing.org_resolver import ORG_RESOLVER
 
     for r in rs:
         event_uri = _event_uri(r.id)
@@ -585,19 +577,13 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
             if r.agencyLGUsPresentAssistance:
                 g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
-                for slug in ORG_RESOLVER.split_and_resolve(r.agencyLGUsPresentAssistance):
-                    o_uri = org_iri(slug)
-                    g.add((o_uri, RDF.type, PROV.Organization))
-                    g.add((o_uri, RDFS.label, Literal(slug)))
-                    g.add((muri, SKG.contributingOrg, o_uri))
+                for org in ORG_RESOLVER.split_and_resolve(str(r.agencyLGUsPresentAssistance)):
+                    g.add((uri, SKG.contributingOrg, org))
 
             if r.internationalOrgsPresent:
                 g.add((muri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
-                for slug in ORG_RESOLVER.split_and_resolve(r.internationalOrgsPresent):
-                    o_uri = org_iri(slug)
-                    g.add((o_uri, RDF.type, PROV.Organization))
-                    g.add((o_uri, RDFS.label, Literal(slug)))
-                    g.add((muri, SKG.contributingOrg, o_uri))
+                for org in ORG_RESOLVER.split_and_resolve(str(r.internationalOrgsPresent)):
+                    g.add((uri, SKG.contributingOrg, org))
 
         if r.amountNGOs is not None:
             uri = _sub_uri(r.id, "assistance/ngo+international")
@@ -641,11 +627,8 @@ def relief_mapping(rs: list[Relief], g: Graph) -> None:
             # g.add((uri, SKG.itemCost, Literal(r.itemCost, datatype=XSD.decimal)))
         if r.itemQty:
             g.add((uri, SKG.itemQty, Literal(r.itemQty)))
-            for slug in ORG_RESOLVER.split_and_resolve(r.itemQty):
-                o_uri = org_iri(slug)
-                g.add((o_uri, RDF.type, PROV.Organization))
-                g.add((o_uri, RDFS.label, Literal(slug)))
-                g.add((uri, SKG.contributingOrg, o_uri))
+            for org in ORG_RESOLVER.split_and_resolve(str(r.itemQty)):
+                    g.add((uri, SKG.contributingOrg, org))
 
 
 

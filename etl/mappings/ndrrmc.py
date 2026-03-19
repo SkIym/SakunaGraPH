@@ -5,6 +5,8 @@ from rdflib import URIRef, Literal, RDFS
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 from dataclasses import dataclass
+
+from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import CUR, SKG, Graph, PROV, add_monetary
 from .iris import aff_pop_iri, agri_iri, airport_iri, assistance_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, flight_iri, housing_iri, incident_iri, infra_iri, org_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
 
@@ -16,17 +18,17 @@ class Event:
     endDate: datetime | None
     id: str
     remarks: str | None = None
-    # Disaster-type specific fields (Task 4)
-    windSpeed: float | None = None
-    gustSpeed: float | None = None
-    centralPressure: float | None = None
-    signalNumber: int | None = None
-    stormCategory: str | None = None
-    internationalName: str | None = None
-    magnitude: float | None = None
-    earthquakeDepth: float | None = None
-    epicenterLatitude: float | None = None
-    epicenterLongitude: float | None = None
+    # Disaster-type specific fields
+    # windSpeed: float | None = None
+    # gustSpeed: float | None = None
+    # centralPressure: float | None = None
+    # signalNumber: int | None = None
+    # stormCategory: str | None = None
+    # internationalName: str | None = None
+    # magnitude: float | None = None
+    # earthquakeDepth: float | None = None
+    # epicenterLatitude: float | None = None
+    # epicenterLongitude: float | None = None
 
 def event_mapping(g: Graph, ev: Event) -> URIRef:
     uri = event_iri(ev.id)
@@ -71,26 +73,26 @@ def event_mapping(g: Graph, ev: Event) -> URIRef:
         ))
 
     # Disaster-type specific properties
-    if ev.windSpeed is not None:
-        g.add((uri, SKG.windSpeed, Literal(ev.windSpeed, datatype=XSD.decimal)))
-    if ev.gustSpeed is not None:
-        g.add((uri, SKG.gustSpeed, Literal(ev.gustSpeed, datatype=XSD.decimal)))
-    if ev.centralPressure is not None:
-        g.add((uri, SKG.centralPressure, Literal(ev.centralPressure, datatype=XSD.decimal)))
-    if ev.signalNumber is not None:
-        g.add((uri, SKG.signalNumber, Literal(ev.signalNumber, datatype=XSD.int)))
-    if ev.stormCategory:
-        g.add((uri, SKG.stormCategory, Literal(ev.stormCategory)))
-    if ev.internationalName:
-        g.add((uri, SKG.internationalName, Literal(ev.internationalName)))
-    if ev.magnitude is not None:
-        g.add((uri, SKG.magnitude, Literal(ev.magnitude, datatype=XSD.decimal)))
-    if ev.earthquakeDepth is not None:
-        g.add((uri, SKG.earthquakeDepth, Literal(ev.earthquakeDepth, datatype=XSD.decimal)))
-    if ev.epicenterLatitude is not None:
-        g.add((uri, SKG.epicenterLatitude, Literal(ev.epicenterLatitude, datatype=XSD.decimal)))
-    if ev.epicenterLongitude is not None:
-        g.add((uri, SKG.epicenterLongitude, Literal(ev.epicenterLongitude, datatype=XSD.decimal)))
+    # if ev.windSpeed is not None:
+    #     g.add((uri, SKG.windSpeed, Literal(ev.windSpeed, datatype=XSD.decimal)))
+    # if ev.gustSpeed is not None:
+    #     g.add((uri, SKG.gustSpeed, Literal(ev.gustSpeed, datatype=XSD.decimal)))
+    # if ev.centralPressure is not None:
+    #     g.add((uri, SKG.centralPressure, Literal(ev.centralPressure, datatype=XSD.decimal)))
+    # if ev.signalNumber is not None:
+    #     g.add((uri, SKG.signalNumber, Literal(ev.signalNumber, datatype=XSD.int)))
+    # if ev.stormCategory:
+    #     g.add((uri, SKG.stormCategory, Literal(ev.stormCategory)))
+    # if ev.internationalName:
+    #     g.add((uri, SKG.internationalName, Literal(ev.internationalName)))
+    # if ev.magnitude is not None:
+    #     g.add((uri, SKG.magnitude, Literal(ev.magnitude, datatype=XSD.decimal)))
+    # if ev.earthquakeDepth is not None:
+    #     g.add((uri, SKG.earthquakeDepth, Literal(ev.earthquakeDepth, datatype=XSD.decimal)))
+    # if ev.epicenterLatitude is not None:
+    #     g.add((uri, SKG.epicenterLatitude, Literal(ev.epicenterLatitude, datatype=XSD.decimal)))
+    # if ev.epicenterLongitude is not None:
+    #     g.add((uri, SKG.epicenterLongitude, Literal(ev.epicenterLongitude, datatype=XSD.decimal)))
 
     return uri
 
@@ -486,7 +488,6 @@ class Assistance:
     itemCostPerUnit: float | None
 
 def relief_mapping(g: Graph, reliefs: List[Assistance], event_iri: URIRef):
-    from semantic_processing.org_resolver import ORG_RESOLVER
 
     for r in reliefs:
         uri = assistance_iri(event_iri, r.id)
@@ -517,11 +518,8 @@ def relief_mapping(g: Graph, reliefs: List[Assistance], event_iri: URIRef):
                 # Keep original literal for auditability
                 g.add((uri, SKG.itemSource, Literal(value)))
                 # Resolve to organization IRIs
-                for slug in ORG_RESOLVER.split_and_resolve(str(value)):
-                    o_uri = org_iri(slug)
-                    g.add((o_uri, RDF.type, PROV.Organization))
-                    g.add((o_uri, RDFS.label, Literal(slug)))
-                    g.add((uri, SKG.contributingOrg, o_uri))
+                for org in ORG_RESOLVER.split_and_resolve(str(value)):
+                    g.add((uri, SKG.contributingOrg, org))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
 

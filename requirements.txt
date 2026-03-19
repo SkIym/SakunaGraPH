@@ -10,3 +10,4 @@ thefuzz
 spacy
 polars
 pytesseract
+sentence_transformers
