@@ -105,7 +105,6 @@ OUT_DIR = "../data/rdf/"
 def run(out_file: str, start: int = 0, count: int | None = None):
     main_graph = create_graph()
 
-    load_uuids(DATA_DIR)
     events = load_events(DATA_DIR)
 
     # ---- batching logic ----

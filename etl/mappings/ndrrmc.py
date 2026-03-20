@@ -8,7 +8,7 @@ from dataclasses import dataclass
 
 from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import CUR, SKG, Graph, PROV, add_monetary
-from .iris import aff_pop_iri, agri_iri, airport_iri, assistance_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, flight_iri, housing_iri, incident_iri, infra_iri, org_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
+from .iris import aff_pop_iri, agri_iri, airport_iri, assistance_iri, casualties_iri, class_dis_iri, comms_iri, doc_iri, event_iri, event_uri, flight_iri, housing_iri, incident_iri, infra_iri, org_iri, pevac_iri, power_iri, prov_iri, relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri
 
 @dataclass
 class Event:
@@ -31,7 +31,7 @@ class Event:
     # epicenterLongitude: float | None = None
 
 def event_mapping(g: Graph, ev: Event) -> URIRef:
-    uri = event_iri(ev.id)
+    uri = event_uri("ndrrmc", ev.id)
     g.add((
         uri,
         RDF.type,

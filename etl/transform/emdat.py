@@ -1,9 +1,11 @@
 # EMDAT XLSX MAPPER HERE
 import argparse
 import os
+import uuid
 import polars as pl
 from polars import DataFrame
 import datetime
+from mappings.iris import EMDAT_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from transform.ndrrmc_cleaner import to_float, to_int
 from mappings.emdat import Assistance, Event, Recovery, Source, DamageGeneral, Casualties, AffectedPopulation
@@ -150,6 +152,10 @@ COLUMN_MAPPINGS = {
     "Location": "hasLocation"
 }
 
+def _event_id(disno: str) -> str:
+    """Deterministic hex ID from DisNo."""
+    return uuid.uuid5(EMDAT_EVENT_NS, disno).hex
+
 
 def clean_loc(df: DataFrame, col: str):
 
@@ -291,6 +297,9 @@ def transform_emdat(input_path: str) -> dict[type, list[Any]]:
 
     df = df.rename(mapping=COLUMN_MAPPINGS)
     df = clean_columns(df)
+    df = df.with_columns(
+        pl.col("id").map_elements(_event_id)
+    )
 
     # events = df_to_entities(df, Event)
 

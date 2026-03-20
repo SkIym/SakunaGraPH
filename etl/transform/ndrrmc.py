@@ -7,6 +7,7 @@ from dataclasses import fields
 from datetime import datetime
 
 import polars as pl
+from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
@@ -26,6 +27,13 @@ from transform.ndrrmc_cleaner import (
 )
 
 T = TypeVar("T")
+
+
+def _event_id(event_name: str, start_date: str | None) -> str:
+    """Deterministic hex ID from event name + start date."""
+    key = f"{event_name.strip().lower()}:{start_date or ''}"
+    return uuid.uuid5(NDRRMC_EVENT_NS, key).hex
+
 
 def load_csv_df(
     path: str,
@@ -106,23 +114,6 @@ def load_multiple_csvs(
     dfs = [load_csv_df(p, **df_kwargs) for p in paths]
     return pl.concat(dfs, rechunk=True)
 
-def load_uuids(folder_path: str):
-    for folder in next(os.walk(folder_path))[1]:
-        meta_path = os.path.join(folder_path, folder, "metadata.json")
-        meta = {}
-
-        if os.path.exists(meta_path):
-            try:
-                with open(meta_path, "r", encoding="utf-8") as f:
-                    meta = json.load(f)
-            except json.JSONDecodeError:
-                pass
-
-        meta.setdefault("id", uuid.uuid4().hex)
-
-        with open(meta_path, "w", encoding="utf-8") as f:
-            json.dump(meta, f, indent=2, ensure_ascii=False)
-        
 def load_events(folder_path: str) -> list[Event]:
     events: list[Event] = []
 
@@ -150,7 +141,7 @@ def load_events(folder_path: str) -> list[Event]:
         params = PARAMS_EXTRACTOR.extract(remarks_text)
 
         events.append(Event(
-            id=meta.get("id"),
+            id=_event_id(meta.get("eventName", folder), meta.get("startDate")),
             eventName=meta.get("eventName", folder),
             startDate=datetime.fromisoformat(meta["startDate"]) if meta.get("startDate") else None,
             endDate=datetime.fromisoformat(meta["endDate"]) if meta.get("endDate") else None,

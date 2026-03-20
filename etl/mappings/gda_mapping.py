@@ -6,8 +6,8 @@ from regex import M
 from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import PROV, QUDT, SKG, add_monetary
 from .iris import (
-    event_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
-    damage_gen_iri, org_iri, recovery_iri
+    comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
+    damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, seaport_iri, sub_iri, water_iri
 )
 
 
@@ -160,16 +160,6 @@ class Recovery:
     postTraining: str | None
     postStructureCost: float | None      # stored in millions
 
-
-def _event_uri(event_id: str) -> URIRef:
-    return URIRef(f"https://sakuna.ph/{event_id}")
-
-
-def _sub_uri(event_id: str, suffix: str) -> URIRef:
-    return URIRef(f"https://sakuna.ph/{event_id}/{suffix}")
-
-
-
 def _add_location(g: Graph, subject: URIRef, location: URIRef | str | None) -> None:
     if not location:
         return
@@ -189,7 +179,7 @@ def _add_type_iri(g: Graph, subject: URIRef, predicate: URIRef, value: str | Non
 
 def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef) -> None:
     for r in rs:
-        uri = _event_uri(r.id)
+        uri = event_uri("gda", r.id)
 
         # rdf:type — map eventClass to the appropriate SKG class
         if r.eventClass == "I":
@@ -225,11 +215,11 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef) -> None:
 
 def incident_mapping(rs: list[Incident], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, f"related_incident/{r.sub_id}")
+        e_uri = event_uri("gda", r.id)
+        uri = incident_iri(e_uri, r.sub_id)
 
         g.add((uri, RDF.type, SKG.Incident))
-        g.add((event_uri, SKG.hasRelatedIncident, uri))
+        g.add((e_uri, SKG.hasRelatedIncident, uri))
 
         _add_location(g, uri, r.hasLocation)
         _add_type_iri(g, uri, SKG.hasDisasterType, r.hasType)
@@ -242,11 +232,11 @@ def incident_mapping(rs: list[Incident], g: Graph) -> None:
 def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
 
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "preparedness")
+        e_uri = event_uri("gda", r.id)
+        uri = sub_iri(e_uri, "preparedness")
 
         g.add((uri, RDF.type, SKG.Preparedness))
-        g.add((event_uri, SKG.hasPreparedness, uri))
+        g.add((e_uri, SKG.hasPreparedness, uri))
 
         if r.agencyLGUsPresentPreparedness:
             g.add((uri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentPreparedness)))
@@ -262,11 +252,11 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
 
 def evacuation_mapping(rs: list[Evacuation], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "preemptive_evacuation")
+        e_uri = event_uri("gda", r.id)
+        uri = pevac_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.PreemptiveEvacuation))
-        g.add((event_uri, SKG.hasPreemptiveEvacuation, uri))
+        g.add((e_uri, SKG.hasPreemptiveEvacuation, uri))
 
         if r.evacuationPlan:
             g.add((uri, SKG.evacuationPlan, Literal(r.evacuationPlan)))
@@ -280,11 +270,11 @@ def evacuation_mapping(rs: list[Evacuation], g: Graph) -> None:
 
 def rescue_mapping(rs: list[Rescue], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "rescue")
+        e_uri = event_uri("gda", r.id)
+        uri = sub_iri(e_uri, "rescue")
 
         g.add((uri, RDF.type, SKG.Rescue))
-        g.add((event_uri, SKG.hasRescue, uri))
+        g.add((e_uri, SKG.hasRescue, uri))
 
         if r.rescueEquipment:
             g.add((uri, SKG.rescueEquipment, Literal(r.rescueEquipment)))
@@ -306,16 +296,16 @@ def calamity_mapping(rs: list[DeclarationOfCalamity], g: Graph) -> None:
         if value:
 
             if "calamity" in value.lower():
-                event_uri = _event_uri(r.id)
-                uri = _sub_uri(r.id, "declaration_of_calamity")
+                e_uri = event_uri("gda", r.id)
+                uri = doc_iri(e_uri)
                 g.add((uri, RDF.type, SKG.DeclarationOfCalamity))
-                g.add((event_uri, SKG.hasDeclarationOfCalamity, uri))
+                g.add((e_uri, SKG.hasDeclarationOfCalamity, uri))
                 g.add((uri, SKG.declarationType, Literal(r.declarationOfCalamity)))
             else:
-                event_uri = _event_uri(r.id)
-                uri = _sub_uri(r.id, "preparedness")
+                e_uri = event_uri("gda", r.id)
+                uri = sub_iri(e_uri, "preparedness")
                 g.add((uri, RDF.type, SKG.Preparedness))
-                g.add((event_uri, SKG.hasPreparedness, uri))
+                g.add((e_uri, SKG.hasPreparedness, uri))
                 g.add((uri, SKG.announcementsReleased, Literal(r.declarationOfCalamity)))
 
 
@@ -325,11 +315,11 @@ def calamity_mapping(rs: list[DeclarationOfCalamity], g: Graph) -> None:
 
 def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "affected_population")
+        e_uri = event_uri("gda", r.id)
+        uri = aff_pop_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.AffectedPopulation))
-        g.add((event_uri, SKG.hasAffectedPopulation, uri))
+        g.add((e_uri, SKG.hasAffectedPopulation, uri))
 
         if r.affectedBarangays is not None:
             g.add((uri, SKG.affectedBarangays, Literal(r.affectedBarangays, datatype=XSD.int)))
@@ -349,29 +339,29 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph) -> None:
 
 def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
+        e_uri = event_uri("gda", r.id)
         
         index = 0
         if r.dead is not None:
-            uri = casualties_iri(event_uri, str(index+1))
+            uri = casualties_iri(e_uri, str(index+1))
             g.add((uri, RDF.type, SKG.Casualties))
-            g.add((event_uri, SKG.hasCasualties, uri))
+            g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.dead, datatype=XSD.int)))
             g.add((uri, SKG.casualtyType, Literal("DEAD", datatype=SKG.casualtyDatatype)))
             index+=1
 
         if r.injured is not None:
-            uri = casualties_iri(event_uri, str(index+1))
+            uri = casualties_iri(e_uri, str(index+1))
             g.add((uri, RDF.type, SKG.Casualties))
-            g.add((event_uri, SKG.hasCasualties, uri))
+            g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.injured, datatype=XSD.int)))
             g.add((uri, SKG.casualtyType, Literal("INJURED", datatype=SKG.casualtyDatatype)))
             index+=1
 
         if r.missing is not None:
-            uri = casualties_iri(event_uri, str(index+1))
+            uri = casualties_iri(e_uri, str(index+1))
             g.add((uri, RDF.type, SKG.Casualties))
-            g.add((event_uri, SKG.hasCasualties, uri))
+            g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.missing, datatype=XSD.int)))
             g.add((uri, SKG.casualtyType, Literal("MISSING", datatype=SKG.casualtyDatatype)))
             index+=1
@@ -383,11 +373,11 @@ def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
 
 def housing_damage_mapping(rs: list[HousingDamage], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "housing_damage")
+        e_uri = event_uri("gda", r.id)
+        uri = housing_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.HousingDamage))
-        g.add((event_uri, SKG.hasHousingDamage, uri))
+        g.add((e_uri, SKG.hasHousingDamage, uri))
 
         if r.totallyDamagedHouses is not None:
             g.add((uri, SKG.totallyDamagedHouses, Literal(r.totallyDamagedHouses, datatype=XSD.int)))
@@ -401,11 +391,11 @@ def housing_damage_mapping(rs: list[HousingDamage], g: Graph) -> None:
 
 def infra_damage_mapping(rs: list[InfrastructureDamage], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "infrastructure_damage")
+        e_uri = event_uri("gda", r.id)
+        uri = infra_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.InfrastructureDamage))
-        g.add((event_uri, SKG.hasInfrastructureDamage, uri))
+        g.add((e_uri, SKG.hasInfrastructureDamage, uri))
 
         if r.infraDamageAmount is not None:
             # g.add((uri, SKG.infraDamageAmount, Literal(r.infraDamageAmount, datatype=XSD.decimal)))
@@ -435,11 +425,11 @@ def infra_damage_mapping(rs: list[InfrastructureDamage], g: Graph) -> None:
 
 def damage_gen_mapping(rs: list[DamageGeneral], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "damage_general")
+        e_uri = event_uri("gda", r.id)
+        uri = damage_gen_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.DamageGeneral))
-        g.add((event_uri, SKG.hasDamageGeneral, uri))
+        g.add((e_uri, SKG.hasDamageGeneral, uri))
 
         if r.generalDamageAmount is not None:
             # g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
@@ -453,11 +443,11 @@ def damage_gen_mapping(rs: list[DamageGeneral], g: Graph) -> None:
 
 def power_disruption_mapping(rs: list[PowerDisruption], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "power_disruption")
+        e_uri = event_uri("gda", r.id)
+        uri = power_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.PowerDisruption))
-        g.add((event_uri, SKG.hasPowerDisruption, uri))
+        g.add((e_uri, SKG.hasPowerDisruption, uri))
 
         if r.powerAffected:
             g.add((uri, SKG.remarks, Literal(r.powerAffected)))
@@ -469,11 +459,11 @@ def power_disruption_mapping(rs: list[PowerDisruption], g: Graph) -> None:
 
 def comms_disruption_mapping(rs: list[CommunicationLineDisruption], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "communication_line_disruption")
+        e_uri = event_uri("gda", r.id)
+        uri = comms_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.CommunicationLineDisruption))
-        g.add((event_uri, SKG.hasCommunicationLineDisruption, uri))
+        g.add((e_uri, SKG.hasCommunicationLineDisruption, uri))
 
         if r.communicationAffected:
             g.add((uri, SKG.remarks, Literal(r.communicationAffected)))
@@ -485,11 +475,11 @@ def comms_disruption_mapping(rs: list[CommunicationLineDisruption], g: Graph) ->
 
 def rnb_damage_mapping(rs: list[RoadAndBridgesDamage], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "road_and_bridges_damage")
+        e_uri = event_uri("gda", r.id)
+        uri = rnb_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.RoadAndBridgesDamage))
-        g.add((event_uri, SKG.hasRoadAndBridgesDamage, uri))
+        g.add((e_uri, SKG.hasRoadAndBridgesDamage, uri))
 
         if r.roadBridgeAffected:
             g.add((uri, SKG.remarks, Literal(r.roadBridgeAffected)))
@@ -501,11 +491,11 @@ def rnb_damage_mapping(rs: list[RoadAndBridgesDamage], g: Graph) -> None:
 
 def seaport_disruption_mapping(rs: list[SeaportDisruption], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "seaport_disruption")
+        e_uri = event_uri("gda", r.id)
+        uri = seaport_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.SeaportDisruption))
-        g.add((event_uri, SKG.hasSeaportDisruption, uri))
+        g.add((e_uri, SKG.hasSeaportDisruption, uri))
 
         if r.seaportsAffected:
             g.add((uri, SKG.remarks, Literal(r.seaportsAffected)))
@@ -525,11 +515,11 @@ def _augment_water_source(source_type: str, affected: str | None) -> str | None:
 
 def water_disruption_mapping(rs: list[WaterDisruption], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "water_disruption")
+        e_uri = event_uri("gda", r.id)
+        uri = water_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.WaterDisruption))
-        g.add((event_uri, SKG.hasWaterDisruption, uri))
+        g.add((e_uri, SKG.hasWaterDisruption, uri))
 
         dam_desc = _augment_water_source("Dam", r.areDamsAffected)
         if dam_desc:
@@ -557,23 +547,23 @@ def _to_millions(val: float):
 def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
     for r in rs:
-        event_uri = _event_uri(r.id)
+        e_uri = event_uri("gda", r.id)
 
         if r.allocatedFunds is not None:
 
-            uri = _sub_uri(r.id, "assistance/allocated")
+            uri = sub_iri(e_uri, "assistance/allocated")
 
             g.add((uri, RDF.type, SKG.Assistance))
-            g.add((event_uri, SKG.hasAssistance, uri))
+            g.add((e_uri, SKG.hasAssistance, uri))
 
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.allocatedFunds), SKG.PHP_millions)
 
 
         if r.agencyLGUsPresentAssistance or r.internationalOrgsPresent:
-            muri = _sub_uri(r.id, "assistance")
+            muri = assistance_iri(e_uri)
 
             g.add((muri, RDF.type, SKG.Assistance))
-            g.add((event_uri, SKG.hasAssistance, muri))
+            g.add((e_uri, SKG.hasAssistance, muri))
 
             if r.agencyLGUsPresentAssistance:
                 g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
@@ -586,10 +576,10 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
                     g.add((uri, SKG.contributingOrg, org))
 
         if r.amountNGOs is not None:
-            uri = _sub_uri(r.id, "assistance/ngo+international")
+            uri = sub_iri(e_uri, "assistance/ngo+international")
 
             g.add((uri, RDF.type, SKG.Assistance))
-            g.add((event_uri, SKG.hasAssistance, uri))
+            g.add((e_uri, SKG.hasAssistance, uri))
 
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.amountNGOs), SKG.PHP_millions)
 
@@ -610,12 +600,12 @@ _RELIEF_ITEM_TYPE_LABELS: dict[str, str] = {
 
 def relief_mapping(rs: list[Relief], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
+        e_uri = event_uri("gda", r.id)
         # slug matches the RML template suffix, e.g. "assistance/goods"
-        uri = _sub_uri(r.id, f"assistance/{r.itemType.lower()}")
+        uri = sub_iri(e_uri, f"assistance/{r.itemType.lower()}")
 
         g.add((uri, RDF.type, SKG.Assistance))
-        g.add((event_uri, SKG.hasAssistance, uri))
+        g.add((e_uri, SKG.hasAssistance, uri))
 
         label = _RELIEF_ITEM_TYPE_LABELS.get(r.itemType.lower(), r.itemType)
         g.add((uri, SKG.itemTypeOrNeeds, Literal(label)))
@@ -638,11 +628,11 @@ def relief_mapping(rs: list[Relief], g: Graph) -> None:
 
 def recovery_mapping(rs: list[Recovery], g: Graph) -> None:
     for r in rs:
-        event_uri = _event_uri(r.id)
-        uri = _sub_uri(r.id, "recovery")
+        e_uri = event_uri("gda", r.id)
+        uri = recovery_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.Recovery))
-        g.add((event_uri, SKG.hasRecovery, uri))
+        g.add((e_uri, SKG.hasRecovery, uri))
 
         if r.srrDone:
             g.add((uri, SKG.srrDone, Literal(r.srrDone)))
