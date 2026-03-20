@@ -7,21 +7,14 @@ SKG = Namespace("https://sakuna.ph/")
 
 LEAF_CLASS_QUERY = """
 SELECT DISTINCT ?c ?defi WHERE {
-    ?c rdfs:subClassOf+ skg:DisasterType ;
+    ?c skos:inScheme skg:DisasterTypeScheme ;
        skos:definition ?defi .
     FILTER NOT EXISTS {
-        ?child rdfs:subClassOf ?c .
-        ?child rdfs:subClassOf+ skg:DisasterType .
+        ?child skos:broader ?c .
     }
 }
 """
 
-WAVE_ACTION_QUERY = """
-SELECT ?defi WHERE {
-    skg:WaveAction skos:definition ?defi .
-}
-LIMIT 1
-"""
 
 ONTOLOGY_PATH = "../ontology/sakunagraph.ttl"
 INIT_NS: dict[str, Namespace | type[DefinedNamespace]] = {"rdfs": RDFS, "skg": SKG, "skos": SKOS}
@@ -38,9 +31,6 @@ def _load_classes(graph: Graph) -> dict[str, str]:
     for row in graph.query(LEAF_CLASS_QUERY, initNs=INIT_NS):
         label = _uri_to_label(graph, row.c)
         classes[row.defi.value] = label
-
-    for row in graph.query(WAVE_ACTION_QUERY, initNs=INIT_NS):
-        classes[row.defi.value] = "WaveAction"
 
     return classes
 
