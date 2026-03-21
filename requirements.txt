@@ -11,3 +11,4 @@ spacy
 polars
 pytesseract
 sentence_transformers
+fastexcel

@@ -3,7 +3,7 @@ from datetime import datetime, date
 from polars import DataFrame
 from rdflib import RDF, RDFS, XSD, Literal, URIRef, Graph
 from .graph import PROV, SKG, add_monetary
-from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_iri, event_uri, org_iri, prov_iri, recovery_iri
+from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_uri, org_iri, prov_iri, recovery_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
 from semantic_processing.org_resolver import ORG_RESOLVER
 
