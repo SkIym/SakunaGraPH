@@ -452,7 +452,7 @@ class LocationMatcher:
 
 LOCATION_MATCHER = LocationMatcher(
     # graph_path="../data/rdf/psgc_rdf.ttl"
-    graph_path="../data/rdf/psgc.ttl"
+    graph_path="../data/rdf/psgc/psgc.ttl"
 
 )
 
@@ -464,7 +464,7 @@ LOCATION_MATCHER = LocationMatcher(
 if __name__ == "__main__":
     import sys
 
-    graph_path = sys.argv[1] if len(sys.argv) > 1 else "../data/rdf/psgc.ttl"
+    graph_path = sys.argv[1] if len(sys.argv) > 1 else "../data/rdf/psgc/psgc.ttl"
     matcher    = LocationMatcher(graph_path)
     BASE       = matcher.base
 

@@ -23,7 +23,7 @@ from pathlib import Path
 
 SOURCES_DIR  = "../data/rdf/events"
 RESOL_DIR = "../data/rdf/resolution"
-OUTPUT_DIR   = "../data/rdf"
+OUTPUT_DIR   = "../data/rdf/"
 
 ALIGNMENTS_PATH = RESOL_DIR + "alignments.ttl"
 CANONICAL_PATH  = RESOL_DIR + "canonical.ttl"

@@ -35,8 +35,8 @@ from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
 
 from mappings.graph import PROV, ORG
 
-DATA_DIR = "../constants"
-OUT_DIR = "../data/rdf/"
+DATA_DIR = "../constants/"
+OUT_DIR = "../data/rdf/orgs/"
 
 # ── Namespaces ───────────────────────────────────────────────────────────────
 

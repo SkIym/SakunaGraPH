@@ -99,7 +99,7 @@ def process_event(args: Tuple[str, Event]) -> Graph:
 
 
 DATA_DIR = "../data/parsed/ndrrmc"
-OUT_DIR = "../data/rdf/"
+OUT_DIR = "../data/rdf/events/"
 
 
 def run(out_file: str, start: int = 0, count: int | None = None):

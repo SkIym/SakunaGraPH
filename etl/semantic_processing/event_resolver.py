@@ -247,12 +247,12 @@ class DisasterEvent:
     disaster_type_uri: Optional[URIRef] = None  # full URI from ont:hasDisasterType
     start_date:        Optional[date]   = None
     end_date:      Optional[date] = None
-    blocking_keys: list[str] = field(default_factory=list)
+    blocking_keys: list[str] = field(default_factory=lambda: [])
 
     def __hash__(self):
         return hash(self.uri)
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         return isinstance(other, DisasterEvent) and self.uri == other.uri
 
     def __repr__(self):
