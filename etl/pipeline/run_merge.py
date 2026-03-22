@@ -1,101 +1,164 @@
-"""Post-processing pipeline: match events across NDRRMC, EM-DAT, and GDA sources.
+"""
+pipeline.py — End-to-end entity resolution pipeline for SakunaGraPH.
 
-Reads the RDF outputs from each pipeline, runs cross-source event matching,
-and produces an event_links.ttl file with owl:sameAs triples.
+Stages:
+  1. Extract  — parse source TTLs → DisasterEvent objects
+  2. Block    — generate candidate pairs via blocking keys
+  3. Score    — compute weighted similarity for each pair
+  4. Align    — write owl:sameAs to alignments.ttl + registry
+  5. Merge    — materialize canonical.ttl
+
+Usage:
+  python pipeline.py                   # full run
+  python pipeline.py --skip-merge      # stop after alignment
+  python pipeline.py --stats           # print stats only, no writes
+  python pipeline.py --incremental     # skip known pairs from registry
+  python pipeline.py --verbose         # print scored pairs
 """
 
+from __future__ import annotations
 import argparse
-import glob
-import os
+import time
+from pathlib import Path
 
-from rdflib import Graph
+SOURCES_DIR  = "../data/rdf/events"
+RESOL_DIR = "../data/rdf/resolution"
+OUTPUT_DIR   = "../data/rdf"
 
-from semantic_processing.event_matcher import (
-    EventMatcher,
-    load_events_from_rdf,
-    matches_to_rdf,
+ALIGNMENTS_PATH = RESOL_DIR + "alignments.ttl"
+CANONICAL_PATH  = RESOL_DIR + "canonical.ttl"
+REGISTRY_PATH   = RESOL_DIR + "dedup_registry.json"
+
+
+from semantic_processing.event_resolver import (
+    MATCH_THRESHOLD,
+    load_all_sources,
+    generate_candidate_pairs, blocking_stats,
+    score_all_pairs,
+    write_alignments, save_registry, load_registry, get_known_pairs, build_clusters,
+    merge_graphs,
 )
 
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="Match events across NDRRMC, EM-DAT, and GDA RDF outputs"
-    )
-    parser.add_argument(
-        "--rdf-dir", default="../data/rdf/",
-        help="Directory containing RDF output files (default: ../data/rdf/)"
-    )
-    parser.add_argument(
-        "--output", default="../data/rdf/event_links.ttl",
-        help="Output path for owl:sameAs links (default: ../data/rdf/event_links.ttl)"
-    )
-    parser.add_argument(
-        "--threshold", type=float, default=0.7,
-        help="Minimum match score (0-1, default: 0.7)"
-    )
-    parser.add_argument(
-        "--date-window", type=int, default=7,
-        help="Maximum date difference in days for candidate pairs (default: 7)"
-    )
-    args = parser.parse_args()
+def print_section(title: str) -> None:
+    print(f"\n{'─'*60}\n  {title}\n{'─'*60}")
 
-    rdf_dir = args.rdf_dir
 
-    # Load events from each source
-    ndrrmc_events = []
-    emdat_events = []
-    gda_events = []
+def print_match_summary(scored_pairs, threshold: float) -> None:
+    matches   = [x for x in scored_pairs if x[2].is_match]
+    near_miss = [x for x in scored_pairs if threshold - 0.10 <= x[2].total < threshold]
 
-    # NDRRMC: ndrrmc-*.ttl files
-    for path in sorted(glob.glob(os.path.join(rdf_dir, "ndrrmc*.ttl"))):
-        if "event_links" in path:
-            continue
-        print(f"Loading NDRRMC events from {os.path.basename(path)}...")
-        ndrrmc_events.extend(load_events_from_rdf(path, "ndrrmc"))
+    print(f"\n  Matches (>={threshold}):     {len(matches)}")
+    print(f"  Near-misses ({threshold-0.10:.2f}-{threshold:.2f}): {len(near_miss)}")
 
-    # EM-DAT: emdat.ttl
-    emdat_path = os.path.join(rdf_dir, "emdat.ttl")
-    if os.path.exists(emdat_path):
-        print(f"Loading EM-DAT events from emdat.ttl...")
-        emdat_events = load_events_from_rdf(emdat_path, "emdat")
+    if matches:
+        print(f"\n  Top matches:")
+        for a, b, sc in matches[:10]:
+            print(f"    [{sc.total:.3f}] {a.source}:{a.label!r} <-> {b.source}:{b.label!r}")
 
-    # GDA: gda.nt or gda.ttl
-    for ext in ["nt", "ttl"]:
-        gda_path = os.path.join(rdf_dir, f"gda.{ext}")
-        if os.path.exists(gda_path):
-            print(f"Loading GDA events from gda.{ext}...")
-            gda_events = load_events_from_rdf(gda_path, "gda")
-            break
+    if near_miss:
+        print(f"\n  Near-misses (review manually):")
+        for a, b, sc in near_miss[:5]:
+            print(
+                f"    [{sc.total:.3f}] {a.source}:{a.label!r} <-> {b.source}:{b.label!r}"
+                f"  label={sc.label:.2f} type={sc.disaster_type:.2f}"
+                f" date={sc.date:.2f} loc={sc.location:.2f}"
+            )
 
-    print(f"\nEvents loaded: NDRRMC={len(ndrrmc_events)}, EM-DAT={len(emdat_events)}, GDA={len(gda_events)}")
 
-    if not any([ndrrmc_events, emdat_events, gda_events]):
-        print("No events found. Nothing to match.")
+def run(
+    sources_dir: Path = SOURCES_DIR,
+    skip_merge:  bool = False,
+    stats_only:  bool = False,
+    incremental: bool = False,
+    verbose:     bool = False,
+) -> None:
+
+    t0 = time.time()
+    OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+
+    # Stage 1: Extract
+    print_section("Stage 1 — Extract")
+    events = load_all_sources(sources_dir)
+    print(f"  Total events loaded: {len(events)}")
+
+    if len(events) < 2:
+        print("  Not enough events to run ER. Add source TTL files to sources/")
         return
 
-    # Run matching
-    matcher = EventMatcher(
-        threshold=args.threshold,
-        date_window_days=args.date_window,
-    )
+    # # Stage 2: Block
+    # print_section("Stage 2 — Block")
+    # pairs = generate_candidate_pairs(events)
+    # stats = blocking_stats(events, pairs)
+    # print(f"  Events:          {stats['total_events']}")
+    # print(f"  Possible pairs:  {stats['total_possible_pairs']}")
+    # print(f"  Candidate pairs: {stats['candidate_pairs']}")
+    # print(f"  Reduction:       {stats['reduction_ratio']:.1%}")
 
-    matches = matcher.match_all(ndrrmc_events, emdat_events, gda_events)
+    # if incremental:
+    #     registry = load_registry(REGISTRY_PATH)
+    #     known    = get_known_pairs(registry)
+    #     before   = len(pairs)
+    #     pairs    = [(a, b) for a, b in pairs if frozenset([a.uri, b.uri]) not in known]
+    #     print(f"  Incremental: skipped {before - len(pairs)} known pairs")
 
-    print(f"\nFound {len(matches)} cross-source matches:")
-    for m in matches:
-        print(f"  {m.source_a} <-> {m.source_b}  score={m.score:.2f}")
-        print(f"    {m.uri_a}")
-        print(f"    {m.uri_b}")
+    # if not pairs:
+    #     print("  No new candidate pairs to evaluate.")
+    #     return
 
-    # Serialize
-    if matches:
-        g = matches_to_rdf(matches)
-        os.makedirs(os.path.dirname(args.output), exist_ok=True)
-        g.serialize(destination=args.output, format="turtle")
-        print(f"\nSaved {len(matches)} owl:sameAs links to {args.output}")
-    else:
-        print("\nNo matches found above threshold.")
+    # # Stage 3: Score
+    # print_section("Stage 3 — Score")
+    # scored_pairs = score_all_pairs(pairs, verbose=verbose)
+    # print_match_summary(scored_pairs, MATCH_THRESHOLD)
+
+    # if stats_only:
+    #     print("\n  (stats-only mode — no files written)")
+    #     return
+
+    # matches = [(a, b, sc) for a, b, sc in scored_pairs if sc.is_match]
+    # if not matches:
+    #     print("\n  No matches found above threshold.")
+    #     return
+
+    # # Stage 4: Align
+    # print_section("Stage 4 — Align")
+    # write_alignments(matches, ALIGNMENTS_PATH)
+    # clusters = build_clusters(matches)
+    # save_registry(clusters, REGISTRY_PATH)
+
+    # if skip_merge:
+    #     print("\n  (--skip-merge: stopping after alignment)")
+    #     print(f"\nDone in {time.time() - t0:.1f}s")
+    #     return
+
+    # # Stage 5: Merge
+    # print_section("Stage 5 — Merge")
+    # merge_graphs(
+    #     sources_dir=sources_dir,
+    #     alignments_path=ALIGNMENTS_PATH,
+    #     output_path=CANONICAL_PATH,
+    # )
+
+    # elapsed = time.time() - t0
+    # print(f"\nPipeline complete in {elapsed:.1f}s")
+    # print(f"  alignments.ttl -> {ALIGNMENTS_PATH}")
+    # print(f"  canonical.ttl  -> {CANONICAL_PATH}")
+    # print(f"  registry.json  -> {REGISTRY_PATH}")
 
 
 if __name__ == "__main__":
-    main()
+    parser = argparse.ArgumentParser(description="SakunaGraPH entity resolution pipeline")
+    parser.add_argument("--sources",     type=Path, default=SOURCES_DIR)
+    parser.add_argument("--skip-merge",  action="store_true")
+    parser.add_argument("--stats",       action="store_true")
+    parser.add_argument("--incremental", action="store_true")
+    parser.add_argument("--verbose",     action="store_true")
+
+    args = parser.parse_args()
+    run(
+        sources_dir=args.sources,
+        skip_merge=args.skip_merge,
+        stats_only=args.stats,
+        incremental=args.incremental,
+        verbose=args.verbose,
+    )
