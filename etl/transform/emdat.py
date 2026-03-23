@@ -189,18 +189,39 @@ def clean_loc(df: DataFrame, col: str):
     return df
 
 def normalize_date(df: DataFrame, start_cols: list[str], end_cols: list[str]):
-
+    """
+    If start and end day is empty, fall back to 01 - 31
+    """
     def parse_date(cols: list[str], alias: str) -> pl.Expr:
+        is_end = alias == "endDate"
+
         combined = (
             pl.concat_str(cols, separator="-", ignore_nulls=True)
-            .str.strip_chars_end("-") 
-
+            .str.strip_chars_end("-")
         )
-        return pl.coalesce([
-            combined.str.to_date("%Y-%m-%d", strict=False),
-            combined.str.to_date("%Y-%m", strict=False),
-            combined.str.to_date("%Y", strict=False),
-        ]).alias(alias)
+
+        is_year_only    = combined.str.len_chars() == 4
+        is_year_month   = combined.str.len_chars() == 7 
+        is_partial      = is_year_only | is_year_month   # <-- capture BEFORE padding
+
+        year_month_day = (
+            pl.when(is_year_month)
+            .then(combined + "-01")
+            .when(is_year_only)
+            .then(combined + ("-12-01" if is_end else "-01-01"))
+            .otherwise(combined)
+        )
+
+        parsed = year_month_day.str.to_date("%Y-%m-%d", strict=True)
+
+        if is_end:
+            parsed = (
+                pl.when(is_partial)        # use the pre-computed flag, not a re-derived length
+                .then(parsed.dt.month_end())
+                .otherwise(parsed)
+            )
+
+        return parsed.alias(alias)
 
     df = df.with_columns(
         parse_date(start_cols, "startDate"),
@@ -263,6 +284,23 @@ def clean_columns(df: DataFrame) -> DataFrame:
     # add canonicalized loc values
     df = df.with_columns(
         hasLocation=canon_loc_df.select("hasLocation_iri").to_series()
+    )
+
+    df = df.with_columns(
+        pl.col("Start Day").replace("", None),
+        pl.col("End Day").replace("", None)
+    )
+
+    df = df.with_columns(
+         pl.when(pl.col("Start Month").is_not_null() & (pl.col("Start Month") != ""))
+        .then(pl.col("Start Month").str.zfill(2))
+        .otherwise(None)
+    )
+
+    df = df.with_columns(
+         pl.when(pl.col("End Month").is_not_null() & (pl.col("End Month") != ""))
+        .then(pl.col("End Month").str.zfill(2))
+        .otherwise(None)
     )
 
     # normalize start and end dates
