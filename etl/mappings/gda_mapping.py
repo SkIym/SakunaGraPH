@@ -6,7 +6,7 @@ from regex import M
 from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import PROV, QUDT, SKG, add_monetary
 from .iris import (
-    comms_iri, doc_iri, event_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
+    comms_iri, doc_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
     damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, seaport_iri, sub_iri, water_iri
 )
 
@@ -20,11 +20,11 @@ class Event:
     id: str
     eventClass: str | None
     eventName: str | None
-    hasType: str | None
+    hasType: str
     hasSubtype: str | None
-    hasLocation: URIRef | None
-    startDate: date | None
-    endDate: date | None
+    hasLocation: URIRef 
+    startDate: date 
+    endDate: date 
     reference: str | None
     remarks: str | None
     otherDescription: str | None
@@ -34,8 +34,10 @@ class Event:
 class Incident:
     id: str
     sub_id: str
-    hasLocation: URIRef | None
-    hasType: str | None
+    startDate: date 
+    endDate: date
+    hasLocation: URIRef
+    hasType: str 
 
 
 @dataclass
@@ -178,6 +180,7 @@ def _add_type_iri(g: Graph, subject: URIRef, predicate: URIRef, value: str | Non
 
 
 def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef) -> None:
+
     for r in rs:
         uri = event_uri("gda", r.id)
 
@@ -196,10 +199,8 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef) -> None:
         _add_type_iri(g, uri, SKG.hasDisasterSubtype, r.hasSubtype)
         _add_location(g, uri, r.hasLocation)
 
-        if r.startDate:
-            g.add((uri, SKG.startDate, Literal(r.startDate, datatype=XSD.dateTime)))
-        if r.endDate:
-            g.add((uri, SKG.endDate, Literal(r.endDate, datatype=XSD.dateTime)))
+        g.add((uri, SKG.startDate, Literal(r.startDate, datatype=XSD.dateTime)))
+        g.add((uri, SKG.endDate, Literal(r.endDate, datatype=XSD.dateTime)))
 
         if r.reference:
             g.add((uri, SKG.reference, Literal(r.reference)))
@@ -220,6 +221,9 @@ def incident_mapping(rs: list[Incident], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.Incident))
         g.add((e_uri, SKG.hasRelatedIncident, uri))
+
+        g.add((uri, SKG.startDate, Literal(r.startDate, datatype=XSD.dateTime)))
+        g.add((uri, SKG.endDate, Literal(r.endDate, datatype=XSD.dateTime)))
 
         _add_location(g, uri, r.hasLocation)
         _add_type_iri(g, uri, SKG.hasDisasterType, r.hasType)
@@ -568,12 +572,12 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
             if r.agencyLGUsPresentAssistance:
                 g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
                 for org in ORG_RESOLVER.split_and_resolve(str(r.agencyLGUsPresentAssistance)):
-                    g.add((uri, SKG.contributingOrg, org))
+                    g.add((muri, SKG.contributingOrg, org))
 
             if r.internationalOrgsPresent:
                 g.add((muri, SKG.internationalOrgsPresent, Literal(r.internationalOrgsPresent)))
                 for org in ORG_RESOLVER.split_and_resolve(str(r.internationalOrgsPresent)):
-                    g.add((uri, SKG.contributingOrg, org))
+                    g.add((muri, SKG.contributingOrg, org))
 
         if r.amountNGOs is not None:
             uri = sub_iri(e_uri, "assistance/ngo+international")

@@ -146,8 +146,7 @@ EXPORT_SPECS: dict[str, Any] = {
         "dropna": {
             "subset": ["totallyDamagedHouses", "partiallyDamagedHouses"],
             "how": "all",
-        },
-        "float_format": "%.0f",
+        }
     },
     "gda_infra.csv": {
         "cols": [
@@ -525,6 +524,8 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
         lambda cell: "|".join(LOCATION_MATCHER.match_cell(cell))
     )
 
+    df["totallyDamagedHouses"] = df["totallyDamagedHouses"].astype(float).astype("Int64")
+
     df["id"] = df.apply(_row_id, axis=1)
 
     # general damage amount values if no other were reported (exclude totals)
@@ -532,7 +533,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     df.loc[df[cols].notna().any(axis=1), "generalDamageAmount"] = None
 
     # Explode compound sub-type incidents into a separate table
-    incidents: dict[str, list[Any]] = {"id": [], "hasType": [], "hasLocation": [], "sub_id": []}
+    incidents: dict[str, list[Any]] = {f.name: [] for f in fields(Incident)}
 
     for _, row in df.iterrows():
         subtypes = row["hasSubtypeRaw"]
@@ -546,6 +547,8 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
                 incidents["hasType"].append("|".join(to_type_iri(has_type)))
                 incidents["hasLocation"].append("|".join(LOCATION_MATCHER.match_cell(has_location)))
                 incidents["sub_id"].append(cnt)
+                incidents["startDate"].append(row["startDate"])
+                incidents["endDate"].append(row["endDate"])
 
     pd.DataFrame(incidents).to_csv(out_dir / "gda_incidents.csv")
 
