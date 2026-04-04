@@ -3,6 +3,13 @@ er.py — SakunaGraPH entity resolution module.
 
 Combines: config, models, extractor, blocker, scorer, aligner, merger.
 
+Resolution criteria (all gates must pass):
+  0. Report level   - skips ndrrmc incident types derived from tables
+  1. Date gate      — |start_date_a - start_date_b| ≤ DATE_HARD_GATE_DAYS (hard reject)
+  2. Type gate      — same concept OR same parent concept (hard reject on mismatch)
+  3. Label/location — if both eventNames present: fuzzy ≥ threshold OR shared proper noun
+                      if absent: at least one location token overlaps (skipped if both missing)
+
 Sections:
   1. Config
   2. Models
@@ -20,26 +27,22 @@ from __future__ import annotations
 # ══════════════════════════════════════════════════════════════════════════════
 
 from pathlib import Path
-
+from typing import Dict, Generic, TypeVar, Set
+from collections import defaultdict
 
 # Earlier in list = higher authority
 SOURCE_PRIORITY = ["ndrrmc", "dromic", "emdat", "gda"]
 
 # Blocking
-BLOCKING_DATE_TOLERANCE_DAYS  = 45
-BLOCKING_LOCATION_PREFIX_LEN  = 4
+BLOCKING_DATE_TOLERANCE_DAYS = 5   # mirrors DATE_HARD_GATE_DAYS — no point surfacing pairs we'll reject
+BLOCKING_LOCATION_PREFIX_LEN = 4
 
-# Scoring weights — label weight is redistributed when label is missing.
-# See score_pair() for dynamic reweighting logic.
-SCORE_WEIGHTS = {
-    "label":         0.25,
-    "disaster_type": 0.30,
-    "date":          0.25,
-    "location":      0.20,
-}
-
-MATCH_THRESHOLD     = 0.85
-DATE_SCORE_MAX_DAYS = 30
+# ── Resolution gates ──────────────────────────────────────────────────────────
+DATE_HARD_GATE_DAYS = 5            # Gate 1: dates must be within this many days
+                                    # Gate 2: disaster type must be exact or same parent
+LABEL_FUZZY_THRESHOLD = 0.72        # Gate 3a: minimum fuzzy similarity when both labels present
+PROPER_NOUN_MIN_LEN   = 4           # Gate 3a: minimum length for a capitalised token to count
+                                    # Gate 3b (no label): any overlapping location token = pass
 
 # Maps free-text variants → canonical concept local name.
 # Used as fallback when :hasDisasterType is a plain literal rather than a URI.
@@ -93,13 +96,10 @@ DISASTER_TYPE_ALIASES = {
 # in sakunagraph.ttl (i.e. the fragment after https://sakuna.ph/).
 # Values are the local name of the skos:broader concept (None = top-level).
 #
-# Scoring by shared ancestor depth:
-#   exact match (same concept)    → 1.0
-#   sibling (same parent)         → 0.7
-#   cousin  (same grandparent)    → 0.4
-#   deeper shared ancestor        → 0.2
-#   no shared ancestor            → 0.0
-#   either type missing           → neutral (weight redistributed to others)
+# Gate 2 logic:
+#   same concept                       → pass (type_match = True)
+#   same parent (sibling concepts)     → pass (type_match = True)
+#   different parent or unresolvable   → fail (hard reject)
 
 DISASTER_TYPE_HIERARCHY: dict[str, str | None] = {
     # ── Top-level ─────────────────────────────────────────────────────
@@ -228,7 +228,7 @@ DISASTER_TYPE_HIERARCHY: dict[str, str | None] = {
 # ══════════════════════════════════════════════════════════════════════════════
 
 from dataclasses import dataclass, field
-from datetime import date
+from datetime import date, timezone
 from typing import Optional
 from rdflib import URIRef
 
@@ -246,8 +246,9 @@ class DisasterEvent:
     disaster_type:     Optional[str]    = None  # local name, e.g. "Flood"
     disaster_type_uri: Optional[URIRef] = None  # full URI from ont:hasDisasterType
     start_date:        Optional[date]   = None
-    end_date:      Optional[date] = None
-    blocking_keys: list[str] = field(default_factory=lambda: [])
+    end_date:          Optional[date]   = None
+    location:          Optional[str]    = None
+    blocking_keys:     list[str]        = field(default_factory=lambda: [])
 
     def __hash__(self):
         return hash(self.uri)
@@ -272,7 +273,7 @@ from datetime import datetime
 
 from rdflib import Graph, Namespace, Literal, RDF, RDFS, OWL
 from rdflib.namespace import SKOS, XSD
-from mappings.graph import SKG, GEO, PROV, create_graph
+from mappings.graph import SKG, GEO, PROV
 
 BAW = Namespace("https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#")
 
@@ -326,18 +327,17 @@ def _get_uri(g: Graph, subject: URIRef, *predicates) -> URIRef | None:
 
 def extract_events_from_graph(g: Graph, source: str) -> list[DisasterEvent]:
     """Extract all DisasterEvent instances from a loaded RDF graph."""
-    events = []
+    events: list[DisasterEvent] = []
     event_uris: set[URIRef] = set()
 
+    # Skip NDRRMC incidents (not report level)
     for s, _, o in g.triples((None, RDF.type, None)):
         if not isinstance(s, URIRef):
             continue
-        # Accept :DisasterEvent, :MajorEvent, :Incident (all subclasses)
-        if str(o) in (
-            f"{SAKUNA_NS}DisasterEvent",
-            f"{SAKUNA_NS}MajorEvent",
-            f"{SAKUNA_NS}Incident",
-        ):
+        type_str = str(o)
+        if type_str in (f"{SAKUNA_NS}DisasterEvent", f"{SAKUNA_NS}MajorEvent"):
+            event_uris.add(s)
+        elif type_str == f"{SAKUNA_NS}Incident" and source != "ndrrmc":
             event_uris.add(s)
 
     for uri in event_uris:
@@ -376,7 +376,6 @@ def extract_events_from_graph(g: Graph, source: str) -> list[DisasterEvent]:
                 disaster_type = _normalize_type(raw)
 
         # ── Dates: :startDate / :endDate (xsd:dateTime in ontology) ──────────
-        # baw:hasDisasterStart ≡ :startDate, baw:hasDisasterEnd ≡ :endDate
         start_str = _get_literal(g, uri,
             SKG.startDate,
             BAW.hasDisasterStart,
@@ -385,26 +384,31 @@ def extract_events_from_graph(g: Graph, source: str) -> list[DisasterEvent]:
             SKG.endDate,
             BAW.hasDisasterEnd,
         )
-
         start_date = _parse_date(start_str) if start_str else None
         end_date   = _parse_date(end_str)   if end_str   else None
 
+        # ── Location ──────────────────────────────────────────────────────────
+        location = _get_literal(g, uri,
+            SKG.hasLocation,
+            RDFS.label,          # some sources embed location in label — handled at scoring
+        )
 
         events.append(DisasterEvent(
             uri=uri, source=inferred_source,
             label=label, disaster_type=disaster_type,
             disaster_type_uri=disaster_type_uri,
             start_date=start_date, end_date=end_date,
+            location=location,
         ))
 
     return events
 
 
-def load_all_sources(sources_dir: Path = SOURCES_DIR) -> list[DisasterEvent]:
+def load_all_sources(sources_dir: Path) -> list[DisasterEvent]:
     """Load all .ttl files from sources_dir and return a flat list of events."""
-    all_events = []
+    all_events: list[DisasterEvent] = []
     for ttl_path in sorted(sources_dir.glob("*.ttl")):
-        source_name = ttl_path.stem.lower()
+        source_name = re.sub(r"-\d+$", "", ttl_path.stem).lower()
         g = Graph()
         g.parse(str(ttl_path), format="turtle")
         events = extract_events_from_graph(g, source=source_name)
@@ -459,13 +463,12 @@ def year_windows(d: date | None) -> list[str]:
 
 
 def generate_blocking_keys(event: DisasterEvent) -> list[str]:
-    """Generate blocking keys: {disaster_type}|{year}|{location_prefix}"""
-    dtype  = event.disaster_type or "unknown"
-    years  = year_windows(event.start_date)
-    loctok = location_token(event.location)
-    keys = []
+    """Generate blocking keys: {disaster_type}|{year}|"""
+    dtype = event.disaster_type or "unknown"
+    years = year_windows(event.start_date)
+    keys: list[str] = []
     for year in years:
-        keys.append(f"{dtype}|{year}|{loctok}")
+        keys.append(f"{dtype}|{year}|")
     for year in years:
         fallback = f"{dtype}|{year}|*"
         if fallback not in keys:
@@ -489,7 +492,7 @@ def generate_candidate_pairs(
         for key in event.blocking_keys:
             buckets[key].append(event)
 
-    seen: set[frozenset] = set()
+    seen: set[frozenset[URIRef]] = set()
     pairs: list[tuple[DisasterEvent, DisasterEvent]] = []
 
     for key, bucket in buckets.items():
@@ -502,6 +505,8 @@ def generate_candidate_pairs(
             if pair_id in seen:
                 continue
             seen.add(pair_id)
+            # Pre-filter using the same hard date gate used in scoring.
+            # Pairs missing both dates are kept — the scorer handles that case.
             if a.start_date and b.start_date:
                 if abs((a.start_date - b.start_date).days) > BLOCKING_DATE_TOLERANCE_DAYS:
                     continue
@@ -513,7 +518,7 @@ def generate_candidate_pairs(
 def blocking_stats(
     events: list[DisasterEvent],
     pairs: list[tuple[DisasterEvent, DisasterEvent]],
-) -> dict:
+) -> dict[str, int | float]:
     n = len(events)
     total_possible = n * (n - 1) // 2
     reduction = 1.0 - (len(pairs) / total_possible) if total_possible > 0 else 1.0
@@ -535,174 +540,214 @@ from rapidfuzz import fuzz
 
 @_dataclass
 class ScoreBreakdown:
-    label:         float
-    disaster_type: float
-    date:          float
-    location:      float
-    total:         float
-    is_match:      bool
+    """
+    Diagnostic record for a scored pair.
+
+    Gate fields:
+      date_gate   — None if either date missing, True/False otherwise
+      type_gate   — None if either type unresolvable, True/False otherwise
+      label_gate  — None if used location fallback or skipped, True/False otherwise
+      location_gate — None if both labels were present (gate not used),
+                      True/False when used as fallback; also None if both missing
+    is_match is True only when every applicable gate passes.
+    """
+    date_days_delta:  int | None       # absolute day difference (None if missing)
+    date_gate:        bool | None
+    type_gate:        bool | None
+    label_similarity: float | None     # fuzzy score (None if labels absent)
+    proper_noun_hit:  bool | None      # shared capitalised token (None if absent)
+    label_gate:       bool | None
+    location_gate:    bool | None
+    is_match:         bool
 
     def as_dict(self) -> dict:
         return {
-            "label":         round(self.label, 4),
-            "disaster_type": round(self.disaster_type, 4),
-            "date":          round(self.date, 4),
-            "location":      round(self.location, 4),
-            "total":         round(self.total, 4),
-            "is_match":      self.is_match,
+            "date_days_delta":  self.date_days_delta,
+            "date_gate":        self.date_gate,
+            "type_gate":        self.type_gate,
+            "label_similarity": round(self.label_similarity, 4) if self.label_similarity is not None else None,
+            "proper_noun_hit":  self.proper_noun_hit,
+            "label_gate":       self.label_gate,
+            "location_gate":    self.location_gate,
+            "is_match":         self.is_match,
         }
 
 
-def score_label(a: DisasterEvent, b: DisasterEvent) -> float | None:
+# ── Gate 1: Date ──────────────────────────────────────────────────────────────
+
+def _gate_date(a: DisasterEvent, b: DisasterEvent) -> tuple[int | None, bool | None]:
     """
-    Fuzzy label similarity using token_sort, token_set, and partial ratios.
-    Returns None when either label is missing — caller redistributes the weight.
+    Returns (delta_days, gate_result).
+    gate_result is None when either date is missing (treated as non-blocking —
+    the pair is not outright rejected, but contributes no positive signal).
     """
-    if not a.label or not b.label:
-        return None  # missing — do not inject a neutral value
-    la, lb = normalize_text(a.label), normalize_text(b.label)
-    return max(
-        fuzz.token_sort_ratio(la, lb) / 100.0,
-        fuzz.token_set_ratio(la, lb)  / 100.0,
-        fuzz.partial_ratio(la, lb)    / 100.0,
-    )
+    if not a.start_date or not b.start_date:
+        return None, None
+    delta = abs((a.start_date - b.start_date).days)
+    return delta, delta <= DATE_HARD_GATE_DAYS
 
 
-# ── Hierarchy helpers ─────────────────────────────────────────────────────────
-
-def _ancestors(concept: str) -> list[str]:
-    """
-    Return the ancestor chain for a concept, from itself up to the root.
-    e.g. FlashFlood -> [FlashFlood, Flood, HydrologicalDisaster, NaturalDisaster]
-    """
-    chain = []
-    current: str | None = concept
-    seen = set()
-    while current is not None and current not in seen:
-        chain.append(current)
-        seen.add(current)
-        current = DISASTER_TYPE_HIERARCHY.get(current)
-    return chain
-
+# ── Gate 2: Disaster type ─────────────────────────────────────────────────────
 
 def _resolve_concept(event: DisasterEvent) -> str | None:
     """
     Get the best concept local name for an event's disaster type.
-    Prefers the local name derived from the URI; falls back to normalized alias.
+    Prefers the local name derived from the URI; falls back to normalised alias.
     """
     if event.disaster_type_uri:
         local = re.sub(r"^.*[/#]", "", str(event.disaster_type_uri))
         if local in DISASTER_TYPE_HIERARCHY:
             return local
     if event.disaster_type:
-        # Try direct match first
         if event.disaster_type in DISASTER_TYPE_HIERARCHY:
             return event.disaster_type
-        # Try alias lookup
-        normalized = event.disaster_type.lower().replace("_", " ")
-        return DISASTER_TYPE_ALIASES.get(normalized)
+        normalised = event.disaster_type.lower().replace("_", " ")
+        return DISASTER_TYPE_ALIASES.get(normalised)
     return None
 
 
-def score_disaster_type(a: DisasterEvent, b: DisasterEvent) -> float | None:
+def _gate_type(a: DisasterEvent, b: DisasterEvent) -> bool | None:
     """
-    Hierarchy-aware disaster type scoring.
+    Gate 2: same concept OR same direct parent.
+    Returns None when either concept is unresolvable (non-blocking).
 
-    Resolves each event's type to a concept in DISASTER_TYPE_HIERARCHY,
-    then scores based on the depth of the lowest common ancestor (LCA):
+    Examples that PASS:
+      FlashFlood  vs RiverineFlood  → both children of Flood         → True
+      TropicalCyclone vs StormSurge → both children of Storm         → True
+      Flood vs Flood                → exact match                     → True
 
-      Same concept                 → 1.0
-      Sibling (same parent)        → 0.7
-      Cousin  (same grandparent)   → 0.4
-      Deeper shared ancestor       → 0.2
-      No shared ancestor           → 0.0
-      Either type unresolvable     → None  (weight redistributed to others)
+    Examples that FAIL:
+      Flood vs Earthquake           → different parents               → False
+      Flood vs Storm                → Flood's parent ≠ Storm          → False
     """
     ca = _resolve_concept(a)
     cb = _resolve_concept(b)
 
     if not ca or not cb:
-        return None  # missing — do not inject a neutral value
+        return None  # unresolvable — do not hard-reject
 
     if ca == cb:
-        return 1.0
+        return True  # exact match
 
-    ancestors_a = _ancestors(ca)
-    ancestors_b = _ancestors(cb)
-    set_b = set(ancestors_b)
+    parent_a = DISASTER_TYPE_HIERARCHY.get(ca)
+    parent_b = DISASTER_TYPE_HIERARCHY.get(cb)
 
-    # Find LCA: first ancestor of a that also appears in b's chain
-    for depth_a, anc in enumerate(ancestors_a):
-        if anc in set_b:
-            depth_b = ancestors_b.index(anc)
-            # Combined distance from both nodes to LCA
-            combined_distance = depth_a + depth_b
-            if combined_distance == 2:   return 0.7   # siblings
-            elif combined_distance == 4: return 0.4   # cousins
-            else:                        return 0.2   # deeper shared root
+    # Sibling: both share the same direct parent
+    if parent_a is not None and parent_a == parent_b:
+        return True
 
-    return 0.0  # completely unrelated subtrees
+    # One is the direct parent of the other (e.g. Flood vs FlashFlood)
+    if ca == parent_b or cb == parent_a:
+        return True
+
+    return False
 
 
-def score_date(a: DisasterEvent, b: DisasterEvent) -> float | None:
-    """Linear decay. Returns None when either date is missing."""
-    if not a.start_date or not b.start_date:
-        return None
-    delta_days = abs((a.start_date - b.start_date).days)
-    return max(0.0, 1.0 - (delta_days / DATE_SCORE_MAX_DAYS))
+# ── Gate 3: Label / location ──────────────────────────────────────────────────
+
+def _proper_nouns(raw_label: str) -> set[str]:
+    """
+    Extract capitalised tokens of length ≥ PROPER_NOUN_MIN_LEN from the
+    original (non-lowercased) label string.
+
+    Rationale: typhoon names (Odette, Rolly), province names (Leyte, Samar),
+    and NDRRMC event codes (PAB-001) all start with a capital letter and are
+    ≥4 characters. We intentionally skip lowercasing here so that function
+    words accidentally capitalised at sentence start are excluded by the
+    length filter in practice.
+    """
+    tokens = re.findall(r"[A-Z][A-Za-z0-9\-]*", raw_label)
+    return {t for t in tokens if len(t) >= PROPER_NOUN_MIN_LEN}
 
 
-def score_location(a: DisasterEvent, b: DisasterEvent) -> float | None:
-    """Token set ratio. Returns None when either location is missing."""
-    if not a.location or not b.location:
-        return None
-    return fuzz.token_set_ratio(normalize_text(a.location), normalize_text(b.location)) / 100.0
+def _gate_label(
+    a: DisasterEvent, b: DisasterEvent
+) -> tuple[float | None, bool | None, bool | None, bool | None]:
+    """
+    Gate 3 dispatcher.
 
+    Returns:
+      (label_similarity, proper_noun_hit, label_gate, location_gate)
+
+    When both labels are present:
+      → label_gate = fuzzy ≥ threshold OR proper noun overlap
+      → location_gate = None (gate not used)
+
+    When either label is absent:
+      → label_gate = None (gate not used)
+      → location_gate = True if any location token overlaps, False if both
+        locations present but no overlap, None if both locations missing.
+    """
+    if a.label and b.label:
+        # ── 3a: label path ────────────────────────────────────────────
+        sim = max(
+            fuzz.token_sort_ratio(normalize_text(a.label), normalize_text(b.label)) / 100.0,
+            fuzz.token_set_ratio(normalize_text(a.label), normalize_text(b.label)) / 100.0,
+            fuzz.partial_ratio(normalize_text(a.label), normalize_text(b.label))  / 100.0,
+        )
+        pn_a = _proper_nouns(a.label)
+        pn_b = _proper_nouns(b.label)
+        pn_hit = bool(pn_a & pn_b)
+
+        label_gate = sim >= LABEL_FUZZY_THRESHOLD or pn_hit
+        return sim, pn_hit, label_gate, None
+
+    else:
+        # ── 3b: location fallback ─────────────────────────────────────
+        if not a.location and not b.location:
+            return None, None, None, None  # nothing to check — non-blocking
+
+        if not a.location or not b.location:
+            # One has location, one doesn't — treat as weak evidence, don't reject
+            return None, None, None, None
+
+        toks_a = set(normalize_text(a.location).split())
+        toks_b = set(normalize_text(b.location).split())
+        # Remove very short tokens (articles, "of", etc.)
+        toks_a = {t for t in toks_a if len(t) >= 3}
+        toks_b = {t for t in toks_b if len(t) >= 3}
+
+        loc_gate = bool(toks_a & toks_b) if toks_a and toks_b else None
+        return None, None, None, loc_gate
+
+
+# ── Main scorer ───────────────────────────────────────────────────────────────
 
 def score_pair(a: DisasterEvent, b: DisasterEvent) -> ScoreBreakdown:
     """
-    Compute weighted similarity. When a feature returns None (missing data),
-    its weight is redistributed proportionally across the present features
-    rather than injecting a neutral 0.5 that dilutes the signal.
-    """
-    base_w = SCORE_WEIGHTS
+    Run all three gates in sequence and determine if the pair is a match.
 
-    raw_scores = {
-        "label":         score_label(a, b),
-        "disaster_type": score_disaster_type(a, b),
-        "date":          score_date(a, b),
-        "location":      score_location(a, b),
-    }
+    Gate evaluation:
+      - A gate returning False  → immediate rejection (is_match = False).
+      - A gate returning None   → missing data; gate is skipped (non-blocking).
+      - A gate returning True   → passes.
 
-    # Separate present and missing features
-    present  = {k: v for k, v in raw_scores.items() if v is not None}
-    missing  = {k for k, v in raw_scores.items() if v is None}
+    is_match = True only when no gate returns False (i.e. all applicable
+    gates pass, even if some were skipped due to missing data).
 
-    if not present:
-        # Extreme edge case: no features available at all
-        total = 0.0
-    else:
-        # Redistribute missing weights proportionally to present features
-        missing_weight = sum(base_w[k] for k in missing)
-        present_weight = sum(base_w[k] for k in present)
+    This intentionally allows matches on sparse data: if two events share
+    the same disaster type and fall within 5 days but have no labels or
+    locations recorded, they are still considered a candidate match.
+    Downstream review (or provenance weighting in the merger) handles
+    low-confidence sparse matches.
+    """ 
 
-        adjusted_w = {
-            k: base_w[k] + base_w[k] / present_weight * missing_weight
-            for k in present
-        }
+    delta_days, date_gate    = _gate_date(a, b)
+    type_gate                = _gate_type(a, b)
+    sim, pn_hit, label_gate, location_gate = _gate_label(a, b)
 
-        total = sum(adjusted_w[k] * present[k] for k in present)
-
-    # Fill None scores with 0.0 for the breakdown record (display only)
-    filled = {k: (v if v is not None else 0.0) for k, v in raw_scores.items()}
+    gates = [date_gate, type_gate, label_gate, location_gate]
+    is_match = all(g is not False for g in gates)
 
     return ScoreBreakdown(
-        label=filled["label"],
-        disaster_type=filled["disaster_type"],
-        date=filled["date"],
-        location=filled["location"],
-        total=total,
-        is_match=total >= MATCH_THRESHOLD,
+        date_days_delta=delta_days,
+        date_gate=date_gate,
+        type_gate=type_gate,
+        label_similarity=sim,
+        proper_noun_hit=pn_hit,
+        label_gate=label_gate,
+        location_gate=location_gate,
+        is_match=is_match,
     )
 
 
@@ -710,17 +755,21 @@ def score_all_pairs(
     pairs: list[tuple[DisasterEvent, DisasterEvent]],
     verbose: bool = False,
 ) -> list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]]:
-    results = []
+    
+    results: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]] = []
+
     for a, b in pairs:
         breakdown = score_pair(a, b)
         results.append((a, b, breakdown))
-        if verbose and breakdown.total >= 0.70:
+        if verbose and breakdown.is_match:
             print(
-                f"  [{breakdown.total:.3f}] "
-                f"{a.source}/{a.label!r} <-> {b.source}/{b.label!r} "
-                f"{'MATCH' if breakdown.is_match else ''}"
+                f"  MATCH  {a.source}/{a.label!r}/{a.uri} <-> {b.source}/{b.label!r}/{b.uri}"
+                f"  Δ{breakdown.date_days_delta}d"
+                f"  type={breakdown.type_gate}"
+                f"  label_sim={breakdown.label_similarity}"
+                f"  pn={breakdown.proper_noun_hit}"
+                f"  loc={breakdown.location_gate}"
             )
-    results.sort(key=lambda x: x[2].total, reverse=True)
     return results
 
 
@@ -743,69 +792,86 @@ def pick_canonical(cluster: set[URIRef]) -> URIRef:
                 return uri
     return sorted(cluster)[0]
 
+T = TypeVar("T")
+
+class UnionFind(Generic[T]):
+    def __init__(self) -> None:
+        self.parent: Dict[T, T] = {}
+
+    def find(self, x: T) -> T:
+        if x not in self.parent:
+            self.parent[x] = x
+        if self.parent[x] != x:
+            self.parent[x] = self.find(self.parent[x])
+        return self.parent[x]
+
+    def union(self, a: T, b: T) -> None:
+        root_a = self.find(a)
+        root_b = self.find(b)
+        if root_a != root_b:
+            self.parent[root_b] = root_a
 
 def build_clusters(
     matches: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]]
 ) -> list[tuple[URIRef, set[URIRef]]]:
-    """Build connected components from match pairs using Union-Find (networkx)."""
-    G = nx.Graph()
+
+    uf = UnionFind[URIRef]()
+
     for a, b, score in matches:
         if score.is_match:
-            G.add_edge(a.uri, b.uri, weight=score.total)
+            uf.union(a.uri, b.uri)
 
-    clusters = []
-    for component in nx.connected_components(G):
+    groups: Dict[URIRef, Set[URIRef]] = defaultdict(set)
+
+    for uri in uf.parent:
+        root = uf.find(uri)
+        groups[root].add(uri)
+
+    clusters: list[tuple[URIRef, set[URIRef]]] = []
+
+    for component in groups.values():
         canonical = pick_canonical(component)
         clusters.append((canonical, component))
+
     return clusters
 
 
 def write_alignments(
     matches: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]],
-    output_path: Path = ALIGNMENTS_PATH,
-    include_scores: bool = True,
+    output_path: Path,
 ) -> Graph:
-    """Write owl:sameAs alignment triples + confidence metadata to Turtle."""
+    """Write owl:sameAs alignment triples + gate diagnostics metadata to TTL."""
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     g = Graph()
-    g.bind("",     SKG)    # base prefix — ontology terms and instances
+    g.bind("",     SKG)
     g.bind("owl",  OWL)
     g.bind("skos", SKOS)
     g.bind("prov", PROV)
     g.bind("xsd",  XSD)
 
     run_uri = URIRef(
-        f"{SAKUNA_NS}alignment-run/{_datetime.utcnow().strftime('%Y%m%dT%H%M%S')}"
+        f"{SAKUNA_NS}alignment-run/{datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S')}"
     )
     g.add((run_uri, RDF.type,       PROV.Activity))
-    g.add((run_uri, SKG.entryDate, Literal(_datetime.utcnow().isoformat(), datatype=XSD.dateTime)))
+    g.add((run_uri, SKG.entryDate, Literal(datetime.now(timezone.utc).isoformat(), datatype=XSD.dateTime)))
     g.add((run_uri, RDFS.label,     Literal("SakunaGraPH entity alignment run")))
 
     clusters = build_clusters(matches)
-    pair_scores: dict[frozenset, float] = {
-        frozenset([a.uri, b.uri]): sc.total
-        for a, b, sc in matches if sc.is_match
-    }
 
     for canonical, cluster in clusters:
         for other in sorted(cluster - {canonical}):
             g.add((canonical, OWL.sameAs, other))
 
-            if include_scores:
-                stmt_uri = URIRef(
-                    f"{SAKUNA_NS}alignment/"
-                    f"{str(canonical).split('/')[-1]}--{str(other).split('/')[-1]}"
-                )
-                g.add((stmt_uri, RDF.type,      RDF.Statement))
-                g.add((stmt_uri, RDF.subject,   canonical))
-                g.add((stmt_uri, RDF.predicate, OWL.sameAs))
-                g.add((stmt_uri, RDF.object,    other))
-                score = pair_scores.get(frozenset([canonical, other]))
-                if score is not None:
-                    g.add((stmt_uri, SKG.matchConfidence,
-                           Literal(round(score, 4), datatype=XSD.decimal)))
-                g.add((stmt_uri, PROV.wasGeneratedBy, run_uri))
+            stmt_uri = URIRef(
+                f"{SAKUNA_NS}alignment/"
+                f"{str(canonical).split('/')[-1]}--{str(other).split('/')[-1]}"
+            )
+            g.add((stmt_uri, RDF.type,      RDF.Statement))
+            g.add((stmt_uri, RDF.subject,   canonical))
+            g.add((stmt_uri, RDF.predicate, OWL.sameAs))
+            g.add((stmt_uri, RDF.object,    other))
+            g.add((stmt_uri, PROV.wasGeneratedBy, run_uri))
 
     g.serialize(str(output_path), format="turtle")
     print(f"  Wrote {len(clusters)} clusters -> {output_path}")
@@ -814,7 +880,7 @@ def write_alignments(
 
 def save_registry(
     clusters: list[tuple[URIRef, set[URIRef]]],
-    registry_path: Path = REGISTRY_PATH,
+    registry_path: Path,
 ) -> None:
     """Persist canonical -> duplicates mapping as JSON for incremental runs."""
     registry = {
@@ -827,15 +893,15 @@ def save_registry(
     print(f"  Registry saved -> {registry_path}")
 
 
-def load_registry(registry_path: Path = REGISTRY_PATH) -> dict[str, list[str]]:
+def load_registry(registry_path: Path) -> dict[str, list[str]]:
     if not registry_path.exists():
         return {}
     with open(registry_path) as f:
         return json.load(f)
 
 
-def get_known_pairs(registry: dict[str, list[str]]) -> set[frozenset]:
-    known = set()
+def get_known_pairs(registry: dict[str, list[str]]) -> set[frozenset[str]]:
+    known: set[frozenset[str]] = set()
     for canonical, duplicates in registry.items():
         for dup in duplicates:
             known.add(frozenset([canonical, dup]))
@@ -867,18 +933,33 @@ def _infer_source_rank(uri: URIRef) -> int:
     return len(SOURCE_PRIORITY)
 
 
-def build_uri_to_canonical(alignment_graph: Graph) -> dict[URIRef, URIRef]:
+def build_uri_to_canonical(alignment_graph: Graph) -> Dict[URIRef, URIRef]:
     """Read owl:sameAs triples, build connected components, return uri -> canonical map."""
-    G = nx.Graph()
+
+    uf = UnionFind[URIRef]()
+
+    # Union all sameAs pairs
     for s, _, o in alignment_graph.triples((None, OWL.sameAs, None)):
         if isinstance(s, URIRef) and isinstance(o, URIRef):
-            G.add_edge(s, o)
+            uf.union(s, o)
 
-    uri_to_canonical: dict[URIRef, URIRef] = {}
-    for component in nx.connected_components(G):
-        canonical = min(component, key=lambda u: (_infer_source_rank(u), str(u)))
+    # 2. Group by root
+    groups: Dict[URIRef, Set[URIRef]] = defaultdict(set)
+    for uri in uf.parent:
+        root = uf.find(uri)
+        groups[root].add(uri)
+
+    # 3. Pick canonical per component
+    uri_to_canonical: Dict[URIRef, URIRef] = {}
+
+    for component in groups.values():
+        canonical = min(
+            component,
+            key=lambda u: (_infer_source_rank(u), str(u))
+        )
         for uri in component:
             uri_to_canonical[uri] = canonical
+
     return uri_to_canonical
 
 
@@ -906,16 +987,14 @@ def _resolve_conflicts(
 
 
 def merge_graphs(
-    sources_dir:     Path = SOURCES_DIR,
-    alignments_path: Path = ALIGNMENTS_PATH,
-    output_path:     Path = CANONICAL_PATH,
+    sources_dir:     Path,
+    alignments_path: Path,
+    output_path:     Path,
 ) -> Graph:
     """
     Full merge pipeline:
       load sources -> remap URIs -> resolve conflicts -> serialize canonical.ttl
     """
-    import glob as _glob
-
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     # Load sources
@@ -960,8 +1039,7 @@ def merge_graphs(
 
     # Build output graph
     merged = Graph()
-    merged.bind("",    SKG)   # base prefix
-    merged.bind("baw", BAW)
+    merged.bind("",    SKG)
     merged.bind("owl", OWL)
     merged.bind("geo", GEO)
     merged.bind("skos", SKOS)
