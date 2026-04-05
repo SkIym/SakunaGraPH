@@ -18,12 +18,14 @@ Usage:
 
 from __future__ import annotations
 import argparse
-import time
+import sys
+from datetime import datetime
 from pathlib import Path
 
-SOURCES_DIR  = "../data/rdf/events"
-RESOL_DIR = "../data/rdf/resolution"
-OUTPUT_DIR   = "../data/rdf/"
+SOURCES_DIR     = "../data/rdf/events"
+RESOL_DIR       = "../data/rdf/resolution"
+OUTPUT_DIR      = "../data/rdf/"
+LOGS_DIR        = "../logs"
 
 ALIGNMENTS_PATH = RESOL_DIR + "/alignments.ttl"
 CANONICAL_PATH  = RESOL_DIR + "/canonical.ttl"
@@ -35,13 +37,39 @@ from semantic_processing.event_resolver import (
     generate_candidate_pairs, blocking_stats,
     score_all_pairs,
     write_alignments, save_registry, load_registry, get_known_pairs, build_clusters,
-    merge_graphs,
+    # merge_graphs,
 )
+
+
+class Tee:
+    """Mirrors all writes to sys.stdout into a log file simultaneously."""
+
+    def __init__(self, log_path: Path) -> None:
+        log_path.parent.mkdir(parents=True, exist_ok=True)
+        self._file = log_path.open("w", encoding="utf-8")
+        self._stdout = sys.stdout
+        sys.stdout = self
+
+    def write(self, data: str) -> None:
+        self._stdout.write(data)
+        self._file.write(data)
+
+    def flush(self) -> None:
+        self._stdout.flush()
+        self._file.flush()
+
+    def close(self) -> None:
+        sys.stdout = self._stdout
+        self._file.close()
+
+
+def make_log_path(logs_dir: str = LOGS_DIR) -> Path:
+    timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return Path(logs_dir) / f"pipeline_{timestamp}.txt"
 
 
 def print_section(title: str) -> None:
     print(f"\n{'─'*60}\n  {title}\n{'─'*60}")
-
 
 
 def run(
@@ -52,76 +80,81 @@ def run(
     verbose:     bool = False,
 ) -> None:
 
-    # t0 = time.time()
-    # OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
+    log_path = make_log_path()
+    tee = Tee(log_path)
+    print(f"  Logging to: {log_path}")
 
-    # Stage 1: Extract
-    print_section("Stage 1 — Extract")
-    events = load_all_sources(Path(sources_dir))
-    print(f"  Total events loaded: {len(events)}")
+    try:
+        # Stage 1: Extract
+        print_section("Stage 1 — Extract")
+        events = load_all_sources(Path(sources_dir))
+        print(f"  Total events loaded: {len(events)}")
 
-    if len(events) < 2:
-        print("  Not enough events to run ER. Add source TTL files to sources/")
-        return
+        if len(events) < 2:
+            print("  Not enough events to run ER. Add source TTL files to sources/")
+            return
 
-    # # Stage 2: Block
-    print_section("Stage 2 — Block")
-    pairs = generate_candidate_pairs(events)
-    stats = blocking_stats(events, pairs)
-    print(f"  Events:          {stats['total_events']}")
-    print(f"  Possible pairs:  {stats['total_possible_pairs']}")
-    print(f"  Candidate pairs: {stats['candidate_pairs']}")
-    print(f"  Reduction:       {stats['reduction_ratio']:.1%}")
+        # Stage 2: Block
+        print_section("Stage 2 — Block")
+        pairs = generate_candidate_pairs(events)
+        stats = blocking_stats(events, pairs)
+        print(f"  Events:          {stats['total_events']}")
+        print(f"  Possible pairs:  {stats['total_possible_pairs']}")
+        print(f"  Candidate pairs: {stats['candidate_pairs']}")
+        print(f"  Reduction:       {stats['reduction_ratio']:.1%}")
 
-    if incremental:
-        registry = load_registry(Path(REGISTRY_PATH))
-        known    = get_known_pairs(registry)
-        before   = len(pairs)
-        pairs    = [(a, b) for a, b in pairs if frozenset([a.uri, b.uri]) not in known]
-        print(f"  Incremental: skipped {before - len(pairs)} known pairs")
+        if incremental:
+            registry = load_registry(Path(REGISTRY_PATH))
+            known    = get_known_pairs(registry)
+            before   = len(pairs)
+            pairs    = [(a, b) for a, b in pairs if frozenset([a.uri, b.uri]) not in known]
+            print(f"  Incremental: skipped {before - len(pairs)} known pairs")
 
-    if not pairs:
-        print("No new candidate pairs to evaluate.")
-        return
+        if not pairs:
+            print("No new candidate pairs to evaluate.")
+            return
 
-    # Stage 3: Score
-    print_section("Stage 3 — Score")
-    scored_pairs = score_all_pairs(pairs, verbose=verbose)
+        # Stage 3: Score
+        print_section("Stage 3 — Score")
+        scored_pairs = score_all_pairs(pairs, verbose=verbose)
 
-    if stats_only:
-        print("\n  (stats-only mode — no files written)")
-        return
+        if stats_only:
+            print("\n  (stats-only mode — no files written)")
+            return
 
-    matches = [(a, b, sc) for a, b, sc in scored_pairs if sc.is_match]
-    if not matches:
-        print("\n  No matches found above threshold.")
-        return
-    
-    print("\n No. of event matches: ", len(matches))
+        matches = [(a, b, sc) for a, b, sc in scored_pairs if sc.is_match]
+        if not matches:
+            print("\n  No matches found above threshold.")
+            return
 
-    # Stage 4: Align
-    print_section("Stage 4 — Align")
-    write_alignments(matches, Path(ALIGNMENTS_PATH))
-    clusters = build_clusters(matches)
-    save_registry(clusters, Path(REGISTRY_PATH))
+        print("\n No. of event matches: ", len(matches))
 
-    if skip_merge:
-        print("\n  (--skip-merge: stopping after alignment)")
-        return
+        # Stage 4: Align
+        print_section("Stage 4 — Align")
+        write_alignments(matches, Path(ALIGNMENTS_PATH))
+        clusters = build_clusters(matches)
+        save_registry(clusters, Path(REGISTRY_PATH))
 
-    # # Stage 5: Merge
-    # print_section("Stage 5 — Merge")
-    # merge_graphs(
-    #     sources_dir=Path(sources_dir),
-    #     alignments_path=Path(ALIGNMENTS_PATH),
-    #     output_path=Path(CANONICAL_PATH),
-    # )
+        if skip_merge:
+            print("\n  (--skip-merge: stopping after alignment)")
+            return
 
-    # elapsed = time.time() - t0
-    # print(f"\nPipeline complete in {elapsed:.1f}s")
-    # print(f"  alignments.ttl -> {ALIGNMENTS_PATH}")
-    # print(f"  canonical.ttl  -> {CANONICAL_PATH}")
-    # print(f"  registry.json  -> {REGISTRY_PATH}")
+        # # Stage 5: Merge
+        # print_section("Stage 5 — Merge")
+        # merge_graphs(
+        #     sources_dir=Path(sources_dir),
+        #     alignments_path=Path(ALIGNMENTS_PATH),
+        #     output_path=Path(CANONICAL_PATH),
+        # )
+
+        # elapsed = time.time() - t0
+        # print(f"\nPipeline complete in {elapsed:.1f}s")
+        # print(f"  alignments.ttl -> {ALIGNMENTS_PATH}")
+        # print(f"  canonical.ttl  -> {CANONICAL_PATH}")
+        # print(f"  registry.json  -> {REGISTRY_PATH}")
+
+    finally:
+        tee.close()
 
 
 if __name__ == "__main__":
