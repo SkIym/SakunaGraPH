@@ -10,7 +10,7 @@ import polars as pl
 from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
+# from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, AIRPORT_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
@@ -138,7 +138,7 @@ def load_events(folder_path: str) -> list[Event]:
 
         # Extract disaster-specific params from narrative text
         remarks_text = meta.get("remarks") or ""
-        params = PARAMS_EXTRACTOR.extract(remarks_text)
+        # params = PARAMS_EXTRACTOR.extract(remarks_text)
 
         events.append(Event(
             id=_event_id(meta.get("eventName", folder), meta.get("startDate")),
