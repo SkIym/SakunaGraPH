@@ -1,49 +1,103 @@
-**BASIC PIPELINE**
+# ETL Pipeline
 
-***Extraction***
-- Generate csv by extracting relevant info from the source
-- Archive from Geography: XLSX -> CSV with renamed columns based on ontology 
-    - To run: `python ./mappers/geog_archive_mapper.py`
-- PSGC Shapefiles: SHP -> TTL via a mapper
-    - To run: `python ./mappers/psgc_datefile_mapper.py`
-- NDRRMC Reports: PDF ->  CSV 
-    - Download from the drive or run `python ./parse/ndrrmc-v311.py`
-    - Make sure the csv and json files are in etl/data/ndrrmc
+Extract-Transform-Load pipeline for converting Philippine disaster data from multiple sources into RDF triples for the SakunaGraPH knowledge graph.
 
-***Transformation***
-- mappings dir contains the rml mappings for each source
-- udfs dir contains the user-defined functions needed for each source
-- basically adheres to the ontology classes and relationships
-- GDA: `python -m morph_kgc ./config.ini`
-- NDRRMC: `python -m pipeline.run_ndrrmc`
+## Data Sources
 
-***Loading***
-- load ttl files from transformation stage to graphDB. This hasn't been automated yet.
+| Source | Description | Raw Format |
+|--------|-------------|------------|
+| **NDRRMC** | National Disaster Risk Reduction and Management Council situation reports | PDF |
+| **GDA** | Geography Disaster Archive (historical records) | XLSX |
+| **EM-DAT** | Emergency Events Database (international disaster data) | XLSX |
+| **PSGC** | Philippine Standard Geographic Code (geographic hierarchy) | XLSX |
+| **DROMIC** | DSWD Disaster Response Operations Monitoring and Information Center | PDF (scraped) |
 
+## Directory Structure
 
+```
+etl/
+├── fetch/                  # Web scraping (DROMIC situation reports)
+├── parse/                  # PDF extraction (NDRRMC reports → CSV)
+├── transform/              # Data cleaning and normalization to dataclasses
+├── semantic_processing/    # NLP-based disaster classification and location matching
+├── mappings/               # Dataclass-to-RDF triple mapping logic + IRI generation
+├── udfs/                   # User-defined functions for morph_kgc (GDA RML)
+├── pipeline/               # Orchestration scripts that run the full ETL per source
+├── config.ini              # morph_kgc configuration (GDA RML pipeline)
+└── disaster_classes.json   # 74 disaster type definitions for semantic classification
+```
 
-**ABOUT DATA**
+## Pipeline Overview
 
-***NDRRMC***
+```
+Raw Data (PDF, XLSX)
+        │
+        ▼
+   fetch / parse          Scrape or extract structured data from raw sources
+        │
+        ▼
+     transform            Normalize columns, clean values, resolve locations,
+        │                 and load into typed dataclasses
+        ▼
+ semantic_processing      Classify disaster types (sentence-transformers)
+        │                 and match locations to PSGC codes (fuzzy matching)
+        ▼
+     mappings             Convert dataclasses to RDF triples using rdflib
+        │
+        ▼
+     pipeline             Orchestrate per-source runs, write .nt output
+        │
+        ▼
+   ../data/rdf/           N-Triples output files
+        │
+        ▼
+     GraphDB              Load into triplestore
+```
 
-To do:
-- Implement OCR for image-based / scanned PDFs
-- Manually correct hasType values for major events (the event corresponding to report)
-- Fix casualty type forward filling (move erratic location values and filter by casualty type only)
+## Usage
 
-***GEOG ARCHIVE***
+### NDRRMC
 
-DONE:
-- Date / Time
-- Disaster Type / Subtype
-- Location
-- Location Granularity (while transforming to RDF)
+1. **Parse** PDFs into CSVs (ensure PDFs are in `data/ndrrmc/`):
+   ```bash
+   python ./parse/ndrrmc-v311.py
+   ```
 
-***PSGC***
+2. **Run** the full transform + mapping pipeline:
+   ```bash
+   python -m pipeline.run_ndrrmc
+   ```
 
-To do:
+### GDA
 
-- Use datafile instead of shapefile
+```bash
+python -m pipeline.run_gda
+```
 
-Considerations:
-- Mapping done down to municipal level only
+### EM-DAT
+
+```bash
+python -m pipeline.run_emdat
+```
+
+### PSGC
+
+Convert the PSGC datafile to RDF:
+```bash
+python ./transform/psgc_datafile.py
+```
+
+## Key Technologies
+
+- **Data wrangling**: Polars, Pandas
+- **RDF**: rdflib,
+- **NLP**: sentence-transformers, thefuzz
+- **PDF parsing**: pdfplumber
+- **Web scraping**: Selenium
+
+## Known Limitations
+
+- OCR for scanned/image-based NDRRMC PDFs is not yet implemented
+- Loading RDF into GraphDB is still manual
+- PSGC mapping goes down to municipal level only, though PSGC rdf can include barangay level
+- Automatic pipeline not yet implemented

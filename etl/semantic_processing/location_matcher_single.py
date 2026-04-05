@@ -11,7 +11,7 @@ from dataclasses import dataclass
 
 
 BASE_IRI  = "https://sakuna.ph/"
-TTL_PATH  = "../data/rdf/psgc.ttl"
+TTL_PATH  = "../data/rdf/psgc/psgc.ttl"
 
 # ---------------------------------------------------------------------------
 # 1. Data model

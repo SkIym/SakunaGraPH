@@ -6,6 +6,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 from dateutil.parser import parse
+from mappings.iris import GDA_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 
 from mappings.gda_mapping import (
@@ -145,8 +146,7 @@ EXPORT_SPECS: dict[str, Any] = {
         "dropna": {
             "subset": ["totallyDamagedHouses", "partiallyDamagedHouses"],
             "how": "all",
-        },
-        "float_format": "%.0f",
+        }
     },
     "gda_infra.csv": {
         "cols": [
@@ -273,6 +273,15 @@ DASH = r"[-–—]"
 # Null-like sentinel values to replace with NaN
 NULL_VALUES = ["","-", "Not applicable", "n.a.", "Not indicated", np.nan, pd.NA]
 
+
+def _row_id(row: pd.Series) -> str:
+    key = "|".join([
+        str(row.get("eventName") or ""),
+        str(row.get("startDate")  or ""),
+        str(row.get("hasLocation") or ""),
+        str(row.name)
+    ]).lower().strip()
+    return uuid.uuid5(GDA_NS, key).hex
 
 def normalize_one_date(text: str) -> str | None:
     """Parse a single date fragment and return 'YYYY-MM-DD', or None on failure."""
@@ -500,7 +509,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     df = df.dropna(subset=["startDate"])
 
     df["eventName"] = df["eventName"].str.replace('"', "", regex=False)
-    df["id"] = [uuid.uuid4().hex for _ in range(len(df))]
+    # df["id"] = [uuid.uuid4().hex for _ in range(len(df))]
 
     df["hasType"] = df["hasType"].apply(
         lambda t: "|".join(to_type_iri(t))
@@ -515,12 +524,16 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
         lambda cell: "|".join(LOCATION_MATCHER.match_cell(cell))
     )
 
+    df["totallyDamagedHouses"] = df["totallyDamagedHouses"].astype(float).astype("Int64")
+
+    df["id"] = df.apply(_row_id, axis=1)
+
     # general damage amount values if no other were reported (exclude totals)
     cols = ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
     df.loc[df[cols].notna().any(axis=1), "generalDamageAmount"] = None
 
     # Explode compound sub-type incidents into a separate table
-    incidents: dict[str, list[Any]] = {"id": [], "hasType": [], "hasLocation": [], "sub_id": []}
+    incidents: dict[str, list[Any]] = {f.name: [] for f in fields(Incident)}
 
     for _, row in df.iterrows():
         subtypes = row["hasSubtypeRaw"]
@@ -534,6 +547,8 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
                 incidents["hasType"].append("|".join(to_type_iri(has_type)))
                 incidents["hasLocation"].append("|".join(LOCATION_MATCHER.match_cell(has_location)))
                 incidents["sub_id"].append(cnt)
+                incidents["startDate"].append(row["startDate"])
+                incidents["endDate"].append(row["endDate"])
 
     pd.DataFrame(incidents).to_csv(out_dir / "gda_incidents.csv")
 

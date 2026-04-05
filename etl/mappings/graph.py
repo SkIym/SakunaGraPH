@@ -1,9 +1,11 @@
-from rdflib import Graph, Namespace, URIRef, BNode, RDF, Literal, XSD
+from rdflib import Graph, Namespace, URIRef, BNode, RDF, RDFS, Literal, XSD, OWL
 
 SKG = Namespace("https://sakuna.ph/")
 PROV = Namespace("http://www.w3.org/ns/prov#")
 QUDT   = Namespace("http://qudt.org/schema/qudt/")
 CUR    = Namespace("http://qudt.org/vocab/currency/")
+ORG = Namespace("https://sakuna.ph/org/")
+GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 
 def create_graph() -> Graph:
     g = Graph()
@@ -11,6 +13,9 @@ def create_graph() -> Graph:
     g.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
     g.bind("qudt", QUDT)
     g.bind("prov", PROV)
+    g.bind("owl", OWL)
+    g.bind("rdfs", RDFS)
+    g.bind("geo", GEO)
     return g
 
 def add_monetary(g: Graph, subject: URIRef, predicate: URIRef, value: float, unit: URIRef) -> None:

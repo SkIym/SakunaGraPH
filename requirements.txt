@@ -7,4 +7,8 @@ rdflib
 openpyxl
 morph-kgc
 thefuzz
+spacy
 polars
+pytesseract
+sentence_transformers
+fastexcel

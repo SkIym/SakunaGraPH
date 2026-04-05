@@ -8,7 +8,7 @@ import os
 import argparse
 
 DATA_DIR = "../data/raw/emdat"
-OUT_DIR = "../data/rdf/"
+OUT_DIR = "../data/rdf/events/"
 
 def process_event(input_path: str, g: Graph, src_uri: URIRef):
     

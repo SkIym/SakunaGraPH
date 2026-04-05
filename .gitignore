@@ -7,3 +7,5 @@ etl/data/
 __pycache__/
 __pycache__
 data/
+ontology/catalog-v001.xml
+.DS_Store

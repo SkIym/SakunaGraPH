@@ -1,45 +1,9 @@
-"""
-PSGC to RDF Converter
-=====================
-Converts the Philippine Standard Geographic Code (PSGC) 4Q-2025 Excel datafile
-into RDF/Turtle format using Polars for data wrangling and rdflib for graph construction.
-
-Output is designed for consumption by LocationMatcher (location_matcher.py):
-  - All individual IRIs use the sakuna.ph base: https://sakuna.ph/<psgc_code>
-  - Region IRIs use the exact slugs expected by the matcher's region_map
-  - rdfs:label holds the plain location name (used directly as a match key)
-  - sakuna:isPartOf links each node to its parent
-
-Features:
-  - Maps all 11 source columns to ontology properties
-  - Handles isPartOf hierarchy (Bgy → City/Mun/SubMun → Prov → Reg)
-  - Correct PSGC segmentation: RR-PPP-MM-BBB (not RR-PP-MMM-BBB)
-  - HUC/Pateros fallback: province-less nodes link directly to their region
-  - Emits OWL class assertions for all six geographic levels
-
-Requirements:
-  pip install polars rdflib openpyxl
-
-Usage:
-  python psgc_to_rdf.py
-  python psgc_to_rdf.py --input data.xlsx --output psgc.ttl
-"""
-
 import argparse
 from pathlib import Path
 
 import polars as pl
-from rdflib import Graph, Namespace, URIRef, Literal, RDF, RDFS, OWL, XSD
-from rdflib.namespace import DCTERMS, SKOS
-
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Namespaces
-# ─────────────────────────────────────────────────────────────────────────────
-
-SKG    = Namespace("https://sakuna.ph/")
-GEO    = Namespace("http://www.w3.org/2003/01/geo/wgs84_pos#")
-SCHEMA = Namespace("https://schema.org/")
+from rdflib import Graph, URIRef, Literal, RDF, RDFS, OWL, XSD, SKOS
+from mappings.graph import SKG, GEO
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -56,7 +20,7 @@ REGION_SLUGS: dict[str, str] = {
     "0200000000": "Region_II",
     "0300000000": "Region_III",
     "0400000000": "Region_IV-A",
-    "1700000000": "Region_IV-B",        # MIMAROPA — separated from IV-A
+    "1700000000": "Region_IV-B",        # MIMAROPA 
     "0500000000": "Region_V",
     "0600000000": "Region_VI",
     "1800000000": "Negros_Island_Region",
@@ -211,42 +175,6 @@ def load_dataframe(xlsx_path: Path) -> pl.DataFrame:
 
     return df
 
-
-# ─────────────────────────────────────────────────────────────────────────────
-# Ontology declaration (TBox)
-# ─────────────────────────────────────────────────────────────────────────────
-
-def build_tbox(g: Graph) -> None:
-    for level, cls in LEVEL_CLASS.items():
-        g.add((cls, RDF.type,        OWL.Class))
-        g.add((cls, RDFS.label,      Literal(LEVEL_LABEL[level], lang="en")))
-        g.add((cls, RDFS.subClassOf, SKG["AdministrativeUnit"]))
-
-    g.add((SKG["AdministrativeUnit"], RDF.type,   OWL.Class))
-    g.add((SKG["AdministrativeUnit"], RDFS.label, Literal("Administrative Unit", lang="en")))
-
-    g.add((SKG["isPartOf"], RDF.type,              OWL.ObjectProperty))
-    g.add((SKG["isPartOf"], RDFS.label,            Literal("Is Part Of", lang="en")))
-    g.add((SKG["isPartOf"], RDFS.subPropertyOf,    DCTERMS.isPartOf))
-
-    dt_props = [
-        (SKG["psgcCode"],            "PSGC Code",              XSD.string,  "10-digit Philippine Standard Geographic Code"),
-        (SKG["correspondenceCode"],  "Correspondence Code",    XSD.string,  "Legacy correspondence/old PSGC code"),
-        (SKG["geographicLevel"],     "Geographic Level",       XSD.string,  "Level abbreviation: Reg, Prov, City, Mun, SubMun, Bgy"),
-        (SKG["cityClass"],           "City Class",             XSD.string,  "HUC, ICC, or CC"),
-        (SKG["incomeClassification"],"Income Classification",  XSD.string,  "DOF income classification (1st–6th)"),
-        (SKG["urbanRural"],          "Urban/Rural",            XSD.string,  "U = Urban, R = Rural (2020 CPH)"),
-        (SKG["population2024"],      "2024 Population",        XSD.integer, "Population count from 2024 census"),
-        (SKG["populationNote"],      "Population Note",        XSD.string,  "Qualification note on population figure"),
-        (SKG["status"],              "Status",                 XSD.string,  "Capital or Pob. (Poblacion)"),
-    ]
-    for prop, label, dtype, comment in dt_props:
-        g.add((prop, RDF.type,     OWL.DatatypeProperty))
-        g.add((prop, RDFS.label,   Literal(label, lang="en")))
-        g.add((prop, RDFS.comment, Literal(comment, lang="en")))
-        g.add((prop, RDFS.range,   dtype))
-
-
 # ─────────────────────────────────────────────────────────────────────────────
 # ABox population
 # ─────────────────────────────────────────────────────────────────────────────
@@ -367,8 +295,6 @@ def init_graph() -> Graph:
     g.bind("owl",   OWL)
     g.bind("rdfs",  RDFS)
     g.bind("xsd",   XSD)
-    g.bind("dct",   DCTERMS)
-    g.bind("schema", SCHEMA)
     return g
 
 

@@ -3,8 +3,25 @@ from rdflib import Namespace, URIRef
 
 SKG = Namespace("https://sakuna.ph/")
 
-def event_iri(event_id: str) -> URIRef:
-    return URIRef(SKG[event_id])
+import uuid
+
+# ontology namespace seed
+SKG_EVENT_NS = uuid.UUID("f47ac10b-58cc-4372-a567-0e02b2c3d479")
+
+EMDAT_EVENT_NS = uuid.UUID("e9d7c5b3-1f2a-4e6d-8c0b-7a4f3e2d1c5b")
+
+GDA_NS = uuid.UUID("c7a2f3b1-9e4d-4a08-b5c6-1d2e3f4a5b6c")
+
+NDRRMC_EVENT_NS = uuid.UUID("a3f2c1d4-7e8b-4f09-b5a6-2c3d4e5f6a7b")
+
+
+def event_uri(source: str, source_record_id: str) -> URIRef:
+    """
+    Deterministic IRI from source name + the record's own ID.
+    Re-running on the same CSV always produces the same IRI.
+    """
+    uid = uuid.uuid5(SKG_EVENT_NS, source_record_id)
+    return URIRef(f"https://sakuna.ph/{source}/{uid}")
 
 def prov_iri(report: str) -> URIRef:
     return URIRef(SKG[report
@@ -13,68 +30,40 @@ def prov_iri(report: str) -> URIRef:
                       .replace(".xlsx", "")
                       .replace("-", "")])
 
-def incident_iri(event_id: URIRef, incident_id: str) -> URIRef:
-    return URIRef(event_id + f"/related_incident/{incident_id}")
+def sub_iri(event_id: URIRef, segment: str, r_id: str | None = None) -> URIRef:
+    """
+    Build a sub-resource IRI scoped under an event IRI.
+    
+    sub_iri(event_id, "casualties")          → .../casualties
+    sub_iri(event_id, "casualties", "abc123") → .../casualties/abc123
+    """
+    base = f"{event_id}/{segment}"
+    return URIRef(f"{base}/{r_id}" if r_id is not None else base)
 
-def aff_pop_iri(event_id: URIRef, aff_pop_id: str) -> URIRef:
-    return URIRef(event_id + f"/affected_population/{aff_pop_id}")
 
-def casualties_iri(event_id: URIRef, cas_id: str) -> URIRef:
-    return URIRef(event_id + f"/casualties/{cas_id}")
+# Named aliases — same as before but delegate to sub_iri
+def incident_iri    (e, r=None): return sub_iri(e, "related_incident", r)
+def aff_pop_iri     (e, r=None): return sub_iri(e, "affected_population", r)
+def casualties_iri  (e, r=None): return sub_iri(e, "casualties", r)
+def relief_iri      (e, r=None): return sub_iri(e, "relief", r)
+def assistance_iri  (e, r=None): return sub_iri(e, "assistance", r)
+def recovery_iri    (e, r=None): return sub_iri(e, "recovery", r)
+def infra_iri       (e, r=None): return sub_iri(e, "infrastructure_damage", r)
+def housing_iri     (e, r=None): return sub_iri(e, "housing_damage", r)
+def agri_iri        (e, r=None): return sub_iri(e, "agriculture_damage", r)
+def pevac_iri       (e, r=None): return sub_iri(e, "preemptive_evacuation", r)
+def rnb_iri         (e, r=None): return sub_iri(e, "road_and_bridges_damage", r)
+def power_iri       (e, r=None): return sub_iri(e, "power_disruption", r)
+def comms_iri       (e, r=None): return sub_iri(e, "communication_line_disruption", r)
+def doc_iri         (e, r=None): return sub_iri(e, "declaration_of_calamity", r)
+def class_dis_iri   (e, r=None): return sub_iri(e, "class_suspension", r)
+def work_dis_iri    (e, r=None): return sub_iri(e, "work_suspension", r)
+def stranded_iri    (e, r=None): return sub_iri(e, "stranded_event", r)
+def water_iri       (e, r=None): return sub_iri(e, "water_disruption", r)
+def seaport_iri     (e, r=None): return sub_iri(e, "seaport_disruption", r)
+def airport_iri     (e, r=None): return sub_iri(e, "airport_disruption", r)
+def flight_iri      (e, r=None): return sub_iri(e, "flight_disruption", r)
+def damage_gen_iri  (e, r=None): return sub_iri(e, "damage_general", r)
 
-def relief_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/relief/{r_id}")
-
-def assistance_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/assistance/{r_id}")
-
-def recovery_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/recovery/{r_id}")
-
-def infra_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/infrastructure_damage/{r_id}")
-
-def housing_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/housing_damage/{r_id}")
-
-def agri_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/agriculture_damage/{r_id}")
-
-def pevac_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/preemptive_evacuation/{r_id}")
-
-def rnb_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/road_and_bridges_damage/{r_id}")
-
-def power_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/power_disruption/{r_id}")
-
-def comms_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/communication_line_disruption/{r_id}")
-
-def doc_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/declaration_of_calamity/{r_id}")
-
-def class_dis_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/class_suspension/{r_id}")
-
-def work_dis_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/work_suspension/{r_id}")
-
-def stranded_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/stranded_event/{r_id}")
-
-def water_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/water_disruption/{r_id}")
-
-def seaport_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/seaport_disruption/{r_id}")
-
-def airport_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/airport_disruption/{r_id}")
-
-def flight_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/flight_disruption/{r_id}")
-
-def damage_gen_iri(event_id: URIRef, r_id: str) -> URIRef:
-    return URIRef(event_id + f"/damage_general/{r_id}")
+def org_iri(slug: str) -> URIRef:
+    return URIRef(SKG[f"org/{slug}"])

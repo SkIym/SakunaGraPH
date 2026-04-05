@@ -6,7 +6,7 @@ base = "https://sakuna.ph/"
 
 # For matching location IRIs
 lg = Graph()
-lg.parse("../data/rdf/psgc.ttl")
+lg.parse("../data/rdf/psgc/psgc.ttl")
 
 # IRI : label
 municities: dict[str, str] = {}

@@ -3,6 +3,7 @@ import pdfplumber
 import pandas as pd
 import re
 import json
+import argparse
 from datetime import datetime
 from dataclasses import dataclass, asdict
 from concurrent.futures import ProcessPoolExecutor, as_completed
@@ -16,6 +17,34 @@ OUTPUT_FOLDER = "../data/parsed/ndrrmc"   # NEW OUTPUT FOLDER
 FOLDER_LENGTH = 0
 HEADER_SEARCH_DISTANCE = 80
 ALIGNMENT_TOLERANCE = 5
+OCR_MIN_CHARS = 20  # minimum non-whitespace chars before falling back to OCR
+
+
+def extract_text_ocr(page, resolution=300):
+    """Extract text from a pdfplumber page using OCR (pytesseract).
+
+    Requires pytesseract and Tesseract OCR to be installed on the system.
+    Uses pdfplumber's built-in page.to_image() to avoid pdf2image/poppler dependency.
+    """
+    try:
+        import pytesseract
+    except ImportError:
+        raise ImportError(
+            "pytesseract is required for OCR. Install with: pip install pytesseract\n"
+            "Also install Tesseract OCR: https://github.com/tesseract-ocr/tesseract"
+        )
+
+    pil_image = page.to_image(resolution=resolution).original
+    return pytesseract.image_to_string(pil_image)
+
+
+def get_page_text(page, use_ocr=False):
+    """Extract text from a page, falling back to OCR if enabled and native extraction yields little text."""
+    text = page.extract_text() or ""
+    if use_ocr and len(text.replace(" ", "").replace("\n", "")) < OCR_MIN_CHARS:
+        print(f"   → Native extraction yielded {len(text.strip())} chars, falling back to OCR...")
+        text = extract_text_ocr(page)
+    return text
 
 @dataclass
 class Event:
@@ -33,15 +62,15 @@ class Event:
 # IMPROVED: MULTI-PAGE NARRATIVE EXTRACTION
 # -----------------------------------------------------------------------
 
-def extract_multi_page_narrative(pdf_path, event_name):
+def extract_multi_page_narrative(pdf_path, event_name, use_ocr=False):
     """Extract narrative text that may span multiple pages."""
     try:
         with pdfplumber.open(pdf_path) as pdf:
             if len(pdf.pages) == 0:
                 return ""
-            
+
             narrative_parts = []
-            
+
             table_start_patterns = [
                 r'REGION\s*\|\s*PROVINCE',
                 r'AFFECTED POPULATION',
@@ -51,12 +80,12 @@ def extract_multi_page_narrative(pdf_path, event_name):
                 r'^\s*PROVINCE\s*$',
                 r'Page \d+\s*/\s*\d+',
             ]
-            
+
             max_narrative_pages = min(5, len(pdf.pages))
-            
+
             for page_num in range(max_narrative_pages):
                 page = pdf.pages[page_num]
-                page_text = page.extract_text() or ""
+                page_text = get_page_text(page, use_ocr=use_ocr)
                 
                 if page_num == 0:
                     lines = page_text.split('\n')
@@ -153,17 +182,17 @@ def parse_flexible_date(date_str):
     return None
 
 
-def extract_narrative_dates(pdf_path, event_name):
+def extract_narrative_dates(pdf_path, event_name, use_ocr=False):
     """Extract start and end dates from multi-page narrative."""
     try:
         with pdfplumber.open(pdf_path) as pdf:
             if len(pdf.pages) == 0:
                 return None, None, "", None
-            
+
             first_page = pdf.pages[0]
-            first_page_text = first_page.extract_text() or ""
-            
-            narrative_text = extract_multi_page_narrative(pdf_path, event_name)
+            first_page_text = get_page_text(first_page, use_ocr=use_ocr)
+
+            narrative_text = extract_multi_page_narrative(pdf_path, event_name, use_ocr=use_ocr)
             print(f"   → Extracted narrative: {len(narrative_text)} characters across pages")
             
             event_lower = event_name.lower()
@@ -173,7 +202,7 @@ def extract_narrative_dates(pdf_path, event_name):
             
             as_of_date = None
             for page_num in range(min(2, len(pdf.pages))):
-                page_text = pdf.pages[page_num].extract_text() or ""
+                page_text = get_page_text(pdf.pages[page_num], use_ocr=use_ocr)
                 as_of_pattern = r'as\s+of\s*[(\[]?\s*([^)\]]+?)\s*[)\]]?(?:\s|$)'
                 as_of_match = re.search(as_of_pattern, page_text, re.IGNORECASE)
                 if as_of_match:
@@ -621,10 +650,12 @@ class SimpleTitleTracker:
 # -----------------------------------------------------------------------
 # MAIN PROCESSOR
 # -----------------------------------------------------------------------
-def process_pdf(pdf_event = Event, file_counter = int, pdf_path = str):
+def process_pdf(pdf_event = Event, file_counter = int, pdf_path = str, use_ocr = False):
     print(f"\n📄{file_counter} Processing PDF: {pdf_path}")
+    if use_ocr:
+        print("   → OCR mode enabled")
 
-    start_date, end_date, narrative_text, report_date = extract_narrative_dates(pdf_path, pdf_event.eventName)
+    start_date, end_date, narrative_text, report_date = extract_narrative_dates(pdf_path, pdf_event.eventName, use_ocr=use_ocr)
     
     if narrative_text:
         pdf_event.remarks = narrative_text
@@ -660,6 +691,10 @@ def process_pdf(pdf_event = Event, file_counter = int, pdf_path = str):
             })
 
             if not tables_found:
+                if use_ocr:
+                    native_text = page.extract_text() or ""
+                    if len(native_text.replace(" ", "").replace("\n", "")) < OCR_MIN_CHARS:
+                        print(f"   ⚠ Page {page_index}: scanned page with no drawn table lines — table extraction skipped (OCR only extracts narrative text)")
                 continue
 
             for table_obj in tables_found:
@@ -760,7 +795,7 @@ def process_pdf(pdf_event = Event, file_counter = int, pdf_path = str):
     generate_json(pdf_event, output_dir)
 
 
-def process_all_pdfs():
+def process_all_pdfs(use_ocr=False):
     print("🔎 Scanning folder for PDFs...")
 
     FILES =  os.listdir(INPUT_FOLDER)
@@ -771,25 +806,26 @@ def process_all_pdfs():
             file_counter += 1
             fullpath = os.path.join(INPUT_FOLDER, filename)
             event = Event(reportName = filename, eventName = clean_filename(filename))
-            process_pdf(event, file_counter, fullpath)
+            process_pdf(event, file_counter, fullpath, use_ocr=use_ocr)
 
     print(f"\n🎉 Finished parsing all PDFs ! {file_counter}/{FOLDER_LENGTH}")
 
-def process_all_pdfs_parallel():
+def process_all_pdfs_parallel(use_ocr=False):
     print("🔎 Scanning folder for PDFs...")
 
     FILES = os.listdir(INPUT_FOLDER)
     pdf_files = [f for f in FILES if f.lower().endswith(".pdf")]
     FOLDER_LENGTH = len(pdf_files)
     file_counter = 0
-    
+
     with ProcessPoolExecutor() as executor:
         futures = {
             executor.submit(
-                process_pdf, 
-                Event(reportName=filename, eventName=clean_filename(filename)), 
-                idx+1, 
-                os.path.join(INPUT_FOLDER, filename)
+                process_pdf,
+                Event(reportName=filename, eventName=clean_filename(filename)),
+                idx+1,
+                os.path.join(INPUT_FOLDER, filename),
+                use_ocr
             ): filename
             for idx, filename in enumerate(pdf_files)
         }
@@ -806,4 +842,14 @@ def process_all_pdfs_parallel():
     print(f"\n🎉 Finished parsing all PDFs ! {file_counter}/{FOLDER_LENGTH}")
 
 if __name__ == "__main__":
-    process_all_pdfs_parallel()
+    parser = argparse.ArgumentParser(description="Parse NDRRMC situational report PDFs")
+    parser.add_argument("--ocr", action="store_true",
+                        help="Enable OCR fallback for scanned/image-based PDFs (requires pytesseract + Tesseract)")
+    parser.add_argument("--sequential", action="store_true",
+                        help="Process PDFs sequentially instead of in parallel")
+    args = parser.parse_args()
+
+    if args.sequential:
+        process_all_pdfs(use_ocr=args.ocr)
+    else:
+        process_all_pdfs_parallel(use_ocr=args.ocr)
