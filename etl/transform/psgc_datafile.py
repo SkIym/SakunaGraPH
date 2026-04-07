@@ -36,6 +36,27 @@ REGION_SLUGS: dict[str, str] = {
     "1900000000": "Bangsamoro_Autonomous_Region_In_Muslim_Mindanao",
 }
 
+REGION_PARENTS: dict[str, str] = {
+    "0100000000": "Luzon",
+    "0200000000": "Luzon",
+    "0300000000": "Luzon",
+    "0400000000": "Luzon",
+    "1700000000": "Luzon",        # MIMAROPA 
+    "0500000000": "Luzon",
+    "0600000000": "Visayas",
+    "1800000000": "Visayas",
+    "0700000000": "Visayas",
+    "0800000000": "Visayas",
+    "0900000000": "Mindanao",
+    "1000000000": "Mindanao",
+    "1100000000": "Mindanao",
+    "1200000000": "Mindanao",
+    "1300000000": "Luzon",
+    "1400000000": "Luzon",
+    "1600000000": "Mindanao",
+    "1900000000": "Mindanao",
+}
+
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Level → OWL class  /  human-readable label
@@ -231,7 +252,7 @@ def build_abox(g: Graph, df: pl.DataFrame, include_barangay: bool = True) -> tup
         if level:
             g.add((uri, SKG["geographicLevel"],
                    Literal(level, datatype=XSD.string)))
-
+            
         # ── Old names → skos:altLabel ─────────────────────────────────────────
         old = row.get("old_names")
         if old:
@@ -280,7 +301,42 @@ def build_abox(g: Graph, df: pl.DataFrame, include_barangay: bool = True) -> tup
             g.add((uri, SKG["isPartOf"], code_to_uri[par_code]))
             part_count += 1
 
+        # For regions
+        if level == "Reg":
+            g.add((uri, SKG["isPartOf"], SKG[f"{REGION_PARENTS.get(code, 'Philippines')}"]))    
+
+
     return ind_count, part_count
+
+
+def add_island_group(g: Graph):
+
+    # Pelepens
+    ph_uri = URIRef(SKG["Philippines"])
+    g.add((ph_uri, RDF.type, SKG["Country"]))
+    g.add((ph_uri, RDFS.label, Literal("Philippines")))
+    g.add((ph_uri, URIRef(SKG["geographicLevel"]), Literal("Country")))
+
+    # 3 group of islands
+    luz_uri = URIRef(SKG["Luzon"])
+    g.add((luz_uri, RDF.type, SKG["IslandGroup"]))
+    g.add((luz_uri, RDFS.label, Literal("Luzon")))
+    g.add((luz_uri, URIRef(SKG["isPartOf"]), ph_uri))
+    g.add((luz_uri, URIRef(SKG["geographicLevel"]), Literal("Island Group")))
+
+
+    vis_uri = URIRef(SKG["Visayas"])
+    g.add((vis_uri, RDF.type, SKG["IslandGroup"]))
+    g.add((vis_uri, RDFS.label, Literal("Visayas")))
+    g.add((vis_uri, URIRef(SKG["isPartOf"]), ph_uri))
+    g.add((vis_uri, URIRef(SKG["geographicLevel"]), Literal("Island Group")))
+
+
+    minda_uri = URIRef(SKG["Mindanao"])
+    g.add((minda_uri, RDF.type, SKG["IslandGroup"]))
+    g.add((minda_uri, RDFS.label, Literal("Mindanao")))
+    g.add((minda_uri, URIRef(SKG["isPartOf"]), ph_uri))
+    g.add((minda_uri, URIRef(SKG["geographicLevel"]), Literal("Island Group")))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -314,7 +370,7 @@ def main() -> None:
     args = parser.parse_args()
 
     xlsx_path = Path(args.input)
-    out_path  = Path(args.output)
+    out_path  = Path("../data/rdf/psgc/" + args.output)
 
     print(f"[1/4] Loading {xlsx_path} …")
     df = load_dataframe(xlsx_path)
@@ -335,7 +391,10 @@ def main() -> None:
 
     print(f"\n[3/4] Building RDF graph …")
     g = init_graph()
+
     # build_tbox(g)
+    add_island_group(g) # add philippines, luzon, viz, minda IRIs
+
     ind_n, part_n = build_abox(g, df, args.barangay)
     print(f"      {ind_n:,} individuals | {part_n:,} isPartOf triples | {len(g):,} total triples")
 
