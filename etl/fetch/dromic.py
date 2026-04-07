@@ -10,7 +10,7 @@ import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Optional
 from urllib.parse import parse_qs, unquote, urlparse
@@ -46,7 +46,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--max-pages",
         type=int,
-        default=5,
+        default=100,
         help="Maximum number of listing pages to scrape.",
     )
     return parser.parse_args()
@@ -88,6 +88,8 @@ class ManifestEntry:
     filename: str
     download_url: str
     downloaded_at: str  # ISO-8601
+    post_url: str
+    page: int
 
 
 def load_manifest(path: Path) -> list[ManifestEntry]:
@@ -168,6 +170,8 @@ def download_file(
     url: str,
     download_dir: Path,
     manifest: list[ManifestEntry],
+    post_url: str,
+    page: int,
     filename_hint: Optional[str] = None,
 ) -> bool:
     """Download a file, record it in the manifest, and return success."""
@@ -188,7 +192,9 @@ def download_file(
             ManifestEntry(
                 filename=filename,
                 download_url=url,
-                downloaded_at=datetime.utcnow().isoformat(timespec="seconds") + "Z",
+                downloaded_at=datetime.now(timezone.utc).isoformat(timespec="seconds") + "Z",
+                post_url=post_url,
+                page=page
             )
         )
         return True
@@ -229,7 +235,7 @@ def extract_first_download_link(driver: WebDriver) -> tuple[Optional[str], Optio
 
 def handle_page(
     driver: WebDriver,
-    wait: WebDriverWait,
+    wait: WebDriverWait[WebDriver],
     scraped_urls: set[str],
     state: ScrapeState,
     state_path: Path,
@@ -237,16 +243,18 @@ def handle_page(
     manifest_path: Path,
     last_scrape_date: datetime,
     download_dir: Path,
+    page: int
 ) -> bool:
     """
     Process all posts on the current listing page.
 
-    Returns True if the scraper should stop (reached already-seen posts).
+    Returns True if the scraper should stop (post published date is older then last scraped date meaning we've gone past new content).
     """
     read_mores = driver.find_elements(
         By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]"
     )
     log.info("Found %d posts on page", len(read_mores))
+
 
     for i in range(len(read_mores)):
         # Re-query after each navigation to avoid stale element refs
@@ -258,80 +266,98 @@ def handle_page(
 
         btn = read_mores[i]
         post_url = btn.get_attribute("href")
-
-        if post_url in scraped_urls:
-            log.info("Skipping already scraped: %s", post_url)
+        
+        if not post_url: 
+            log.info("Skipping a post. No read more found")
             continue
 
         driver.execute_script("arguments[0].scrollIntoView(true);", btn)
         time.sleep(0.5)
         driver.execute_script("arguments[0].click();", btn)
 
+        navigated_away = False
         try:
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.post-content")))
+            navigated_away = True  # driver is now on the post page
 
             post_date = get_post_date(driver)
             log.info("Post date: %s", post_date.date())
 
             if post_date <= last_scrape_date:
-                log.info("Post is not newer than last scrape date — stopping")
+                log.info("Post is older than last scrape date — stopping")
+
+                driver.back()
+                wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, "//a[contains(.,'Read More')]")
+                ))
                 return True
-
-            file_url, file_name = extract_first_download_link(driver)
-
-            if file_url:
-                success = download_file(file_url, download_dir, manifest, file_name)
-                if success:
-                    scraped_urls.add(post_url)
-                    state.scraped_urls = list(scraped_urls)
-
-                    current_max = (
-                        datetime.strptime(state.last_scrape_date, "%Y-%m-%d")
-                        if state.last_scrape_date
-                        else datetime.min
-                    )
-                    if post_date > current_max:
-                        state.last_scrape_date = post_date.strftime("%Y-%m-%d")
-
-                    save_state(state_path, state)
-                    save_manifest(manifest_path, manifest)
+                
             else:
-                log.warning("No downloadable link found for: %s", post_url)
+
+                file_url, file_name = extract_first_download_link(driver)
+
+                if file_url:
+                    success = download_file(file_url, download_dir, manifest, post_url, page,  file_name)
+                    if success:
+                        scraped_urls.add(post_url)
+                        state.scraped_urls = list(scraped_urls)
+
+                        save_state(state_path, state)
+                        save_manifest(manifest_path, manifest)
+                else:
+                    log.warning("No downloadable link found for: %s", post_url)
 
         except Exception:
             log.exception("Error processing post: %s", post_url)
 
-        driver.back()
-        wait.until(
-            EC.presence_of_all_elements_located(
-                (By.XPATH, "//a[contains(.,'Read More')]")
-            )
-        )
-        time.sleep(1)
+        finally:
+            # Always return to the listing page if we navigated away
+            if navigated_away:
+                try:
+                    driver.back()
+                    wait.until(EC.presence_of_all_elements_located(
+                        (By.XPATH, "//a[contains(.,'Read More')]")
+                    ))
+                    time.sleep(1)
+                except Exception:
+                    log.exception("Failed to navigate back to listing page")
 
     return False
 
 
-def goto_page(driver: WebDriver, wait: WebDriverWait, page_num: int) -> bool:
-    """Click the pagination link for page_num. Returns False if not found."""
-    try:
-        el = wait.until(
-            EC.element_to_be_clickable((
-                By.XPATH,
-                f"//ul[contains(@class,'pagination')]//li//*[normalize-space()='{page_num}']",
-            ))
-        )
-        driver.execute_script("arguments[0].scrollIntoView();", el)
-        el.click()
-        wait.until(
-            EC.presence_of_all_elements_located(
-                (By.XPATH, "//a[contains(.,'Read More')]")
+def goto_page(
+    driver: WebDriver, wait: WebDriverWait[WebDriver], page_num: int, retries: int = 2
+) -> bool:
+    """
+    Click the pagination link for page_num. Returns False only when the link
+    genuinely doesn't exist (i.e. no more pages). Retries on transient errors.
+    """
+    for attempt in range(1, retries + 1):
+        try:
+            el = wait.until(
+                EC.element_to_be_clickable((
+                    By.XPATH,
+                    f"//ul[contains(@class,'pagination')]//li//*[normalize-space()='{page_num}']",
+                ))
             )
-        )
-        return True
-    except Exception:
-        log.debug("Pagination link for page %d not found", page_num)
-        return False
+            driver.execute_script("arguments[0].scrollIntoView();", el)
+            el.click()
+            wait.until(
+                EC.presence_of_all_elements_located(
+                    (By.XPATH, "//a[contains(.,'Read More')]")
+                )
+            )
+            return True
+        except Exception as e:
+            if attempt < retries:
+                log.warning(
+                    "goto_page(%d) attempt %d failed (%s) — retrying",
+                    page_num, attempt, e,
+                )
+                time.sleep(2)
+            else:
+                log.info("Pagination link for page %d not found — assuming last page", page_num)
+    return False
 
 
 # =============================================================================
@@ -353,10 +379,10 @@ def setup_logging(log_file: Path) -> None:
 def main() -> None:
     args = parse_args()
 
-    download_dir = Path(f"../data/raw/dromic/{args.year}")
+    download_dir = Path(f"../data/raw/dromic-new/{args.year}")
     log_dir = Path("../logs/dromic")
-    state_path = Path(args.state_file)
-    manifest_path = log_dir / f"manifest/{args.year}_manifest.json"
+    state_path = log_dir / f"{args.year}_scrape_state.json"
+    manifest_path = log_dir / f"{args.year}_manifest.json"
     log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
     download_dir.mkdir(parents=True, exist_ok=True)
@@ -365,18 +391,18 @@ def main() -> None:
     state = load_state(state_path)
     manifest = load_manifest(manifest_path)
 
+
     if args.last_scrape_date:
         last_scrape_date = datetime.strptime(args.last_scrape_date, "%Y-%m-%d")
     elif state.last_scrape_date:
-        last_scrape_date = datetime.strptime(state.last_scrape_date, "%Y-%m-%d")
+        last_scrape_date = datetime.strptime(state.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
     else:
         last_scrape_date = datetime.min
 
     scraped_urls: set[str] = set(state.scraped_urls)
 
     opts = Options()
-
-    opts.add_experimental_option( # type: ignore
+    opts.add_experimental_option(
         "prefs",
         {
             "download.default_directory": str(download_dir.resolve()),
@@ -406,10 +432,10 @@ def main() -> None:
                 manifest_path=manifest_path,
                 last_scrape_date=last_scrape_date,
                 download_dir=download_dir,
+                page=page
             )
 
             if should_stop:
-                log.info("Reached last scrape date — stopping")
                 break
 
             page += 1
@@ -419,6 +445,8 @@ def main() -> None:
                 break
     finally:
         driver.quit()
+        state.last_scrape_date = datetime.now(timezone.utc).strftime("%Y-%m-%d, %H:%M:%S")
+        save_state(state_path, state)
         log.info("Done. Manifest written to: %s", manifest_path)
 
 
