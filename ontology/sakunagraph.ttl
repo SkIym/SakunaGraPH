@@ -3148,7 +3148,7 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                   :DisasterType ;
          skos:broader :Storm ;
          skos:inScheme :DisasterTypeScheme ;
-         skos:definition "Tornadoes and whirlwinds. A violently rotating column of air that reaches the ground or open water (waterspout)." ;
+         skos:definition "Tornado: Tornadoes and whirlwinds. A violently rotating column of air that reaches the ground or open water (waterspout). Can be associated with heavy rains and bring damage." ;
          skos:prefLabel "Tornado"@en .
 
 
