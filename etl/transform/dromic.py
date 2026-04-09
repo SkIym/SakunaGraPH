@@ -64,13 +64,14 @@ def load_events(folder_path: str) -> List[Event]:
         if location and location != "":
             hasLocation = "|".join(LOCATION_MATCHER.match_cell(_add_commas(location)))
 
-        print('Transforming: ', event_name, "location: ", hasLocation)
+        if not meta["startDate"]:
+            print('Missing dates in metadata.json: ', event_name)
 
         events.append(Event(
             id=_event_id(event_name, meta.get("startDate")),
             eventName=event_name,
-            startDate=datetime.fromisoformat(meta["startDate"]) if meta["startDate"] else None,
-            endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
+            startDate=datetime.fromisoformat(meta["startDate"]),
+            endDate=datetime.fromisoformat(meta["endDate"]),
             remarks=remarks,
             hasDisasterType=pred,
             hasLocation=URIRef(str(hasLocation)) if hasLocation else None
