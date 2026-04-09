@@ -4,7 +4,7 @@ from transform.ndrrmc import load_aff_pop, load_agri, load_airport, load_casualt
 from mappings.ndrrmc import Event, aff_pop_mapping, agri_mapping, airport_mapping, casualties_mapping, class_mapping, comms_mapping, doc_mapping, event_mapping, flight_mapping, housing_mapping, incident_mapping, infra_mapping, pevac_mapping, power_mapping, prov_mapping, relief_mapping, rnb_mapping, seaport_mapping, stranded_mapping, water_mapping, work_mapping
 import argparse
 import os
-from typing import Tuple
+from typing import List, Tuple
 
 def process_event(args: Tuple[str, Event]) -> Graph:
     DATA_DIR, ev = args
@@ -102,10 +102,8 @@ DATA_DIR = "../data/parsed/ndrrmc"
 OUT_DIR = "../data/rdf/events/"
 
 
-def run(out_file: str, start: int = 0, count: int | None = None):
+def run(events: List[Event],out_file: str, start: int = 0, count: int | None = None):
     main_graph = create_graph()
-
-    events = load_events(DATA_DIR)
 
     # ---- batching logic ----
     if count is None:
@@ -140,13 +138,19 @@ if __name__ == "__main__":
     parser.add_argument("--count", type=int, default=10)
     args = parser.parse_args()
 
+    
+    events = load_events(DATA_DIR)
 
     index = 1
     file_conv = 0
     file_no = 89
     while file_conv < file_no:
 
-        run(out_file=OUT_DIR+args.out+"-"+str(index)+".ttl", start=args.start+file_conv, count=args.count, )
+        run(
+            events=events,
+            out_file=OUT_DIR+args.out+"-"+str(index)+".ttl", 
+            start=args.start+file_conv, 
+            count=args.count, )
 
         index+=1
         file_conv += 10

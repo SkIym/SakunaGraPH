@@ -14,6 +14,8 @@ GDA_NS = uuid.UUID("c7a2f3b1-9e4d-4a08-b5c6-1d2e3f4a5b6c")
 
 NDRRMC_EVENT_NS = uuid.UUID("a3f2c1d4-7e8b-4f09-b5a6-2c3d4e5f6a7b")
 
+DROMIC_EVENT_NS = uuid.UUID("f7c14e82-3b9d-4a56-8e01-d2f5a7c93b1e")
+ 
 
 def event_uri(source: str, source_record_id: str) -> URIRef:
     """
