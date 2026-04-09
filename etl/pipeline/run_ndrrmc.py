@@ -1,3 +1,4 @@
+import logging
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from mappings.graph import create_graph, Graph
 from transform.ndrrmc import load_aff_pop, load_agri, load_airport, load_casualties, load_class_suspension, load_comms, load_docalamity, load_events, load_flight, load_housing, load_infra, load_pevac, load_power, load_relief, load_rnb, load_seaport, load_stranded_events, load_incidents, load_provenance, load_water, load_work_suspension
@@ -6,95 +7,77 @@ import argparse
 import os
 from typing import List, Tuple
 
+log = logging.getLogger(__name__)
+
+
+def _run_loader_and_mapping(
+    name: str,
+    loader,
+    mapper,
+    event_folder: str,
+    g: Graph,
+    event_iri,
+) -> None:
+    log.info("→ %s: loading from %s", name, event_folder)
+    rows = loader(event_folder)
+    if rows:
+        count = len(rows) if hasattr(rows, "__len__") else "?"
+        log.info("  %s loaded %s rows; mapping...", name, count)
+        mapper(g, rows, event_iri)
+        log.info("  ✓ %s done", name)
+    else:
+        log.info("  %s: no rows, skipping", name)
+
+
 def process_event(args: Tuple[str, Event]) -> Graph:
+    # ProcessPoolExecutor workers don't inherit root logger config — set it here.
+    if not logging.getLogger().handlers:
+        logging.basicConfig(
+            level=logging.INFO,
+            format="%(asctime)s — %(levelname)s — %(name)s — %(message)s",
+        )
+
     DATA_DIR, ev = args
+    log.info("Processing event: %s (%s)", ev.eventName, ev.id)
 
     g = create_graph()
 
+    log.info("→ event_mapping: %s", ev.eventName)
     event_iri = event_mapping(g, ev)
+    log.info("  event IRI: %s", event_iri)
 
     event_folder = os.path.join(DATA_DIR, ev.eventName)
 
+    log.info("→ load_provenance: loading from %s", event_folder)
     prov = load_provenance(event_folder)
     if prov:
+        log.info("  provenance loaded; mapping...")
         prov_mapping(g, prov, event_iri)
+        log.info("  ✓ prov_mapping done")
+    else:
+        log.info("  load_provenance: no rows, skipping")
 
-    inci = load_incidents(event_folder)
-    if inci:
-        incident_mapping(g, inci, event_iri)
+    _run_loader_and_mapping("incidents", load_incidents, incident_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("aff_pop", load_aff_pop, aff_pop_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("casualties", load_casualties, casualties_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("relief", load_relief, relief_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("infra", load_infra, infra_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("housing", load_housing, housing_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("agri", load_agri, agri_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("pevac", load_pevac, pevac_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("rnb", load_rnb, rnb_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("power", load_power, power_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("comms", load_comms, comms_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("doc_calamity", load_docalamity, doc_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("class_suspension", load_class_suspension, class_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("work_suspension", load_work_suspension, work_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("stranded", load_stranded_events, stranded_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("water", load_water, water_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("seaport", load_seaport, seaport_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("airport", load_airport, airport_mapping, event_folder, g, event_iri)
+    _run_loader_and_mapping("flight", load_flight, flight_mapping, event_folder, g, event_iri)
 
-    aff_pop = load_aff_pop(event_folder)
-    if aff_pop:
-        aff_pop_mapping(g, aff_pop, event_iri)
-    
-    casualties = load_casualties(event_folder)
-    if casualties:
-        casualties_mapping(g, casualties, event_iri)
-
-    relief = load_relief(event_folder)
-    if relief:
-        relief_mapping(g, relief, event_iri)
-
-    infra = load_infra(event_folder)
-    if infra:
-        infra_mapping(g, infra, event_iri)
-
-    housing = load_housing(event_folder)
-    if housing:
-        housing_mapping(g, housing, event_iri)
-
-    agri = load_agri(event_folder)
-    if agri:
-        agri_mapping(g, agri, event_iri)
-
-    pevac = load_pevac(event_folder)
-    if pevac:
-        pevac_mapping(g, pevac, event_iri)
-
-    rnb = load_rnb(event_folder)
-    if rnb:
-        rnb_mapping(g, rnb, event_iri)
-    
-    power = load_power(event_folder)
-    if power:
-        power_mapping(g, power, event_iri)
-
-    comms = load_comms(event_folder)
-    if comms:
-        comms_mapping(g, comms, event_iri)
-
-    doc = load_docalamity(event_folder)
-    if doc:
-        doc_mapping(g, doc, event_iri)
-
-    class_sus = load_class_suspension(event_folder)
-    if class_sus:
-        class_mapping(g, class_sus, event_iri)
-
-    work_sus = load_work_suspension(event_folder)
-    if work_sus:
-        work_mapping(g, work_sus, event_iri)
-
-    stranded = load_stranded_events(event_folder)
-    if stranded:
-        stranded_mapping(g, stranded, event_iri)
-
-    water = load_water(event_folder)
-    if water:    
-        water_mapping(g, water, event_iri)
-
-    seaport = load_seaport(event_folder)
-    if seaport:
-        seaport_mapping(g, seaport, event_iri)
-
-    airport = load_airport(event_folder)
-    if airport:
-        airport_mapping(g, airport, event_iri)
-
-    flight = load_flight(event_folder)
-    if flight:
-        flight_mapping(g, flight, event_iri)
-
+    log.info("Finished event %s — %d triples", ev.eventName, len(g))
     return g
 
 
@@ -102,7 +85,9 @@ DATA_DIR = "../data/parsed/ndrrmc"
 OUT_DIR = "../data/rdf/events/"
 
 
-def run(events: List[Event],out_file: str, start: int = 0, count: int | None = None):
+def run(events: List[Event], out_file: str, start: int = 0, count: int | None = None):
+    log.info("=== NDRRMC pipeline batch start ===")
+    log.info("Step 1/3: Creating main graph")
     main_graph = create_graph()
 
     # ---- batching logic ----
@@ -111,7 +96,7 @@ def run(events: List[Event],out_file: str, start: int = 0, count: int | None = N
     else:
         batch = events[start:start + count]
 
-    print(f"Processing events {start} → {start + len(batch)}")
+    log.info("Step 2/3: Processing events %d → %d (batch size %d)", start, start + len(batch), len(batch))
 
     with ProcessPoolExecutor() as executor:
         futures = [
@@ -119,19 +104,27 @@ def run(events: List[Event],out_file: str, start: int = 0, count: int | None = N
             for ev in batch
         ]
 
+        completed = 0
         for future in as_completed(futures):
             subgraph = future.result()
             main_graph += subgraph
+            completed += 1
+            log.info("Merged subgraph %d/%d (main graph now %d triples)", completed, len(batch), len(main_graph))
 
+    log.info("Step 3/3: Serializing main graph to %s", out_file)
     main_graph.serialize(
         destination=out_file,
         format="turtle"
     )
-
-    print(f"Serialized {len(batch)} events → {out_file}")
+    log.info("=== NDRRMC batch complete: %d events → %s ===", len(batch), out_file)
 
 
 if __name__ == "__main__":
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s — %(levelname)s — %(name)s — %(message)s",
+    )
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--out", type=str, default="ndrrmc")
     parser.add_argument("--start", type=int, default=0)
@@ -145,12 +138,13 @@ if __name__ == "__main__":
     file_conv = 0
     file_no = 89
     while file_conv < file_no:
+        log.info("Starting batch %d (offset %d)", index, args.start + file_conv)
 
         run(
             events=events,
             out_file=OUT_DIR+args.out+"-"+str(index)+".ttl", 
             start=args.start+file_conv, 
-            count=args.count, )
+            count=args.count)
 
         index+=1
         file_conv += 10

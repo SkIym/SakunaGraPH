@@ -18,6 +18,7 @@ Usage:
 
 from __future__ import annotations
 import argparse
+import logging
 import sys
 from datetime import datetime
 from pathlib import Path
@@ -41,26 +42,7 @@ from semantic_processing.event_resolver import (
 )
 
 
-class Tee:
-    """Mirrors all writes to sys.stdout into a log file simultaneously."""
-
-    def __init__(self, log_path: Path) -> None:
-        log_path.parent.mkdir(parents=True, exist_ok=True)
-        self._file = log_path.open("w", encoding="utf-8")
-        self._stdout = sys.stdout
-        sys.stdout = self
-
-    def write(self, data: str) -> None:
-        self._stdout.write(data)
-        self._file.write(data)
-
-    def flush(self) -> None:
-        self._stdout.flush()
-        self._file.flush()
-
-    def close(self) -> None:
-        sys.stdout = self._stdout
-        self._file.close()
+log = logging.getLogger(__name__)
 
 
 def make_log_path(logs_dir: str = LOGS_DIR) -> Path:
@@ -68,8 +50,22 @@ def make_log_path(logs_dir: str = LOGS_DIR) -> Path:
     return Path(logs_dir) / f"pipeline_{timestamp}.txt"
 
 
-def print_section(title: str) -> None:
-    print(f"\n{'─'*60}\n  {title}\n{'─'*60}")
+def setup_logging(log_path: Path) -> None:
+    log_path.parent.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s — %(levelname)s — %(message)s",
+        handlers=[
+            logging.FileHandler(log_path, encoding="utf-8"),
+            logging.StreamHandler(sys.stdout),
+        ],
+    )
+
+
+def log_section(title: str) -> None:
+    log.info("─" * 60)
+    log.info("  %s", title)
+    log.info("─" * 60)
 
 
 def run(
@@ -81,80 +77,97 @@ def run(
 ) -> None:
 
     log_path = make_log_path()
-    tee = Tee(log_path)
-    print(f"  Logging to: {log_path}")
+    setup_logging(log_path)
+    log.info("Logging to: %s", log_path)
+    log.info("=== Entity resolution pipeline start ===")
 
-    try:
-        # Stage 1: Extract
-        print_section("Stage 1 — Extract")
-        events = load_all_sources(Path(sources_dir))
-        print(f"  Total events loaded: {len(events)}")
+    # Stage 1: Extract
+    log_section("Stage 1 — Extract")
+    log.info("→ load_all_sources(%s)", sources_dir)
+    events = load_all_sources(Path(sources_dir))
+    log.info("✓ load_all_sources done — total events loaded: %d", len(events))
 
-        if len(events) < 2:
-            print("  Not enough events to run ER. Add source TTL files to sources/")
-            return
+    if len(events) < 2:
+        log.warning("Not enough events to run ER. Add source TTL files to sources/")
+        return
 
-        # Stage 2: Block
-        print_section("Stage 2 — Block")
-        pairs = generate_candidate_pairs(events)
-        stats = blocking_stats(events, pairs)
-        print(f"  Events:          {stats['total_events']}")
-        print(f"  Possible pairs:  {stats['total_possible_pairs']}")
-        print(f"  Candidate pairs: {stats['candidate_pairs']}")
-        print(f"  Reduction:       {stats['reduction_ratio']:.1%}")
+    # Stage 2: Block
+    log_section("Stage 2 — Block")
+    log.info("→ generate_candidate_pairs(%d events)", len(events))
+    pairs = generate_candidate_pairs(events)
+    log.info("✓ generate_candidate_pairs done — %d candidate pairs", len(pairs))
 
-        if incremental:
-            registry = load_registry(Path(REGISTRY_PATH))
-            known    = get_known_pairs(registry)
-            before   = len(pairs)
-            pairs    = [(a, b) for a, b in pairs if frozenset([a.uri, b.uri]) not in known]
-            print(f"  Incremental: skipped {before - len(pairs)} known pairs")
+    log.info("→ blocking_stats")
+    stats = blocking_stats(events, pairs)
+    log.info("✓ blocking_stats done")
+    log.info("  Events:          %d", stats["total_events"])
+    log.info("  Possible pairs:  %d", stats["total_possible_pairs"])
+    log.info("  Candidate pairs: %d", stats["candidate_pairs"])
+    log.info("  Reduction:       %.1f%%", stats["reduction_ratio"] * 100)
 
-        if not pairs:
-            print("No new candidate pairs to evaluate.")
-            return
+    if incremental:
+        log.info("→ load_registry(%s)", REGISTRY_PATH)
+        registry = load_registry(Path(REGISTRY_PATH))
+        log.info("✓ load_registry done")
 
-        # Stage 3: Score
-        print_section("Stage 3 — Score")
-        scored_pairs = score_all_pairs(pairs, verbose=verbose)
+        log.info("→ get_known_pairs")
+        known = get_known_pairs(registry)
+        log.info("✓ get_known_pairs done — %d known pairs", len(known))
 
-        if stats_only:
-            print("\n  (stats-only mode — no files written)")
-            return
+        before = len(pairs)
+        pairs = [(a, b) for a, b in pairs if frozenset([a.uri, b.uri]) not in known]
+        log.info("Incremental: skipped %d known pairs", before - len(pairs))
 
-        matches = [(a, b, sc) for a, b, sc in scored_pairs if sc.is_match]
-        if not matches:
-            print("\n  No matches found above threshold.")
-            return
+    if not pairs:
+        log.info("No new candidate pairs to evaluate.")
+        return
 
-        print("\n No. of event matches: ", len(matches))
+    # Stage 3: Score
+    log_section("Stage 3 — Score")
+    log.info("→ score_all_pairs(%d pairs, verbose=%s)", len(pairs), verbose)
+    scored_pairs = score_all_pairs(pairs, verbose=verbose)
+    log.info("✓ score_all_pairs done — %d scored pairs", len(scored_pairs))
 
-        # Stage 4: Align
-        print_section("Stage 4 — Align")
-        write_alignments(matches, Path(ALIGNMENTS_PATH))
-        clusters = build_clusters(matches)
-        save_registry(clusters, Path(REGISTRY_PATH))
+    if stats_only:
+        log.info("(stats-only mode — no files written)")
+        return
 
-        if skip_merge:
-            print("\n  (--skip-merge: stopping after alignment)")
-            return
+    matches = [(a, b, sc) for a, b, sc in scored_pairs if sc.is_match]
+    if not matches:
+        log.info("No matches found above threshold.")
+        return
 
-        # # Stage 5: Merge
-        # print_section("Stage 5 — Merge")
-        # merge_graphs(
-        #     sources_dir=Path(sources_dir),
-        #     alignments_path=Path(ALIGNMENTS_PATH),
-        #     output_path=Path(CANONICAL_PATH),
-        # )
+    log.info("No. of event matches: %d", len(matches))
 
-        # elapsed = time.time() - t0
-        # print(f"\nPipeline complete in {elapsed:.1f}s")
-        # print(f"  alignments.ttl -> {ALIGNMENTS_PATH}")
-        # print(f"  canonical.ttl  -> {CANONICAL_PATH}")
-        # print(f"  registry.json  -> {REGISTRY_PATH}")
+    # Stage 4: Align
+    log_section("Stage 4 — Align")
+    log.info("→ write_alignments(%d matches → %s)", len(matches), ALIGNMENTS_PATH)
+    write_alignments(matches, Path(ALIGNMENTS_PATH))
+    log.info("✓ write_alignments done")
 
-    finally:
-        tee.close()
+    log.info("→ build_clusters(%d matches)", len(matches))
+    clusters = build_clusters(matches)
+    log.info("✓ build_clusters done — %d clusters", len(clusters))
+
+    log.info("→ save_registry(%s)", REGISTRY_PATH)
+    save_registry(clusters, Path(REGISTRY_PATH))
+    log.info("✓ save_registry done")
+
+    if skip_merge:
+        log.info("(--skip-merge: stopping after alignment)")
+        return
+
+    # # Stage 5: Merge
+    # log_section("Stage 5 — Merge")
+    # log.info("→ merge_graphs")
+    # merge_graphs(
+    #     sources_dir=Path(sources_dir),
+    #     alignments_path=Path(ALIGNMENTS_PATH),
+    #     output_path=Path(CANONICAL_PATH),
+    # )
+    # log.info("✓ merge_graphs done")
+
+    log.info("=== Entity resolution pipeline complete ===")
 
 
 if __name__ == "__main__":
