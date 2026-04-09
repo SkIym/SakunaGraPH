@@ -274,7 +274,7 @@ DASH = r"[-–—]"
 NULL_VALUES = ["","-", "Not applicable", "n.a.", "Not indicated", np.nan, pd.NA]
 
 
-def _row_id(row: pd.Series) -> str:
+def _event_id(row: pd.Series) -> str:
     key = "|".join([
         str(row.get("eventName") or ""),
         str(row.get("startDate")  or ""),
@@ -526,7 +526,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
 
     df["totallyDamagedHouses"] = df["totallyDamagedHouses"].astype(float).astype("Int64")
 
-    df["id"] = df.apply(_row_id, axis=1)
+    df["id"] = df.apply(_event_id, axis=1)
 
     # general damage amount values if no other were reported (exclude totals)
     cols = ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
