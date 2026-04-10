@@ -8,6 +8,7 @@ from mappings.dromic import Event, event_mapping
 from transform.dromic import load_events
 from mappings.graph import create_graph
 import os
+import time
 
 DATA_DIR = "../data/parsed/dromic/"
 OUT_DIR = "../data/rdf/events/"
@@ -16,6 +17,7 @@ def process_event(args: Tuple[str, Event]) -> Graph:
     data_dir, ev = args
     g = create_graph()
     event_mapping(g, ev)
+
     return g
 
 
@@ -26,13 +28,16 @@ def run(events: List[Event],sub_data_dir: str, out_file: str, start: int = 0, co
 
     print(f"Processing events {start} → {start + len(batch)}")
 
-    with ProcessPoolExecutor() as executor:
-        futures = [
-            executor.submit(process_event, (sub_data_dir, ev))
-            for ev in batch
-        ]
-        for future in as_completed(futures):
-            main_graph += future.result()
+    for ev in batch:
+        main_graph += process_event((sub_data_dir, ev))
+
+    # with ProcessPoolExecutor() as executor:
+    #     futures = [
+    #         executor.submit(process_event, (sub_data_dir, ev))
+    #         for ev in batch
+    #     ]
+    #     for future in as_completed(futures):
+    #         main_graph += future.result()
 
     main_graph.serialize(destination=out_file, format="turtle")
     print(f"Serialized {len(batch)} events → {out_file}")

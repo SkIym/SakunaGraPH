@@ -98,18 +98,21 @@ def run(events: List[Event], out_file: str, start: int = 0, count: int | None = 
 
     log.info("Step 2/3: Processing events %d → %d (batch size %d)", start, start + len(batch), len(batch))
 
-    with ProcessPoolExecutor() as executor:
-        futures = [
-            executor.submit(process_event, (DATA_DIR, ev))
-            for ev in batch
-        ]
+    for ev in batch:
+        main_graph += process_event((DATA_DIR, ev))
 
-        completed = 0
-        for future in as_completed(futures):
-            subgraph = future.result()
-            main_graph += subgraph
-            completed += 1
-            log.info("Merged subgraph %d/%d (main graph now %d triples)", completed, len(batch), len(main_graph))
+    # with ProcessPoolExecutor() as executor:
+    #     futures = [
+    #         executor.submit(process_event, (DATA_DIR, ev))
+    #         for ev in batch
+    #     ]
+
+    #     completed = 0
+    #     for future in as_completed(futures):
+    #         subgraph = future.result()
+    #         main_graph += subgraph
+    #         completed += 1
+    #         log.info("Merged subgraph %d/%d (main graph now %d triples)", completed, len(batch), len(main_graph))
 
     log.info("Step 3/3: Serializing main graph to %s", out_file)
     main_graph.serialize(
