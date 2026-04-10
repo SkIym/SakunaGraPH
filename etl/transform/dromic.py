@@ -11,30 +11,27 @@ import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 import uuid
 from datetime import datetime
+import re
 
 def _event_id(event_name: str, start_date: str | None) -> str:
     """Deterministic hex ID from event name + start date."""
     key = f"{event_name.strip().lower()}:{start_date or ''}"
     return uuid.uuid5(DROMIC_EVENT_NS, key).hex
 
-def _add_commas(location: str) -> str:
-    words = location.split(" ")
-    result: list[str] = []
-    commas = 0
-    i = 0
-    while i < len(words):
-        word = words[i]
-        # treat "Brgy." and the next word as one token
-        if word == "Brgy." and i + 1 < len(words):
-            result.append(f"{word} {words[i+1]}")
-            i += 2
-            continue
-        if result and commas < 2:
-            result[-1] += ","
-            commas += 1
-        result.append(word)
-        i += 1
-    return " ".join(result)
+def _extract_barangay(text: str) -> str | None:
+    """
+    Extracts the barangay name from strings like:
+      "Brgy. Proper, Calamba, Laguna"
+      "Barangay Holy Spirit, Quezon City"
+      "Bgy. Commonwealth, QC"
+    
+    Returns the raw barangay name (e.g. "Proper"), or None if not found.
+    """
+    pattern = r'(?:Barangay|Brgy\.?|Bgy\.?)\s+([^,]+)'
+    match = re.search(pattern, text, re.IGNORECASE)
+    if match:
+        return match.group(1).strip()
+    return None
 
 def load_events(folder_path: str) -> List[Event]:
     
@@ -62,18 +59,19 @@ def load_events(folder_path: str) -> List[Event]:
         # if location is explicit add, if not, tag through impact (outside)
         hasLocation = ""
         if location and location != "":
-            hasLocation = "|".join(LOCATION_MATCHER.match_cell(_add_commas(location)))
+            hasLocation = "|".join(LOCATION_MATCHER.match_cell(location))
 
-        if not meta["startDate"]:
-            print('Missing dates in metadata.json: ', event_name)
+        # if not meta["startDate"]:
+        #     print('Missing dates in metadata.json: ', event_name)
 
         events.append(Event(
             id=_event_id(event_name, meta.get("startDate")),
             eventName=event_name,
-            startDate=datetime.fromisoformat(meta["startDate"]),
-            endDate=datetime.fromisoformat(meta["endDate"]),
+            startDate=datetime.fromisoformat(meta["startDate"]) if meta["startDate"] else None,
+            endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
             remarks=remarks,
             hasDisasterType=pred,
+            hasBarangay=_extract_barangay(location) if location else None,
             hasLocation=URIRef(str(hasLocation)) if hasLocation else None
         ))
 

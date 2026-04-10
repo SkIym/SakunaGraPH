@@ -13,11 +13,12 @@ from .graph import CUR, SKG, Graph, PROV, add_monetary
 class Event:
     eventName: str
     hasDisasterType: str
-    startDate: datetime
-    endDate: datetime
+    startDate: datetime | None
+    endDate: datetime | None
     id: str
     remarks: str
-    hasLocation: URIRef | None   # events can be incidents or 
+    hasBarangay: str | None
+    hasLocation: URIRef | None   # events can be disaggregated
 
 
 INCIDENT_MARKERS = ["incident", "conflict", "disorganization"]
