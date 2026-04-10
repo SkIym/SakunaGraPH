@@ -7,6 +7,15 @@ FUZZ_THRESHOLD_REGION = 85
 FUZZ_THRESHOLD_PROVINCE = 85
 FUZZ_THRESHOLD_MUNI = 60
 
+_ABBREV_MAP = {
+    r'\bsta\.?': 'santa',
+    r'\bsto\.?': 'santo',
+    r'\bgen\.?': 'general',
+    r'\bbrgy\.?': 'barangay',
+    r'\bpob\.?': 'poblacion',
+    r'\bpurok\.?': 'purok',
+    r'\bmt\.?': 'mount',
+}
 
 class LocationMatcher:
     def __init__(self, graph_path: str):
@@ -201,6 +210,11 @@ class LocationMatcher:
 
             return closest_match if highest_score >= threshold else None
 
+    def _normalize(self, label: str) -> str:
+        label = label.lower().strip()
+        for pattern, replacement in _ABBREV_MAP.items():
+            label = re.sub(pattern, replacement, label, flags=re.IGNORECASE)
+        return label
     # --------------------------------------------------
     # Region-scoped municipality lookup
     # --------------------------------------------------
@@ -258,7 +272,7 @@ class LocationMatcher:
         Matches region. Returns loc if found, else none.
         
         """
-        label = label.lower()
+        label = self._normalize(label)
 
         if label in self.region_map:
             return self.base + self.region_map[label]
@@ -278,7 +292,8 @@ class LocationMatcher:
         Matches province. Returns loc if found, else none.
         
         """
-        label = label.lower()
+        label = self._normalize(label)
+
         if label in self.provinces:
             return self.provinces[label]
 
@@ -295,7 +310,8 @@ class LocationMatcher:
         Returns loc if found, else none.
         
         """
-        label = label.lower()
+        label = self._normalize(label)
+        
         candidate = label.split(" (")[0].strip()
         city = candidate + " city"
         city_of = "city of " + city.replace(" city", "")
@@ -358,7 +374,7 @@ class LocationMatcher:
                     continue
 
                 muni_iri = self.match_municipality(highest, None)
-                matched.append(muni_iri if muni_iri else highest)
+                matched.append(muni_iri if muni_iri else "")
                 continue
 
             # Multi-tier: try highest as region
