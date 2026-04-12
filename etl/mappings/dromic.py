@@ -4,7 +4,7 @@ from rdflib import URIRef, Literal, RDFS
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
-from .iris import event_uri
+from .iris import event_uri, prov_iri
 from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import CUR, SKG, Graph, PROV, add_monetary
 
@@ -20,8 +20,15 @@ class Event:
     hasBarangay: str | None
     hasLocation: URIRef | None   # events can be disaggregated
 
+@dataclass
+class Provenance:
+    lastUpdateDate: datetime | None
+    reportName: str
+    reportLink: str | None
+    obtainedDate: str | None
 
-INCIDENT_MARKERS = ["incident", "conflict", "disorganization"]
+
+INCIDENT_MARKERS = ["incident", "conflict",  "disorganization"]
 # rule-based incident v major event resolution
 def _is_incident_by_name(name: str) -> bool:
 
@@ -56,3 +63,23 @@ def event_mapping(g: Graph, ev: Event) -> URIRef:
 
 
     return uri
+
+def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
+    uri = prov_iri(prov.reportName)
+
+    g.add((uri, RDF.type, SKG.Source))
+    g.add((event_iri, PROV.wasDerivedFrom, uri))
+
+    file_format = prov.reportName[prov.reportName.rfind('.') + 1:] 
+
+    g.add((uri, SKG["format"], Literal(file_format)))
+
+    for f in fields(prov):
+
+        value = getattr(prov, f.name)
+        if value is None: continue
+
+        if f.type == datetime:
+            g.add((uri, getattr(SKG, f.name), Literal(value, datatype=XSD.dateTime)))
+        else:
+            g.add((uri, getattr(SKG, f.name), Literal(value)))

@@ -5,7 +5,7 @@ from typing import List
 from rdflib import URIRef
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import Event
+from mappings.dromic import Event, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
@@ -33,46 +33,50 @@ def _extract_barangay(text: str) -> str | None:
         return match.group(1).strip()
     return None
 
-def load_events(folder_path: str) -> List[Event]:
+def load_event(file_path: str) -> Event:
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        meta: dict[str, str] = json.load(f)
+
+    event_name = meta.get("eventName", "") 
+    remarks = meta.get("remarks", "") 
+    pred, _ = DISASTER_CLASSIFIER.classify(
+        [event_name + remarks]
+    )[0]
+
+    location = meta.get("location", None)
+
+    # if location is explicit add, if not, tag through impact (outside)
+    hasLocation = ""
+    if location and location != "":
+        hasLocation = "|".join(LOCATION_MATCHER.match_cell(location))
+
+    # if not meta["startDate"]:
+    #     print('Missing dates in metadata.json: ', event_name)
+
+    event = Event(
+        id=_event_id(event_name, meta.get("startDate")),
+        eventName=event_name,
+        startDate=datetime.fromisoformat(meta["startDate"]) if meta["startDate"] else None,
+        endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
+        remarks=remarks,
+        hasDisasterType=pred,
+        hasBarangay=_extract_barangay(location) if location else None,
+        hasLocation=URIRef(str(hasLocation)) if hasLocation else None
+    )
+
+    return event
+
+def load_provenance(file_path: str) -> Provenance:
+
+    with open(file_path, "r", encoding="utf-8") as f:
+        src: dict[str, str] = json.load(f)
+
+    if not src["lastUpdateDate"]: print("Missing last update date on file: ", src["reportName"])
     
-    events: List[Event] = []
-
-    for folder in next(os.walk(folder_path))[1]:
-        meta_path = os.path.join(folder_path, folder, "metadata.json")
-
-        if not os.path.exists(meta_path):
-            continue
-
-        with open(meta_path, "r", encoding="utf-8") as f:
-            meta: dict[str, str] = json.load(f)
-
-  
-        event_name = meta.get("eventName", folder)
-        remarks = meta.get("remarks") or ""
-        pred, _ = DISASTER_CLASSIFIER.classify(
-            [event_name + remarks]
-        )[0]
-
-        location = meta.get("location", None)
-
-        
-        # if location is explicit add, if not, tag through impact (outside)
-        hasLocation = ""
-        if location and location != "":
-            hasLocation = "|".join(LOCATION_MATCHER.match_cell(location))
-
-        # if not meta["startDate"]:
-        #     print('Missing dates in metadata.json: ', event_name)
-
-        events.append(Event(
-            id=_event_id(event_name, meta.get("startDate")),
-            eventName=event_name,
-            startDate=datetime.fromisoformat(meta["startDate"]) if meta["startDate"] else None,
-            endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
-            remarks=remarks,
-            hasDisasterType=pred,
-            hasBarangay=_extract_barangay(location) if location else None,
-            hasLocation=URIRef(str(hasLocation)) if hasLocation else None
-        ))
-
-    return events
+    return Provenance(
+        lastUpdateDate=datetime.fromisoformat(src['lastUpdateDate']) if src['lastUpdateDate'] else None,
+        reportLink=src.get("reportLink"),
+        reportName=src.get("reportName", ""),
+        obtainedDate=src.get("obtainedDate"),
+    )

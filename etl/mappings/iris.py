@@ -30,6 +30,8 @@ def prov_iri(report: str) -> URIRef:
                       .replace(" ", "_")
                       .replace(".pdf", "")
                       .replace(".xlsx", "")
+                      .replace(".docx", "")
+                      .replace(".", "")
                       .replace("-", "")])
 
 def sub_iri(event_id: URIRef, segment: str, r_id: str | None = None) -> URIRef:
