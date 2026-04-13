@@ -1,17 +1,19 @@
 
 
-from typing import List
+from typing import Iterable, List
 
 from rdflib import URIRef
+from transform.ndrrmc import load_csv_df
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import Event, Provenance
+from mappings.dromic import AFF_POP_COL_MAP, AffectedPopulation, Event, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 import uuid
 from datetime import datetime
 import re
+import polars as pl
 
 def _event_id(event_name: str, start_date: str | None) -> str:
     """Deterministic hex ID from event name + start date."""
@@ -32,6 +34,7 @@ def _extract_barangay(text: str) -> str | None:
     if match:
         return match.group(1).strip()
     return None
+
 
 def load_event(file_path: str) -> Event:
 
@@ -80,3 +83,39 @@ def load_provenance(file_path: str) -> Provenance:
         reportName=src.get("reportName", ""),
         obtainedDate=src.get("obtainedDate"),
     )
+
+def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
+
+    src_paths: List[str] = []
+
+    for file in os.listdir(folder_path):
+        if "affected" in file and file.endswith(".csv"):
+            src_paths.append(os.path.join(folder_path, file))
+            continue
+
+        if (
+            "total" in file
+            and any(k in file for k in ("displaced", "served"))
+            and file.endswith(".csv")
+        ):
+            src_paths.append(os.path.join(folder_path, file))
+        elif ("displaced" in file):
+            src_paths.append(os.path.join(folder_path, file))
+
+    
+    if len(src_paths) == 0: return None
+
+    dfs: Iterable[pl.DataFrame] = []
+
+    index = 1
+
+    for src_path in src_paths:
+        df = load_csv_df(
+            src_path,
+            mapping=AFF_POP_COL_MAP,
+            
+        )
+
+    # find a csv with "total" and "displaced" or "served" first
+    # if found proceed,
+    # else, find csvs with "displaced"
