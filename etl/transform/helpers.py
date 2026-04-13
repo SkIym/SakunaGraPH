@@ -27,6 +27,7 @@ def load_csv_df(
     collapse_key: str | None = None,
     replace_ws: bool = False,
     match_location: bool = True,
+    correct_QTY_Barangay: bool = True,
     schema_overrides: Mapping[str, pl.DataType] | None = None,
     move_values: MoveArg | None = None
 ) -> pl.DataFrame:
@@ -37,7 +38,9 @@ def load_csv_df(
     
     df = df.filter()
 
-    df = correct_QTY_Barangay_column(df)
+    if correct_QTY_Barangay:
+
+        df = correct_QTY_Barangay_column(df)
 
     if replace_ws:
         df = replace_column_whitespace_with_underscore(df)
@@ -50,8 +53,11 @@ def load_csv_df(
     else:
         df = move_col_values(df, MoveArg(source_col="Summary_Type", dest_col="City_Muni", remain=None))
 
-    if target_cols and collapse_on and collapse_key:
-        df = forward_fill_and_collapse(df, target_cols, collapse_on, collapse_key)
+    if target_cols:
+        df = forward_fill(df, target_cols)
+
+    if collapse_on and collapse_key:
+        df = collapse(df, collapse_on, collapse_key)
 
     if match_location:
         locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
@@ -97,36 +103,27 @@ def df_to_entities(df: pl.DataFrame, cls: Type[T]) -> list[T]:
 #     dfs = [load_csv_df(p, **df_kwargs) for p in paths]
 #     return pl.concat(dfs, rechunk=True)
 
-def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, baseline_col: str) -> DataFrame:
+def forward_fill(df: DataFrame, cols: list[str]) -> DataFrame:
     """
-    Forward fill location values and collapse rows down only to most granular and detailed level
+    Forward fill specified columns.
 
-    :param cols: list of columns to forward fill
-    :type cols: list[str]
-    :param none_col: column that should be none 
+    :param cols: columns to forward fill
+    """
+    return df.with_columns([
+        pl.col(c).forward_fill() for c in cols
+    ])
+
+
+def collapse(df: DataFrame, none_col: str, baseline_col: str) -> DataFrame:
+    """
+    Collapse rows down to the most granular level and clean breakdown labels.
+
+    :param none_col: column that should be null after collapse
     :param baseline_col: column that dictates the identity of the entry
     """
-
-    # Move erratic municities placement
-    # if "Summary_Type" in df.columns:
-
-    #     df = df.filter(pl.col("Summary_Type") != "GRAND TOTAL")
-    #     df = df.with_columns([
-    #         pl.coalesce(["City_Muni", "Summary_Type"]).alias("City_Muni"),
-    #     ])
-    
-    # 1. Forward fill specified columns
-    # 2. Filter out rows where Column_1 is null AND Column_2 > 0
-    df = (
-        df.with_columns([
-            pl.col(c).forward_fill() for c in cols
-        ])
-        .filter(
-            ((pl.col(none_col).is_null()) & (pl.col(baseline_col).is_not_null()))
-        )
+    df = df.filter(
+        (pl.col(none_col).is_null()) & (pl.col(baseline_col).is_not_null())
     )
-
-    # set no breakdown to null
 
     df = df.with_columns([
         pl.when(pl.col(c).str.contains_any(["breakdown"], ascii_case_insensitive=True))
@@ -136,8 +133,13 @@ def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, bas
         for c in ["City_Muni", "Province"]
     ])
 
-    # output_path = os.path.join(folder_path, "ffilled.csv")
+    return df
 
+
+def forward_fill_and_collapse(df: DataFrame, cols: list[str], none_col: str, baseline_col: str) -> DataFrame:
+    """Kept for backwards compatibility."""
+    df = forward_fill(df, cols)
+    df = collapse(df, none_col, baseline_col)
     return df
 
 def event_name_expander(name: str) -> str:

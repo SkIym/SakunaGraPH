@@ -3,7 +3,7 @@
 from typing import Iterable, List
 
 from rdflib import URIRef
-from transform.ndrrmc import load_csv_df
+from transform.helpers import df_to_entities, to_int, load_csv_df
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
 from mappings.dromic import AFF_POP_COL_MAP, AffectedPopulation, Event, Provenance
@@ -20,20 +20,21 @@ def _event_id(event_name: str, start_date: str | None) -> str:
     key = f"{event_name.strip().lower()}:{start_date or ''}"
     return uuid.uuid5(DROMIC_EVENT_NS, key).hex
 
-def _extract_barangay(text: str) -> str | None:
+def _extract_barangay(text: str) -> tuple[str | None, str]:
     """
-    Extracts the barangay name from strings like:
+    Extracts the barangay name and the remaining string from strings like:
       "Brgy. Proper, Calamba, Laguna"
       "Barangay Holy Spirit, Quezon City"
       "Bgy. Commonwealth, QC"
     
-    Returns the raw barangay name (e.g. "Proper"), or None if not found.
+    Returns (barangay_name, remaining) e.g. ("Proper", "Calamba, Laguna"),
+    or None if not found.
     """
-    pattern = r'(?:Barangay|Brgy\.?|Bgy\.?)\s+([^,]+)'
+    pattern = r'(?:Barangay|Brgy\.?|Bgy\.?)\s+([^,]+),?\s*(.*)'
     match = re.search(pattern, text, re.IGNORECASE)
     if match:
-        return match.group(1).strip()
-    return None
+        return match.group(1).strip(), match.group(2).strip()
+    return (None, text)
 
 
 def load_event(file_path: str) -> Event:
@@ -49,9 +50,12 @@ def load_event(file_path: str) -> Event:
 
     location = meta.get("location", None)
 
+
     # if location is explicit add, if not, tag through impact (outside)
     hasLocation = ""
+    hasBarangay = ""
     if location and location != "":
+        (hasBarangay, location) = _extract_barangay(location)
         hasLocation = "|".join(LOCATION_MATCHER.match_cell(location))
 
     # if not meta["startDate"]:
@@ -64,7 +68,7 @@ def load_event(file_path: str) -> Event:
         endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
         remarks=remarks,
         hasDisasterType=pred,
-        hasBarangay=_extract_barangay(location) if location else None,
+        hasBarangay=hasBarangay if hasBarangay else None,
         hasLocation=URIRef(str(hasLocation)) if hasLocation else None
     )
 
@@ -75,7 +79,7 @@ def load_provenance(file_path: str) -> Provenance:
     with open(file_path, "r", encoding="utf-8") as f:
         src: dict[str, str] = json.load(f)
 
-    if not src["lastUpdateDate"]: print("Missing last update date on file: ", src["reportName"])
+    # if not src["lastUpdateDate"]: print("Missing last update date on file: ", src["reportName"])
     
     return Provenance(
         lastUpdateDate=datetime.fromisoformat(src['lastUpdateDate']) if src['lastUpdateDate'] else None,
@@ -88,34 +92,77 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
 
     src_paths: List[str] = []
 
-    for file in os.listdir(folder_path):
-        if "affected" in file and file.endswith(".csv"):
+    files = os.listdir(folder_path)
+
+    # Check if a total displaced/served file exists anywhere
+    has_total_displaced = any(
+        "total" in f and any(k in f for k in ("displaced", "served")) and f.endswith(".csv")
+        for f in files
+    )
+
+    for file in files:
+        if "affected" in file and "number" in file and file.endswith(".csv"):
             src_paths.append(os.path.join(folder_path, file))
             continue
 
-        if (
-            "total" in file
-            and any(k in file for k in ("displaced", "served"))
-            and file.endswith(".csv")
-        ):
+        if "total" in file and any(k in file for k in ("displaced", "served")) and file.endswith(".csv"):
             src_paths.append(os.path.join(folder_path, file))
-        elif ("displaced" in file):
+        elif "displaced" in file and not has_total_displaced:
             src_paths.append(os.path.join(folder_path, file))
 
     
     if len(src_paths) == 0: return None
 
+    
     dfs: Iterable[pl.DataFrame] = []
-
     index = 1
-
     for src_path in src_paths:
+        print("Loading aff pop for: ", src_path)
         df = load_csv_df(
             src_path,
             mapping=AFF_POP_COL_MAP,
-            
+            target_cols=["Region", "Province"],
+            collapse_on="Summary_Type",
+            collapse_key="City_Muni",
+            match_location=True,
+            correct_QTY_Barangay=False
         )
 
-    # find a csv with "total" and "displaced" or "served" first
-    # if found proceed,
-    # else, find csvs with "displaced"
+        df = to_int(df, ["affectedFamilies", "affectedPersons", "affectedBarangays", "displacedFamilies", "displacedPersons", "displacedFamiliesI", "displacedPersonsI", "displacedFamiliesO", "displacedPersonsO"])
+
+        dfs.append(df)
+        index += 1
+
+    # combine all dfs on hasLocation
+    try:
+        combined = dfs[0]
+        for df in dfs[1:]:
+            shared_cols = [c for c in df.columns if c in combined.columns and c != "hasLocation"]
+            combined = combined.join(df.drop(shared_cols), on="hasLocation", how="full", coalesce=True)
+    except pl.exceptions.SchemaError:
+        return None
+
+    # resolve O + I into displacedFamilies / displacedPersons only if no total displaced file
+    if not has_total_displaced:
+        fam_cols = [c for c in ["displacedFamiliesO", "displacedFamiliesI"] if c in combined.columns]
+        per_cols = [c for c in ["displacedPersonsO", "displacedPersonsI"] if c in combined.columns]
+        drop_cols = fam_cols + per_cols
+
+        exprs: List[pl.Expr] = []
+        if fam_cols:
+            exprs.append(pl.sum_horizontal([pl.col(c).fill_null(0) for c in fam_cols]).alias("displacedFamilies"))
+        if per_cols:
+            exprs.append(pl.sum_horizontal([pl.col(c).fill_null(0) for c in per_cols]).alias("displacedPersons"))
+        
+        if exprs:
+            combined = combined.with_columns(exprs).drop(drop_cols)
+    
+    if len(combined) > 1: 
+        combined = combined.with_row_index("id", 1)
+
+    combined.write_csv(f"./dump/combined.csv")
+
+    return df_to_entities(combined, AffectedPopulation)
+
+if __name__ == "__main__":
+    load_aff_pop("../data/parsed/dromic/2022/Armed Conflict in Bislig City Surigao Del Sur 2022")

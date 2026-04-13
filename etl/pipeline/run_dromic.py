@@ -4,8 +4,8 @@ from typing import List, Tuple
 
 from rdflib import Graph
 
-from mappings.dromic import Event, event_mapping, prov_mapping
-from transform.dromic import load_event, load_provenance
+from mappings.dromic import Event, aff_pop_mapping, event_mapping, prov_mapping
+from transform.dromic import load_aff_pop, load_event, load_provenance
 from mappings.graph import create_graph
 import os
 import time
@@ -24,6 +24,10 @@ def process_event(folder_path: str) -> Graph:
     prov = load_provenance(os.path.join(folder_path, "source.json"))
     
     prov_mapping(g, prov, event_iri)
+
+    aps = load_aff_pop(folder_path)
+    if aps:
+        aff_pop_mapping(g, aps, event_iri)
 
 
     return g
@@ -45,7 +49,7 @@ def run(sub_data_dir: str, out_file: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--year", type=str)
+    parser.add_argument("--year", type=str, required=True)
     parser.add_argument("--out", type=str, default="dromic")
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--count", type=int, default=50)
