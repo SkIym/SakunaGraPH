@@ -6,7 +6,7 @@ from rdflib import URIRef
 from transform.helpers import df_to_entities, to_int, load_csv_df
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import AFF_POP_COL_MAP, AffectedPopulation, Event, Provenance
+from mappings.dromic import AFF_POP_COL_MAP, HOUSES_MAPPING, AffectedPopulation, Event, Housing, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
@@ -163,6 +163,31 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
     combined.write_csv(f"./dump/combined.csv")
 
     return df_to_entities(combined, AffectedPopulation)
+
+def load_housing(folder_path: str) -> List[Housing] | None:
+
+    src_path = next(
+        (
+            os.path.join(folder_path, f)
+            for f in os.listdir(folder_path)
+            if "house" in f.lower() and f.endswith(".csv")
+        ),
+        None,
+    )
+
+    if not src_path:
+        return None
+    
+    df = load_csv_df(
+        src_path,
+        mapping=HOUSES_MAPPING,
+        target_cols=["Region", "Province"],
+        collapse_on="Summary_Type",
+        collapse_key="City_Muni",
+        match_location=True,
+        correct_QTY_Barangay=False,
+    )
+
 
 if __name__ == "__main__":
     load_aff_pop("../data/parsed/dromic/2022/Armed Conflict in Bislig City Surigao Del Sur 2022")

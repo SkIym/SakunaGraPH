@@ -4,7 +4,7 @@ from rdflib import URIRef, Literal, RDFS
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
-from .iris import aff_pop_iri, event_uri, prov_iri
+from .iris import aff_pop_iri, event_uri, housing_iri, prov_iri
 from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import CUR, SKG, Graph, PROV, add_monetary
 
@@ -37,6 +37,14 @@ class AffectedPopulation:
     displacedPersons: int
     hasLocation: URIRef
 
+@dataclass
+class Housing:
+    id: str
+    hasLocation: URIRef
+    totallyDamagedHouses: int
+    partiallyDamagedHouses: int
+
+
 AFF_POP_COL_MAP = {
     "NUMBER_OF_EVACUATION_CENTERS_ECs_CUM" : "evacuationCenters", # should be in Preemptive Evac
     "NUMBER_OF_DISPLACED_INSIDE_ECs_Families_CUM": "displacedFamiliesI",
@@ -52,11 +60,19 @@ AFF_POP_COL_MAP = {
     "TOTAL_DISPLACED_SERVED_Persons_Total_Persons_CUM": "displacedPersons",
     "TOTAL_DISPLACED_SERVED_Persons_REGION_PROVINCE_MUNICIPALITY_Total_Persons_CUM": "displacedPersons",
     "NUMBER_OF_DISPLACED_TOTAL_Persons_CUM": "displacedPersons",
-    # "REGION_PROVINCE_MUNICIPALITY": "affectedBarangays",
+    "NUMBER_OF_AFFECTED_Barangays": "affectedBarangays",
     "NUMBER_OF_AFFECTED_Families": "affectedFamilies",
     "NUMBER_OF_AFFECTED_Persons": "affectedPersons",
     "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Families_CUM": "displacedFamiliesO",
     "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Persons_CUM": "displacedPersonsO"
+}
+
+HOUSES_MAPPING = {
+    "NO_OF_DAMAGED_HOUSES_REGION_PROVINCE_MUNICIPALITY_Totally": "totallyDamagedHouses",
+    "NO_OF_DAMAGED_HOUSES_Totally": "totallyDamagedHouses",
+    "NO_OF_DAMAGED_HOUSES_REGION_PROVINCE_MUNICIPALITY_Partially": "partiallyDamagedHouses",
+    "NO_OF_DAMAGED_HOUSES_Partially": "partiallyDamagedHouses",
+
 }
 
 INCIDENT_MARKERS = ["incident", "conflict",  "disorganization"]
@@ -133,6 +149,26 @@ def  aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef)
             if f.name == "affectedBarangays" and value > 1:
                 g.add((uri, SKG.affectedBarangays, Literal(value, datatype=XSD.int)))
             elif f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(str(value))))
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value)))
+
+def housing_mapping(g: Graph, hs: List[Housing], event_iri: URIRef):
+
+    for h in hs:
+        uri = housing_iri(event_iri, h.id)
+        
+        g.add((uri, RDF.type, SKG.HousingDamage))
+        g.add((event_iri, SKG.hasHousingDamage, uri))
+
+        for f in fields(h):
+
+            if f.name == "id": continue
+
+            value = getattr(h, f.name)
+            if value is None: continue
+
+            if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))

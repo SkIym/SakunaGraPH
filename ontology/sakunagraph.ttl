@@ -3083,7 +3083,7 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                        :DisasterType ;
               skos:broader :Storm ;
               skos:inScheme :DisasterTypeScheme ;
-              skos:definition "Storm general: Can be storms brought by monsoons (southwest monsoons) and shear lines." ;
+              skos:definition "Storm general: Can be storms brought by monsoons (southwest or northeast monsoons), low pressure areas and shear lines that can bring effects like flooding, flashfloods, thunderstorms, and heavy rains." ;
               skos:prefLabel "Storm (General)"@en .
 
 
