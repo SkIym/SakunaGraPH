@@ -31,6 +31,8 @@
     "PNRC": ["PNRC", "PRC", "Philippine Red Cross", "Philippine National Red Cross"],
     "ICRC": ["ICRC", "International Committee of the Red Cross"],
 
+    "NGO": ["NGO", "ngo" ],
+
     "UN": ["UN", "United Nations"],
     "UNICEF": ["UNICEF"],
     "WHO": ["WHO", "World Health Organization"],
@@ -51,5 +53,8 @@
     "NPC": ["NPC", "National Power Corporation"],
     "MWSS": ["MWSS"],
     "LWUA": ["LWUA"],
-    "NTC": ["NTC", "National Telecommunications Commission"]
+    "NTC": ["NTC", "National Telecommunications Commission"],
+
+
+    "Unspecified": ["unspecified", "others"]
 }
