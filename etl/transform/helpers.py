@@ -54,6 +54,9 @@ def load_csv_df(
         df = move_col_values(df, MoveArg(source_col="Summary_Type", dest_col="City_Muni", remain=None))
 
     if target_cols:
+        df = df.with_columns(
+            pl.col("Province").replace("Province", None)
+        )
         df = forward_fill(df, target_cols)
 
     if collapse_on and collapse_key:
@@ -285,7 +288,9 @@ def to_million_php(df: DataFrame, cols: list[str]):
             .cast(pl.Utf8, strict=False)
             .str.replace_all(",", "")
             .str.replace_all(" ", "")
+            .str.replace_all("-", "")
             .str.replace_all(r"[^0-9.\-]", "")
+            .replace("", None) 
             .cast(pl.Float64)
             / 1000000)
         .round(6)
@@ -366,6 +371,42 @@ def move_col_values(df: DataFrame, arg: MoveArg) -> DataFrame:
         )
 
     return df
+
+
+def normalize_columns(
+    df: pl.DataFrame,
+    token_map: dict[str, str],
+) -> pl.DataFrame:
+    """
+    Rename DataFrame columns by detecting tokens as substrings of column names.
+
+    Args:
+        df:        Input Polars DataFrame.
+        token_map: Maps search tokens (substrings to detect) to canonical names.
+                   e.g. {"DSWD": "dswd", "LGU": "lgu"}
+
+    Raises:
+        ValueError: If a column matches more than one token.
+    """
+    rename_map: dict[str, str] = {}
+
+    for col in df.columns:
+        col_upper = col.upper()
+        matches = [
+            canonical
+            for token, canonical in token_map.items()
+            if token.upper() in col_upper
+        ]
+
+        if len(matches) > 1:
+            raise ValueError(
+                f"Column '{col}' matched multiple tokens: {matches}. "
+                "Resolve ambiguity in token_map."
+            )
+        elif len(matches) == 1:
+            rename_map[col] = matches[0]
+
+    return df.rename(rename_map)
 
 # if __name__ == "__main__":
 #     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"

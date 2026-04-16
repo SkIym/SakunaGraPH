@@ -4,7 +4,7 @@ from rdflib import URIRef, Literal, RDFS
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
-from .iris import aff_pop_iri, event_uri, housing_iri, prov_iri
+from .iris import aff_pop_iri, assistance_iri, event_uri, housing_iri, prov_iri
 from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import CUR, SKG, Graph, PROV, add_monetary
 
@@ -37,13 +37,6 @@ class AffectedPopulation:
     displacedPersons: int
     hasLocation: URIRef
 
-@dataclass
-class Housing:
-    id: str
-    hasLocation: URIRef
-    totallyDamagedHouses: int
-    partiallyDamagedHouses: int
-
 
 AFF_POP_COL_MAP = {
     "NUMBER_OF_EVACUATION_CENTERS_ECs_CUM" : "evacuationCenters", # should be in Preemptive Evac
@@ -67,12 +60,33 @@ AFF_POP_COL_MAP = {
     "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Persons_CUM": "displacedPersonsO"
 }
 
+@dataclass
+class Housing:
+    id: str
+    hasLocation: URIRef
+    totallyDamagedHouses: int 
+    partiallyDamagedHouses: int
+
 HOUSES_MAPPING = {
     "NO_OF_DAMAGED_HOUSES_REGION_PROVINCE_MUNICIPALITY_Totally": "totallyDamagedHouses",
     "NO_OF_DAMAGED_HOUSES_Totally": "totallyDamagedHouses",
     "NO_OF_DAMAGED_HOUSES_REGION_PROVINCE_MUNICIPALITY_Partially": "partiallyDamagedHouses",
     "NO_OF_DAMAGED_HOUSES_Partially": "partiallyDamagedHouses",
 
+}
+
+@dataclass
+class Assistance:
+    id: str
+    hasLocation: URIRef
+    contributingOrg: URIRef
+    contributionAmount: float
+
+ASSISTANCE_TOKENS = {
+    "DSWD": "dswd",
+    "LGU": "lgu",
+    "NGOs": "ngo",
+    "OTHERS_MU": "others",
 }
 
 INCIDENT_MARKERS = ["incident", "conflict",  "disorganization"]
@@ -172,3 +186,24 @@ def housing_mapping(g: Graph, hs: List[Housing], event_iri: URIRef):
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
+
+def assistance_mapping(g: Graph, assis: List[Assistance], event_iri: URIRef):
+
+    for a in assis:
+        uri = assistance_iri(event_iri, a.id)
+
+        g.add((uri, RDF.type, SKG.Assistance))
+        g.add((event_iri, SKG.hasAssistance, uri))
+
+        for f in fields(a):
+            if f.name == "id": continue
+
+            value = getattr(a, f.name)
+            if value is None: continue
+
+            if f.type == URIRef:
+                g.add((uri, getattr(SKG, f.name), value))
+
+            # just the contributionAmount left
+            else:
+                add_monetary(g, uri, SKG.contributionAmount, value, SKG.PHP_millions)

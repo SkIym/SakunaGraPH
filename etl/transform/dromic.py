@@ -3,10 +3,10 @@
 from typing import Iterable, List
 
 from rdflib import URIRef
-from transform.helpers import df_to_entities, to_int, load_csv_df
+from transform.helpers import df_to_entities, normalize_columns, to_int, load_csv_df, to_million_php
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import AFF_POP_COL_MAP, HOUSES_MAPPING, AffectedPopulation, Event, Housing, Provenance
+from mappings.dromic import AFF_POP_COL_MAP, ASSISTANCE_TOKENS, HOUSES_MAPPING, AffectedPopulation, Assistance, Event, Housing, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
@@ -188,6 +188,68 @@ def load_housing(folder_path: str) -> List[Housing] | None:
         correct_QTY_Barangay=False,
     )
 
+    df = to_int(df, ["totallyDamagedHouses", "partiallyDamagedHouses"])
+
+    if len(df) > 1:
+        df = df.with_row_index("id", 1)
+
+    return df_to_entities(df, Housing)
+
+def load_assistance(folder_path: str) -> List[Assistance] | None:
+
+    src_path = next(
+        (
+            os.path.join(folder_path, f)
+            for f in os.listdir(folder_path)
+            if "assistance" in f.lower() and f.endswith(".csv")
+        ),
+        None,
+    )
+
+    if not src_path:
+        return None
+    
+
+
+    df = load_csv_df(
+        src_path,
+        target_cols=["Region", "Province"],
+        collapse_on="Summary_Type",
+        collapse_key="City_Muni",
+        match_location=True,
+        correct_QTY_Barangay=False,
+    )
+
+    df = normalize_columns(df, ASSISTANCE_TOKENS)
+
+    df = to_million_php(df, ["dswd", "lgu", "others", "ngo"])
+
+    df = df.rename({
+        "dswd": "https://sakuna.ph/org/DSWD",
+        "lgu": "https://sakuna.ph/org/LGU",
+        "ngo": "https://sakuna.ph/org/NGO",
+        "others": "https://sakuna.ph/org/Unspecified",
+    })
+
+    # pivot: hasLocation, contributingOrg, contributionAmount
+
+    df = df.unpivot(
+        on=["https://sakuna.ph/org/DSWD", "https://sakuna.ph/org/LGU", "https://sakuna.ph/org/Unspecified", "https://sakuna.ph/org/NGO"],
+        index="hasLocation",
+        variable_name="contributingOrg",
+        value_name="contributionAmount",
+    ).filter(
+        pl.col("contributionAmount").is_not_null()
+        & (pl.col("contributionAmount") != 0)
+    )
+
+
+    if len(df) > 1:
+        df = df.with_row_index("id", 1)
+
+    df.write_csv(f"dump/assistance.csv")
+
+    return df_to_entities(df, Assistance)
 
 if __name__ == "__main__":
-    load_aff_pop("../data/parsed/dromic/2022/Armed Conflict in Bislig City Surigao Del Sur 2022")
+    load_assistance("../data/parsed/dromic/2022/Mw 7.0 Earthquake Incident in Tayum Abra 2023")

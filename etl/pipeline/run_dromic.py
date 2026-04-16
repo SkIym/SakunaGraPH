@@ -4,8 +4,8 @@ from typing import List, Tuple
 
 from rdflib import Graph
 
-from mappings.dromic import Event, aff_pop_mapping, event_mapping, prov_mapping
-from transform.dromic import load_aff_pop, load_event, load_provenance
+from mappings.dromic import Event, aff_pop_mapping, event_mapping, housing_mapping, prov_mapping
+from transform.dromic import load_aff_pop, load_event, load_housing, load_provenance
 from mappings.graph import create_graph
 import os
 import time
@@ -29,6 +29,9 @@ def process_event(folder_path: str) -> Graph:
     if aps:
         aff_pop_mapping(g, aps, event_iri)
 
+    hs = load_housing(folder_path)
+    if hs:
+        housing_mapping(g, hs, event_iri)
 
     return g
 
