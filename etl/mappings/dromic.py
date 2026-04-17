@@ -1,12 +1,11 @@
 from dataclasses import fields, dataclass
-from typing import List, Literal as TypingLiteral
-from rdflib import URIRef, Literal, RDFS
+from typing import List
+from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
 from .iris import aff_pop_iri, assistance_iri, event_uri, housing_iri, prov_iri
-from semantic_processing.org_resolver import ORG_RESOLVER
-from .graph import CUR, SKG, Graph, PROV, add_monetary
+from .graph import SKG, Graph, PROV, add_monetary
 
 
 @dataclass
@@ -38,26 +37,38 @@ class AffectedPopulation:
     hasLocation: URIRef
 
 
-AFF_POP_COL_MAP = {
-    "NUMBER_OF_EVACUATION_CENTERS_ECs_CUM" : "evacuationCenters", # should be in Preemptive Evac
-    "NUMBER_OF_DISPLACED_INSIDE_ECs_Families_CUM": "displacedFamiliesI",
-    "NUMBER_OF_DISPLACED_OUTSIDE_ECs_Families_CUM": "displacedFamiliesO",
-    "NUMBER_OF_DISPLACED_INSIDE_ECs_Persons_CUM": "displacedPersonsI",
-    "NUMBER_OF_DISPLACED_OUTSIDE_ECs_Persons_CUM": "displacedPersonsO",
-    "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Barangays": "affectedBarangays",
-    "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Families": "affectedFamilies",
-    "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Persons": "affectedPersons",
-    "NUMBER_OF_DISPLACED_TOTAL_Families_CUM": "displacedFamilies",
-    "TOTAL_DISPLACED_SERVED_Families_Total_Families_CUM": "displacedFamilies",
-    "TOTAL_DISPLACED_SERVED_Families_REGION_PROVINCE_MUNICIPALITY_Total_Families_CUM": "displacedFamilies",
-    "TOTAL_DISPLACED_SERVED_Persons_Total_Persons_CUM": "displacedPersons",
-    "TOTAL_DISPLACED_SERVED_Persons_REGION_PROVINCE_MUNICIPALITY_Total_Persons_CUM": "displacedPersons",
-    "NUMBER_OF_DISPLACED_TOTAL_Persons_CUM": "displacedPersons",
-    "NUMBER_OF_AFFECTED_Barangays": "affectedBarangays",
-    "NUMBER_OF_AFFECTED_Families": "affectedFamilies",
-    "NUMBER_OF_AFFECTED_Persons": "affectedPersons",
-    "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Families_CUM": "displacedFamiliesO",
-    "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Persons_CUM": "displacedPersonsO"
+AFF_POP_TOKENS = {
+
+    "evacuationCenters": ["evacuation", "center"],
+    "displacedFamiliesI": ["displaced", "inside", "families"],
+    "displacedFamiliesO": ["displaced", "outside", "families"],
+    "displacedPersonsI": ["displaced", "inside", "persons"],
+    "displacedPersonsO": ["displaced", "outside", "persons"],
+    "affectedBarangays": ["affected", "barangays"],
+    "affectedFamilies": ["affected", "families"],
+    "affectedPersons": ["affected", "persons"],
+    "displacedFamilies": ["displaced", "total", "families"],
+    "displacedPersons": ["displaced", "total", "persons"],
+
+    # "NUMBER_OF_EVACUATION_CENTERS_ECs_CUM" : "evacuationCenters", # should be in Preemptive Evac
+    # "NUMBER_OF_DISPLACED_INSIDE_ECs_Families_CUM": "displacedFamiliesI",
+    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_Families_CUM": "displacedFamiliesO",
+    # "NUMBER_OF_DISPLACED_INSIDE_ECs_Persons_CUM": "displacedPersonsI",
+    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_Persons_CUM": "displacedPersonsO",
+    # "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Barangays": "affectedBarangays",
+    # "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Families": "affectedFamilies",
+    # "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Persons": "affectedPersons",
+    # "NUMBER_OF_DISPLACED_TOTAL_Families_CUM": "displacedFamilies",
+    # "TOTAL_DISPLACED_SERVED_Families_Total_Families_CUM": "displacedFamilies",
+    # "TOTAL_DISPLACED_SERVED_Families_REGION_PROVINCE_MUNICIPALITY_Total_Families_CUM": "displacedFamilies",
+    # "TOTAL_DISPLACED_SERVED_Persons_Total_Persons_CUM": "displacedPersons",
+    # "TOTAL_DISPLACED_SERVED_Persons_REGION_PROVINCE_MUNICIPALITY_Total_Persons_CUM": "displacedPersons",
+    # "NUMBER_OF_DISPLACED_TOTAL_Persons_CUM": "displacedPersons",
+    # "NUMBER_OF_AFFECTED_Barangays": "affectedBarangays",
+    # "NUMBER_OF_AFFECTED_Families": "affectedFamilies",
+    # "NUMBER_OF_AFFECTED_Persons": "affectedPersons",
+    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Families_CUM": "displacedFamiliesO",
+    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Persons_CUM": "displacedPersonsO"
 }
 
 @dataclass
@@ -67,12 +78,9 @@ class Housing:
     totallyDamagedHouses: int 
     partiallyDamagedHouses: int
 
-HOUSES_MAPPING = {
-    "NO_OF_DAMAGED_HOUSES_REGION_PROVINCE_MUNICIPALITY_Totally": "totallyDamagedHouses",
-    "NO_OF_DAMAGED_HOUSES_Totally": "totallyDamagedHouses",
-    "NO_OF_DAMAGED_HOUSES_REGION_PROVINCE_MUNICIPALITY_Partially": "partiallyDamagedHouses",
-    "NO_OF_DAMAGED_HOUSES_Partially": "partiallyDamagedHouses",
-
+HOUSING_TOKENS = {
+    "totallyDamagedHouses": ["totally"],
+    "partiallyDamagedHouses": ["partially"],
 }
 
 @dataclass
@@ -83,10 +91,10 @@ class Assistance:
     contributionAmount: float
 
 ASSISTANCE_TOKENS = {
-    "DSWD": "dswd",
-    "LGU": "lgu",
-    "NGOs": "ngo",
-    "OTHERS_MU": "others",
+    "dswd": ["dswd"],
+    "lgu": ["lgu"],
+    "ngo": ["ngos"],
+    "others": ["others_m"],
 }
 
 INCIDENT_MARKERS = ["incident", "conflict",  "disorganization"]

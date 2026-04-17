@@ -3,10 +3,10 @@
 from typing import Iterable, List
 
 from rdflib import URIRef
-from transform.helpers import df_to_entities, normalize_columns, to_int, load_csv_df, to_million_php
+from transform.helpers import df_to_entities, to_int, load_csv_df, to_million_php
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import AFF_POP_COL_MAP, ASSISTANCE_TOKENS, HOUSES_MAPPING, AffectedPopulation, Assistance, Event, Housing, Provenance
+from mappings.dromic import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, AffectedPopulation, Assistance, Event, Housing, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
@@ -120,7 +120,7 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
         print("Loading aff pop for: ", src_path)
         df = load_csv_df(
             src_path,
-            mapping=AFF_POP_COL_MAP,
+            mapping_tokens=AFF_POP_TOKENS,
             target_cols=["Region", "Province"],
             collapse_on="Summary_Type",
             collapse_key="City_Muni",
@@ -180,7 +180,7 @@ def load_housing(folder_path: str) -> List[Housing] | None:
     
     df = load_csv_df(
         src_path,
-        mapping=HOUSES_MAPPING,
+        mapping_tokens=HOUSING_TOKENS,
         target_cols=["Region", "Province"],
         collapse_on="Summary_Type",
         collapse_key="City_Muni",
@@ -214,13 +214,12 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
     df = load_csv_df(
         src_path,
         target_cols=["Region", "Province"],
+        mapping_tokens=ASSISTANCE_TOKENS,
         collapse_on="Summary_Type",
         collapse_key="City_Muni",
         match_location=True,
         correct_QTY_Barangay=False,
     )
-
-    df = normalize_columns(df, ASSISTANCE_TOKENS)
 
     df = to_million_php(df, ["dswd", "lgu", "others", "ngo"])
 

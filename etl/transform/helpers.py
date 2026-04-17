@@ -22,6 +22,7 @@ def load_csv_df(
     path: str,
     *,
     mapping: dict[str, str] | None = None,
+    mapping_tokens: dict[str, list[str]] | None = None,
     target_cols: list[str] | None = None,
     collapse_on: str | None = None,
     collapse_key: str | None = None,
@@ -47,6 +48,9 @@ def load_csv_df(
 
     if mapping:
         df = df.rename(mapping=mapping, strict=False)
+
+    if mapping_tokens:
+        df = normalize_columns(df, mapping_tokens)
 
     if move_values:
         df = move_col_values(df, move_values)
@@ -375,32 +379,33 @@ def move_col_values(df: DataFrame, arg: MoveArg) -> DataFrame:
 
 def normalize_columns(
     df: pl.DataFrame,
-    token_map: dict[str, str],
+    token_map: dict[str, list[str]],
 ) -> pl.DataFrame:
     """
-    Rename DataFrame columns by detecting tokens as substrings of column names.
+    Rename DataFrame columns by matching all tokens as substrings of column names.
 
     Args:
         df:        Input Polars DataFrame.
-        token_map: Maps search tokens (substrings to detect) to canonical names.
-                   e.g. {"DSWD": "dswd", "LGU": "lgu"}
+        token_map: Maps canonical names to a list of tokens that must ALL appear
+                   as substrings in a column name (case-insensitive AND match).
+                   e.g. {"displaced_families_inside": ["displaced", "families", "inside"]}
 
     Raises:
-        ValueError: If a column matches more than one token.
+        ValueError: If a column matches more than one canonical entry.
     """
     rename_map: dict[str, str] = {}
 
     for col in df.columns:
-        col_upper = col.upper()
+        col_lower = col.lower()
         matches = [
             canonical
-            for token, canonical in token_map.items()
-            if token.upper() in col_upper
+            for canonical, tokens in token_map.items()
+            if all(token.lower() in col_lower for token in tokens)
         ]
 
         if len(matches) > 1:
             raise ValueError(
-                f"Column '{col}' matched multiple tokens: {matches}. "
+                f"Column '{col}' matched multiple canonicals: {matches}. "
                 "Resolve ambiguity in token_map."
             )
         elif len(matches) == 1:
