@@ -4,7 +4,7 @@ from typing import List, Tuple
 
 from rdflib import Graph
 
-from mappings.dromic import Event, aff_pop_mapping, event_mapping, housing_mapping, prov_mapping
+from mappings.dromic import Event, aff_pop_mapping, event_mapping, housing_mapping, pevac_mapping, prov_mapping
 from transform.dromic import load_aff_pop, load_event, load_housing, load_provenance
 from mappings.graph import create_graph
 import os
@@ -25,9 +25,12 @@ def process_event(folder_path: str) -> Graph:
     
     prov_mapping(g, prov, event_iri)
 
-    aps = load_aff_pop(folder_path)
+    aps, pevacs = load_aff_pop(folder_path)
     if aps:
         aff_pop_mapping(g, aps, event_iri)
+
+    if pevacs:
+        pevac_mapping(g, pevacs, event_iri)
 
     hs = load_housing(folder_path)
     if hs:

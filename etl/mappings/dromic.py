@@ -4,7 +4,7 @@ from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
-from .iris import aff_pop_iri, assistance_iri, event_uri, housing_iri, prov_iri
+from .iris import aff_pop_iri, assistance_iri, event_uri, housing_iri, pevac_iri, prov_iri
 from .graph import SKG, Graph, PROV, add_monetary
 
 
@@ -39,16 +39,16 @@ class AffectedPopulation:
 
 AFF_POP_TOKENS = {
 
-    "evacuationCenters": ["evacuation", "center"],
-    "displacedFamiliesI": ["displaced", "inside", "families"],
-    "displacedFamiliesO": ["displaced", "outside", "families"],
-    "displacedPersonsI": ["displaced", "inside", "persons"],
-    "displacedPersonsO": ["displaced", "outside", "persons"],
+    "evacuationCenters": ["evacuation", "center", "cum"],
+    "displacedFamiliesI": ["displaced", "inside", "families", "cum"],
+    "displacedFamiliesO": ["displaced", "outside", "families", "cum"],
+    "displacedPersonsI": ["displaced", "inside", "persons", "cum"],
+    "displacedPersonsO": ["displaced", "outside", "persons", "cum"],
     "affectedBarangays": ["affected", "barangays"],
     "affectedFamilies": ["affected", "families"],
     "affectedPersons": ["affected", "persons"],
-    "displacedFamilies": ["displaced", "total", "families"],
-    "displacedPersons": ["displaced", "total", "persons"],
+    "displacedFamilies": ["displaced", "total", "families", "cum"],
+    "displacedPersons": ["displaced", "total", "persons", "cum"],
 
     # "NUMBER_OF_EVACUATION_CENTERS_ECs_CUM" : "evacuationCenters", # should be in Preemptive Evac
     # "NUMBER_OF_DISPLACED_INSIDE_ECs_Families_CUM": "displacedFamiliesI",
@@ -94,8 +94,13 @@ ASSISTANCE_TOKENS = {
     "dswd": ["dswd"],
     "lgu": ["lgu"],
     "ngo": ["ngos"],
-    "others": ["others_m"],
+    "others": ["others"],
 }
+@dataclass
+class PEvac:
+    id: str
+    hasLocation: URIRef
+    evacuationCenters: int
 
 INCIDENT_MARKERS = ["incident", "conflict",  "disorganization"]
 # rule-based incident v major event resolution
@@ -169,7 +174,7 @@ def  aff_pop_mapping(g: Graph, aps: List[AffectedPopulation], event_iri: URIRef)
             if value is None: continue
 
             if f.name == "affectedBarangays" and value > 1:
-                g.add((uri, SKG.affectedBarangays, Literal(value, datatype=XSD.int)))
+                g.add((uri, SKG.affectedBarangays, Literal(value)))
             elif f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             else:
@@ -210,8 +215,32 @@ def assistance_mapping(g: Graph, assis: List[Assistance], event_iri: URIRef):
             if value is None: continue
 
             if f.type == URIRef:
-                g.add((uri, getattr(SKG, f.name), value))
+                g.add((uri, getattr(SKG, f.name), URIRef(value)))
 
             # just the contributionAmount left
             else:
                 add_monetary(g, uri, SKG.contributionAmount, value, SKG.PHP_millions)
+
+def pevac_mapping(g: Graph, pevac: List[PEvac], event_iri: URIRef):
+
+    for p in pevac:
+        uri = pevac_iri(event_iri, p.id)
+
+        if not p.evacuationCenters or p.evacuationCenters == 0:
+            continue
+
+        g.add((uri, RDF.type, SKG.PreemptiveEvacuation))
+        g.add((event_iri, SKG.hasPreemptiveEvacuation, uri))
+
+        for f in fields(p):
+            if f.name == "id": continue
+
+            value = getattr(p, f.name)
+            if value is None: continue
+
+            if f.type == URIRef:
+                g.add((uri, getattr(SKG, f.name), URIRef(value)))
+
+            # just the evacCenters left
+            else:
+                g.add((uri, getattr(SKG, f.name), Literal(value)))

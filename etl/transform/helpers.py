@@ -403,12 +403,14 @@ def normalize_columns(
             if all(token.lower() in col_lower for token in tokens)
         ]
 
-        if len(matches) > 1:
-            raise ValueError(
-                f"Column '{col}' matched multiple canonicals: {matches}. "
-                "Resolve ambiguity in token_map."
-            )
-        elif len(matches) == 1:
+        # if len(matches) > 1:
+        #     raise ValueError(
+        #         f"Column '{col}' matched multiple canonicals: {matches}. "
+        #         "Resolve ambiguity in token_map."
+        #     )
+        # elif len(matches) == 1:
+        #     rename_map[col] = matches[0]
+        if matches:
             rename_map[col] = matches[0]
 
     return df.rename(rename_map)

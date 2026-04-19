@@ -1,12 +1,12 @@
 
 
-from typing import Iterable, List
+from typing import Iterable, List, Tuple
 
 from rdflib import URIRef
 from transform.helpers import df_to_entities, to_int, load_csv_df, to_million_php
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, AffectedPopulation, Assistance, Event, Housing, Provenance
+from mappings.dromic import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, AffectedPopulation, Assistance, Event, Housing, PEvac, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
@@ -88,7 +88,7 @@ def load_provenance(file_path: str) -> Provenance:
         obtainedDate=src.get("obtainedDate"),
     )
 
-def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
+def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, List[PEvac] | None]:
 
     src_paths: List[str] = []
 
@@ -111,7 +111,7 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
             src_paths.append(os.path.join(folder_path, file))
 
     
-    if len(src_paths) == 0: return None
+    if len(src_paths) == 0: return (None, None)
 
     
     dfs: Iterable[pl.DataFrame] = []
@@ -128,7 +128,7 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
             correct_QTY_Barangay=False
         )
 
-        df = to_int(df, ["affectedFamilies", "affectedPersons", "affectedBarangays", "displacedFamilies", "displacedPersons", "displacedFamiliesI", "displacedPersonsI", "displacedFamiliesO", "displacedPersonsO"])
+        df = to_int(df, ["affectedFamilies", "affectedPersons", "affectedBarangays", "displacedFamilies", "displacedPersons", "displacedFamiliesI", "displacedPersonsI", "displacedFamiliesO", "displacedPersonsO", "evacuationCenters"])
 
         dfs.append(df)
         index += 1
@@ -140,7 +140,7 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
             shared_cols = [c for c in df.columns if c in combined.columns and c != "hasLocation"]
             combined = combined.join(df.drop(shared_cols), on="hasLocation", how="full", coalesce=True)
     except pl.exceptions.SchemaError:
-        return None
+        return (None, None)
 
     # resolve O + I into displacedFamilies / displacedPersons only if no total displaced file
     if not has_total_displaced:
@@ -162,7 +162,7 @@ def load_aff_pop(folder_path: str) -> List[AffectedPopulation] | None:
 
     combined.write_csv(f"./dump/combined.csv")
 
-    return df_to_entities(combined, AffectedPopulation)
+    return df_to_entities(combined, AffectedPopulation), df_to_entities(combined, PEvac)
 
 def load_housing(folder_path: str) -> List[Housing] | None:
 
