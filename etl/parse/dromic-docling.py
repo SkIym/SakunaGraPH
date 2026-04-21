@@ -42,6 +42,7 @@ class DromicEvent:
     page           : int = 0
     remarks        : str = ""
 
+    
 def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicEvent:
     first_page_texts = [
         item.text.strip()
