@@ -1,3 +1,5 @@
+import argparse
+import os
 from typing import Any
 
 from docling.document_converter import DocumentConverter
@@ -16,11 +18,10 @@ from dataclasses import dataclass, asdict
 import json
 
 RAW_PATH = "../data/raw/dromic/2022/DSWD-DROMIC-Terminal-Report-on-Tropical-Depression-Obet-07-November-2022-6PM.pdf"
+SIMILARITY_THRESHOLD = 0.95
 
 PDF_CACHE   = Path("../data/interim/pdf_cache")
 output_dir = Path("./dump")
-
-processed_tables: list[tuple[str, pd.DataFrame]] = []
 
 # metadata
 
@@ -41,7 +42,6 @@ class DromicEvent:
     downloadUrl    : str = ""
     page           : int = 0
     remarks        : str = ""
-
     
 def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicEvent:
     first_page_texts = [
@@ -200,7 +200,6 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
         recordedBy   = "DROMIC",
     )
 
-
 METADATA_KEYS = {"eventName", "eventType", "location", "reportNumber",
                  "reportDate", "startDate", "endDate", "remarks"}
 
@@ -213,8 +212,6 @@ def generate_json(event: DromicEvent, output_dir: Path) -> None:
         json.dump(metadata, f, indent=4)
     with open(output_dir / "source.json", "w") as f:
         json.dump(source, f, indent=4)
-
-# 0. Preprocess docx to pdf
 
 def convert_docx_to_pdf(docx_path: Path, output_dir: Path) -> Path:
     output_dir.mkdir(parents=True, exist_ok=True)
@@ -234,33 +231,6 @@ def resolve_pdf(path: Path, pdf_cache_dir: Path) -> Path:
     else:
         raise ValueError(f"Unsupported format: {path.suffix}")
     
-PDF_PATH = resolve_pdf(Path(RAW_PATH), PDF_CACHE)
-# ── 1. Docling setup ──────────────────────────────────────────────────────────
-
-pipeline_options = PdfPipelineOptions()
-pipeline_options.do_ocr = False
-pipeline_options.do_table_structure = True
-pipeline_options.table_structure_options.do_cell_matching = True
-pipeline_options.images_scale = 1.0
-
-converter = DocumentConverter(
-    format_options={
-        InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
-    }
-)
-
-result = converter.convert(PDF_PATH)
-doc = result.document
-
-manifest_path = PDF_PATH.parent / "manifest.json"  # or per-file json
-event = extract_report_metadata(doc, PDF_PATH, manifest_path)
-generate_json(event, output_dir)
-
-print(f"Tables found: {len(doc.tables)}\n")
-
-
-# ── 2. Font analysis helpers ──────────────────────────────────────────────────
-
 def is_bold(fontname: str) -> bool:
     return "bold" in fontname.lower()
 
@@ -318,9 +288,6 @@ def find_location_column(df: pd.DataFrame) -> int | None:
 
     return None  # no location column found in this table
 
-
-# ── 3. pdfplumber cell font extraction ───────────────────────────────────────
-
 def extract_cell_words_on_page(plumber_page, cell_bbox):
     x0, top, x1, bottom = cell_bbox
     INSET = 1.5  # points — keeps us away from cell borders
@@ -357,136 +324,6 @@ def validate_caption(caption: str, df: pd.DataFrame) -> str:
 
     return caption
 
-# ── 4. Main loop ──────────────────────────────────────────────────────────────
-
-with pdfplumber.open(PDF_PATH) as pdf:
-
-    for i, table in enumerate(doc.tables):
-        caption    = table.caption_text(doc)
-        prov_pages = [p.page_no for p in table.prov]
-        print(f"=== Table {i+1} | pages={prov_pages} | caption={caption!r} ===")
-
-        df = table.export_to_dataframe(doc)
-        caption = validate_caption(caption, df)  # validate before processing
-
-        # ── Find the location column ──────────────────────────────────────────
-        loc_col_idx = find_location_column(df)
-        if loc_col_idx is None:
-            print("  [skip] No location column detected.\n")
-            df.to_csv(f"./dump/{i}.csv", index=False)
-            continue
-
-        loc_col_name = df.columns[loc_col_idx]
-        print(f"  Location column: index={loc_col_idx}, name={loc_col_name!r}")
-
-        # ── Build a (page_no → pdfplumber page) map for this table's pages ───
-        plumber_pages = {
-            pno: pdf.pages[pno - 1]   # pdfplumber is 0-indexed
-            for pno in prov_pages
-        }
-
-        # ── Walk Docling's table cells to get bounding boxes per row ─────────
-        # doc.tables[i].data is a TableData with a grid of TableCell objects
-        # Each TableCell has .bbox (in Docling's page coordinate space) and
-        # .prov entries that tell us which page it's on.
-
-        # ── Build row_bbox_map ────────────────────────────────────────────────────────
-        row_bbox_map: dict[int, tuple[int, tuple]] = {}
-
-        SKIP_TEXTS = {"GRAND TOTAL", "GRAND  TOTAL"}  # handle double-space variants
-
-        for cell in table.data.table_cells:
-            if cell.column_header:
-                continue
-            if cell.start_col_offset_idx != loc_col_idx:
-                continue
-            if cell.text.strip() == str(loc_col_name).strip():
-                continue
-            if cell.text.strip().upper() in SKIP_TEXTS:          # ← new
-                continue
-
-            row_idx = cell.start_row_offset_idx
-            bbox    = cell.bbox
-            row_bbox_map[row_idx] = (prov_pages[0], (bbox.l, bbox.t, bbox.r, bbox.b))
-
-        # Derive offset: minimum row_idx in the map = first data row → maps to df row 0
-        if not row_bbox_map:
-            print("  [skip] No data cells found.\n")
-            df.to_csv(f"./dump/{i}.csv", index=False)
-            continue
-
-        # ── Classify each data row by font ────────────────────────────────────
-        # We offset by 1 if Docling's df has a header row at row 0
-        # (Docling exports the first row as column headers by default)
-        # so Docling cell row_idx=1 → df row index 0, etc.
-
-        cell_text_to_row_idx: dict[str, int] = {}
-        for row_idx, (page_no, bbox) in sorted(row_bbox_map.items()):
-            plumber_page = plumber_pages.get(page_no)
-            words = extract_cell_words_on_page(plumber_page, bbox)
-            cell_text = " ".join(w["text"] for w in words).strip()
-            cell_text_to_row_idx[cell_text] = row_idx
-
-        # Find the first df row whose text appears in the bbox map
-        min_row_idx = None
-        for df_row_i in range(len(df)):
-            candidate = str(df.iloc[df_row_i, loc_col_idx]).strip()
-            if candidate in cell_text_to_row_idx:
-                min_row_idx = cell_text_to_row_idx[candidate] - df_row_i
-                break
-
-        if min_row_idx is None:
-            min_row_idx = min(row_bbox_map.keys())  # fallback
-
-        # ── classify each cell ────────────────────────────────────────────────
-        level_per_df_row: dict[int, str | None] = {}
-
-        for row_idx, (page_no, bbox) in row_bbox_map.items():
-            plumber_page = plumber_pages.get(page_no)
-            if plumber_page is None:
-                continue
-            words = extract_cell_words_on_page(plumber_page, bbox)
-            level = classify_level(words)
-            df_row = row_idx - min_row_idx
-            if 0 <= df_row < len(df):
-                level_per_df_row[df_row] = level
-
-        # ── Forward-fill region / province / municipality ─────────────────────
-        region_col       = []
-        province_col     = []
-        municipality_col = []
-
-        current_region   = None
-        current_province = None
-        current_muni     = None
-
-        for df_row in range(len(df)):
-            level = level_per_df_row.get(df_row)
-            text  = str(df.iloc[df_row, loc_col_idx]).strip()
-
-            if level == "region":
-                current_region   = text
-                current_province = None
-                current_muni     = None
-            elif level == "province":
-                current_province = text
-                current_muni     = None
-            elif level == "municipality":
-                current_muni     = text
-
-            region_col.append(current_region)
-            province_col.append(current_province)
-            municipality_col.append(current_muni)
-
-        df.insert(0, "region",       region_col)
-        df.insert(1, "province",     province_col)
-        df.insert(2, "municipality", municipality_col)
-
-        processed_tables.append((caption or "", df))
-        print(df.to_string())
-        print()
-
-    
 def slugify(text: str) -> str:
     """Convert caption to a safe filename."""
     text = text.strip()
@@ -547,59 +384,6 @@ def fix_caption_sequence(processed_tables: list[tuple[str, pd.DataFrame]]) -> li
             print(f"  [caption gap] Tables {num_prev+1}–{num_curr-1} have no caption, will use column names as filename")
 
     return result  # unchanged
-
-processed_tables = fix_caption_sequence(processed_tables)
-# ── grouping logic: merge by signature OR by high similarity to adjacent table ─
-SIMILARITY_THRESHOLD = 0.95
-
-print("\n=== processed_tables before grouping ===")
-for i, (caption, df) in enumerate(processed_tables):
-    print(f"  [{i}] caption={caption!r} | cols={list(df.columns)[:3]}... | rows={len(df)}")
-
-print("\n=== similarity matrix ===")
-for i in range(len(processed_tables)):
-    for j in range(i+1, len(processed_tables)):
-        df1 = processed_tables[i][1]
-        df2 = processed_tables[j][1]
-        sim = col_similarity(df1, df2)
-        if sim > 0.3:  # only show non-trivial similarities
-            print(f"  [{i}] vs [{j}]: similarity={sim:.2f}")
-
-groups: dict[int, list[tuple[str, pd.DataFrame]]] = {}
-group_representatives: dict[int, pd.DataFrame] = {}
-group_last_idx: dict[int, int] = {}  # track last position added to each group
-group_id = 0
-
-for pos, (caption, df) in enumerate(processed_tables):
-    merged = False
-
-    for gid, rep_df in group_representatives.items():
-        # Only consider merging if this table is adjacent to the last one in group
-        if pos - group_last_idx[gid] > 1:
-            continue  # gap between them — don't merge
-        # Don't merge if this table has its own non-generic caption
-        # and the group already has a captioned table
-        group_has_caption = any(
-            bool(re.search(r'Table\s+\d+\.\s+\w', c))
-            for c, _ in groups[gid]
-        )
-        this_has_caption = bool(re.search(r'Table\s+\d+\.\s+\w', caption))
-        if group_has_caption and this_has_caption:
-            continue  # both have real captions — they're different tables
-
-        sim = col_similarity(df, rep_df)
-        if sim >= SIMILARITY_THRESHOLD:
-            groups[gid].append((caption, df))
-            group_last_idx[gid] = pos
-            merged = True
-            break
-
-    if not merged:
-        groups[group_id] = [(caption, df)]
-        group_representatives[group_id] = df
-        group_last_idx[group_id] = pos
-        group_id += 1
-
 def align_columns(base_df: pd.DataFrame, other_df: pd.DataFrame) -> pd.DataFrame:
     base_cols  = list(base_df.columns)
     base_norms = [normalize_col(c) for c in base_cols]
@@ -627,42 +411,321 @@ def align_columns(base_df: pd.DataFrame, other_df: pd.DataFrame) -> pd.DataFrame
     result = result.loc[:, ~result.columns.duplicated()]
     return result
 
+def make_folder_name(filename: str) -> str:
+    name = os.path.splitext(filename)[0]
+    name = re.sub(r'\.docx$', '', name, flags=re.IGNORECASE)
+    name = re.sub(r'-[1-9A-Z]$', '', name)
 
-# ── save each group ───────────────────────────────────────────────────────────
-for gid, items in groups.items():
-    caption = next((c for c, _ in items if c.strip()), "")
+    year_m = re.search(r'\b(20\d{2})\b', name)
+    year   = year_m.group(1) if year_m else ""
 
-    if not caption:
-        sample_cols = [
-            normalize_col(c) for c in items[0][1].columns
-            if c.lower() not in LOCATION_COLS
-            and normalize_col(c) not in {
-                normalize_col(lc) for lc in ["REGION / PROVINCE / MUNICIPALITY",
-                                            "REGION / PROVINCE / MUNICIPALITY."]
+    desc = re.sub(r'^DSWD-DROMIC-.*?-on-(?:the-)?', '', name, flags=re.IGNORECASE)
+    desc = re.sub(r'(?:-as-of)?-?\d{1,2}-[A-Za-z]+-20\d{2}.*$', '', desc, flags=re.IGNORECASE)
+    desc = desc.replace('-', ' ').strip()
+    desc = re.sub(r'\s+', ' ', desc)
+    desc = re.sub(r'\b([A-Z][a-z]{0,4})_\b', r'\1. ', desc)
+    desc = desc.replace('_', ' ')
+    desc = re.sub(r'\s+', ' ', desc).strip()
+
+    return f"{desc} {year}".strip() if year else desc
+
+def infer_table_name(sample_cols: list[str], id: int) -> str:
+
+    cols = " ".join(sample_cols).lower()
+
+    if "damaged" in cols:
+        return "number_of_damaged_houses"
+    if "assistance" in cols:
+        return "cost_of_assistance"
+    if "affected" in cols:
+        return "number_of_affected_population"
+    if "displaced" in cols and "total" in cols:
+        return "total_displaced_families_persons"
+    if "displaced" in cols and "outside" in cols:
+        return "inside_ec_displaced_families_persons"
+    if "displaced" in cols and "inside" in cols:
+        return "outside_ec_displaced_families_persons"
+    
+    return cols if cols else f"table_{id}"
+
+# Main loop ──────────────────────────────────────────────────────────────
+pipeline_options = PdfPipelineOptions()
+pipeline_options.do_ocr = False
+pipeline_options.do_table_structure = True
+pipeline_options.table_structure_options.do_cell_matching = True
+pipeline_options.images_scale = 1.0
+
+converter = DocumentConverter(
+    format_options={
+        InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+    }
+)
+
+def process_file(file: Path, output_dir: Path):
+
+    pdf_path = resolve_pdf(file, PDF_CACHE)
+    result = converter.convert(pdf_path)
+    doc = result.document
+
+
+    manifest_path = file.parent / "manifest.json"  # or per-file json
+    event = extract_report_metadata(doc, pdf_path, manifest_path)
+
+    folder_name = make_folder_name(os.path.basename(pdf_path)) or event.eventName
+    output_dir  = Path(os.path.join(output_dir, folder_name))
+    os.makedirs(output_dir, exist_ok=True)
+
+    generate_json(event, output_dir)
+
+    print(f"Tables found: {len(doc.tables)}\n")
+
+    processed_tables: list[tuple[str, pd.DataFrame]] = []
+
+    with pdfplumber.open(pdf_path) as pdf:
+
+        for i, table in enumerate(doc.tables):
+            caption    = table.caption_text(doc)
+            prov_pages = [p.page_no for p in table.prov]
+            # print(f"=== Table {i+1} | pages={prov_pages} | caption={caption!r} ===")
+
+            df = table.export_to_dataframe(doc)
+            caption = validate_caption(caption, df)  # validate before processing
+
+            # ── Find the location column ──────────────────────────────────────────
+            loc_col_idx = find_location_column(df)
+            if loc_col_idx is None:
+                print("  [skip] No location column detected.\n")
+                df.to_csv(f"./dump/{i}.csv", index=False)
+                continue
+
+            loc_col_name = df.columns[loc_col_idx]
+            # print(f"  Location column: index={loc_col_idx}, name={loc_col_name!r}")
+
+            # ── Build a (page_no → pdfplumber page) map for this table's pages ───
+            plumber_pages = {
+                pno: pdf.pages[pno - 1]   # pdfplumber is 0-indexed
+                for pno in prov_pages
             }
-        ]
-        caption = "_".join(sample_cols) if sample_cols else f"table_{gid}"
 
-    filename = slugify(caption) + ".csv"
+            # ── Walk Docling's table cells to get bounding boxes per row ─────────
+            # doc.tables[i].data is a TableData with a grid of TableCell objects
+            # Each TableCell has .bbox (in Docling's page coordinate space) and
+            # .prov entries that tell us which page it's on.
 
-    # Dedup base_df too before using as reference
-    base_caption, base_df = items[0]
-    base_df = base_df.loc[:, ~base_df.columns.duplicated()]
+            # ── Build row_bbox_map ────────────────────────────────────────────────────────
+            row_bbox_map: dict[int, tuple[int, tuple]] = {}
 
-    aligned = [base_df] + [align_columns(base_df, df) for _, df in items[1:]]
+            SKIP_TEXTS = {"GRAND TOTAL", "GRAND  TOTAL"}  # handle double-space variants
 
-    # Reindex each df to base columns only before concat to avoid schema drift
-    base_cols = list(base_df.columns)
-    aligned = [df.reindex(columns=base_cols) for df in aligned]
+            for cell in table.data.table_cells:
+                if cell.column_header:
+                    continue
+                if cell.start_col_offset_idx != loc_col_idx:
+                    continue
+                if cell.text.strip() == str(loc_col_name).strip():
+                    continue
+                if cell.text.strip().upper() in SKIP_TEXTS:          # ← new
+                    continue
 
-    merged_df = pd.concat(aligned, ignore_index=True)
+                row_idx = cell.start_row_offset_idx
+                bbox    = cell.bbox
+                row_bbox_map[row_idx] = (prov_pages[0], (bbox.l, bbox.t, bbox.r, bbox.b))
 
-    # Handle duplicate filename
-    counter = 1
-    original = filename
-    while (output_dir / filename).exists():
-        filename = slugify(caption) + f"_{counter}.csv"
-        counter += 1
+            # Derive offset: minimum row_idx in the map = first data row → maps to df row 0
+            if not row_bbox_map:
+                print("  [skip] No data cells found.\n")
+                df.to_csv(f"./dump/{i}.csv", index=False)
+                continue
 
-    merged_df.to_csv(output_dir / filename, index=False)
-    print(f"Saved: {filename} ({len(merged_df)} rows from {len(items)} table(s))")
+            # ── Classify each data row by font ────────────────────────────────────
+            # We offset by 1 if Docling's df has a header row at row 0
+            # (Docling exports the first row as column headers by default)
+            # so Docling cell row_idx=1 → df row index 0, etc.
+
+            cell_text_to_row_idx: dict[str, int] = {}
+            for row_idx, (page_no, bbox) in sorted(row_bbox_map.items()):
+                plumber_page = plumber_pages.get(page_no)
+                words = extract_cell_words_on_page(plumber_page, bbox)
+                cell_text = " ".join(w["text"] for w in words).strip()
+                cell_text_to_row_idx[cell_text] = row_idx
+
+            # Find the first df row whose text appears in the bbox map
+            min_row_idx = None
+            for df_row_i in range(len(df)):
+                candidate = str(df.iloc[df_row_i, loc_col_idx]).strip()
+                if candidate in cell_text_to_row_idx:
+                    min_row_idx = cell_text_to_row_idx[candidate] - df_row_i
+                    break
+
+            if min_row_idx is None:
+                min_row_idx = min(row_bbox_map.keys())  # fallback
+
+            # ── classify each cell ────────────────────────────────────────────────
+            level_per_df_row: dict[int, str | None] = {}
+
+            for row_idx, (page_no, bbox) in row_bbox_map.items():
+                plumber_page = plumber_pages.get(page_no)
+                if plumber_page is None:
+                    continue
+                words = extract_cell_words_on_page(plumber_page, bbox)
+                level = classify_level(words)
+                df_row = row_idx - min_row_idx
+                if 0 <= df_row < len(df):
+                    level_per_df_row[df_row] = level
+
+            # ── Forward-fill region / province / municipality ─────────────────────
+            region_col: list[str | None]      = []
+            province_col: list[str | None]      = []
+            municipality_col: list[str | None]  = []
+
+            current_region   = None
+            current_province = None
+            current_muni     = None
+
+            for df_row in range(len(df)):
+                level = level_per_df_row.get(df_row)
+                text  = str(df.iloc[df_row, loc_col_idx]).strip()
+
+                if level == "region":
+                    current_region   = text
+                    current_province = None
+                    current_muni     = None
+                elif level == "province":
+                    current_province = text
+                    current_muni     = None
+                elif level == "municipality":
+                    current_muni     = text
+
+                region_col.append(current_region)
+                province_col.append(current_province)
+                municipality_col.append(current_muni)
+
+            df.insert(0, "region",       region_col)
+            df.insert(1, "province",     province_col)
+            df.insert(2, "municipality", municipality_col)
+
+            processed_tables.append((caption or "", df))
+            # print(df.to_string())
+            print()
+
+    processed_tables = fix_caption_sequence(processed_tables)
+
+    # ── grouping logic: merge by signature OR by high similarity to adjacent table ─
+    # print("\n=== processed_tables before grouping ===")
+    # for i, (caption, df) in enumerate(processed_tables):
+    #     print(f"  [{i}] caption={caption!r} | cols={list(df.columns)[:3]}... | rows={len(df)}")
+
+    # print("\n=== similarity matrix ===")
+    # for i in range(len(processed_tables)):
+    #     for j in range(i+1, len(processed_tables)):
+    #         df1 = processed_tables[i][1]
+    #         df2 = processed_tables[j][1]
+    #         sim = col_similarity(df1, df2)
+    #         if sim > 0.3:  # only show non-trivial similarities
+    #             print(f"  [{i}] vs [{j}]: similarity={sim:.2f}")
+
+    groups: dict[int, list[tuple[str, pd.DataFrame]]] = {}
+    group_representatives: dict[int, pd.DataFrame] = {}
+    group_last_idx: dict[int, int] = {}  # track last position added to each group
+    group_id = 0
+
+    for pos, (caption, df) in enumerate(processed_tables):
+        merged = False
+
+        for gid, rep_df in group_representatives.items():
+            # Only consider merging if this table is adjacent to the last one in group
+            if pos - group_last_idx[gid] > 1:
+                continue  # gap between them — don't merge
+            # Don't merge if this table has its own non-generic caption
+            # and the group already has a captioned table
+            group_has_caption = any(
+                bool(re.search(r'Table\s+\d+\.\s+\w', c))
+                for c, _ in groups[gid]
+            )
+            this_has_caption = bool(re.search(r'Table\s+\d+\.\s+\w', caption))
+            if group_has_caption and this_has_caption:
+                continue  # both have real captions — they're different tables
+
+            sim = col_similarity(df, rep_df)
+            if sim >= SIMILARITY_THRESHOLD:
+                groups[gid].append((caption, df))
+                group_last_idx[gid] = pos
+                merged = True
+                break
+
+        if not merged:
+            groups[group_id] = [(caption, df)]
+            group_representatives[group_id] = df
+            group_last_idx[group_id] = pos
+            group_id += 1
+
+
+    # ── save each group ───────────────────────────────────────────────────────────
+    for gid, items in groups.items():
+        caption = next((c for c, _ in items if c.strip()), "")
+
+        if not caption:
+            sample_cols = [
+                normalize_col(c) for c in items[0][1].columns
+                if c.lower() not in LOCATION_COLS
+                and normalize_col(c) not in {
+                    normalize_col(lc) for lc in ["REGION / PROVINCE / MUNICIPALITY",
+                                                "REGION / PROVINCE / MUNICIPALITY."]
+                }
+            ]
+            # caption = "_".join(sample_cols) if sample_cols else f"table_{gid}"
+            caption = infer_table_name(sample_cols, gid)
+            print(caption)
+
+        filename = slugify(caption) + ".csv"
+        
+
+        # Dedup base_df too before using as reference
+        base_caption, base_df = items[0]
+        base_df = base_df.loc[:, ~base_df.columns.duplicated()]
+
+        aligned = [base_df] + [align_columns(base_df, df) for _, df in items[1:]]
+
+        # Reindex each df to base columns only before concat to avoid schema drift
+        base_cols = list(base_df.columns)
+        aligned = [df.reindex(columns=base_cols) for df in aligned]
+
+        merged_df = pd.concat(aligned, ignore_index=True)
+
+        # Handle duplicate filename
+        counter = 1
+        original = filename
+        while (output_dir / filename).exists():
+            filename = slugify(caption) + f"_{counter}.csv"
+            counter += 1
+
+        merged_df.to_csv(output_dir / filename, index=False)
+        print(f"Saved: {filename} ({len(merged_df)} rows from {len(items)} table(s))")
+
+
+def parse_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--year", required=True)
+    return parser.parse_args()
+
+
+def main() -> None:
+    args = parse_args()
+
+    input_dir = Path(f"../data/raw/dromic-new/{args.year}")
+    output_dir =  Path(f"../data/parsed/dromic-new/{args.year}")
+
+    files = list(input_dir.glob("*"))
+
+
+    for file in files:
+        if file.suffix.lower() not in [".pdf", ".docx"]:
+            continue
+        try:
+            process_file(file, output_dir)
+        except Exception as e:
+            print(f"[ERROR] {file.name}: {e}")
+
+
+if __name__ == "__main__":
+    main()
