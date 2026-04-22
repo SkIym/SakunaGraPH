@@ -381,7 +381,7 @@ def main() -> None:
 
     download_dir = Path(f"../data/raw/dromic-new/{args.year}")
     log_dir = Path("../logs/dromic")
-    state_path = log_dir / f"{args.year}_scrape_state.json"
+    state_path = Path(os.path.join(download_dir, "scrape_state.json"))
     manifest_path = Path(os.path.join(download_dir, "manifest.json"))
     log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
