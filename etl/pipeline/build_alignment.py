@@ -34,6 +34,7 @@ REGISTRY_PATH   = RESOL_DIR + "/dedup_registry.json"
 
 
 from semantic_processing.event_resolver import (
+    expand_clusters,
     load_all_sources,
     generate_candidate_pairs, blocking_stats,
     score_all_pairs,
@@ -115,7 +116,10 @@ def run(
         log.info("✓ get_known_pairs done — %d known pairs", len(known))
 
         before = len(pairs)
-        pairs = [(a, b) for a, b in pairs if frozenset([a.uri, b.uri]) not in known]
+        pairs = [
+            (a, b) for a, b in pairs
+            if not (a.uri in known and b.uri in known)
+        ]
         log.info("Incremental: skipped %d known pairs", before - len(pairs))
 
     if not pairs:
@@ -132,25 +136,31 @@ def run(
         log.info("(stats-only mode — no files written)")
         return
 
-    matches = [(a, b, sc) for a, b, sc in scored_pairs if sc.is_match]
-    if not matches:
-        log.info("No matches found above threshold.")
-        return
-
-    log.info("No. of event matches: %d", len(matches))
-
     # Stage 4: Align
     log_section("Stage 4 — Align")
-    log.info("→ write_alignments(%d matches → %s)", len(matches), ALIGNMENTS_PATH)
-    write_alignments(matches, Path(ALIGNMENTS_PATH))
+
+    registry = load_registry(Path(REGISTRY_PATH))
+    log.info("→ load_registry — %d existing clusters", len(registry))
+
+    expanded_clusters, new_matches = expand_clusters(scored_pairs, registry)
+    log.info("✓ expand_clusters — %d expansions, %d new matches", 
+         len(expanded_clusters), len(new_matches))
+
+    new_clusters = build_clusters(new_matches)
+    log.info("✓ build_clusters — %d new clusters", len(new_clusters))
+
+    all_clusters = expanded_clusters + new_clusters
+
+    if not all_clusters:
+        log.info("No matches or expansions found.")
+        return
+
+    log.info("→ write_alignments(%d clusters → %s)", len(all_clusters), ALIGNMENTS_PATH)
+    write_alignments(all_clusters, Path(ALIGNMENTS_PATH))
     log.info("✓ write_alignments done")
 
-    log.info("→ build_clusters(%d matches)", len(matches))
-    clusters = build_clusters(matches)
-    log.info("✓ build_clusters done — %d clusters", len(clusters))
-
     log.info("→ save_registry(%s)", REGISTRY_PATH)
-    save_registry(clusters, Path(REGISTRY_PATH))
+    save_registry(all_clusters, Path(REGISTRY_PATH))
     log.info("✓ save_registry done")
 
     if skip_merge:
