@@ -1,22 +1,29 @@
 import argparse
 import os
 from typing import Any
-
+from docx import Document
 from docling.document_converter import DocumentConverter
-from docling.datamodel.pipeline_options import PdfPipelineOptions
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
 from docling.document_converter import PdfFormatOption
 from docling.datamodel.base_models import InputFormat
+from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 import pandas as pd
 import pdfplumber
 import re
 import subprocess   
 from pathlib import Path
 from docx2pdf import convert
+from pdfplumber.page import Page
 from rapidfuzz import fuzz
 from datetime import datetime
 from dataclasses import dataclass, asdict
 import json
+import hashlib
+import zipfile
+import torch
+import win32com 
 
+os.environ["PYTHONUTF8"] = "1"
 RAW_PATH = "../data/raw/dromic/2022/DSWD-DROMIC-Terminal-Report-on-Tropical-Depression-Obet-07-November-2022-6PM.pdf"
 SIMILARITY_THRESHOLD = 0.95
 
@@ -63,7 +70,8 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
     event_name = ""
     title_match = re.search(
         r'DSWD\s+DROMIC\s+(?:Situation\s+Report|Terminal\s+Report|Report)\s+'
-        r'(?:No\.\s*\d+\s+)?on\s+(?:the\s+)?(.+?)(?:\n|,\s*\d{2}\s+\w+|\s+\d{2}\s+\w+)',
+        r'(?:No\.?\s*\d+\s+|#\d+\s+)?'          # ← add #N variant
+        r'(?:on\s+)?(?:the\s+)?(.+?)(?:\n|,\s*\d{2}\s+\w+|\s+\d{2}\s+\w+)',
         full_text, re.IGNORECASE
     )
     if title_match:
@@ -75,14 +83,18 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
         "Typhoon":             "Typhoon",
         "Earthquake":          "Earthquake",
         "Flood":               "Flood",
+        "Flashflood":          "Flashflood",
         "Landslide":           "Landslide",
+        "Mudslide":            "Mudslide",
         "Armed Conflict":      "Armed Conflict",
         "Disorganization":      "Armed Conflict",
         "Fire":                "Fire",
-        "Volcanic":            "Volcanic Eruption",
+        "Volcanic":            "VolcanicActivityGeneral",
         "Demolition":          "Demolition Incident",
+        "Eruption":             "VolcanicActivityGeneral",
+
     }
-    event_type = "Unknown"
+    event_type = ""
     for kw, label in EVENT_TYPE_KEYWORDS.items():
         if kw.lower() in event_name.lower() or kw.lower() in full_text[:500].lower():
             event_type = label
@@ -106,10 +118,19 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
 
     location = ""
     loc_match = re.search(
-        r'(?:in|at)\s+(Brgy\.[^,\n]+(?:,\s*[^,\n]+){1,3})',
-        full_text, re.IGNORECASE
+        r'(?:in|at)\s+((?:Sitio|Purok|Brgy\.)[^,\n]+(?:,\s*[^,\n]+){1,4})',
+        event_name,
+        re.IGNORECASE
     )
-    if loc_match:
+
+    if not loc_match:
+        loc_match = re.search(
+            r'(?:in|at)\s+((?:Sitio|Purok|Brgy\.)[^,\n]+(?:,\s*[^,\n]+){1,4})',
+            full_text,
+            re.IGNORECASE
+        )
+
+    if loc_match:    
         location = loc_match.group(1).strip()
 
     MONTHS = (
@@ -124,16 +145,33 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
             return ""
 
     remarks = ""
+    # ── Tier 1: explicit sections ─────────────────────────────
     overview_match = re.search(
-        r'(?:Situation Overview|Background)\s*\n+(.+?)(?:\n{2,}|\Z)',
+        r'(?:Situation Overview|Background|SUMMARY)\s*\n+(.+?)(?:\n{2,}|\Z)',
         full_text, re.IGNORECASE | re.DOTALL
     )
     if overview_match:
         remarks = re.sub(r'\s+', ' ', overview_match.group(1)).strip()
-    else:
-        source_match = re.search(r'Source:\s*(.+)', full_text)
-        if source_match:
-            remarks = source_match.group(1).strip()
+
+    paragraphs = re.split(r'\n{2,}', full_text)
+    # ── Tier 2: narrative paragraph (On <date>...) ────────────
+    if not remarks:
+        
+        for p in paragraphs:
+            if re.search(r'(At|Last|On|At around)\s+\d{1,2}\s+\w+\s+\d{4}', p, re.IGNORECASE):
+                remarks = re.sub(r'\s+', ' ', p).strip()
+                break
+
+    # ── Tier 3: first meaningful paragraph ────────────────────
+    if not remarks:
+        for p in paragraphs:
+            if len(p.split()) > 15 and not p.isupper():
+                remarks = p.strip()
+                break
+
+    # ── Tier 4: fallback to title ─────────────────────────────
+    if not remarks and event_name:
+        remarks = f"This report covers {event_name.lower()}."
 
     # Combine for better temporal extraction
     text_for_dates = full_text + "\n" + remarks
@@ -163,7 +201,7 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
     else:
         # ── Single-date fallback ────────────────────────────────────────────
         on_match = re.search(
-            rf'On\s+(\d{{1,2}})\s+({MONTHS})\s+(\d{{4}})',
+            rf'(?:On|last)\s+(\d{{1,2}})\s+({MONTHS})\s+(\d{{4}})',
             text_for_dates, re.IGNORECASE
         )
 
@@ -172,7 +210,7 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
         else:
             # Handle: "On September 26, 2025"
             on_match_alt = re.search(
-                rf'On\s+({MONTHS})\s+(\d{{1,2}}),\s*(\d{{4}})',
+                rf'(?:On|last)\s+({MONTHS})\s+(\d{{1,2}}),\s*(\d{{4}})',
                 text_for_dates, re.IGNORECASE
             )
             if on_match_alt:
@@ -213,32 +251,17 @@ def generate_json(event: DromicEvent, output_dir: Path) -> None:
     with open(output_dir / "source.json", "w") as f:
         json.dump(source, f, indent=4)
 
-def convert_docx_to_pdf(docx_path: Path, output_dir: Path) -> Path:
-    output_dir.mkdir(parents=True, exist_ok=True)
-    pdf_path = output_dir / docx_path.with_suffix(".pdf").name
-    convert(str(docx_path), str(pdf_path))
-    return pdf_path
+def safe_filename(name: str) -> str:
+    return re.sub(r'[^\w\-. ]', '', name)
 
-def resolve_pdf(path: Path, pdf_cache_dir: Path) -> Path:
-    """Return path as-is if PDF, otherwise convert and return the PDF path."""
-    if path.suffix.lower() == ".pdf":
-        return path
-    elif path.suffix.lower() == ".docx":
-        pdf_path = pdf_cache_dir / path.with_suffix(".pdf").name
-        if not pdf_path.exists():  # idempotent — skip if already converted
-            convert_docx_to_pdf(path, pdf_cache_dir)
-        return pdf_path
-    else:
-        raise ValueError(f"Unsupported format: {path.suffix}")
-    
 def is_bold(fontname: str) -> bool:
     return "bold" in fontname.lower()
 
 def is_italic(fontname: str) -> bool:
     return any(x in fontname.lower() for x in ["italic", "oblique"])
 
-EXPECTED_SIZE_MIN = 8.0
-EXPECTED_SIZE_MAX = 11.0  # excludes the size=16 heading bleed
+EXPECTED_SIZE_MIN = 7.5
+EXPECTED_SIZE_MAX = 13.5  # excludes the size=16 heading bleed
 
 def classify_level(words: list[dict]) -> str | None:
     if not words:
@@ -249,6 +272,7 @@ def classify_level(words: list[dict]) -> str | None:
         return None
 
     text = " ".join(w["text"] for w in words).strip()
+    x0 = min(w["x0"] for w in words)  # ← indentation signal
     bold_count   = sum(1 for w in words if is_bold(w["fontname"]))
     italic_count = sum(1 for w in words if is_italic(w["fontname"]))
     total        = len(words)
@@ -259,12 +283,25 @@ def classify_level(words: list[dict]) -> str | None:
     # ── DEBUG ──
     print(f"    classify → text={text!r} bold={bold_count}/{total} italic={italic_count}/{total} all_caps={all_caps} fonts={[w['fontname'] for w in words]}")
 
-    if majority_italic:
-        return "municipality"
-    elif majority_bold and all_caps:
+    if any(k in text.lower() for k in ["region", "luzon", "mindanao", "visayas"]):
         return "region"
-    elif majority_bold and not all_caps:
+    
+    if text.lower() in ["caraga", "ncr", "armm", "barmm", "car", "mimaropa", "calabarzon"]:
+        return "region"
+
+    if any(x in text.lower() for x in ["city", "municipality", "mun."]):
+        return "municipality"
+
+    if majority_bold and all_caps:
+        return "region"
+
+    if majority_bold:
         return "province"
+
+    # fallback: indentation-based
+    if majority_italic or x0 > 100 :   # tune threshold
+        return "municipality"
+
     return None
 
 def find_location_column(df: pd.DataFrame) -> int | None:
@@ -288,11 +325,31 @@ def find_location_column(df: pd.DataFrame) -> int | None:
 
     return None  # no location column found in this table
 
-def extract_cell_words_on_page(plumber_page, cell_bbox):
-    x0, top, x1, bottom = cell_bbox
-    INSET = 1.5  # points — keeps us away from cell borders
-    cropped = plumber_page.crop((x0 + INSET, top + INSET, x1 - INSET, bottom - INSET))
-    return cropped.extract_words(extra_attrs=["fontname", "size"])
+def extract_cell_words_on_page(plumber_page: Page, cell_bbox: tuple[float, float, float, float]):
+    l, t, r, b = cell_bbox
+
+    x0, x1 = min(l, r), max(l, r)
+    y0, y1 = min(t, b), max(t, b)
+    
+    cell_height = y1 - y0
+    
+    # For very short cells, use a proportional vertical inset
+    # to avoid bleeding into adjacent rows
+    v_inset = max(1.5, cell_height * 0.15)  # 15% of height, min 1.5pt
+    h_inset = 1.5
+    
+    try:
+        cropped = plumber_page.crop((
+            x0 + h_inset,
+            y0 + v_inset,
+            x1 - h_inset,
+            y1 - v_inset,
+        ))
+        return cropped.extract_words(extra_attrs=["fontname", "size"])
+    
+    except ValueError:
+        # Fallback if the cell is too small for the insets
+        return plumber_page.within_bbox((x0, y0, x1, y1)).extract_words(extra_attrs=["fontname", "size"])
 
 # Caption-content consistency keywords
 CAPTION_CONTENT_KEYWORDS: list[tuple[str, str]] = [
@@ -314,6 +371,13 @@ def validate_caption(caption: str, df: pd.DataFrame) -> str:
 
     caption_lower = caption.lower()
     col_text = " ".join(df.columns).upper()
+
+    if any(k in caption_lower for k in ["page", "note"]):
+        return ""
+    
+    inferred_caption = infer_table_name([caption], 0)
+    if inferred_caption != caption: # if it matched any key words
+        return inferred_caption
 
     for cap_kw, col_kw in CAPTION_CONTENT_KEYWORDS:
         if cap_kw in caption_lower:
@@ -345,11 +409,21 @@ def col_signature(df: pd.DataFrame) -> frozenset[str]:
 
 LOCATION_COLS = {"region", "province", "municipality"}
 
+def is_location_col(col: str) -> bool:
+    """True if this column is the raw location column (not the derived region/province/municipality)."""
+    col_lower = col.lower()
+    return (
+        col_lower in LOCATION_COLS  # derived cols
+        or all(k in col_lower for k in ["region", "province", "municipality"])  # raw header
+        or (  # partial match for corrupted continuation headers like "MUNICIPALITY.Loboc"
+            any(k in col_lower for k in ["region", "province", "municipality"])
+            and col_lower not in LOCATION_COLS
+        )
+    )
+
 def col_similarity(df1: pd.DataFrame, df2: pd.DataFrame) -> float:
-    cols1 = [normalize_col(c) for c in df1.columns
-             if c.lower() not in LOCATION_COLS]
-    cols2 = [normalize_col(c) for c in df2.columns
-             if c.lower() not in LOCATION_COLS]
+    cols1 = [normalize_col(c) for c in df1.columns if not is_location_col(c)]
+    cols2 = [normalize_col(c) for c in df2.columns if not is_location_col(c)]
     if not cols1 or not cols2:
         return 0.0
     scores: list[float] = []
@@ -413,21 +487,21 @@ def align_columns(base_df: pd.DataFrame, other_df: pd.DataFrame) -> pd.DataFrame
 
 def make_folder_name(filename: str) -> str:
     name = os.path.splitext(filename)[0]
-    name = re.sub(r'\.docx$', '', name, flags=re.IGNORECASE)
-    name = re.sub(r'-[1-9A-Z]$', '', name)
-
     year_m = re.search(r'\b(20\d{2})\b', name)
     year   = year_m.group(1) if year_m else ""
 
-    desc = re.sub(r'^DSWD-DROMIC-.*?-on-(?:the-)?', '', name, flags=re.IGNORECASE)
-    desc = re.sub(r'(?:-as-of)?-?\d{1,2}-[A-Za-z]+-20\d{2}.*$', '', desc, flags=re.IGNORECASE)
+    desc = re.sub(r'^DSWD[\s\-]DROMIC[\s\-].*?[\s\-]on[\s\-](?:the[\s\-])?', '', name, flags=re.IGNORECASE)
+    desc = re.sub(r'[\s\-]*as[\s\-]of[\s\-].*$', '', desc, flags=re.IGNORECASE)
+    desc = re.sub(r'[\s\-]*\d{1,2}[\s\-][A-Za-z]+[\s\-]20\d{2}.*$', '', desc, flags=re.IGNORECASE)
+    desc = re.sub(r'[\s\-]+[1-9A-Z]$', '', desc)
+
+    # Sanitize — remove Windows-invalid chars AND commas
+    desc = re.sub(r'[#<>:"/\\|?*,]', '', desc)  # ← added comma
     desc = desc.replace('-', ' ').strip()
-    desc = re.sub(r'\s+', ' ', desc)
-    desc = re.sub(r'\b([A-Z][a-z]{0,4})_\b', r'\1. ', desc)
-    desc = desc.replace('_', ' ')
     desc = re.sub(r'\s+', ' ', desc).strip()
 
-    return f"{desc} {year}".strip() if year else desc
+    folder = f"{desc} {year}".strip() if year else desc.strip()
+    return folder[:80].strip()
 
 def infer_table_name(sample_cols: list[str], id: int) -> str:
 
@@ -441,34 +515,64 @@ def infer_table_name(sample_cols: list[str], id: int) -> str:
         return "number_of_affected_population"
     if "displaced" in cols and "total" in cols:
         return "total_displaced_families_persons"
-    if "displaced" in cols and "outside" in cols:
-        return "inside_ec_displaced_families_persons"
     if "displaced" in cols and "inside" in cols:
+        return "inside_ec_displaced_families_persons"
+    if "served" in cols and "total" in cols:
+        return "total_displaced_families_persons"
+    if "served" in cols and "inside" in cols:
+        return "inside_ec_displaced_families_persons"
+    if "displaced" in cols and "outside" in cols:
+        return "outside_ec_displaced_families_persons"
+    if "served" in cols and "outside" in cols:
+        return "outside_ec_displaced_families_persons"
+    if "served" in cols and "oustide" in cols:
+        return "outside_ec_displaced_families_persons"
+    if "evacuation" in cols and "inside" in cols:
+        return "inside_ec_displaced_families_persons"
+    if "evacuation" in cols and "outside" in cols:
+        return "outside_ec_displaced_families_persons"
+    if "evacuation" in cols and "served" in cols:
+        return "total_ec_displaced_families_persons"
+    
+    if "served" in cols or "displaced" in cols:
+        return "total_ec_displaced_families_persons"
+    
+    if "inside" in cols:
+        return "inside_ec_displaced_families_persons"
+    
+    if "outside" in cols:
         return "outside_ec_displaced_families_persons"
     
     return cols if cols else f"table_{id}"
 
 # Main loop ──────────────────────────────────────────────────────────────
+
+device = "cuda" if torch.cuda.is_available() else "cpu"
+print(f"Using device: {device}")  # should print 'cuda'
+
 pipeline_options = PdfPipelineOptions()
 pipeline_options.do_ocr = False
 pipeline_options.do_table_structure = True
 pipeline_options.table_structure_options.do_cell_matching = True
+pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE  # can afford ACCURATE on GPU
+pipeline_options.generate_page_images = False
+pipeline_options.generate_picture_images = False
 pipeline_options.images_scale = 1.0
 
 converter = DocumentConverter(
     format_options={
-        InputFormat.PDF: PdfFormatOption(pipeline_options=pipeline_options)
+        InputFormat.PDF: PdfFormatOption(
+            pipeline_options=pipeline_options,
+            backend=PyPdfiumDocumentBackend)
     }
 )
 
-def process_file(file: Path, output_dir: Path):
+def process_file(pdf_path: Path, output_dir: Path):
 
-    pdf_path = resolve_pdf(file, PDF_CACHE)
     result = converter.convert(pdf_path)
     doc = result.document
 
-
-    manifest_path = file.parent / "manifest.json"  # or per-file json
+    manifest_path = pdf_path.parent / "manifest.json"  # or per-file json
     event = extract_report_metadata(doc, pdf_path, manifest_path)
 
     folder_name = make_folder_name(os.path.basename(pdf_path)) or event.eventName
@@ -493,6 +597,7 @@ def process_file(file: Path, output_dir: Path):
 
             # ── Find the location column ──────────────────────────────────────────
             loc_col_idx = find_location_column(df)
+
             if loc_col_idx is None:
                 print("  [skip] No location column detected.\n")
                 df.to_csv(f"./dump/{i}.csv", index=False)
@@ -524,7 +629,7 @@ def process_file(file: Path, output_dir: Path):
                     continue
                 if cell.text.strip() == str(loc_col_name).strip():
                     continue
-                if cell.text.strip().upper() in SKIP_TEXTS:          # ← new
+                if cell.text.strip().upper() in SKIP_TEXTS:          
                     continue
 
                 row_idx = cell.start_row_offset_idx
@@ -712,19 +817,21 @@ def parse_args():
 def main() -> None:
     args = parse_args()
 
-    input_dir = Path(f"../data/raw/dromic-new/{args.year}")
+    input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf")
     output_dir =  Path(f"../data/parsed/dromic-new/{args.year}")
 
     files = list(input_dir.glob("*"))
 
 
     for file in files:
-        if file.suffix.lower() not in [".pdf", ".docx"]:
+        if file.suffix != ".pdf":
             continue
-        try:
-            process_file(file, output_dir)
-        except Exception as e:
-            print(f"[ERROR] {file.name}: {e}")
+
+        process_file(file, output_dir)
+        # try:
+        #     process_file(file, output_dir)
+        # except Exception as e:
+        #     print(f"[ERROR] {file.name}: {e}")
 
 
 if __name__ == "__main__":
