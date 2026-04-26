@@ -1729,6 +1729,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/DisasterEvent
 :DisasterEvent rdf:type owl:Class ;
+               rdfs:subClassOf prov:Entity ;
                rdfs:label "Disaster Event"@en ;
                skos:definition "Any event that has dealt notable impact to the population, infrastructure, or has disrupted operations and services." .
 
@@ -2371,7 +2372,6 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 :DisasterTypeScheme rdf:type owl:NamedIndividual ,
                              skos:Concept ,
                              skos:ConceptScheme ,
-                             owl:Class ,
                              :DisasterTypeScheme ;
                     skos:hasTopConcept :Natural ,
                                        :Technological .

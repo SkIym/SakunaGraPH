@@ -45,6 +45,7 @@ AFF_POP_TOKENS = {
     "displacedPersonsI": ["displaced", "inside", "persons", "cum"],
     "displacedPersonsO": ["displaced", "outside", "persons", "cum"],
     "affectedBarangays": ["affected", "barangays"],
+    "affectedBarangays": ["affected", "brgy"],
     "affectedFamilies": ["affected", "families"],
     "affectedPersons": ["affected", "persons"],
     "displacedFamilies": ["displaced", "total", "families", "cum"],
