@@ -21,7 +21,7 @@ Sections:
   4. Blocker
   5. Scorer
   6. Aligner
-  7. Merger
+  7. Merger - temporarily disabled
 """
 
 from __future__ import annotations
@@ -34,8 +34,11 @@ from pathlib import Path
 from typing import Dict, Generic, TypeVar, Set
 from collections import defaultdict
 
+from mappings.iris import mint_canonical_iri
+
 # Earlier in list = higher authority
 SOURCE_PRIORITY = ["ndrrmc", "dromic", "emdat", "gda"]
+
 
 # Blocking
 BLOCKING_DATE_TOLERANCE_DAYS = 5   # mirrors DATE_HARD_GATE_DAYS — no point surfacing pairs we'll reject
@@ -867,30 +870,89 @@ class UnionFind(Generic[T]):
         if root_a != root_b:
             self.parent[root_b] = root_a
 
+def expand_clusters(
+    scored_pairs: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]],
+    registry: dict[str, frozenset[str]],
+) -> tuple[
+    list[tuple[URIRef, frozenset[URIRef]]],  # expanded existing clusters
+    list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]],                        # remaining new-vs-new matches
+]:
+    # build reverse lookup: member_uri -> canonical_iri
+    member_to_canonical: dict[str, str] = {
+        member: canonical
+        for canonical, members in registry.items()
+        for member in members
+    }
+
+    expanded: dict[str, set[str] | None] = {}   # canonical_iri -> updated member set
+    remaining: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]] = []
+
+    for a, b, sc in scored_pairs:
+        if not sc.is_match:
+            continue
+
+        a_known = a.uri in member_to_canonical
+        b_known = b.uri in member_to_canonical
+
+        if a_known and b_known:
+            # both already clustered — could be same or different clusters
+            canon_a = member_to_canonical[a.uri]
+            canon_b = member_to_canonical[b.uri]
+            if canon_a != canon_b:
+                # two existing clusters now found to match — merge them
+                # keep canon_a, absorb canon_b's members into it
+                merged = (
+                    set(registry[canon_a])
+                    | set(registry[canon_b])
+                )
+                expanded[canon_a] = merged
+                # mark canon_b as absorbed so save_registry can drop it
+                expanded[canon_b] = None  
+            continue
+
+        if a_known:
+            canon = member_to_canonical[a.uri]
+            expanded.setdefault(canon, set(registry[canon]))
+            expanded[canon].add(b.uri)
+        elif b_known:
+            canon = member_to_canonical[b.uri]
+            expanded.setdefault(canon, set(registry[canon]))
+            expanded[canon].add(a.uri)
+        else:
+            remaining.append((a, b, sc))
+
+    # rebuild as (canonical_iri, frozenset) — drop absorbed clusters
+    updated_clusters = [
+        (canonical, frozenset(members))
+        for canonical, members in expanded.items()
+        if members is not None
+    ]
+
+    return updated_clusters, remaining
+
 
 def build_clusters(
     matches: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]]
-) -> list[tuple[URIRef, set[URIRef]]]:
+) -> list[tuple[URIRef, frozenset[URIRef]]]:
 
     uf = UnionFind[URIRef]()
     for a, b, score in matches:
         if score.is_match:
             uf.union(a.uri, b.uri)
 
-    groups: Dict[URIRef, Set[URIRef]] = defaultdict(set)
+    clusters: Dict[URIRef, Set[URIRef]] = defaultdict(set)
     for uri in uf.parent:
         root = uf.find(uri)
-        groups[root].add(uri)
+        clusters[root].add(uri)
 
-    clusters: list[tuple[URIRef, set[URIRef]]] = []
-    for component in groups.values():
-        canonical = pick_canonical(component)
-        clusters.append((canonical, component))
-    return clusters
+    return [
+        (mint_canonical_iri(frozenset(members)), frozenset(members))
+        for members in clusters.values()
+    ]
 
 
 def write_alignments(
-    matches: list[tuple[DisasterEvent, DisasterEvent, ScoreBreakdown]],
+    clusters: list[tuple[URIRef, frozenset[URIRef]]],
     output_path: Path,
 ) -> Graph:
     """Write owl:sameAs alignment triples + gate diagnostics metadata to TTL."""
@@ -910,21 +972,38 @@ def write_alignments(
     g.add((run_uri, SKG.entryDate, Literal(datetime.now(timezone.utc).isoformat(), datatype=XSD.dateTime)))
     g.add((run_uri, RDFS.label,     Literal("SakunaGraPH entity alignment run")))
 
-    clusters = build_clusters(matches)
 
-    for canonical, cluster in clusters:
-        for other in sorted(cluster - {canonical}):
-            g.add((canonical, OWL.sameAs, other))
+    for canonical, members in clusters:
+        
+        canonical = URIRef(canonical)
 
-            stmt_uri = URIRef(
+        g.add((canonical, RDF.type, SKG.DisasterEvent)) # commond ID
+        member_list = list(members)
+
+        stmt_uri = URIRef(
                 f"{SAKUNA_NS}alignment/"
-                f"{str(canonical).split('/')[-1]}--{str(other).split('/')[-1]}"
-            )
-            g.add((stmt_uri, RDF.type,      RDF.Statement))
-            g.add((stmt_uri, RDF.subject,   canonical))
-            g.add((stmt_uri, RDF.predicate, OWL.sameAs))
-            g.add((stmt_uri, RDF.object,    other))
+                f"{str(canonical).split('/')[-1]}"
+        )
+
+        g.add((stmt_uri, RDF.type,      RDF.Statement))
+        g.add((stmt_uri, RDF.subject,   canonical))
+        g.add((stmt_uri, RDF.predicate, PROV.alternateOf))
+        
+        # common uri link 
+
+        for member in members:
+            member = URIRef(member)
+
+            g.add((canonical, PROV.alternateOf, member))
+            g.add((stmt_uri, RDF.object, member))
             g.add((stmt_uri, PROV.wasGeneratedBy, run_uri))
+        
+        # event link
+        for a, b in combinations(member_list, 2):
+            a = URIRef(a)
+            b = URIRef(b)
+            g.add((a, PROV.alternateOf, b))
+            g.add((b, PROV.alternateOf, a))
 
     g.serialize(str(output_path), format="turtle")
     print(f"  Wrote {len(clusters)} clusters -> {output_path}")
@@ -932,33 +1011,34 @@ def write_alignments(
 
 
 def save_registry(
-    clusters: list[tuple[URIRef, set[URIRef]]],
-    registry_path: Path,
+    clusters: list[tuple[URIRef, frozenset[URIRef]]],
+    path: Path
 ) -> None:
-    """Persist canonical -> duplicates mapping as JSON for incremental runs."""
     registry = {
-        str(canonical): [str(u) for u in sorted(cluster)]
-        for canonical, cluster in clusters
+        canonical_iri: sorted(members)  # sorted for deterministic JSON
+        for canonical_iri, members in clusters
     }
-    registry_path.parent.mkdir(parents=True, exist_ok=True)
-    with open(registry_path, "w") as f:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with open(path, "w", encoding="utf-8") as f:
         json.dump(registry, f, indent=2)
-    print(f"  Registry saved -> {registry_path}")
 
 
-def load_registry(registry_path: Path) -> dict[str, list[str]]:
-    if not registry_path.exists():
+def load_registry(path: Path) -> dict[str, frozenset[str]]:
+    if not path.exists():
         return {}
-    with open(registry_path) as f:
-        return json.load(f)
+    with open(path, "r", encoding="utf-8") as f:
+        raw = json.load(f)
+    return {
+        canonical_iri: frozenset(members)
+        for canonical_iri, members in raw.items()
+    }
 
 
-def get_known_pairs(registry: dict[str, list[str]]) -> set[frozenset[str]]:
-    known: set[frozenset[str]] = set()
-    for canonical, duplicates in registry.items():
-        for dup in duplicates:
-            known.add(frozenset([canonical, dup]))
-    return known
+def get_known_pairs(registry: dict[str, frozenset[str]]) -> set[str]:
+    known_members: set[str] = set()
+    for members in registry.values():
+        known_members.update(members)
+    return known_members
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -989,7 +1069,7 @@ def _infer_source_rank(uri: URIRef) -> int:
 def build_uri_to_canonical(alignment_graph: Graph) -> Dict[URIRef, URIRef]:
     """Read owl:sameAs triples, build connected components, return uri -> canonical map."""
     uf = UnionFind[URIRef]()
-    for s, _, o in alignment_graph.triples((None, OWL.sameAs, None)):
+    for s, _, o in alignment_graph.triples((None, PROV.alternateOf, None)):
         if isinstance(s, URIRef) and isinstance(o, URIRef):
             uf.union(s, o)
 
@@ -1052,7 +1132,7 @@ def merge_graphs(
     alignments = Graph()
     if alignments_path.exists():
         alignments.parse(str(alignments_path), format="turtle")
-        n_sameas = len(list(alignments.triples((None, OWL.sameAs, None))))
+        n_sameas = len(list(alignments.triples((None, PROV.alternateOf, None))))
         print(f"  {n_sameas} owl:sameAs pairs")
     else:
         print("  No alignments file found — producing unmerged graph")
@@ -1073,7 +1153,7 @@ def merge_graphs(
             triple_candidates[(canonical_s, p)].append((rank, canonical_o))
 
     print("Resolving conflicts...")
-    resolved = _resolve_conflicts(triple_candidates)
+    resolved =  (triple_candidates)
 
     merged = Graph()
     merged.bind("",    SKG)
@@ -1088,7 +1168,7 @@ def merge_graphs(
 
     for original, canonical in uri_to_canonical.items():
         if original != canonical:
-            merged.add((canonical, OWL.sameAs, original))
+            merged.add((canonical, PROV.alternateOf, original))
 
     merged.serialize(str(output_path), format="turtle")
     print(f"\ncanonical.ttl written: {len(merged)} triples -> {output_path}")
