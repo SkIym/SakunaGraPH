@@ -5,10 +5,10 @@ pandas
 geopandas
 rdflib
 openpyxl
-morph-kgc
 thefuzz
-spacy
 polars
-pytesseract
 sentence_transformers
 fastexcel
+docx2pdf
+docling
+lxml
