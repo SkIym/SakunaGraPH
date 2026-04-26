@@ -6,6 +6,7 @@ helper.py
 etl/data/
 __pycache__/
 __pycache__
-data/
+data/*
+logs/*
 ontology/catalog-v001.xml
 .DS_Store

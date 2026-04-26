@@ -31,6 +31,7 @@ log = logging.getLogger(__name__)
 def parse_args() -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="DROMIC situation report scraper")
     parser.add_argument("--year", type=int, required=True)
+    parser.add_argument("--page", type=int)
     parser.add_argument(
         "--last-scrape-date",
         type=str,
@@ -291,7 +292,15 @@ def handle_page(
                     (By.XPATH, "//a[contains(.,'Read More')]")
                 ))
                 return True
-                
+            
+            elif post_url in scraped_urls:
+                log.info("Skipping. Post already scraped.")
+                navigated_away = False
+                driver.back()
+                wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, "//a[contains(.,'Read More')]")
+                ))
+
             else:
 
                 file_url, file_name = extract_first_download_link(driver)
@@ -394,7 +403,7 @@ def main() -> None:
 
     if args.last_scrape_date:
         last_scrape_date = datetime.strptime(args.last_scrape_date, "%Y-%m-%d")
-    elif state.last_scrape_date:
+    elif state.last_scrape_date and not args.page:
         last_scrape_date = datetime.strptime(state.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
     else:
         last_scrape_date = datetime.min
@@ -415,9 +424,13 @@ def main() -> None:
     wait = WebDriverWait(driver, 10)
 
     base_url = f"https://dromic.dswd.gov.ph/category/situation-reports/{args.year}/"
+
+    if args.page:
+        base_url += f"page/{args.page}"
+
     driver.get(base_url)
 
-    page = 1
+    page = args.page if args.page else 1
     try:
         while page <= args.max_pages:
             log.info("Processing page %d", page)
