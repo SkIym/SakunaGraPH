@@ -1,33 +1,25 @@
 import argparse
 import os
 from typing import Any
-from docx import Document
-from docling.document_converter import DocumentConverter
-from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode
-from docling.document_converter import PdfFormatOption
+from docling.document_converter import DocumentConverter, PdfFormatOption
+from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode, TableStructureOptions
 from docling.datamodel.base_models import InputFormat
 from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 import pandas as pd
 import pdfplumber
-import re
-import subprocess   
+import re  
 from pathlib import Path
-from docx2pdf import convert
 from pdfplumber.page import Page
 from rapidfuzz import fuzz
 from datetime import datetime
 from dataclasses import dataclass, asdict
 import json
-import hashlib
-import zipfile
 import torch
-import win32com 
+from docling_core.types.doc.document import DoclingDocument
+
 
 os.environ["PYTHONUTF8"] = "1"
-RAW_PATH = "../data/raw/dromic/2022/DSWD-DROMIC-Terminal-Report-on-Tropical-Depression-Obet-07-November-2022-6PM.pdf"
 SIMILARITY_THRESHOLD = 0.95
-
-PDF_CACHE   = Path("../data/interim/pdf_cache")
 output_dir = Path("./dump")
 
 # metadata
@@ -49,8 +41,15 @@ class DromicEvent:
     downloadUrl    : str = ""
     page           : int = 0
     remarks        : str = ""
+
+def parse_dmy(day: str, month: str, year: str) -> str:
+    try:
+        return datetime.strptime(f"{day} {month} {year}", "%d %B %Y").strftime("%Y-%m-%d")
+    except ValueError:
+        return ""
+
     
-def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicEvent:
+def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path: Path) -> DromicEvent:
     first_page_texts = [
         item.text.strip()
         for item in doc.texts
@@ -78,19 +77,27 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
         event_name = title_match.group(1).strip()
 
     EVENT_TYPE_KEYWORDS = {
-        "Tropical Depression": "Tropical Depression",
-        "Tropical Storm":      "Tropical Storm",
-        "Typhoon":             "Typhoon",
-        "Earthquake":          "Earthquake",
+        "Tropical Depression": "Tropical Cyclone",
+        "Tropical Storm":      "Tropical Cyclone",
+        "Typhoon":             "Tropical Cyclone",
+        "Earthquake":          "Ground Movement",
+        "Tornado":               "Tornado",
         "Flood":               "Flood",
         "Flashflood":          "Flashflood",
+        "Flash Flood":          "Flashflood",
         "Landslide":           "Landslide",
         "Mudslide":            "Mudslide",
         "Armed Conflict":      "Armed Conflict",
+        "Monsoon":              "Storm General",
+        "Tail End":             "Storm General",
+        "Continuous rain":      "Storm General",
+        "Lightning":      "Thunderstorm",
+        "strong wind":      "Severe weather",
         "Disorganization":      "Armed Conflict",
         "Fire":                "Fire",
         "Volcanic":            "VolcanicActivityGeneral",
-        "Demolition":          "Demolition Incident",
+        "Volcano":            "VolcanicActivityGeneral",
+        "Demolition":          "Collapse",
         "Eruption":             "VolcanicActivityGeneral",
 
     }
@@ -117,20 +124,26 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
             report_date = date_match.group(1)
 
     location = ""
+
+    # Try Sitio/Purok/Brgy. in event_name first
     loc_match = re.search(
         r'(?:in|at)\s+((?:Sitio|Purok|Brgy\.)[^,\n]+(?:,\s*[^,\n]+){1,4})',
-        event_name,
-        re.IGNORECASE
+        event_name, re.IGNORECASE
     )
-
+    # Try plain "in location" from event_name (e.g. "in Mabini, Batangas")
+    if not loc_match:
+        loc_match = re.search(
+            r'\bin\s+(.+)$',
+            event_name.strip(), 
+            re.IGNORECASE
+        )
+    # Fall back to full_text with Brgy/Sitio
     if not loc_match:
         loc_match = re.search(
             r'(?:in|at)\s+((?:Sitio|Purok|Brgy\.)[^,\n]+(?:,\s*[^,\n]+){1,4})',
-            full_text,
-            re.IGNORECASE
+            full_text, re.IGNORECASE
         )
-
-    if loc_match:    
+    if loc_match:
         location = loc_match.group(1).strip()
 
     MONTHS = (
@@ -138,54 +151,81 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
         "September|October|November|December"
     )
 
-    def parse_dmy(day: str, month: str, year: str) -> str:
-        try:
-            return datetime.strptime(f"{day} {month} {year}", "%d %B %Y").strftime("%Y-%m-%d")
-        except ValueError:
-            return ""
-
+    HEADER_PATTERNS: list[str | re.Pattern[str]] = [
+        r'Republic of the Philippines\s*',
+        r'Disaster Response Operations Monitoring and Information Center\s*',
+        r'DISASTER RESPONSE ASSISTANCE AND MANAGEMENT BUREAU[^\n]*\n',
+        r'Page\s+\d+\s+of\s+\d+\|[^\n]*\n',
+        r'DSWD\s+DROMIC\s+(?:Situation\s+Report|Terminal\s+Report)[^\n]*\n',
+        r'(?:Situation\s+Report|Terminal\s+Report)\s+on\s+[^\n]*\n',
+        r'as\s+of\s+\d{1,2}\s+\w+\s+\d{4}[^\n]*\n',
+        event_name
+    ]
     remarks = ""
-    # ── Tier 1: explicit sections ─────────────────────────────
+    clean_text = full_text
+
+    # print(full_text)
+    for pat in HEADER_PATTERNS:
+        clean_text = re.sub(pat, '', clean_text, flags=re.IGNORECASE)
+    clean_text = clean_text.strip()
+    # print(clean_text)
+
+    # Tier 1: explicit section headers
     overview_match = re.search(
-        r'(?:Situation Overview|Background|SUMMARY)\s*\n+(.+?)(?:\n{2,}|\Z)',
-        full_text, re.IGNORECASE | re.DOTALL
+        r'(?:Situation Overview|Background|SUMMARY)\s*\n+(.+?)(?=\n{2,}|Source:|^\s*\d+\.|$)',
+        clean_text, re.IGNORECASE | re.DOTALL | re.MULTILINE
     )
     if overview_match:
-        remarks = re.sub(r'\s+', ' ', overview_match.group(1)).strip()
+        raw = overview_match.group(1).strip()
+        first_para = re.split(r'\n{2,}|Source:', raw)[0].strip()
+        if len(first_para.split()) < 10:
+            paras = re.split(r'\n{2,}|Source:', raw)
+            first_para = next((p for p in paras if len(p.split()) >= 10), first_para)
+        remarks = re.sub(r'\s+', ' ', first_para).strip()
 
-    paragraphs = re.split(r'\n{2,}', full_text)
-    # ── Tier 2: narrative paragraph (On <date>...) ────────────
+        # print("tier 1: ", remarks)
+
+
+    # Tier 2: "This is the final report..." or "On/At <date>..." pattern
     if not remarks:
+        match = re.search(
+            r'(This\s+is\s+the\s+final\s+report.+?)(?=\s+\d+\.\s+[A-Z]|Table\s+\d+|Source:|\Z)',
+            clean_text,
+            re.IGNORECASE | re.DOTALL
+        )
+
+        if match:
+            remarks = re.sub(r'\s+', ' ', match.group(1)).strip()
+        # print("tier 2: ", remarks)
+
+    # Tier 3: first meaningful paragraph not matching header/numbering patterns
+    if not remarks:
+        sentences = re.split(r'(?<=[.!?])\s+', clean_text)
+
+        for s in sentences:
+            s_clean = re.split(r'Source:', s)[0].strip()
+
+            if (
+                len(s_clean.split()) > 12
+                and not s_clean.isupper()
+                and not re.match(r'^\d+\.', s_clean)          # skip "1. ..."
+                and not re.match(r'^Table\s+\d+', s_clean)    # skip table titles
+                and not re.match(r'^Page\s+\d+', s_clean)     # skip page headers
+                and 'DROMIC' not in s_clean[:40]
+            ):
+                remarks = re.sub(r'\s+', ' ', s_clean).strip()
+                break
+
+        # print("tier 3:", remarks)
         
-        for p in paragraphs:
-            if re.search(r'(At|Last|On|At around)\s+\d{1,2}\s+\w+\s+\d{4}', p, re.IGNORECASE):
-                remarks = re.sub(r'\s+', ' ', p).strip()
-                break
 
-    # ── Tier 3: first meaningful paragraph ────────────────────
-    if not remarks:
-        for p in paragraphs:
-            if len(p.split()) > 15 and not p.isupper():
-                remarks = p.strip()
-                break
-
-    # ── Tier 4: fallback to title ─────────────────────────────
+    # Tier 4: fallback
     if not remarks and event_name:
         remarks = f"This report covers {event_name.lower()}."
 
     # Combine for better temporal extraction
     text_for_dates = full_text + "\n" + remarks
 
-    MONTHS = (
-        "January|February|March|April|May|June|July|August|"
-        "September|October|November|December"
-    )
-
-    def parse_dmy(day: str, month: str, year: str) -> str:
-        try:
-            return datetime.strptime(f"{day} {month} {year}", "%d %B %Y").strftime("%Y-%m-%d")
-        except ValueError:
-            return ""
 
     start_date, end_date = "", ""
 
@@ -218,6 +258,10 @@ def extract_report_metadata(doc, pdf_path: Path, manifest_path: Path) -> DromicE
                 start_date = parse_dmy(day, month, year)
 
     # ── Final fallback ──────────────────────────────────────────────────────
+    if not start_date:
+        start_date = report_date
+        end_date = report_date
+
     if not end_date and start_date:
         end_date = start_date
 
@@ -263,7 +307,7 @@ def is_italic(fontname: str) -> bool:
 EXPECTED_SIZE_MIN = 7.5
 EXPECTED_SIZE_MAX = 13.5  # excludes the size=16 heading bleed
 
-def classify_level(words: list[dict]) -> str | None:
+def classify_level(words: list[dict[Any, Any]]) -> str | None:
     if not words:
         return None
 
@@ -281,7 +325,7 @@ def classify_level(words: list[dict]) -> str | None:
     all_caps = text == text.upper() and any(c.isalpha() for c in text)
 
     # ── DEBUG ──
-    print(f"    classify → text={text!r} bold={bold_count}/{total} italic={italic_count}/{total} all_caps={all_caps} fonts={[w['fontname'] for w in words]}")
+    # print(f"    classify → text={text!r} bold={bold_count}/{total} italic={italic_count}/{total} all_caps={all_caps} fonts={[w['fontname'] for w in words]}")
 
     if any(k in text.lower() for k in ["region", "luzon", "mindanao", "visayas"]):
         return "region"
@@ -299,7 +343,7 @@ def classify_level(words: list[dict]) -> str | None:
         return "province"
 
     # fallback: indentation-based
-    if majority_italic or x0 > 100 :   # tune threshold
+    if majority_italic or x0 > 50 :   # tune threshold
         return "municipality"
 
     return None
@@ -485,7 +529,7 @@ def align_columns(base_df: pd.DataFrame, other_df: pd.DataFrame) -> pd.DataFrame
     result = result.loc[:, ~result.columns.duplicated()]
     return result
 
-def make_folder_name(filename: str) -> str:
+def make_folder_name(filename: str, report_date: str = "") -> str:
     name = os.path.splitext(filename)[0]
     year_m = re.search(r'\b(20\d{2})\b', name)
     year   = year_m.group(1) if year_m else ""
@@ -494,13 +538,18 @@ def make_folder_name(filename: str) -> str:
     desc = re.sub(r'[\s\-]*as[\s\-]of[\s\-].*$', '', desc, flags=re.IGNORECASE)
     desc = re.sub(r'[\s\-]*\d{1,2}[\s\-][A-Za-z]+[\s\-]20\d{2}.*$', '', desc, flags=re.IGNORECASE)
     desc = re.sub(r'[\s\-]+[1-9A-Z]$', '', desc)
-
-    # Sanitize — remove Windows-invalid chars AND commas
-    desc = re.sub(r'[#<>:"/\\|?*,]', '', desc)  # ← added comma
+    desc = re.sub(r'[#<>:"/\\|?*,]', '', desc)
     desc = desc.replace('-', ' ').strip()
     desc = re.sub(r'\s+', ' ', desc).strip()
 
-    folder = f"{desc} {year}".strip() if year else desc.strip()
+    # Use report_date as disambiguator if provided (YYYY-MM-DD → YYYYMMDD)
+    date_suffix = report_date.replace("-", "") if report_date else ""
+
+    parts = [p for p in [desc, date_suffix] if p]
+    folder = " ".join(parts)
+    if year and year not in folder:
+        folder = f"{folder} {year}".strip()
+
     return folder[:80].strip()
 
 def infer_table_name(sample_cols: list[str], id: int) -> str:
@@ -511,8 +560,10 @@ def infer_table_name(sample_cols: list[str], id: int) -> str:
         return "number_of_damaged_houses"
     if "assistance" in cols:
         return "cost_of_assistance"
-    if "affected" in cols:
+    if "affected" in cols and "evacuation" not in cols: 
         return "number_of_affected_population"
+    if "affected" in cols and "evacuation" in cols:
+        return "inside_ec_displaced_families_persons"
     if "displaced" in cols and "total" in cols:
         return "total_displaced_families_persons"
     if "displaced" in cols and "inside" in cols:
@@ -534,7 +585,7 @@ def infer_table_name(sample_cols: list[str], id: int) -> str:
     if "evacuation" in cols and "served" in cols:
         return "total_ec_displaced_families_persons"
     
-    if "served" in cols or "displaced" in cols:
+    if "served" in cols or "displaced" in cols or "evacuee" in cols:
         return "total_ec_displaced_families_persons"
     
     if "inside" in cols:
@@ -542,6 +593,7 @@ def infer_table_name(sample_cols: list[str], id: int) -> str:
     
     if "outside" in cols:
         return "outside_ec_displaced_families_persons"
+    
     
     return cols if cols else f"table_{id}"
 
@@ -553,8 +605,12 @@ print(f"Using device: {device}")  # should print 'cuda'
 pipeline_options = PdfPipelineOptions()
 pipeline_options.do_ocr = False
 pipeline_options.do_table_structure = True
-pipeline_options.table_structure_options.do_cell_matching = True
-pipeline_options.table_structure_options.mode = TableFormerMode.ACCURATE  # can afford ACCURATE on GPU
+
+pipeline_options.table_structure_options = TableStructureOptions(
+    do_cell_matching=True,
+    mode=TableFormerMode.ACCURATE  # can afford ACCURATE on GPU
+)
+
 pipeline_options.generate_page_images = False
 pipeline_options.generate_picture_images = False
 pipeline_options.images_scale = 1.0
@@ -575,7 +631,7 @@ def process_file(pdf_path: Path, output_dir: Path):
     manifest_path = pdf_path.parent / "manifest.json"  # or per-file json
     event = extract_report_metadata(doc, pdf_path, manifest_path)
 
-    folder_name = make_folder_name(os.path.basename(pdf_path)) or event.eventName
+    folder_name = make_folder_name(os.path.basename(pdf_path), event.lastUpdateDate) or event.eventName
     output_dir  = Path(os.path.join(output_dir, folder_name))
     os.makedirs(output_dir, exist_ok=True)
 
@@ -618,7 +674,7 @@ def process_file(pdf_path: Path, output_dir: Path):
             # .prov entries that tell us which page it's on.
 
             # ── Build row_bbox_map ────────────────────────────────────────────────────────
-            row_bbox_map: dict[int, tuple[int, tuple]] = {}
+            row_bbox_map: dict[int, tuple[int, tuple[float, float, float, float]]] = {}
 
             SKIP_TEXTS = {"GRAND TOTAL", "GRAND  TOTAL"}  # handle double-space variants
 
@@ -634,6 +690,10 @@ def process_file(pdf_path: Path, output_dir: Path):
 
                 row_idx = cell.start_row_offset_idx
                 bbox    = cell.bbox
+
+                if bbox is None:
+                    continue 
+
                 row_bbox_map[row_idx] = (prov_pages[0], (bbox.l, bbox.t, bbox.r, bbox.b))
 
             # Derive offset: minimum row_idx in the map = first data row → maps to df row 0
@@ -650,6 +710,8 @@ def process_file(pdf_path: Path, output_dir: Path):
             cell_text_to_row_idx: dict[str, int] = {}
             for row_idx, (page_no, bbox) in sorted(row_bbox_map.items()):
                 plumber_page = plumber_pages.get(page_no)
+                if plumber_page is None:
+                    continue
                 words = extract_cell_words_on_page(plumber_page, bbox)
                 cell_text = " ".join(w["text"] for w in words).strip()
                 cell_text_to_row_idx[cell_text] = row_idx
@@ -716,18 +778,6 @@ def process_file(pdf_path: Path, output_dir: Path):
     processed_tables = fix_caption_sequence(processed_tables)
 
     # ── grouping logic: merge by signature OR by high similarity to adjacent table ─
-    # print("\n=== processed_tables before grouping ===")
-    # for i, (caption, df) in enumerate(processed_tables):
-    #     print(f"  [{i}] caption={caption!r} | cols={list(df.columns)[:3]}... | rows={len(df)}")
-
-    # print("\n=== similarity matrix ===")
-    # for i in range(len(processed_tables)):
-    #     for j in range(i+1, len(processed_tables)):
-    #         df1 = processed_tables[i][1]
-    #         df2 = processed_tables[j][1]
-    #         sim = col_similarity(df1, df2)
-    #         if sim > 0.3:  # only show non-trivial similarities
-    #             print(f"  [{i}] vs [{j}]: similarity={sim:.2f}")
 
     groups: dict[int, list[tuple[str, pd.DataFrame]]] = {}
     group_representatives: dict[int, pd.DataFrame] = {}
@@ -764,6 +814,7 @@ def process_file(pdf_path: Path, output_dir: Path):
             group_last_idx[group_id] = pos
             group_id += 1
 
+    merged_results: list[dict[str, Any]] = []
 
     # ── save each group ───────────────────────────────────────────────────────────
     for gid, items in groups.items():
@@ -786,26 +837,52 @@ def process_file(pdf_path: Path, output_dir: Path):
         
 
         # Dedup base_df too before using as reference
-        base_caption, base_df = items[0]
-        base_df = base_df.loc[:, ~base_df.columns.duplicated()]
-
+        base_df = items[0][1].loc[:, ~items[0][1].columns.duplicated()]
         aligned = [base_df] + [align_columns(base_df, df) for _, df in items[1:]]
-
-        # Reindex each df to base columns only before concat to avoid schema drift
         base_cols = list(base_df.columns)
         aligned = [df.reindex(columns=base_cols) for df in aligned]
-
         merged_df = pd.concat(aligned, ignore_index=True)
+        
+        merged_results.append({
+            "caption": caption,
+            "df": merged_df,
+            "filename": filename
+        })
 
-        # Handle duplicate filename
+    final_to_save: list[dict[str, Any]] = []
+    for i, table_i in enumerate(merged_results):
+        is_summary = False
+        df_i = table_i["df"]
+        
+        for j, table_j in enumerate(merged_results):
+            if i == j: continue
+            df_j = table_j["df"]
+            
+            # If tables are highly similar and table_j has more rows, i is a summary
+            if col_similarity(df_i, df_j) > 0.95:
+                if len(df_j) > len(df_i):
+                    print(f"  [dedupe] Skipping summary '{table_i['caption']}' ({len(df_i)} rows) "
+                        f"in favor of detailed '{table_j['caption']}' ({len(df_j)} rows)")
+                    is_summary = True
+                    break
+        
+        if not is_summary:
+            final_to_save.append(table_i)
+
+    # Final Save
+    for item in final_to_save:
+        df = item["df"]
+        filename = item["filename"]
+        
+        # Final safety check for duplicate filenames in the same folder
         counter = 1
-        original = filename
+        original_stem = Path(filename).stem
         while (output_dir / filename).exists():
-            filename = slugify(caption) + f"_{counter}.csv"
+            filename = f"{original_stem}_{counter}.csv"
             counter += 1
-
-        merged_df.to_csv(output_dir / filename, index=False)
-        print(f"Saved: {filename} ({len(merged_df)} rows from {len(items)} table(s))")
+            
+        df.to_csv(output_dir / filename, index=False)
+        print(f"Saved: {filename} ({len(df)} rows)")
 
 
 def parse_args():
