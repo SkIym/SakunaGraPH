@@ -165,10 +165,10 @@ def convert_docx_to_pdf_word(src: Path, dest: Path, retries: int=3, delay: float
     return converted
 
 
-def copy_pdfs(src: Path, dst: Path) -> None:
-    """Copy any PDFs that already exist in src into dst (no conversion needed)."""
+def copy_pdfs_jsons(src: Path, dst: Path) -> None:
+    """Copy any PDFs that already exist and jsons in src into dst (no conversion needed)."""
     dst.mkdir(parents=True, exist_ok=True)
-    for p in src.rglob("*.pdf"):
+    for p in list(src.rglob("*.pdf")) + list(src.rglob("*.json")):
         if p.is_file():
             target = dst / p.name
             if target.exists():
@@ -180,6 +180,7 @@ def copy_pdfs(src: Path, dst: Path) -> None:
             shutil.copy2(p, target)
 
 
+
 # =============================================================================
 # MAIN
 # =============================================================================
@@ -189,7 +190,7 @@ def main():
     parser.add_argument("--year",           required=True,  help="Year to process")
     parser.add_argument("--input-dir",      default=None,   help="Override input directory")
     parser.add_argument("--output-dir",     default=None,   help="Override output directory")
-    parser.add_argument("--min-row-height", default=14.0,   type=float,
+    parser.add_argument("--min-row-height", default=18.0,   type=float,
                         help="Minimum table row height in points (default: 14.0)")
     args = parser.parse_args()
 
@@ -204,7 +205,7 @@ def main():
         input_dir, output_dir,
         min_row_height_pt=args.min_row_height,
     )
-    copy_pdfs(input_dir, output_dir)
+    copy_pdfs_jsons(input_dir, output_dir)
 
     print(f"\nDone. Converted {len(converted)} file(s).")
 
