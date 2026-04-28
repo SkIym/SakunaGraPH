@@ -6,7 +6,6 @@ import polars as pl
 from polars import DataFrame
 import datetime
 from mappings.iris import EMDAT_EVENT_NS
-from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from etl.transform.helpers import to_float, to_int
 from mappings.emdat import Assistance, Event, Recovery, Source, DamageGeneral, Casualties, AffectedPopulation
 from semantic_processing.location_matcher_single import canonicalize_column

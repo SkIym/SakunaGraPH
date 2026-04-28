@@ -15,6 +15,8 @@ from datetime import datetime
 import re
 import polars as pl
 
+# add guard: if municiplaity row all blank, consider province instead as collapse key
+
 def _event_id(event_name: str, start_date: str | None) -> str:
     """Deterministic hex ID from event name + start date."""
     key = f"{event_name.strip().lower()}:{start_date or ''}"
@@ -54,7 +56,7 @@ def load_event(file_path: str) -> Event:
     # if location is explicit add, if not, tag through impact (outside)
     hasLocation = ""
     hasBarangay = ""
-    if location and location != "":
+    if location and location != "" and "," in location:
         (hasBarangay, location) = _extract_barangay(location)
         hasLocation = "|".join(LOCATION_MATCHER.match_cell(location))
 
@@ -142,7 +144,7 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
     except pl.exceptions.SchemaError:
         return (None, None)
 
-    # resolve O + I into displacedFamilies / displacedPersons only if no total displaced file
+    # resolve O + I into displacedFamilies / displacedPersons only if no total displaced file / columns
     if not has_total_displaced:
         fam_cols = [c for c in ["displacedFamiliesO", "displacedFamiliesI"] if c in combined.columns]
         per_cols = [c for c in ["displacedPersonsO", "displacedPersonsI"] if c in combined.columns]
