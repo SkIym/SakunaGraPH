@@ -172,11 +172,7 @@ def copy_pdfs_jsons(src: Path, dst: Path) -> None:
         if p.is_file():
             target = dst / p.name
             if target.exists():
-                stem, suffix = target.stem, target.suffix
-                i = 1
-                while target.exists():
-                    target = dst / f"{stem}_{i}{suffix}"
-                    i += 1
+                continue
             shutil.copy2(p, target)
 
 

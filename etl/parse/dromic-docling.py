@@ -74,8 +74,10 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
         r'(?:on\s+)?(?:the\s+)?(.+?)(?:\n|,\s*\d{2}\s+\w+|\s+\d{2}\s+\w+)',
         full_text, re.IGNORECASE
     )
+
     if title_match:
         event_name = title_match.group(1).strip()
+
 
     EVENT_TYPE_KEYWORDS = {
         "Tropical Depression": "Tropical Cyclone",
@@ -267,7 +269,7 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
         end_date = start_date
 
     return DromicEvent(
-        eventName    = event_name,
+        eventName    = event_name if event_name else make_folder_name(manifest_entry["filename"] if manifest_entry else pdf_path.name),
         eventType    = event_type,
         location     = location,
         reportNumber = report_number,
@@ -444,13 +446,24 @@ def validate_caption(caption: str, df: pd.DataFrame) -> str:
         return caption
 
     caption_lower = caption.lower()
-    col_text = " ".join(df.columns).upper()
+    col_text = " ".join(str(c) for c in df.columns).upper()
 
     if any(k in caption_lower for k in ["page", "note"]):
         return ""
     
     inferred_caption = infer_table_name([caption], 0)
     if inferred_caption != caption: # if it matched any key words
+        # Verify the inferred name is consistent with the actual column content.
+        # A caption may mention e.g. "assistance" while the table is really about
+        # damaged houses — the column check catches that mismatch.
+        inferred_lower = inferred_caption.replace('_', ' ')
+        for cap_kw, col_kw in CAPTION_CONTENT_KEYWORDS:
+            if cap_kw in inferred_lower:
+                if col_kw not in col_text:
+                    print(f"  [caption mismatch] Inferred '{inferred_caption}' from caption "
+                          f"but no '{col_kw}' in columns — clearing caption")
+                    return ""
+                break
         return inferred_caption
 
     for cap_kw, col_kw in CAPTION_CONTENT_KEYWORDS:
@@ -626,6 +639,156 @@ def infer_table_name(sample_cols: list[str], id: int) -> str:
 
     return cols[:60] if cols else f"table_{id}"
 
+
+def clean_column_names(df: pd.DataFrame) -> pd.DataFrame:
+    """Collapse newlines and extra whitespace within column names.
+
+    Docling joins multi-line header cell text with '\\n', so the same column
+    can appear as 'DISPLACED\\nFAMILIES' on one page and 'DISPLACED FAMILIES'
+    on the next.  Normalising here keeps col_similarity stable.
+    """
+    df.columns = [re.sub(r'\s+', ' ', str(c)).strip() for c in df.columns]
+    return df
+
+
+def drop_repeated_header_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Remove leading rows that echo the column headers.
+
+    Pass 1 — column-name match: drops rows whose values fuzzy-match the current
+    column labels (handles repeated headers on continuation pages).
+
+    Pass 2 — orphan sub-header detection: after pass 1, drops any remaining
+    leading rows where *every* non-location, non-empty data cell contains only
+    alphabetic text (no digits).  In DROMIC tables all real data cells are
+    numbers or dashes, so an all-alpha data row must be a sub-header label row
+    (e.g. 'Partially | Totally') that Docling didn't flag as column_header=True.
+    """
+    if df.empty:
+        return df
+
+    # ── Pass 1: fuzzy match against column names ──────────────────────────────
+    cols_norm = [normalize_col(str(c)) for c in df.columns]
+    drop_up_to = 0
+
+    for idx in range(min(3, len(df))):
+        row_vals = [normalize_col(str(v)) for v in df.iloc[idx].values]
+        pairs = [
+            (c, r) for c, r in zip(cols_norm, row_vals)
+            if c and r not in ('', 'NAN', 'NONE')
+        ]
+        if not pairs:
+            continue
+        match_count = sum(1 for c, r in pairs if fuzz.token_set_ratio(c, r) >= 75)
+        if match_count / len(pairs) >= 0.5:
+            drop_up_to = idx + 1
+        else:
+            break
+
+    if drop_up_to:
+        print(f"  [continuation] Dropped {drop_up_to} repeated header row(s)")
+        df = df.iloc[drop_up_to:].reset_index(drop=True)
+
+    # ── Pass 2: orphan sub-header rows (all-alpha data cells) ─────────────────
+    drop_up_to2 = 0
+    for idx in range(min(3, len(df))):
+        row = df.iloc[idx]
+        data_vals = [
+            str(v).strip()
+            for col, v in row.items()
+            if not is_location_col(str(col))
+            and str(v).strip().upper() not in ('', 'NAN', 'NONE')
+        ]
+        if not data_vals:
+            continue  # row is location-only — skip, not a sub-header
+        if all(re.match(r'^[A-Za-z][A-Za-z0-9 /\(\)\.]*$', v) and not re.search(r'\d', v)
+               for v in data_vals):
+            drop_up_to2 = idx + 1
+        else:
+            break  # first row with numeric data — stop
+
+    if drop_up_to2:
+        print(f"  [sub-header]  Dropped {drop_up_to2} orphan sub-header row(s)")
+        df = df.iloc[drop_up_to2:].reset_index(drop=True)
+
+    return df
+
+
+def strip_absorbed_data_from_columns(df: pd.DataFrame) -> pd.DataFrame:
+    """Strip numeric data values that Docling absorbed into column names.
+
+    When a table has 3 header rows, Docling flattens them with '.' as separator.
+    If it misidentifies the GRAND TOTAL row as a third header row the result is:
+      'NO. OF DAMAGED HOUSES.Total.115,840'  →  'NO. OF DAMAGED HOUSES.Total'
+      'REGION / PROVINCE / MUNICIPALITY..GRAND TOTAL'  →  'REGION / PROVINCE / MUNICIPALITY'
+    The fix strips any trailing segment that is a bare number (with optional commas)
+    or the literal text 'GRAND TOTAL'.
+    """
+    new_cols = []
+    for col in df.columns:
+        cleaned = re.sub(
+            r'[\.\s]+(GRAND\s+TOTAL|\d[\d,]*)$',
+            '', str(col), flags=re.IGNORECASE
+        ).strip('.')
+        new_cols.append(cleaned.strip() if cleaned.strip() else str(col))
+    if new_cols != list(df.columns):
+        print(f"  [col-clean] Stripped absorbed data from column names")
+    df.columns = new_cols
+    return df
+
+
+def split_merged_rows(df: pd.DataFrame) -> pd.DataFrame:
+    """Split rows where Docling fused adjacent PDF rows due to small row height.
+
+    Fused rows are detected by cells containing two or more values separated
+    by 2+ consecutive spaces (e.g. '9  1', 'City of Balanga  Dinalupihan').
+    'region' and 'province' are always propagated to every split row since
+    they come from forward-filled higher-level rows and are never merged.
+    All other columns — including 'municipality' — are split normally, so
+    'City of Balanga (capital)  Dinalupihan' becomes two correct rows.
+    For columns with only a single value in a merged row, the value is kept
+    on the first split row and left empty on the rest (information was lost
+    at the PDF-parsing stage and cannot be recovered).
+    """
+    PROPAGATE = {"region", "province"}
+
+    new_rows: list[dict] = []
+    split_count = 0
+
+    for _, row in df.iterrows():
+        n_splits = 1
+        for col, val in row.items():
+            if col in PROPAGATE:
+                continue
+            s = str(val).strip()
+            if re.search(r'  +', s):
+                parts = [p for p in re.split(r'  +', s) if p.strip() or p == '']
+                n_splits = max(n_splits, len(parts))
+
+        if n_splits <= 1:
+            new_rows.append(row.to_dict())
+            continue
+
+        split_count += 1
+        for k in range(n_splits):
+            new_row: dict = {}
+            for col, val in row.items():
+                if col in PROPAGATE:
+                    new_row[col] = val
+                    continue
+                s = str(val).strip()
+                if re.search(r'  +', s):
+                    parts = [p.strip() for p in re.split(r'  +', s)]
+                    new_row[col] = parts[k] if k < len(parts) else ''
+                else:
+                    new_row[col] = val if k == 0 else ''
+            new_rows.append(new_row)
+
+    if split_count:
+        print(f"  [row-split] Split {split_count} merged row(s)")
+
+    return pd.DataFrame(new_rows, columns=df.columns)
+
+
 # Main loop ──────────────────────────────────────────────────────────────
 
 device = "cuda" if torch.cuda.is_available() else "cpu"
@@ -678,6 +841,10 @@ def process_file(pdf_path: Path, output_dir: Path):
             # print(f"=== Table {i+1} | pages={prov_pages} | caption={caption!r} ===")
 
             df = table.export_to_dataframe(doc)
+            df = clean_column_names(df)
+            df = strip_absorbed_data_from_columns(df)
+            df = drop_repeated_header_rows(df)
+            print(df.columns.tolist())
             caption = validate_caption(caption, df)  # validate before processing
 
             # ── Find the location column ──────────────────────────────────────────
@@ -800,6 +967,8 @@ def process_file(pdf_path: Path, output_dir: Path):
             df.insert(1, "province",     province_col)
             df.insert(2, "municipality", municipality_col)
 
+            df = split_merged_rows(df)
+
             processed_tables.append((caption or "", df))
             # print(df.to_string())
 
@@ -830,7 +999,12 @@ def process_file(pdf_path: Path, output_dir: Path):
                 continue  # both have real captions — they're different tables
 
             sim = col_similarity(df, rep_df)
-            if sim >= SIMILARITY_THRESHOLD:
+            # Continuation pages are always immediately adjacent; allow a
+            # slightly lower threshold to absorb minor column-name variations
+            # (e.g. abbreviation differences) that survive normalisation.
+            is_adjacent = pos - group_last_idx[gid] == 1
+            threshold = 0.85 if is_adjacent else SIMILARITY_THRESHOLD
+            if sim >= threshold:
                 groups[gid].append((caption, df))
                 group_last_idx[gid] = pos
                 merged = True
@@ -886,9 +1060,11 @@ def process_file(pdf_path: Path, output_dir: Path):
             if i == j: continue
             df_j = table_j["df"]
             
-            # If tables are highly similar and table_j has more rows, i is a summary
+            # Only deduplicate when table_j is substantially larger — requiring
+            # at least 2× the rows prevents page-continuation segments (30 rows
+            # vs 32 rows) from being wrongly classified as summary vs detail.
             if col_similarity(df_i, df_j) > 0.95:
-                if len(df_j) > len(df_i):
+                if len(df_j) >= max(len(df_i) * 2, len(df_i) + 10):
                     print(f"  [dedupe] Skipping summary '{table_i['caption']}' ({len(df_i)} rows) "
                         f"in favor of detailed '{table_j['caption']}' ({len(df_j)} rows)")
                     is_summary = True
@@ -922,7 +1098,7 @@ def parse_args():
 def main() -> None:
     args = parse_args()
 
-    input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf")
+    input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf-mini")
     output_dir =  Path(f"../data/parsed/dromic-new/{args.year}")
 
     files = list(input_dir.glob("*"))
