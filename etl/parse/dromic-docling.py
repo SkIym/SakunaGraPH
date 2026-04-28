@@ -698,8 +698,8 @@ def drop_repeated_header_rows(df: pd.DataFrame) -> pd.DataFrame:
             if not is_location_col(str(col))
             and str(v).strip().upper() not in ('', 'NAN', 'NONE')
         ]
-        if not data_vals:
-            continue  # row is location-only — skip, not a sub-header
+        if len(data_vals) < 2:
+            continue  # too few non-location values to judge reliably
         if all(re.match(r'^[A-Za-z][A-Za-z0-9 /\(\)\.]*$', v) and not re.search(r'\d', v)
                for v in data_vals):
             drop_up_to2 = idx + 1
@@ -849,11 +849,21 @@ def process_file(pdf_path: Path, output_dir: Path):
 
             # ── Find the location column ──────────────────────────────────────────
             loc_col_idx = find_location_column(df)
+            used_fallback = False
 
             if loc_col_idx is None:
-                print("  [skip] No location column detected.\n")
-                df.to_csv(f"./dump/{i}.csv", index=False)
-                continue
+                # Headerless continuation pages have a data value (e.g. "Surigao del Norte")
+                # as the column name, so no keyword match is possible.  Fall back to col 0 —
+                # in DROMIC tables the location column is always first.  If the assumption is
+                # wrong the level-classification gate further below will still skip the table.
+                if df.shape[1] > 1:
+                    loc_col_idx = 0
+                    used_fallback = True
+                    print(f"  [fallback] No named location column; trying col 0 ({df.columns[0]!r})")
+                else:
+                    print("  [skip] No location column detected.\n")
+                    df.to_csv(f"./dump/{i}.csv", index=False)
+                    continue
 
             loc_col_name = df.columns[loc_col_idx]
             # print(f"  Location column: index={loc_col_idx}, name={loc_col_name!r}")
@@ -935,6 +945,14 @@ def process_file(pdf_path: Path, output_dir: Path):
                 df_row = row_idx - min_row_idx
                 if 0 <= df_row < len(df):
                     level_per_df_row[df_row] = level
+
+            # When using the col-0 fallback, guard against narrative tables:
+            # if no rows were classified as any location level the first column
+            # is almost certainly not a location column (e.g. a DATE column).
+            if used_fallback and not any(v is not None for v in level_per_df_row.values()):
+                print("  [skip] No location hierarchy detected after fallback — likely narrative table.\n")
+                df.to_csv(f"./dump/{i}.csv", index=False)
+                continue
 
             # ── Forward-fill region / province / municipality ─────────────────────
             region_col: list[str | None]      = []
