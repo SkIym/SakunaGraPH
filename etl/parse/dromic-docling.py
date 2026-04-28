@@ -39,7 +39,7 @@ class DromicEvent:
     obtainedDate   : str = ""
     reportLink     : str = ""
     downloadUrl    : str = ""
-    page           : int = 0
+    page           : int | None = 0
     remarks        : str = ""
 
 def parse_dmy(day: str, month: str, year: str) -> str:
@@ -60,10 +60,11 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
 
     manifest_entry = None
     if manifest_path.exists():
-        with open(manifest_path) as f:
+        with open(manifest_path, encoding="utf-8", errors="replace") as f:
             raw = json.load(f)
+
         manifest_entry = next(
-            (e for e in raw if e.get("filename") == pdf_path.name), None
+            (e for e in raw if Path(e.get("filename")).stem == pdf_path.stem), None
         )
 
     event_name = ""
@@ -278,7 +279,7 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
         reportLink   = manifest_entry["post_url"]     if manifest_entry else "",
         downloadUrl  = manifest_entry["download_url"] if manifest_entry else "",
         obtainedDate = manifest_entry["downloaded_at"] if manifest_entry else "",
-        page         = manifest_entry["page"]         if manifest_entry else 0,
+        page         = manifest_entry["page"]         if manifest_entry and "page" in manifest_entry else None,
         recordedBy   = "DROMIC",
     )
 
@@ -350,24 +351,53 @@ def classify_level(words: list[dict[Any, Any]]) -> str | None:
 
 def find_location_column(df: pd.DataFrame) -> int | None:
     """
-    Find the column index whose header contains all three keywords:
-    'region', 'province', and 'municipality' (case-insensitive).
-    Falls back to checking if any single column header contains at least one.
+    Handles variants like 'municipality' and 'municipalities'.
+    Priority:
+    1. region + province + municipality
+    2. province + municipality
+    3. any single keyword
     """
-    keywords = {"region", "province", "municipality"}
+
+    keyword_groups = {
+        "region": {"region", "regions"},
+        "province": {"province", "provinces"},
+        "municipality": {"municipality", "municipalities", "city", "cities"}
+    }
+
+    priority_sets = [
+        {"region", "province", "municipality"},
+        {"province", "municipality"},
+    ]
+
+    def match_score(text: str, keys: set[str]) -> int:
+        text = text.lower()
+        score = 0
+        for key in keys:
+            if any(alias in text for alias in keyword_groups[key]):
+                score += 1
+        return score
+
     combined_header = " ".join(str(c) for c in df.columns).lower()
 
-    # Check if all three keywords appear somewhere across all headers combined
-    if all(k in combined_header for k in keywords):
-        # Find the specific column that contains the most keyword matches
-        best_col, best_score = 0, 0
-        for i, col in enumerate(df.columns):
-            score = sum(1 for k in keywords if k in str(col).lower())
-            if score > best_score:
-                best_col, best_score = i, score
-        return best_col
+    # Priority matching
+    for key_set in priority_sets:
+        if all(any(alias in combined_header for alias in keyword_groups[k]) for k in key_set):
+            best_col, best_score = None, 0
+            for i, col in enumerate(df.columns):
+                score = match_score(str(col), key_set)
+                if score > best_score:
+                    best_col, best_score = i, score
+            if best_col is not None:
+                return best_col
 
-    return None  # no location column found in this table
+    # Final fallback: any keyword
+    best_col, best_score = None, 0
+    for i, col in enumerate(df.columns):
+        score = match_score(str(col), set(keyword_groups.keys()))
+        if score > best_score:
+            best_col, best_score = i, score
+
+    return best_col if best_score > 0 else None
 
 def extract_cell_words_on_page(plumber_page: Page, cell_bbox: tuple[float, float, float, float]):
     l, t, r, b = cell_bbox
@@ -552,50 +582,49 @@ def make_folder_name(filename: str, report_date: str = "") -> str:
 
     return folder[:80].strip()
 
-def infer_table_name(sample_cols: list[str], id: int) -> str:
+# Each rule: (required, excluded, name)
+# All keywords in `required` must be present, none in `excluded`
+TABLE_NAME_RULES: list[tuple[set[str], set[str], str]] = [
+    # Damaged houses
+    ({"damaged"},                       set(),                          "number_of_damaged_houses"),
+    # Cost of assistance
+    ({"assistance"},                    set(),                          "cost_of_assistance"),
+    # Relief / FFPs
+    ({"ffps"},                          set(),                          "relief_provided"),
+    ({"packs"},                          set(),                          "relief_provided"),
+    ({"standby"},                          set(),                          "standby_funds"),
+    # Affected (no displacement context)
+    ({"affected"},                      {"evacuation", "displaced"},    "number_of_affected_population"),
+    # Inside EC — any combination that implies inside
+    ({"inside"},                        set(),                          "inside_ec_displaced_families_persons"),
+    ({"affected", "evacuation"},        set(),                          "inside_ec_displaced_families_persons"),
+    ({"served", "inside"},              set(),                          "inside_ec_displaced_families_persons"),
+    ({"displaced", "inside"},           set(),                          "inside_ec_displaced_families_persons"),
+    ({"evacuation", "inside"},          set(),                          "inside_ec_displaced_families_persons"),
+    # Outside EC
+    ({"outside"},                       set(),                          "outside_ec_displaced_families_persons"),
+    ({"served", "outside"},             set(),                          "outside_ec_displaced_families_persons"),
+    ({"displaced", "outside"},          set(),                          "outside_ec_displaced_families_persons"),
+    ({"evacuation", "outside"},         set(),                          "outside_ec_displaced_families_persons"),
+    # Total displaced
+    ({"displaced", "total"},            set(),                          "total_displaced_families_persons"),
+    ({"served", "total"},               set(),                          "total_displaced_families_persons"),
+    # General displaced / served / evacuee fallback
+    ({"served"},                        set(),                          "total_ec_displaced_families_persons"),
+    ({"displaced"},                     set(),                          "total_ec_displaced_families_persons"),
+    ({"evacuee"},                       set(),                          "total_ec_displaced_families_persons"),
+    ({"evacuation", "served"},          set(),                          "total_ec_displaced_families_persons"),
+]
 
+def infer_table_name(sample_cols: list[str], id: int) -> str:
     cols = " ".join(sample_cols).lower()
 
-    if "damaged" in cols:
-        return "number_of_damaged_houses"
-    if "assistance" in cols:
-        return "cost_of_assistance"
-    if "affected" in cols and "evacuation" not in cols: 
-        return "number_of_affected_population"
-    if "affected" in cols and "evacuation" in cols:
-        return "inside_ec_displaced_families_persons"
-    if "displaced" in cols and "total" in cols:
-        return "total_displaced_families_persons"
-    if "displaced" in cols and "inside" in cols:
-        return "inside_ec_displaced_families_persons"
-    if "served" in cols and "total" in cols:
-        return "total_displaced_families_persons"
-    if "served" in cols and "inside" in cols:
-        return "inside_ec_displaced_families_persons"
-    if "displaced" in cols and "outside" in cols:
-        return "outside_ec_displaced_families_persons"
-    if "served" in cols and "outside" in cols:
-        return "outside_ec_displaced_families_persons"
-    if "served" in cols and "oustide" in cols:
-        return "outside_ec_displaced_families_persons"
-    if "evacuation" in cols and "inside" in cols:
-        return "inside_ec_displaced_families_persons"
-    if "evacuation" in cols and "outside" in cols:
-        return "outside_ec_displaced_families_persons"
-    if "evacuation" in cols and "served" in cols:
-        return "total_ec_displaced_families_persons"
-    
-    if "served" in cols or "displaced" in cols or "evacuee" in cols:
-        return "total_ec_displaced_families_persons"
-    
-    if "inside" in cols:
-        return "inside_ec_displaced_families_persons"
-    
-    if "outside" in cols:
-        return "outside_ec_displaced_families_persons"
-    
-    
-    return cols if cols else f"table_{id}"
+    for required, excluded, name in TABLE_NAME_RULES:
+        if (all(kw in cols for kw in required) and
+                not any(kw in cols for kw in excluded)):
+            return name
+
+    return cols[:60] if cols else f"table_{id}"
 
 # Main loop ──────────────────────────────────────────────────────────────
 
@@ -773,7 +802,6 @@ def process_file(pdf_path: Path, output_dir: Path):
 
             processed_tables.append((caption or "", df))
             # print(df.to_string())
-            print()
 
     processed_tables = fix_caption_sequence(processed_tables)
 
@@ -831,7 +859,7 @@ def process_file(pdf_path: Path, output_dir: Path):
             ]
             # caption = "_".join(sample_cols) if sample_cols else f"table_{gid}"
             caption = infer_table_name(sample_cols, gid)
-            print(caption)
+            # print(caption)
 
         filename = slugify(caption) + ".csv"
         
