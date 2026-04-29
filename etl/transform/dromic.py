@@ -123,9 +123,8 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
         df = load_csv_df(
             src_path,
             mapping_tokens=AFF_POP_TOKENS,
-            target_cols=["Region", "Province"],
-            collapse_on="Summary_Type",
-            collapse_key="City_Muni",
+            target_cols=["region", "province"],
+            collapse_key="municipality",
             match_location=True,
             correct_QTY_Barangay=False
         )
@@ -183,9 +182,8 @@ def load_housing(folder_path: str) -> List[Housing] | None:
     df = load_csv_df(
         src_path,
         mapping_tokens=HOUSING_TOKENS,
-        target_cols=["Region", "Province"],
-        collapse_on="Summary_Type",
-        collapse_key="City_Muni",
+        target_cols=["region", "province"],
+        collapse_key="municipality",
         match_location=True,
         correct_QTY_Barangay=False,
     )
@@ -215,10 +213,9 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
 
     df = load_csv_df(
         src_path,
-        target_cols=["Region", "Province"],
+        target_cols=["region", "province"],
         mapping_tokens=ASSISTANCE_TOKENS,
-        collapse_on="Summary_Type",
-        collapse_key="City_Muni",
+        collapse_key="municipality",
         match_location=True,
         correct_QTY_Barangay=False,
     )

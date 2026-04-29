@@ -102,7 +102,7 @@ def load_aff_pop(event_folder_path: str) -> list[AffectedPopulation] | None:
     df = load_csv_df(
         path,
         mapping=AFF_POP_COL_MAP,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="affectedBarangays",
     )
@@ -124,7 +124,7 @@ def load_infra(event_folder_path: str) -> list[Infrastructure] | None:
     df = load_csv_df(
         path,
         mapping=INFRA_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="infraDamageType",
     )
@@ -151,7 +151,7 @@ def load_relief(event_folder_path: str) -> list[Assistance] | None:
         df = load_csv_df(
             src_path,
             mapping=ASSISTANCE_PROVIDED_MAPPING,
-            target_cols=["Region", "Province", "City_Muni"],
+            target_cols=["region", "province", "municipality"],
             collapse_on="QTY",
             collapse_key="itemCost",
             match_location=True,
@@ -206,7 +206,7 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
 
     move_arg = MoveArg(
         source_col="Summary_Type",
-        dest_col="City_Muni",
+        dest_col="municipality",
         remain=[r"(?i)injured", r"(?i)dead"]
     )
 
@@ -214,7 +214,7 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
         src_path,
         mapping=CASUALTY_MAPPING,
         move_values=move_arg,
-        target_cols=["Region", "Province", "City_Muni", "Summary_Type"],
+        target_cols=["region", "province", "municipality", "Summary_Type"],
         collapse_on="QTY",
         collapse_key="VALIDATED",
         match_location=True,
@@ -250,7 +250,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
     df = load_csv_df(
         src_path,
         mapping=INCIDENT_COLUMN_MAPPINGS,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="hasOrigType",
         match_location=True,
@@ -328,17 +328,17 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
 
     # custom fill
     df = df.with_columns(
-        pl.col("Region").forward_fill(),
-        pl.col("Province").forward_fill(),
+        pl.col("region").forward_fill(),
+        pl.col("province").forward_fill(),
     )
 
     # remove summary adm rows
-    df = remove_summary_rows(df, nulls=["City_Muni", "hasBarangay"])
+    df = remove_summary_rows(df, nulls=["municipality", "hasBarangay"])
 
     # deduplicate entries
     df = df.unique(
         subset=[
-            "City_Muni",
+            "municipality",
             "hasBarangay",
             "totallyDamagedHouses",
             "partiallyDamagedHouses",
@@ -349,19 +349,19 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
 
     # Forward fill city after deduplication
     df = df.with_columns(
-        pl.col("City_Muni").forward_fill()
+        pl.col("municipality").forward_fill()
     )
 
     # Remove city-level summary rows
     df = df.filter(
         ~(
             pl.col("hasBarangay").is_null()
-            & pl.col("City_Muni").is_duplicated()
+            & pl.col("municipality").is_duplicated()
         )
     )
 
     # Location matching (final, correct level)
-    locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+    locations = concat_loc_levels(df, ["municipality", "province", "region"], ",")
     df = df.with_columns(
         pl.Series("hasLocation", LOCATION_MATCHER.match(locations))
     )
@@ -392,7 +392,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
     df = load_csv_df(
         src_path,
         mapping=AGRI_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="agriDamageClassification",
         replace_ws=True,
@@ -447,7 +447,7 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
         evac_df = load_csv_df(
             evac_path,
             mapping=PEVAC_MAPPING,
-            target_cols=["Region", "Province", "City_Muni"],
+            target_cols=["region", "province", "municipality"],
             collapse_on="QTY",
             collapse_key="preemptPersons",
             replace_ws=True,
@@ -545,7 +545,7 @@ def load_rnb(event_folder_path: str) -> List[RNB] | None:
     df = load_csv_df(
         src_path,
         mapping=RNB_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="roadBridgeType",
         replace_ws=True,
@@ -589,7 +589,7 @@ def load_power(event_folder_path: str) -> List[Power] | None:
     df = load_csv_df(
         src_path,
         mapping=POWER_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="disruptionType",
         replace_ws=True,
@@ -633,9 +633,9 @@ def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
     df = load_csv_df(
         src_path,
         mapping=COMMS_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
-        collapse_key="Province",
+        collapse_key="province",
         replace_ws=True,
         match_location=True,
     )
@@ -677,7 +677,7 @@ def load_docalamity(event_folder_path: str) -> List[DOC] | None:
     df = load_csv_df(
         src_path,
         mapping=DOC_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="resolutionNo",
         match_location=True
@@ -715,7 +715,7 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
     df = load_csv_df(
         src_path,
         mapping=CLASS_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="fromClassLevel",
         replace_ws=True,
@@ -763,7 +763,7 @@ def load_work_suspension(event_folder_path: str) -> List[WorkDisruption] | None:
     df = load_csv_df(
         src_path,
         mapping=WORK_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="cancellationDate",
         replace_ws=True,
@@ -810,9 +810,9 @@ def load_stranded_events(event_folder_path: str) -> List[Stranded] | None:
     df = load_csv_df(
         src_path,
         mapping=STRANDED_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
-        collapse_key="Province",
+        collapse_key="province",
         replace_ws=True,
         match_location=True
     )
@@ -845,7 +845,7 @@ def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
     df = load_csv_df(
         src_path,
         mapping=WATER_DIS_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="interruptionDate",
         replace_ws=True,
@@ -890,7 +890,7 @@ def load_seaport(event_folder_path: str) -> List[Seaport] | None:
     df = load_csv_df(
         src_path,
         mapping=SEAPORT_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="cancellationDate",
         replace_ws=True,
@@ -938,7 +938,7 @@ def load_airport(event_folder_path: str) -> List[Airport] | None:
     df = load_csv_df(
         src_path,
         mapping=AIRPORT_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="cancellationDate",
         replace_ws=True,
@@ -986,7 +986,7 @@ def load_flight(event_folder_path: str) -> List[Flight] | None:
     df = load_csv_df(
         src_path,
         mapping=AIRPORT_MAPPING,
-        target_cols=["Region", "Province", "City_Muni"],
+        target_cols=["region", "province", "municipality"],
         collapse_on="QTY",
         collapse_key="cancellationDate",
         replace_ws=True,

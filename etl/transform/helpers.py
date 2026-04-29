@@ -39,6 +39,9 @@ def load_csv_df(
     
     df = df.filter()
 
+    df = df.rename({col: col.lower() for col in df.columns})
+    df = df.rename(mapping={"City_Muni": "municipality"})
+
     if correct_QTY_Barangay:
 
         df = correct_QTY_Barangay_column(df)
@@ -55,19 +58,19 @@ def load_csv_df(
     if move_values:
         df = move_col_values(df, move_values)
     else:
-        df = move_col_values(df, MoveArg(source_col="Summary_Type", dest_col="City_Muni", remain=None))
+        df = move_col_values(df, MoveArg(source_col="Summary_Type", dest_col="municipality", remain=None))
 
     if target_cols:
         df = df.with_columns(
-            pl.col("Province").replace("Province", None)
+            pl.col("province").replace("Province", None)
         )
         df = forward_fill(df, target_cols)
 
-    if collapse_on and collapse_key:
+    if collapse_key:
         df = collapse(df, collapse_on, collapse_key)
 
     if match_location:
-        locations = concat_loc_levels(df, ["City_Muni", "Province", "Region"], ",")
+        locations = concat_loc_levels(df, ["municipality", "province", "region"], ",")
         df = df.with_columns(
             pl.Series("hasLocation", LOCATION_MATCHER.match(locations))
         )
@@ -121,23 +124,30 @@ def forward_fill(df: DataFrame, cols: list[str]) -> DataFrame:
     ])
 
 
-def collapse(df: DataFrame, none_col: str, baseline_col: str) -> DataFrame:
-    """
-    Collapse rows down to the most granular level and clean breakdown labels.
+def collapse(
+    df: DataFrame,
+    none_col: str | None,
+    baseline_col: str | None
+) -> DataFrame:
 
-    :param none_col: column that should be null after collapse
-    :param baseline_col: column that dictates the identity of the entry
-    """
-    df = df.filter(
-        (pl.col(none_col).is_null()) & (pl.col(baseline_col).is_not_null())
-    )
+    if baseline_col is None:
+        return df  # nothing meaningful to do
+
+    if none_col is not None:
+        df = df.filter(
+            (pl.col(none_col).is_null()) &
+            (pl.col(baseline_col).is_not_null())
+        )
+    else:
+        # baseline-only mode: just keep meaningful rows
+        df = df.filter(pl.col(baseline_col).is_not_null())
 
     df = df.with_columns([
-        pl.when(pl.col(c).str.contains_any(["breakdown"], ascii_case_insensitive=True))
+        pl.when(pl.col(c).str.contains_any("breakdown", ascii_case_insensitive=True))
         .then(None)
         .otherwise(pl.col(c))
         .alias(c)
-        for c in ["City_Muni", "Province"]
+        for c in ["municipality", "province"]
     ])
 
     return df
