@@ -6,6 +6,7 @@ from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMo
 from docling.datamodel.base_models import InputFormat
 from docling.backend.pypdfium2_backend import PyPdfiumDocumentBackend
 import pandas as pd
+from pandas import DataFrame
 import pdfplumber
 import re  
 from pathlib import Path
@@ -393,13 +394,15 @@ def find_location_column(df: pd.DataFrame) -> int | None:
                 return best_col
 
     # Final fallback: any keyword
-    best_col, best_score = None, 0
-    for i, col in enumerate(df.columns):
-        score = match_score(str(col), set(keyword_groups.keys()))
-        if score > best_score:
-            best_col, best_score = i, score
+    # best_col, best_score = None, 0
+    # for i, col in enumerate(df.columns):
+    #     score = match_score(str(col), set(keyword_groups.keys()))
+    #     if score > best_score:
+    #         best_col, best_score = i, score
 
-    return best_col if best_score > 0 else None
+    # return best_col if best_score > 0 else None
+
+    return None
 
 def extract_cell_words_on_page(plumber_page: Page, cell_bbox: tuple[float, float, float, float]):
     l, t, r, b = cell_bbox
@@ -842,31 +845,52 @@ def process_file(pdf_path: Path, output_dir: Path):
 
             df = table.export_to_dataframe(doc)
             df = clean_column_names(df)
-            df = strip_absorbed_data_from_columns(df)
-            df = drop_repeated_header_rows(df)
-            print(df.columns.tolist())
             caption = validate_caption(caption, df)  # validate before processing
 
             # ── Find the location column ──────────────────────────────────────────
             loc_col_idx = find_location_column(df)
-            used_fallback = False
+            used_fallback = loc_col_idx is None and df.shape[1] > 1
+
+            print("loc col: ", loc_col_idx, df.shape[1] > 1)
+
+            if not used_fallback:
+                df = strip_absorbed_data_from_columns(df)
+                df = drop_repeated_header_rows(df)
+            else:
+                # likely a continuation table without repeated header
+
+                loc_col_idx = 0
+
+                if (processed_tables and df.shape[1] == processed_tables[-1][1].shape[1] - 3):
+
+                    prev_caption, prev_df = processed_tables[-1]
+                    # Remaining cols are the numeric data values for that row
+                    
+                    split_cols = [col.split('.') for col in df.columns]
+
+                    print(df.columns)
+                    new_rows = pd.DataFrame(split_cols).T
+                    new_rows.columns = prev_df.columns[3:]
+
+                    # Positional rename: continuation cols → base table cols
+                    # (fuzzy match fails because continuation col names are absorbed data values)
+                    df_renamed = df.copy()
+                    df_renamed.columns = prev_df.columns[3:]
+
+                    # print(new_rows.columns, df_renamed.columns)
+
+                    df = pd.concat([new_rows, df_renamed], ignore_index=True)
+                    caption = prev_caption
+                    print(f"  [continuation] recovered data values and set column")
+
 
             if loc_col_idx is None:
-                # Headerless continuation pages have a data value (e.g. "Surigao del Norte")
-                # as the column name, so no keyword match is possible.  Fall back to col 0 —
-                # in DROMIC tables the location column is always first.  If the assumption is
-                # wrong the level-classification gate further below will still skip the table.
-                if df.shape[1] > 1:
-                    loc_col_idx = 0
-                    used_fallback = True
-                    print(f"  [fallback] No named location column; trying col 0 ({df.columns[0]!r})")
-                else:
                     print("  [skip] No location column detected.\n")
                     df.to_csv(f"./dump/{i}.csv", index=False)
                     continue
 
+
             loc_col_name = df.columns[loc_col_idx]
-            # print(f"  Location column: index={loc_col_idx}, name={loc_col_name!r}")
 
             # ── Build a (page_no → pdfplumber page) map for this table's pages ───
             plumber_pages = {
@@ -986,7 +1010,6 @@ def process_file(pdf_path: Path, output_dir: Path):
             df.insert(2, "municipality", municipality_col)
 
             df = split_merged_rows(df)
-
             processed_tables.append((caption or "", df))
             # print(df.to_string())
 
@@ -1021,7 +1044,7 @@ def process_file(pdf_path: Path, output_dir: Path):
             # slightly lower threshold to absorb minor column-name variations
             # (e.g. abbreviation differences) that survive normalisation.
             is_adjacent = pos - group_last_idx[gid] == 1
-            threshold = 0.85 if is_adjacent else SIMILARITY_THRESHOLD
+            threshold = 0.95 if is_adjacent else SIMILARITY_THRESHOLD
             if sim >= threshold:
                 groups[gid].append((caption, df))
                 group_last_idx[gid] = pos
@@ -1116,8 +1139,8 @@ def parse_args():
 def main() -> None:
     args = parse_args()
 
-    input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf-mini")
-    output_dir =  Path(f"../data/parsed/dromic-new/{args.year}")
+    input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf")
+    output_dir =  Path(f"../data/parsed/dromic/{args.year}")
 
     files = list(input_dir.glob("*"))
 
