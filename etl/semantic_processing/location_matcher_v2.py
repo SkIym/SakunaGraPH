@@ -1,4 +1,4 @@
-from rdflib import Graph, RDF, Namespace, URIRef, RDFS
+from rdflib import Graph, RDF, Namespace, URIRef, RDFS, SKOS
 from typing import List, Optional
 from thefuzz import fuzz, process
 import re
@@ -48,12 +48,14 @@ class LocationMatcher:
             "iva": "0400000000",
             "region iv-a": "0400000000",
             "calabarzon": "0400000000",
+            "region calabarzon": "0400000000",
 
             "iv-b": "1700000000",
             "4b": "1700000000",
             "ivb": "1700000000",
             "region iv-b": "1700000000",
             "mimaropa": "1700000000",
+            "region mimaropa": "1700000000",
 
             "v": "0500000000",
             "5": "0500000000",
@@ -142,14 +144,16 @@ class LocationMatcher:
         # label → IRI
         self.provinces: dict[str, str] = {}
 
+        # altLabel → IRI (populated by _load_locations, merged into municipalities_rev)
+        self.municipalities_alts: dict[str, str] = {}
+
         self._load_locations()
 
-        # reverse lookup
-
-        # label -> IRI
+        # reverse lookup: primary labels first, then alt labels (primary wins on collision)
         self.municipalities_rev = {
             label.lower(): iri for iri, label in self.municipalities.items()
         }
+        self.municipalities_rev.update(self.municipalities_alts)
 
     # --------------------------------------------------
     # Load RDF locations
@@ -161,23 +165,32 @@ class LocationMatcher:
             self.municipalities_parent[str(s)] = str(
                 self.g.value(s, URIRef(self.SKG["isPartOf"]))
             )
+            for alt in self.g.objects(s, SKOS.altLabel):
+                self.municipalities_alts[str(alt).lower()] = str(s)
+
         for s, _, _ in self.g.triples((None, RDF.type, URIRef(self.SKG["City"]))):
             label = str(self.g.value(s, RDFS.label))
             self.municipalities[str(s)] = label.lower()
             self.municipalities_parent[str(s)] = str(
                 self.g.value(s, URIRef(self.SKG["isPartOf"]))
-            )   
+            )
+            for alt in self.g.objects(s, SKOS.altLabel):
+                self.municipalities_alts[str(alt).lower()] = str(s)
 
         for s, _, _ in self.g.triples((None, RDF.type, URIRef(self.SKG["SubMunicipality"]))):
             label = str(self.g.value(s, RDFS.label))
             self.municipalities[str(s)] = label.lower()
             self.municipalities_parent[str(s)] = str(
                 self.g.value(s, URIRef(self.SKG["isPartOf"]))
-            )     
+            )
+            for alt in self.g.objects(s, SKOS.altLabel):
+                self.municipalities_alts[str(alt).lower()] = str(s)
 
         for s, _, _ in self.g.triples((None, RDF.type, URIRef(self.SKG["Province"]))):
             label = str(self.g.value(s, RDFS.label))
             self.provinces[label.lower()] = str(s)
+            for alt in self.g.objects(s, SKOS.altLabel):
+                self.provinces[str(alt).lower()] = str(s)
 
     # --------------------------------------------------
     # Fuzzy helper
@@ -519,7 +532,11 @@ if __name__ == "__main__":
         ("Cebu, VII",                         None, "Cebu province under Central Visayas"),
 
         # ── Municipality → Province → Region ──────────────────────────────────
-        ("Davao City, Davao del Sur, XI",     None, "Standard 3-level match"),
+        ("Baco, Oriental Mindoro, MIMAROPA",     None, "Standard 3-level match"),
+        ("Bansud, Oriental Mindoro, MIMAROPA",     None, "Standard 3-level match"),
+        ("Naujan, Oriental Mindoro, MIMAROPA",     None, "Standard 3-level match"),
+        ("Alcantara, Romblon, MIMAROPA",     None, "Standard 3-level match"),
+        ("Odiongan, Romblon, MIMAROPA",     None, "Standard 3-level match"),
         ("Laoag, Ilocos Norte, I",            None, "Laoag City under Ilocos Norte"),
         ("Vigan, Ilocos Sur, I",              None, "Vigan City under Ilocos Sur"),
 
