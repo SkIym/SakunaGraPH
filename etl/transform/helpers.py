@@ -22,7 +22,7 @@ def load_csv_df(
     path: str,
     *,
     mapping: dict[str, str] | None = None,
-    mapping_tokens: dict[str, list[str]] | None = None,
+    mapping_tokens: dict[str, list[list[str]]] | None = None,
     target_cols: list[str] | None = None,
     collapse_on: str | None = None,
     collapse_key: str | None = None,
@@ -38,9 +38,13 @@ def load_csv_df(
         infer_schema_length=10000)
     
     df = df.filter()
-
+    
     df = df.rename({col: col.lower() for col in df.columns})
-    df = df.rename(mapping={"City_Muni": "municipality"})
+    df = df.rename(mapping={"City_Muni": "municipality"}, strict=False)
+    df = df.with_columns(
+        pl.col("municipality").str.replace("(capital)", "", literal=True)
+    )
+
 
     if correct_QTY_Barangay:
 
@@ -143,7 +147,7 @@ def collapse(
         df = df.filter(pl.col(baseline_col).is_not_null())
 
     df = df.with_columns([
-        pl.when(pl.col(c).str.contains_any("breakdown", ascii_case_insensitive=True))
+        pl.when(pl.col(c).str.contains("breakdown", literal=False, strict=False))
         .then(None)
         .otherwise(pl.col(c))
         .alias(c)
@@ -359,7 +363,7 @@ def move_col_values(df: DataFrame, arg: MoveArg) -> DataFrame:
     source_col = arg.source_col
     dest_col = arg.dest_col
 
-    if source_col not in df.columns and dest_col not in df.columns: return df
+    if source_col not in df.columns or dest_col not in df.columns: return df
 
     if remain:
 
@@ -389,38 +393,45 @@ def move_col_values(df: DataFrame, arg: MoveArg) -> DataFrame:
 
 def normalize_columns(
     df: pl.DataFrame,
-    token_map: dict[str, list[str]],
+    token_map: dict[str, list[list[str]]],
 ) -> pl.DataFrame:
     """
-    Rename DataFrame columns by matching all tokens as substrings of column names.
+    Rename DataFrame columns by matching ANY group of tokens as substrings
+    of column names (case-insensitive).
 
-    Args:
-        df:        Input Polars DataFrame.
-        token_map: Maps canonical names to a list of tokens that must ALL appear
-                   as substrings in a column name (case-insensitive AND match).
-                   e.g. {"displaced_families_inside": ["displaced", "families", "inside"]}
+    Each canonical key maps to a list of token-groups:
+        - Inner list = AND condition (all tokens must appear)
+        - Outer list = OR condition (any group can match)
 
-    Raises:
-        ValueError: If a column matches more than one canonical entry.
+    Example:
+        {
+            "displaced_families_inside": [
+                ["displaced", "families", "inside"],
+                ["inside", "evac", "families"]
+            ]
+        }
     """
+    used_canonicals: set[str] = set()
     rename_map: dict[str, str] = {}
 
     for col in df.columns:
         col_lower = col.lower()
-        matches = [
-            canonical
-            for canonical, tokens in token_map.items()
-            if all(token.lower() in col_lower for token in tokens)
-        ]
 
-        # if len(matches) > 1:
-        #     raise ValueError(
-        #         f"Column '{col}' matched multiple canonicals: {matches}. "
-        #         "Resolve ambiguity in token_map."
-        #     )
-        # elif len(matches) == 1:
-        #     rename_map[col] = matches[0]
+        matches: list[str] = []
+        # print(col)
+        for canonical, token_groups in token_map.items():
+            # token_groups is List[List[str]]
+
+            if canonical in used_canonicals:
+                continue
+            for group in token_groups:
+                if all(token.lower() in col_lower for token in group):
+                    matches.append(canonical)
+                    used_canonicals.add(canonical)
+                    break  # stop after first matching group for this canonical
+
         if matches:
+            # keep first match (same behavior as before)
             rename_map[col] = matches[0]
 
     return df.rename(rename_map)
