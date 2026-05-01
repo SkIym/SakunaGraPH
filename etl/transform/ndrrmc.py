@@ -14,9 +14,9 @@ from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, AIRPORT_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
-    POWER_MAPPING, RNB_MAPPING, SEAPORT_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WATER_DISRUPTION, WORK_MAPPING,
+    POWER_MAPPING, RNB_MAPPING, SEAPORT_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WORK_MAPPING,
     AffectedPopulation, Agriculture, Airport, Casualties, ClassDisruption, CommunicationLines, Event, Flight,
-    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, WorkDisruption
+    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, WorkDisruption, WaterDisruption
 )
 
 from transform.helpers import (
@@ -103,7 +103,7 @@ def load_aff_pop(event_folder_path: str) -> list[AffectedPopulation] | None:
         path,
         mapping=AFF_POP_COL_MAP,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="affectedBarangays",
     )
 
@@ -125,7 +125,7 @@ def load_infra(event_folder_path: str) -> list[Infrastructure] | None:
         path,
         mapping=INFRA_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="infraDamageType",
     )
 
@@ -152,7 +152,7 @@ def load_relief(event_folder_path: str) -> list[Assistance] | None:
             src_path,
             mapping=ASSISTANCE_PROVIDED_MAPPING,
             target_cols=["region", "province", "municipality"],
-            collapse_on="QTY",
+            collapse_on="qty",
             collapse_key="itemCost",
             match_location=True,
             schema_overrides={"QUANTITY": pl.Utf8()}
@@ -205,7 +205,7 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
     if not src_path: return None
 
     move_arg = MoveArg(
-        source_col="Summary_Type",
+        source_col="summary_type",
         dest_col="municipality",
         remain=[r"(?i)injured", r"(?i)dead"]
     )
@@ -214,23 +214,23 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
         src_path,
         mapping=CASUALTY_MAPPING,
         move_values=move_arg,
-        target_cols=["region", "province", "municipality", "Summary_Type"],
-        collapse_on="QTY",
-        collapse_key="VALIDATED",
+        target_cols=["region", "province", "municipality", "summary_type"],
+        collapse_on="qty",
+        collapse_key="validated",
         match_location=True,
         schema_overrides={"AGE": pl.Utf8()}
     )
 
     # Normalize casualty type
     df = df.with_columns(
-        pl.when(pl.col("Summary_Type").str.contains(r"(?i)injured"))
+        pl.when(pl.col("summary_type").str.contains(r"(?i)injured"))
             .then(pl.lit("INJURED"))
-            .otherwise(pl.col("Summary_Type"))
+            .otherwise(pl.col("summary_type"))
             .alias("casualtyType")
     )
 
     df = df.rename({
-        "QTY": "casualtyCount"
+        "qty": "casualtyCount"
     })
 
     # df.write_csv(event_folder_path + "/hakdog.csv")
@@ -251,7 +251,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
         src_path,
         mapping=INCIDENT_COLUMN_MAPPINGS,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="hasOrigType",
         match_location=True,
         replace_ws=True
@@ -276,11 +276,12 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
                     "hasOrigType",
                     "incidentStatus",
                     "incidentDescription",
-                    "event_name",
+                    "incidentActionsTaken",
+                    # "event_name",
                 ],
                 separator=" — ",
                 ignore_nulls=True,
-            )
+            ).str.to_lowercase()
         )
         .to_series()
         .to_list()
@@ -393,7 +394,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
         src_path,
         mapping=AGRI_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="agriDamageClassification",
         replace_ws=True,
         match_location=True,
@@ -448,7 +449,7 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
             evac_path,
             mapping=PEVAC_MAPPING,
             target_cols=["region", "province", "municipality"],
-            collapse_on="QTY",
+            collapse_on="qty",
             collapse_key="preemptPersons",
             replace_ws=True,
             match_location=True,
@@ -546,7 +547,7 @@ def load_rnb(event_folder_path: str) -> List[RNB] | None:
         src_path,
         mapping=RNB_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="roadBridgeType",
         replace_ws=True,
         match_location=True,
@@ -590,7 +591,7 @@ def load_power(event_folder_path: str) -> List[Power] | None:
         src_path,
         mapping=POWER_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="disruptionType",
         replace_ws=True,
         match_location=True,
@@ -634,7 +635,7 @@ def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
         src_path,
         mapping=COMMS_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="province",
         replace_ws=True,
         match_location=True,
@@ -678,7 +679,7 @@ def load_docalamity(event_folder_path: str) -> List[DOC] | None:
         src_path,
         mapping=DOC_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="resolutionNo",
         match_location=True
     )
@@ -716,7 +717,7 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
         src_path,
         mapping=CLASS_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="fromClassLevel",
         replace_ws=True,
         match_location=True
@@ -764,7 +765,7 @@ def load_work_suspension(event_folder_path: str) -> List[WorkDisruption] | None:
         src_path,
         mapping=WORK_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
         match_location=True
@@ -811,7 +812,7 @@ def load_stranded_events(event_folder_path: str) -> List[Stranded] | None:
         src_path,
         mapping=STRANDED_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="province",
         replace_ws=True,
         match_location=True
@@ -828,7 +829,7 @@ def load_stranded_events(event_folder_path: str) -> List[Stranded] | None:
 
     return df_to_entities(df, Stranded)
 
-def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
+def load_water(event_folder_path: str) -> List[WaterDisruption] | None:
     # Locate water supply CSV
     src_path = next(
         (
@@ -846,7 +847,7 @@ def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
         src_path,
         mapping=WATER_DIS_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="interruptionDate",
         replace_ws=True,
         match_location=True,
@@ -871,7 +872,7 @@ def load_water(event_folder_path: str) -> List[WATER_DISRUPTION] | None:
     df = df.with_row_index("id", 1)
     # df.write_csv(event_folder_path + "/hakdog.csv")
 
-    return df_to_entities(df, WATER_DISRUPTION)
+    return df_to_entities(df, WaterDisruption)
 
 def load_seaport(event_folder_path: str) -> List[Seaport] | None:
 
@@ -891,7 +892,7 @@ def load_seaport(event_folder_path: str) -> List[Seaport] | None:
         src_path,
         mapping=SEAPORT_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
         match_location=True
@@ -939,7 +940,7 @@ def load_airport(event_folder_path: str) -> List[Airport] | None:
         src_path,
         mapping=AIRPORT_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
         match_location=True
@@ -987,7 +988,7 @@ def load_flight(event_folder_path: str) -> List[Flight] | None:
         src_path,
         mapping=AIRPORT_MAPPING,
         target_cols=["region", "province", "municipality"],
-        collapse_on="QTY",
+        collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
         match_location=True
