@@ -402,6 +402,11 @@ def find_location_column(df: pd.DataFrame) -> int | None:
 
     # return best_col if best_score > 0 else None
 
+    for i, col in enumerate(df.columns):
+        col_lower = str(col).lower()
+        if "municipality" in col_lower or "municipalities" in col_lower:
+            return i
+
     return None
 
 def extract_cell_words_on_page(plumber_page: Page, cell_bbox: tuple[float, float, float, float]):
@@ -851,7 +856,8 @@ def process_file(pdf_path: Path, output_dir: Path):
             loc_col_idx = find_location_column(df)
             used_fallback = loc_col_idx is None and df.shape[1] > 1
 
-            print("loc col: ", loc_col_idx, df.shape[1] > 1)
+            print(f"[DEBUG] Columns: {list(df.columns)}")
+            print(f"[DEBUG] loc_col_idx: {loc_col_idx}")
 
             if not used_fallback:
                 df = strip_absorbed_data_from_columns(df)
@@ -860,7 +866,6 @@ def process_file(pdf_path: Path, output_dir: Path):
                 # likely a continuation table without repeated header
 
                 loc_col_idx = 0
-
                 if (processed_tables and df.shape[1] == processed_tables[-1][1].shape[1] - 3):
 
                     prev_caption, prev_df = processed_tables[-1]
@@ -868,7 +873,6 @@ def process_file(pdf_path: Path, output_dir: Path):
                     
                     split_cols = [col.split('.') for col in df.columns]
 
-                    print(df.columns)
                     new_rows = pd.DataFrame(split_cols).T
                     new_rows.columns = prev_df.columns[3:]
 
@@ -886,7 +890,7 @@ def process_file(pdf_path: Path, output_dir: Path):
 
             if loc_col_idx is None:
                     print("  [skip] No location column detected.\n")
-                    df.to_csv(f"./dump/{i}.csv", index=False)
+                    # df.to_csv(f"./dump/{i}.csv", index=False)
                     continue
 
 
@@ -929,7 +933,7 @@ def process_file(pdf_path: Path, output_dir: Path):
             # Derive offset: minimum row_idx in the map = first data row → maps to df row 0
             if not row_bbox_map:
                 print("  [skip] No data cells found.\n")
-                df.to_csv(f"./dump/{i}.csv", index=False)
+                # df.to_csv(f"./dump/{i}.csv", index=False)
                 continue
 
             # ── Classify each data row by font ────────────────────────────────────
@@ -975,8 +979,14 @@ def process_file(pdf_path: Path, output_dir: Path):
             # is almost certainly not a location column (e.g. a DATE column).
             if used_fallback and not any(v is not None for v in level_per_df_row.values()):
                 print("  [skip] No location hierarchy detected after fallback — likely narrative table.\n")
-                df.to_csv(f"./dump/{i}.csv", index=False)
+                # df.to_csv(f"./dump/{i}.csv", index=False)
                 continue
+
+
+            # df.columns = df.columns.str.lower()
+            # for col in LOCATION_COLS:
+            #     if col in df.columns:
+            #         df.drop(columns=[col], inplace=True)
 
             # ── Forward-fill region / province / municipality ─────────────────────
             region_col: list[str | None]      = []
@@ -1008,6 +1018,8 @@ def process_file(pdf_path: Path, output_dir: Path):
             df.insert(0, "region",       region_col)
             df.insert(1, "province",     province_col)
             df.insert(2, "municipality", municipality_col)
+
+            df = df.drop(df.columns[loc_col_idx + 3], axis=1)
 
             df = split_merged_rows(df)
             processed_tables.append((caption or "", df))
@@ -1125,8 +1137,10 @@ def process_file(pdf_path: Path, output_dir: Path):
         while (output_dir / filename).exists():
             filename = f"{original_stem}_{counter}.csv"
             counter += 1
-            
-        df.to_csv(output_dir / filename, index=False)
+
+        
+        if not df["municipality"].isna().all():    
+            df.to_csv(output_dir / filename, index=False)
         print(f"Saved: {filename} ({len(df)} rows)")
 
 
@@ -1135,6 +1149,13 @@ def parse_args():
     parser.add_argument("--year", required=True)
     return parser.parse_args()
 
+def load_parsed_files(sub_data_dir: str) -> set[str]:
+    """Load folder names that need rerunning from _needs_rerun.txt."""
+    source_filenames_path = os.path.join(sub_data_dir, "_parsed.txt")
+    if not os.path.exists(source_filenames_path):
+        return set()
+    with open(source_filenames_path, encoding="utf-8") as f:
+        return {line.strip() for line in f if line.strip()}
 
 def main() -> None:
     args = parse_args()
@@ -1143,17 +1164,35 @@ def main() -> None:
     output_dir =  Path(f"../data/parsed/dromic/{args.year}")
 
     files = list(input_dir.glob("*"))
+    skipped = 0
+    parsed = 0
 
-
+    already_parsed = load_parsed_files(str(output_dir))
     for file in files:
         if file.suffix != ".pdf":
             continue
+        
 
-        process_file(file, output_dir)
-        # try:
-        #     process_file(file, output_dir)
-        # except Exception as e:
-        #     print(f"[ERROR] {file.name}: {e}")
+        sanitized_name = file.name
+
+        if ".docx" in file.name:
+            sanitized_name = file.name.replace(".docx", "")
+            sanitized_name = sanitized_name.replace(".doc", "")
+
+        if sanitized_name in already_parsed:
+            skipped += 1
+            continue
+        
+
+        print(file)
+        # parsed += 1
+        try:
+            process_file(file, output_dir)
+            parsed += 1
+        except Exception as e:
+            print(f"[ERROR] {file.name}: {e}")
+
+    print(f"Serialized {parsed} events → {output_dir} (skipped {skipped})")
 
 
 if __name__ == "__main__":
