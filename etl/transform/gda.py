@@ -417,13 +417,14 @@ def load_with_tiered_headers(path: str | Path) -> pd.DataFrame:
     df.columns = new_cols
     return df
 
-def to_type_iri(dtype: str | None) -> list[str]:
+def to_type_iri(dtype: str | None) -> list[str] | None:
 
     if dtype is None: return []
 
     # Subtype incidents are handled separately
     if "[" in dtype:
-        return dtype
+        print(dtype)
+        return []
 
     types = dtype.split("|")
     cleaned_iris: list[str] = []
@@ -516,6 +517,7 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     )
 
     df["hasSubtypeRaw"] = df["hasSubtype"]
+
     df["hasSubtype"] = df["hasSubtype"].apply(
         lambda t: "|".join(to_type_iri(t))
     )
