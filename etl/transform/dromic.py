@@ -1,12 +1,13 @@
 
 
-from typing import Iterable, List, Tuple
+from pathlib import Path
+from typing import Iterable, List, Optional, Tuple
 
 from rdflib import URIRef
 from transform.helpers import df_to_entities, to_int, load_csv_df, to_million_php
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from mappings.iris import DROMIC_EVENT_NS
-from mappings.dromic import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, AffectedPopulation, Assistance, Event, Housing, PEvac, Provenance
+from mappings.dromic import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, ORG_MAPPING, AffectedPopulation, Assistance, Event, Housing, PEvac, Provenance
 import os
 import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
@@ -16,6 +17,28 @@ import re
 import polars as pl
 
 # add guard: if municiplaity row all blank, consider province instead as collapse key
+
+def _parse_date(value: str) -> Optional[datetime]:
+    """Parse a date string in various formats, return None if unparseable."""
+    if not value or not value.strip():
+        return None
+    value = value.strip()
+    formats = [
+        "%Y-%m-%d",           # 2020-09-29
+        "%d %B %Y",           # 29 September 2020
+        "%d %b %Y",           # 29 Sep 2020
+        "%B %d, %Y",          # September 29, 2020
+        "%b %d, %Y",          # Sep 29, 2020
+        "%d-%m-%Y",           # 29-09-2020
+        "%m/%d/%Y",           # 09/29/2020
+    ]
+    for fmt in formats:
+        try:
+            return datetime.strptime(value, fmt)
+        except ValueError:
+            continue
+    print(f"  [WARN] Could not parse date: {value!r}")
+    return None
 
 def _event_id(event_name: str, start_date: str | None) -> str:
     """Deterministic hex ID from event name + start date."""
@@ -66,8 +89,8 @@ def load_event(file_path: str) -> Event:
     event = Event(
         id=_event_id(event_name, meta.get("startDate")),
         eventName=event_name,
-        startDate=datetime.fromisoformat(meta["startDate"]) if meta["startDate"] else None,
-        endDate=datetime.fromisoformat(meta["endDate"]) if meta["endDate"] else None,
+        startDate=_parse_date(meta.get("startDate", "")),
+        endDate=_parse_date(meta.get("endDate", "")),
         remarks=remarks,
         hasDisasterType=pred,
         hasBarangay=hasBarangay if hasBarangay else None,
@@ -84,7 +107,7 @@ def load_provenance(file_path: str) -> Provenance:
     # if not src["lastUpdateDate"]: print("Missing last update date on file: ", src["reportName"])
     
     return Provenance(
-        lastUpdateDate=datetime.fromisoformat(src['lastUpdateDate']) if src['lastUpdateDate'] else None,
+        lastUpdateDate=_parse_date(src.get("lastUpdateDate", "")),
         reportLink=src.get("reportLink"),
         reportName=src.get("reportName", ""),
         obtainedDate=src.get("obtainedDate"),
@@ -119,14 +142,14 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
     dfs: Iterable[pl.DataFrame] = []
     index = 1
     for src_path in src_paths:
-        print("Loading aff pop for: ", src_path)
+        # print("Loading aff pop for: ", src_path)
         df = load_csv_df(
             src_path,
             mapping_tokens=AFF_POP_TOKENS,
             target_cols=["region", "province"],
             collapse_key="municipality",
             match_location=True,
-            correct_QTY_Barangay=False
+            correct_qty_barangay=False
         )
 
         df = to_int(df, ["affectedFamilies", "affectedPersons", "affectedBarangays", "displacedFamilies", "displacedPersons", "displacedFamiliesI", "displacedPersonsI", "displacedFamiliesO", "displacedPersonsO", "evacuationCenters"])
@@ -142,6 +165,7 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
             combined = combined.join(df.drop(shared_cols), on="hasLocation", how="full", coalesce=True)
     except pl.exceptions.SchemaError:
         return (None, None)
+    
 
     # resolve O + I into displacedFamilies / displacedPersons only if no total displaced file / columns
     if not has_total_displaced:
@@ -161,7 +185,8 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
     if len(combined) > 1: 
         combined = combined.with_row_index("id", 1)
 
-    combined.write_csv(f"./dump/combined.csv")
+    combined.write_csv(f"./dump/{Path(folder_path).stem}_aff_pop.csv")
+
 
     return df_to_entities(combined, AffectedPopulation), df_to_entities(combined, PEvac)
 
@@ -179,13 +204,15 @@ def load_housing(folder_path: str) -> List[Housing] | None:
     if not src_path:
         return None
     
+    # print("Loading housing for: ", src_path)
+
     df = load_csv_df(
         src_path,
         mapping_tokens=HOUSING_TOKENS,
         target_cols=["region", "province"],
         collapse_key="municipality",
         match_location=True,
-        correct_QTY_Barangay=False,
+        correct_qty_barangay=False,
     )
 
     df = to_int(df, ["totallyDamagedHouses", "partiallyDamagedHouses"])
@@ -194,6 +221,7 @@ def load_housing(folder_path: str) -> List[Housing] | None:
         df = df.with_row_index("id", 1)
 
     return df_to_entities(df, Housing)
+
 
 def load_assistance(folder_path: str) -> List[Assistance] | None:
 
@@ -210,6 +238,7 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
         return None
     
 
+    # print("Loading assistance for: ", src_path)
 
     df = load_csv_df(
         src_path,
@@ -217,29 +246,26 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
         mapping_tokens=ASSISTANCE_TOKENS,
         collapse_key="municipality",
         match_location=True,
-        correct_QTY_Barangay=False,
+        correct_qty_barangay=False,
     )
 
-    df = to_million_php(df, ["dswd", "lgu", "others", "ngo"])
+    df = to_million_php(df, ["dswd", "lgu", "others", "ngo", "nga"])
 
-    df = df.rename({
-        "dswd": "https://sakuna.ph/org/DSWD",
-        "lgu": "https://sakuna.ph/org/LGU",
-        "ngo": "https://sakuna.ph/org/NGO",
-        "others": "https://sakuna.ph/org/Unspecified",
-    })
+    df = df.rename(mapping=ORG_MAPPING, strict=False)
 
     # pivot: hasLocation, contributingOrg, contributionAmount
 
+    existing_org_cols = [c for c in ORG_MAPPING.values() if c in df.columns]
+
     df = df.unpivot(
-        on=["https://sakuna.ph/org/DSWD", "https://sakuna.ph/org/LGU", "https://sakuna.ph/org/Unspecified", "https://sakuna.ph/org/NGO"],
+        on=existing_org_cols,
         index="hasLocation",
         variable_name="contributingOrg",
         value_name="contributionAmount",
     ).filter(
-        pl.col("contributionAmount").is_not_null()
-        & (pl.col("contributionAmount") != 0)
-    )
+            pl.col("contributionAmount").is_not_null()
+            & (pl.col("contributionAmount") != 0)
+        )
 
 
     if len(df) > 1:

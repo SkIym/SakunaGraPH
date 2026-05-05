@@ -28,10 +28,11 @@ def load_csv_df(
     collapse_key: str | None = None,
     replace_ws: bool = False,
     match_location: bool = True,
-    correct_QTY_Barangay: bool = True,
+    correct_qty_barangay: bool = True,
     schema_overrides: Mapping[str, pl.DataType] | None = None,
     move_values: MoveArg | None = None
 ) -> pl.DataFrame:
+    
     df = pl.read_csv(
         path, 
         schema_overrides=schema_overrides,
@@ -40,15 +41,18 @@ def load_csv_df(
     df = df.filter()
     
     df = df.rename({col: col.lower() for col in df.columns})
-    df = df.rename(mapping={"City_Muni": "municipality"}, strict=False)
+    df = df.rename(mapping={"city_muni": "municipality"}, strict=False)
     df = df.with_columns(
         pl.col("municipality").str.replace("(capital)", "", literal=True)
     )
 
+    if "assistance" in path:
+        df = split_merged_cost_columns(df)
+        df = split_merged_cost_values(df)
 
-    if correct_QTY_Barangay:
+    if correct_qty_barangay:
 
-        df = correct_QTY_Barangay_column(df)
+        df = correct_qty_barangay_column(df)
 
     if replace_ws:
         df = replace_column_whitespace_with_underscore(df)
@@ -62,7 +66,7 @@ def load_csv_df(
     if move_values:
         df = move_col_values(df, move_values)
     else:
-        df = move_col_values(df, MoveArg(source_col="Summary_Type", dest_col="municipality", remain=None))
+        df = move_col_values(df, MoveArg(source_col="summary_type", dest_col="municipality", remain=None))
 
     if target_cols:
         df = df.with_columns(
@@ -334,10 +338,10 @@ def concat_loc_levels(df: DataFrame, loc_cols: list[str], sep: str):
 
     return locs
 
-def correct_QTY_Barangay_column(df: DataFrame):
+def correct_qty_barangay_column(df: DataFrame):
 
-    rename_dict = {col: "QTY" for col in df.columns if "REGION" in col}
-    rename_dict["Barangay"] = "hasBarangay"
+    rename_dict = {col: "qty" for col in df.columns if "region_" in col}
+    rename_dict["barangay"] = "hasBarangay"
 
     return df.rename(mapping=rename_dict, strict=False)
 
@@ -435,6 +439,117 @@ def normalize_columns(
             rename_map[col] = matches[0]
 
     return df.rename(rename_map)
+
+COST_COL_TOKENS = ["dswd", "lgu", "ngos", "others", "grand total"]
+
+def split_merged_cost_columns(df: pl.DataFrame) -> pl.DataFrame:
+    for col in df.columns:
+        col_lower = col.lower()
+
+        found_tokens = [t for t in COST_COL_TOKENS if t in col_lower]
+
+        if len(found_tokens) < 2:
+            continue
+
+        prefix = ".".join(col.split(".")[:-1])
+        n = len(found_tokens)
+        new_col_names = [
+            f"{prefix}.{t}" if prefix else t
+            for t in found_tokens
+        ]
+
+        split_exprs = [
+            pl.col(col)
+              .cast(pl.Utf8)
+              .str.strip_chars()
+              .str.splitn(" ", n + 1)
+              .struct.field(f"field_{i}")
+              .alias(new_col_names[i])
+            for i in range(n)
+        ]
+
+        df = (
+            df
+            .with_columns(split_exprs)
+            .drop(col)
+        )
+
+        print(f"  [split] '{col}' → {new_col_names}")
+
+    return df
+
+def normalize_numeric(val: str) -> str:
+    """
+    Normalize spaced numeric formatting:
+    '3 , 120 , 128 . 00' → '3120128.00'
+    '169,332 . 45'       → '169332.45'
+    """
+    # Collapse spaces around commas: '3 , 120' → '3,120'
+    val = re.sub(r'(\d)\s*,\s*(\d)', r'\1\2', val)  # remove thousands sep entirely
+    # Collapse spaces around decimal point: '128 . 00' → '128.00'
+    val = re.sub(r'(\d)\s*\.\s*(\d)', r'\1.\2', val)
+    return val.strip('.')
+
+def split_merged_cost_values(df: pl.DataFrame) -> pl.DataFrame:
+    """
+    For columns that are already properly named (e.g. separate DSWD, LGU columns)
+    but whose values contain multiple space-separated numbers
+    (e.g. "144,784.20 300,000.00"), split the values across the next N columns.
+    
+    Works for any number of merged values, not just 2.
+    """
+    # Pattern: a numeric value (with commas/decimals/dash) followed by space + another
+    MERGED_VALUE_RE = re.compile(r'^[\d,\.\-]+(?:\s+[\d,\.\-]+)+$')
+
+    cols = df.columns
+    result = df
+
+    for i, col in enumerate(cols):
+        # Sample non-null values to detect merging
+        sample = (
+            result
+            .filter(pl.col(col).is_not_null())
+            .select(pl.col(col).cast(pl.Utf8).str.strip_chars())
+            .head(10)
+            .to_series()
+            .to_list()
+        )
+        sample = [normalize_numeric(v) for v in sample if v and v not in ("-", "")]
+        if not sample:
+            continue
+
+        # Count how many are merged (space-separated numerics)
+        merged = [v for v in sample if MERGED_VALUE_RE.match(v)]
+        if not merged or len(merged) / len(sample) < 0.5:
+            continue
+
+        # Determine split count from the most common part count
+        part_counts = [len(v.split()) for v in merged]
+        n = max(set(part_counts), key=part_counts.count)
+        if n < 2:
+            continue
+
+        # Find the next n-1 sibling columns to receive the split values
+        siblings = cols[i + 1: i + n]
+        if len(siblings) < n - 1:
+            continue  # not enough sibling columns
+
+        print(f"  [split_values] '{col}' has {n} merged values → distributing into {[col] + list(siblings)}")
+
+        # Split: first part stays in col, remaining go to siblings
+        split_exprs = [
+            pl.col(col)
+              .cast(pl.Utf8)
+              .str.strip_chars()
+              .str.splitn(" ", n + 1)
+              .struct.field(f"field_{j}")
+              .alias(col if j == 0 else siblings[j - 1])
+            for j in range(n)
+        ]
+
+        result = result.with_columns(split_exprs)
+
+    return result
 
 # if __name__ == "__main__":
 #     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"

@@ -1,4 +1,5 @@
 from dataclasses import fields, dataclass
+from turtle import st
 from typing import List
 from rdflib import URIRef, Literal
 from rdflib.namespace import RDF, XSD
@@ -39,37 +40,43 @@ class AffectedPopulation:
 
 AFF_POP_TOKENS = {
 
-    "evacuationCenters": ["evacuation", "center", "cum"],
-    "displacedFamiliesI": ["displaced", "inside", "families", "cum"],
-    "displacedFamiliesO": ["displaced", "outside", "families", "cum"],
-    "displacedPersonsI": ["displaced", "inside", "persons", "cum"],
-    "displacedPersonsO": ["displaced", "outside", "persons", "cum"],
-    "affectedBarangays": ["affected", "barangays"],
-    "affectedBarangays": ["affected", "brgy"],
-    "affectedFamilies": ["affected", "families"],
-    "affectedPersons": ["affected", "persons"],
-    "displacedFamilies": ["displaced", "total", "families", "cum"],
-    "displacedPersons": ["displaced", "total", "persons", "cum"],
+    "evacuationCenters": [
+        ["evacuation", "center", "cum"],
+        ["evacuation", "center"],
 
-    # "NUMBER_OF_EVACUATION_CENTERS_ECs_CUM" : "evacuationCenters", # should be in Preemptive Evac
-    # "NUMBER_OF_DISPLACED_INSIDE_ECs_Families_CUM": "displacedFamiliesI",
-    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_Families_CUM": "displacedFamiliesO",
-    # "NUMBER_OF_DISPLACED_INSIDE_ECs_Persons_CUM": "displacedPersonsI",
-    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_Persons_CUM": "displacedPersonsO",
-    # "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Barangays": "affectedBarangays",
-    # "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Families": "affectedFamilies",
-    # "NUMBER_OF_AFFECTED_REGION_PROVINCE_MUNICIPALITY_Persons": "affectedPersons",
-    # "NUMBER_OF_DISPLACED_TOTAL_Families_CUM": "displacedFamilies",
-    # "TOTAL_DISPLACED_SERVED_Families_Total_Families_CUM": "displacedFamilies",
-    # "TOTAL_DISPLACED_SERVED_Families_REGION_PROVINCE_MUNICIPALITY_Total_Families_CUM": "displacedFamilies",
-    # "TOTAL_DISPLACED_SERVED_Persons_Total_Persons_CUM": "displacedPersons",
-    # "TOTAL_DISPLACED_SERVED_Persons_REGION_PROVINCE_MUNICIPALITY_Total_Persons_CUM": "displacedPersons",
-    # "NUMBER_OF_DISPLACED_TOTAL_Persons_CUM": "displacedPersons",
-    # "NUMBER_OF_AFFECTED_Barangays": "affectedBarangays",
-    # "NUMBER_OF_AFFECTED_Families": "affectedFamilies",
-    # "NUMBER_OF_AFFECTED_Persons": "affectedPersons",
-    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Families_CUM": "displacedFamiliesO",
-    # "NUMBER_OF_DISPLACED_OUTSIDE_ECs_REGION_PROVINCE_MUNICIPALITY_Persons_CUM": "displacedPersonsO"
+    ],
+    "displacedFamiliesI": [
+        ["displaced", "inside", "families", "cum"],
+        ["inside", "families", "evacuation"]
+    ],
+    "displacedFamiliesO": [
+        ["displaced", "outside", "families", "cum"],
+        ["outside", "families", "evacuation"]
+    ],
+    "displacedPersonsI": [
+        ["displaced", "inside", "persons", "cum"],
+        ["inside", "person", "evacuation"]
+    ],
+    "displacedPersonsO": [
+        ["displaced", "outside", "persons", "cum"],
+        ["outside", "person", "evacuation"]
+    ],
+    "affectedBarangays": [["affected", "barangays"]],
+    "affectedBarangays": [["affected", "brgy"]],
+    "affectedFamilies": [["affected", "families"]],
+    "affectedPersons": [["affected", "person"]],
+    "displacedFamilies": [
+        ["displaced", "total", "families", "cum"],
+        ["served", "total", "families", "cum"],
+        ["served", "total", "families"],
+        ["evacuee", "families"]
+    ],
+    "displacedPersons": [
+        ["displaced", "total", "person", "cum"],
+        ["served", "total", "persons", "cum"],
+        ["served", "total", "persons"],
+        ["evacuee", "person"]
+    ]
 }
 
 @dataclass
@@ -80,8 +87,8 @@ class Housing:
     partiallyDamagedHouses: int
 
 HOUSING_TOKENS = {
-    "totallyDamagedHouses": ["totally"],
-    "partiallyDamagedHouses": ["partially"],
+    "totallyDamagedHouses": [["totally"]],
+    "partiallyDamagedHouses": [["partially"]],
 }
 
 @dataclass
@@ -92,16 +99,60 @@ class Assistance:
     contributionAmount: float
 
 ASSISTANCE_TOKENS = {
-    "dswd": ["dswd"],
-    "lgu": ["lgu"],
-    "ngo": ["ngos"],
-    "others": ["others"],
+    "dswd": [["dswd"]],
+    "lgu": [["lgu"]],
+    "ngo": [["ngo"]],
+    "others": [["others"]],
+    "nga": [["nga"]],
 }
+
+ORG_MAPPING = {
+
+    "dswd": "https://sakuna.ph/org/DSWD",
+    "lgu": "https://sakuna.ph/org/LGU",
+    "ngo": "https://sakuna.ph/org/NGO",
+    "others": "https://sakuna.ph/org/Unspecified",
+    "nga": "https://sakuna.ph/org/NGA"
+}
+
 @dataclass
 class PEvac:
     id: str
     hasLocation: URIRef
     evacuationCenters: int
+
+@dataclass
+class Stranded:
+    id: str
+    hasLocation: URIRef
+    strandedVessels: int | None
+    strandedMotorBancas: int | None
+    strandedPassengers: int | None
+    strandedRollingCargoes: int | None
+    portOrTerminalName: str | None
+
+STRANDED_TOKENS = {
+    "strandedPassengers": [
+        ["strandees"],
+        ["passenger"],
+        ["stranded", "passengers"]
+    ],
+    "strandedVessel": [
+        ["vehicle"],
+        ["vessel"]
+    ],
+    "strandedMotorBancas": [
+        ["motor", "banca"]
+    ],
+    "strandedRollingCargoes": [
+        ["others"]
+    ],
+    "port": [
+        ["port"],
+        ["terminal"]
+    ],
+}
+
 
 INCIDENT_MARKERS = ["incident", "conflict",  "disorganization"]
 # rule-based incident v major event resolution

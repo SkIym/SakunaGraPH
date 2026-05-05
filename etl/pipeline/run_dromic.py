@@ -1,14 +1,11 @@
 import argparse
-from concurrent.futures import ProcessPoolExecutor, as_completed
-from typing import List, Tuple
-
 from rdflib import Graph
 
-from mappings.dromic import Event, aff_pop_mapping, event_mapping, housing_mapping, pevac_mapping, prov_mapping
-from transform.dromic import load_aff_pop, load_event, load_housing, load_provenance
+from mappings.dromic import aff_pop_mapping, assistance_mapping, event_mapping, housing_mapping, pevac_mapping, prov_mapping
+from transform.dromic import load_aff_pop, load_assistance, load_event, load_housing, load_provenance
 from mappings.graph import create_graph
 import os
-import time
+
 
 DATA_DIR = "../data/parsed/dromic/"
 OUT_DIR = "../data/rdf/events/"
@@ -36,21 +33,45 @@ def process_event(folder_path: str) -> Graph:
     if hs:
         housing_mapping(g, hs, event_iri)
 
+    try:
+        assis = load_assistance(folder_path)
+        if assis:
+            assistance_mapping(g, assis, event_iri)
+    except:
+        print(folder_path)
+
+
+
     return g
+
+
+def load_needs_rerun(sub_data_dir: str) -> set[str]:
+    """Load folder names that need rerunning from _needs_rerun.txt."""
+    needs_rerun_path = os.path.join(sub_data_dir, "_needs_rerun.txt")
+    if not os.path.exists(needs_rerun_path):
+        return set()
+    with open(needs_rerun_path, encoding="utf-8") as f:
+        return {line.strip() for line in f if line.strip()}
 
 
 def run(sub_data_dir: str, out_file: str):
     main_graph = create_graph()
+    needs_rerun = load_needs_rerun(sub_data_dir)
 
     ec = 0
+    skipped = 0
     for folder in next(os.walk(sub_data_dir))[1]:
+        if folder in needs_rerun:
+            print(f"[SKIP] {folder} — in _needs_rerun.txt")
+            skipped += 1
+            continue
+
         folder_path = os.path.join(sub_data_dir, folder)
         main_graph += process_event(folder_path)
-
         ec += 1
 
     main_graph.serialize(destination=out_file, format="turtle")
-    print(f"Serialized {ec} events → {out_file}")
+    print(f"Serialized {ec} events → {out_file} (skipped {skipped})")
 
 
 if __name__ == "__main__":
