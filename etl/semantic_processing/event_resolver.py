@@ -292,7 +292,7 @@ from datetime import datetime
 
 from rdflib import Graph, Namespace, Literal, RDF, RDFS, OWL
 from rdflib.namespace import SKOS, XSD
-from mappings.graph import SKG, GEO, PROV
+from mappings.graph import SKG, PROV
 
 BAW = Namespace("https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#")
 
@@ -553,6 +553,8 @@ def generate_candidate_pairs(
             if a.start_date and b.start_date:
                 if abs((a.start_date - b.start_date).days) > BLOCKING_DATE_TOLERANCE_DAYS:
                     continue
+
+            print(a.source, b.source)
             pairs.append((a, b))
 
     return pairs
@@ -590,8 +592,6 @@ class ScoreBreakdown:
       date_gate     — None if either date missing, True/False otherwise
       type_gate     — None if either type unresolvable, True/False otherwise
       label_gate    — None if used location fallback or skipped, True/False otherwise
-      location_gate — None if labels were present (gate not used) or both locations
-                      missing; True/False when used as fallback
       psgc_gate     — None if neither event is an Incident (gate not active), or if
                       the gate is active but either side has no resolvable PSGC codes
                       (non-blocking skip); True if a PSGC prefix match is found;
@@ -608,7 +608,6 @@ class ScoreBreakdown:
     label_similarity: float | None
     proper_noun_hit:  bool | None
     label_gate:       bool | None
-    location_gate:    bool | None
     psgc_gate:        bool | None
     psgc_match_level: int | None
     is_match:         bool
@@ -621,7 +620,6 @@ class ScoreBreakdown:
             "label_similarity": round(self.label_similarity, 4) if self.label_similarity is not None else None,
             "proper_noun_hit":  self.proper_noun_hit,
             "label_gate":       self.label_gate,
-            "location_gate":    self.location_gate,
             "psgc_gate":        self.psgc_gate,
             "psgc_match_level": self.psgc_match_level,
             "is_match":         self.is_match,
@@ -674,7 +672,7 @@ def _gate_type(a: DisasterEvent, b: DisasterEvent) -> bool | None:
     return False
 
 
-# ── Gate 3: Label / location ──────────────────────────────────────────────────
+# ── Gate 3: Label  ──────────────────────────────────────────────────
 
 def _proper_nouns(raw_label: str) -> set[str]:
     tokens = re.findall(r"[A-Z][A-Za-z0-9\-]*", raw_label)
@@ -683,7 +681,7 @@ def _proper_nouns(raw_label: str) -> set[str]:
 
 def _gate_label(
     a: DisasterEvent, b: DisasterEvent
-) -> tuple[float | None, bool | None, bool | None, bool | None]:
+) -> tuple[float | None, bool | None, bool | None]:
     if a.label and b.label:
         sim = max(
             fuzz.token_sort_ratio(normalize_text(a.label), normalize_text(b.label)) / 100.0,
@@ -694,19 +692,10 @@ def _gate_label(
         pn_b = _proper_nouns(b.label)
         pn_hit = bool(pn_a & pn_b)
         label_gate = sim >= LABEL_FUZZY_THRESHOLD or pn_hit
-        return sim, pn_hit, label_gate, None
+        return sim, pn_hit, label_gate
+    
+    return None, None, None
 
-    else:
-        if not a.location and not b.location:
-            return None, None, None, None
-
-        if not a.location or not b.location:
-            return None, None, None, None
-
-        toks_a = {t for t in normalize_text(a.location).split() if len(t) >= 3}
-        toks_b = {t for t in normalize_text(b.location).split() if len(t) >= 3}
-        loc_gate = bool(toks_a & toks_b) if toks_a and toks_b else None
-        return None, None, None, loc_gate
 
 
 # ── Gate 4: PSGC location (Incident pairs only) ───────────────────────────────
@@ -793,10 +782,10 @@ def score_pair(a: DisasterEvent, b: DisasterEvent) -> ScoreBreakdown:
     """
     delta_days, date_gate                       = _gate_date(a, b)
     type_gate                                   = _gate_type(a, b)
-    sim, pn_hit, label_gate, location_gate      = _gate_label(a, b)
+    sim, pn_hit, label_gate                     = _gate_label(a, b)
     psgc_gate, psgc_match_level                 = _gate_psgc(a, b)
 
-    gates = [date_gate, type_gate, label_gate, location_gate, psgc_gate]
+    gates = [date_gate, type_gate, label_gate, psgc_gate]
     is_match = all(g is not False for g in gates)
 
     return ScoreBreakdown(
@@ -806,7 +795,6 @@ def score_pair(a: DisasterEvent, b: DisasterEvent) -> ScoreBreakdown:
         label_similarity=sim,
         proper_noun_hit=pn_hit,
         label_gate=label_gate,
-        location_gate=location_gate,
         psgc_gate=psgc_gate,
         psgc_match_level=psgc_match_level,
         is_match=is_match,
@@ -830,7 +818,6 @@ def score_all_pairs(
                 f"  type={breakdown.type_gate}"
                 f"  label_sim={breakdown.label_similarity}"
                 f"  pn={breakdown.proper_noun_hit}"
-                f"  loc={breakdown.location_gate}"
                 f"  psgc={breakdown.psgc_gate}(L{breakdown.psgc_match_level})"
             )
     return results
@@ -1001,6 +988,10 @@ def write_alignments(
         for a, b in combinations(member_list, 2):
             a = URIRef(a)
             b = URIRef(b)
+
+            if _infer_source(a) == _infer_source(b):
+                continue
+
             g.add((a, PROV.alternateOf, b))
             g.add((b, PROV.alternateOf, a))
 
