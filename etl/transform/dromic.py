@@ -16,7 +16,43 @@ from datetime import datetime
 import re
 import polars as pl
 
-# add guard: if municiplaity row all blank, consider province instead as collapse key
+def _fix_docling_numeric(val: str) -> str:
+    """
+    Fix Docling's numeric parsing artifacts where digits leak into
+    separators, producing patterns like:
+      '17, 7, 785'     → '17785'     (then reformat as needed)
+      '1, 1, 562, 599' → '1562599'
+      '28. 8. 23'      → '28.23'
+    
+    Strategy: detect the artifact pattern and reconstruct the number.
+    """
+    if not val or not isinstance(val, str):
+        return val
+
+    val = val.strip()
+
+    # Pattern: digit groups separated by ", digit, " where the middle digit
+    # is a duplicate of the leading digit of the next group
+    # e.g. "1, 1, 562, 2, 599" → remove the spurious single-digit tokens
+
+    # Step 1: fix decimal artifact "28. 8. 23" → "28.23"
+    # Pattern: number DOT spurious_digit DOT real_decimal
+    val = re.sub(
+        r'(\d+)\.\s*\d+\.\s*(\d+)',
+        lambda m: f"{m.group(1)}.{m.group(2)}",
+        val
+    )
+
+    # Step 2: fix thousands separator artifact "1, 1, 562, 2, 599"
+    # Remove single-digit tokens that appear between multi-digit groups
+    # i.e. "X, D, YYY" where D is a single digit → "X, YYY"
+    val = re.sub(r',\s*\d(?=\s*,)', '', val)
+
+    # Step 3: remove remaining commas/spaces to get clean number
+    # then reformat if needed — but since we're storing as string, just clean
+    val = re.sub(r',\s*', '', val).strip()
+
+    return val
 
 def _parse_date(value: str) -> Optional[datetime]:
     """Parse a date string in various formats, return None if unparseable."""
@@ -248,6 +284,15 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
         match_location=True,
         correct_qty_barangay=False,
     )
+
+    cost_cols = [c for c in df.columns if any(
+    kw in c.lower() for kw in ["dswd", "lgu", "ngo", "others", "nga"]
+    )]
+
+    df = df.with_columns([
+        pl.col(c).cast(pl.Utf8).map_elements(_fix_docling_numeric, return_dtype=pl.Utf8)
+        for c in cost_cols
+    ])
 
     df = to_million_php(df, ["dswd", "lgu", "others", "ngo", "nga"])
 

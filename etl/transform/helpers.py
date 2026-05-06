@@ -474,7 +474,7 @@ def split_merged_cost_columns(df: pl.DataFrame) -> pl.DataFrame:
             .drop(col)
         )
 
-        print(f"  [split] '{col}' → {new_col_names}")
+        # print(f"  [split] '{col}' → {new_col_names}")
 
     return df
 
@@ -534,7 +534,7 @@ def split_merged_cost_values(df: pl.DataFrame) -> pl.DataFrame:
         if len(siblings) < n - 1:
             continue  # not enough sibling columns
 
-        print(f"  [split_values] '{col}' has {n} merged values → distributing into {[col] + list(siblings)}")
+        # print(f"  [split_values] '{col}' has {n} merged values → distributing into {[col] + list(siblings)}")
 
         # Split: first part stays in col, remaining go to siblings
         split_exprs = [

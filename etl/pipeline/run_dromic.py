@@ -38,7 +38,7 @@ def process_event(folder_path: str) -> Graph:
         if assis:
             assistance_mapping(g, assis, event_iri)
     except:
-        print(folder_path)
+        print("[ASSISTANCE SKIP]: ", folder_path)
 
 
 
@@ -62,7 +62,7 @@ def run(sub_data_dir: str, out_file: str):
     skipped = 0
     for folder in next(os.walk(sub_data_dir))[1]:
         if folder in needs_rerun:
-            print(f"[SKIP] {folder} — in _needs_rerun.txt")
+            # print(f"[SKIP] {folder} — in _needs_rerun.txt")
             skipped += 1
             continue
 
