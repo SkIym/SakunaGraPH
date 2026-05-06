@@ -1,4 +1,5 @@
 import argparse
+from pathlib import Path
 from rdflib import Graph
 
 from mappings.dromic import aff_pop_mapping, assistance_mapping, event_mapping, housing_mapping, pevac_mapping, prov_mapping
@@ -10,7 +11,7 @@ import os
 DATA_DIR = "../data/parsed/dromic/"
 OUT_DIR = "../data/rdf/events/"
 
-def process_event(folder_path: str) -> Graph:
+def process_event(folder_path: str, needs_rerun_path: str) -> Graph:
 
     g = create_graph()
     ev = load_event(os.path.join(folder_path, "metadata.json"))
@@ -37,17 +38,25 @@ def process_event(folder_path: str) -> Graph:
         assis = load_assistance(folder_path)
         if assis:
             assistance_mapping(g, assis, event_iri)
-    except:
-        print(folder_path)
+    except Exception as e:
+
+        print("[ASSISTANCE SKIP]: ", folder_path, e)
+        p  = Path(needs_rerun_path)
+        existing = p.read_text(encoding="utf-8").splitlines() if p.exists() else []
+        folder = Path(folder_path).stem.strip()
+        if folder not in existing:
+            with open(needs_rerun_path, "a", encoding="utf-8") as f:
+                f.write("\n" + folder)
+        
+        print(needs_rerun_path, folder)
 
 
 
     return g
 
 
-def load_needs_rerun(sub_data_dir: str) -> set[str]:
+def load_needs_rerun(needs_rerun_path: str) -> set[str]:
     """Load folder names that need rerunning from _needs_rerun.txt."""
-    needs_rerun_path = os.path.join(sub_data_dir, "_needs_rerun.txt")
     if not os.path.exists(needs_rerun_path):
         return set()
     with open(needs_rerun_path, encoding="utf-8") as f:
@@ -56,18 +65,19 @@ def load_needs_rerun(sub_data_dir: str) -> set[str]:
 
 def run(sub_data_dir: str, out_file: str):
     main_graph = create_graph()
-    needs_rerun = load_needs_rerun(sub_data_dir)
+    needs_rerun_path = os.path.join(sub_data_dir, "_needs_rerun.txt")
+    needs_rerun = load_needs_rerun(needs_rerun_path)
 
     ec = 0
     skipped = 0
     for folder in next(os.walk(sub_data_dir))[1]:
         if folder in needs_rerun:
-            print(f"[SKIP] {folder} — in _needs_rerun.txt")
+            # print(f"[SKIP] {folder} — in _needs_rerun.txt")
             skipped += 1
             continue
 
         folder_path = os.path.join(sub_data_dir, folder)
-        main_graph += process_event(folder_path)
+        main_graph += process_event(folder_path, needs_rerun_path)
         ec += 1
 
     main_graph.serialize(destination=out_file, format="turtle")

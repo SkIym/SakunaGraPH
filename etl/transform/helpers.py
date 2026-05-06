@@ -105,21 +105,6 @@ def df_to_entities(df: pl.DataFrame, cls: Type[T]) -> list[T]:
 
     return entities
 
-# def load_multiple_csvs(
-#     folder: str,
-#     predicate: Callable[[str], bool],
-#     **df_kwargs,
-# ) -> pl.DataFrame | None:
-#     paths = [
-#         os.path.join(folder, f)
-#         for f in os.listdir(folder)
-#         if predicate(f)
-#     ]
-#     if not paths:
-#         return None
-
-#     dfs = [load_csv_df(p, **df_kwargs) for p in paths]
-#     return pl.concat(dfs, rechunk=True)
 
 def forward_fill(df: DataFrame, cols: list[str]) -> DataFrame:
     """
@@ -440,7 +425,7 @@ def normalize_columns(
 
     return df.rename(rename_map)
 
-COST_COL_TOKENS = ["dswd", "lgu", "ngos", "others", "grand total"]
+COST_COL_TOKENS = ["dswd", "lgu", "ngo", "others", "nga", "total"]
 
 def split_merged_cost_columns(df: pl.DataFrame) -> pl.DataFrame:
     for col in df.columns:
@@ -474,21 +459,15 @@ def split_merged_cost_columns(df: pl.DataFrame) -> pl.DataFrame:
             .drop(col)
         )
 
-        print(f"  [split] '{col}' → {new_col_names}")
+        # print(f"  [split] '{col}' → {new_col_names}")
 
     return df
 
 def normalize_numeric(val: str) -> str:
-    """
-    Normalize spaced numeric formatting:
-    '3 , 120 , 128 . 00' → '3120128.00'
-    '169,332 . 45'       → '169332.45'
-    """
-    # Collapse spaces around commas: '3 , 120' → '3,120'
-    val = re.sub(r'(\d)\s*,\s*(\d)', r'\1\2', val)  # remove thousands sep entirely
-    # Collapse spaces around decimal point: '128 . 00' → '128.00'
+    val = re.sub(r',\s*\d\s*,', ',', val)
+    val = re.sub(r'(\d)\s*,\s*(\d)', r'\1\2', val)
     val = re.sub(r'(\d)\s*\.\s*(\d)', r'\1.\2', val)
-    return val.strip('.')
+    return val.strip('.,')  # ← strip both
 
 def split_merged_cost_values(df: pl.DataFrame) -> pl.DataFrame:
     """
@@ -534,35 +513,24 @@ def split_merged_cost_values(df: pl.DataFrame) -> pl.DataFrame:
         if len(siblings) < n - 1:
             continue  # not enough sibling columns
 
-        print(f"  [split_values] '{col}' has {n} merged values → distributing into {[col] + list(siblings)}")
+        # print(f"  [split_values] '{col}' has {n} merged values → distributing into {[col] + list(siblings)}")
 
         # Split: first part stays in col, remaining go to siblings
         split_exprs = [
             pl.col(col)
-              .cast(pl.Utf8)
-              .str.strip_chars()
-              .str.splitn(" ", n + 1)
-              .struct.field(f"field_{j}")
-              .alias(col if j == 0 else siblings[j - 1])
+            .cast(pl.Utf8)
+            .str.strip_chars()
+            .str.replace_all(r',\s*\d\s*,', ',')
+            .str.replace_all(r'(\d)\s*,\s*(\d)', '${1}${2}')
+            .str.replace_all(r'(\d)\s*\.\s*(\d)', '${1}.${2}')
+            .str.strip_chars('.,')                              # ← strip both
+            .str.splitn(" ", n + 1)
+            .struct.field(f"field_{j}")
+            .alias(col if j == 0 else siblings[j - 1])
             for j in range(n)
         ]
 
         result = result.with_columns(split_exprs)
 
     return result
-
-# if __name__ == "__main__":
-#     DATA_DIR = "./data/ndrrmc/Undas 2023/related_incidents.csv"
-#     target_cols = ["Region", "Province", "City_Muni"]
-#     df = forward_fill_and_collapse(None, DATA_DIR, target_cols, "Column_1", "Column_2")
-
-#     texts = df.select("Column_2").to_series()
-
-
-#     predictions = DISASTER_CLASSIFIER.classify(list(texts))
-
-#     for text, (pred_class, score) in zip(texts, predictions):
-#         print(f"\nType of incident: {text}")
-#         print(f"→ Predicted class: {pred_class}")
-#         print(f"→ Similarity score: {score:.4f}")
 
