@@ -1146,6 +1146,7 @@ def process_file(pdf_path: Path, output_dir: Path):
 
 def parse_args():
     parser = argparse.ArgumentParser()
+    parser.add_argument("--single")
     parser.add_argument("--year", required=True)
     return parser.parse_args()
 
@@ -1162,6 +1163,11 @@ def main() -> None:
 
     input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf")
     output_dir =  Path(f"../data/parsed/dromic/{args.year}")
+
+    if args.single:
+        process_file(Path(os.path.join(input_dir,args.single)), output_dir)
+        return
+
 
     files = list(input_dir.glob("*"))
     skipped = 0

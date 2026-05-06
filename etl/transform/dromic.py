@@ -48,6 +48,9 @@ def _fix_docling_numeric(val: str) -> str:
     # i.e. "X, D, YYY" where D is a single digit → "X, YYY"
     val = re.sub(r',\s*\d(?=\s*,)', '', val)
 
+    val = re.sub(r'^\s*[.,]+\s*', '', val)  # strip leading dots/commas
+    val = re.sub(r'\s*[.,]+\s*$', '', val)       # strip trailing dots/commas
+
     # Step 3: remove remaining commas/spaces to get clean number
     # then reformat if needed — but since we're storing as string, just clean
     val = re.sub(r',\s*', '', val).strip()
@@ -221,7 +224,7 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
     if len(combined) > 1: 
         combined = combined.with_row_index("id", 1)
 
-    combined.write_csv(f"./dump/{Path(folder_path).stem}_aff_pop.csv")
+    # combined.write_csv(f"./dump/{Path(folder_path).stem}_aff_pop.csv")
 
 
     return df_to_entities(combined, AffectedPopulation), df_to_entities(combined, PEvac)
@@ -294,6 +297,8 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
         for c in cost_cols
     ])
 
+    df.write_csv(f"dump/assistance.csv")
+
     df = to_million_php(df, ["dswd", "lgu", "others", "ngo", "nga"])
 
     df = df.rename(mapping=ORG_MAPPING, strict=False)
@@ -316,9 +321,8 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
     if len(df) > 1:
         df = df.with_row_index("id", 1)
 
-    df.write_csv(f"dump/assistance.csv")
 
     return df_to_entities(df, Assistance)
 
 if __name__ == "__main__":
-    load_assistance("../data/parsed/dromic/2022/Mw 7.0 Earthquake Incident in Tayum Abra 2023")
+    load_assistance("../data/parsed/dromic/2025/Combined Effects of Southwest Monsoon and TCs Mirasol Nando and Opong 20260312")
