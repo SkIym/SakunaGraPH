@@ -49,9 +49,9 @@ def load_events(folder_path: str) -> list[Event]:
             src: dict[str, str] = json.load(f)
 
         event_name = event_name_expander(meta.get("eventName", folder))
-        text = (meta.get("remarks") or "").split(". ")[0]
+        # text = (meta.get("remarks") or "").split(". ")[0]
         pred, _ = DISASTER_CLASSIFIER.classify(
-            [event_name + src.get("reportName", "") + text]
+            [event_name + src.get("reportName", "")]
         )[0]
 
         # Extract disaster-specific params from narrative text
