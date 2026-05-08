@@ -86,15 +86,27 @@ def run(sub_data_dir: str, out_file: str):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("--year", type=str, required=True)
+    parser.add_argument("--year", type=str, default="2026")
     parser.add_argument("--out", type=str, default="dromic")
     parser.add_argument("--start", type=int, default=0)
     parser.add_argument("--count", type=int, default=50)
+    parser.add_argument("--all",       action="store_true")
     args = parser.parse_args()
 
-    sub_data_dir = DATA_DIR + str(args.year)
+    if args.all:
+        for folder in next(os.walk(DATA_DIR))[1]:
+            sub_data_dir = DATA_DIR + folder
 
-    run(
-        sub_data_dir=sub_data_dir,
-        out_file=f"{OUT_DIR}{args.out}-{args.year}.ttl",
-    )
+            run(
+                sub_data_dir=sub_data_dir,
+                out_file=f"{OUT_DIR}{args.out}-{folder}.ttl"
+            )
+
+    else:
+        sub_data_dir = DATA_DIR + str(args.year)
+
+
+        run(
+            sub_data_dir=sub_data_dir,
+            out_file=f"{OUT_DIR}{args.out}-{args.year}.ttl",
+        )
