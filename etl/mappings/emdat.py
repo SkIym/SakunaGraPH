@@ -87,13 +87,38 @@ def source_mapping(g: Graph, s: Source) -> URIRef:
 
     return uri
 
+def _is_incident(loc: URIRef, dtype: str) -> bool:
+
+    if not loc: return False
+    print(loc)
+    if ("|" not in loc
+        and all(
+            l not in loc
+            for l in 
+            ["Philippines", "Mindanao", "Visayas", "Luzon"]
+        )
+        and all(
+            t not in dtype.lower()
+            for t in
+            ["cyclone", "storm", "ground"]
+        )
+    ): return True
+
+    return False
+
+
 def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
     for r in rs:
 
         uri = event_uri("emdat", r.id)
 
-        g.add((uri, RDF.type, SKG.MajorEvent)) # rdf type
+        # print(r)
+        if _is_incident(r.hasLocation, r.hasDisasterType): # add type
+            g.add((uri, RDF.type, SKG.Incident))
+        else:
+            g.add((uri, RDF.type, SKG.MajorEvent)) # rdf type
+
         g.add((uri, PROV.wasDerivedFrom, src_uri)) # link source
 
         for f in fields(r):
@@ -109,6 +134,8 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
                 locs = value.split("|")
                 for loc in locs:
                     g.add((uri, SKG.hasLocation, URIRef(loc)))
+
+                
             elif f.name == "startDate":
                 g.add((uri, SKG.startDate, Literal(value, datatype=XSD.date)))
             elif f.name == "endDate":
