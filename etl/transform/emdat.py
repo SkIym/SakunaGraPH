@@ -358,7 +358,7 @@ def transform_emdat(input_path: str) -> dict[type, list[Any]]:
                     data[f.name] = value 
 
             # skip empty entities
-            if any(v is not None and v != "" for k, v in data.items() if k != "id"):
+            if any(v is not None and v != "" for k, v in data.items() if k != "id" and k != "hasLocation"):
                 entities[cls].append(cls(**data))
 
 
