@@ -1,7 +1,7 @@
 
 import logging
 from rdflib import URIRef
-from mappings.gda_mapping import (
+from mappings.gda import (
     Assistance, AffectedPopulation, Casualties, CommunicationLineDisruption,
     DeclarationOfCalamity, DamageGeneral, Evacuation, Event, HousingDamage,
     Incident, InfrastructureDamage, PowerDisruption, Preparedness, Recovery, Relief,
