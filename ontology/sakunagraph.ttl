@@ -2383,7 +2383,7 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                   :DisasterType ;
          skos:broader :Climatological ;
          skos:inScheme :DisasterTypeScheme ;
-         skos:definition "Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector." ;
+         skos:definition "Drought: An extended period of unusually low precipitation that produces a shortage of water for people, animals, and plants. Drought is different from most other hazards in that it develops slowly, sometimes even over the years, and its onset is generally difficult to detect. Drought is not solely a physical phenomenon because its impacts can be exacerbated by human activities and water supply demands. Drought is therefore often defined both conceptually and operationally. Operational definitions of drought, i.e., the degree of precipitation reduction that constitutes a drought, vary by locality, climate, and environmental sector. Can be considered dry spell." ;
          skos:prefLabel "Drought"@en .
 
 
