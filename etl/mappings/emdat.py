@@ -30,11 +30,14 @@ class Assistance:
     id: str
     contributionAID: float | None
     internationalOrgsPresent: str
+    hasLocation: URIRef | None
 
 @dataclass
 class Recovery:
     id: str
     postStructureCost: float | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class DamageGeneral:
@@ -42,18 +45,24 @@ class DamageGeneral:
     insuredDamage: float | None
     generalDamageAmount: float | None
     cpi: float | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class Casualties:
     id: str
     dead: int | None
     injured: int | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class AffectedPopulation:
     id: str
     affectedPersons: int | None
     displacedPersons: int | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class Source:
@@ -146,7 +155,10 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
             if value is None or value == "":
                 continue
 
-            if f.name == "contributionAID":
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(value)))
+
+            elif f.name == "contributionAID":
                 add_monetary(g, uri, SKG.contributionAID, value, SKG.USD_thousands)
 
             elif f.name == "internationalOrgsPresent":
@@ -169,9 +181,12 @@ def recovery_mapping(rs: list[Recovery], g: Graph):
         g.add((uri, RDF.type, SKG.Recovery)) # rdf type
         g.add((e_uri, SKG.hasRecovery, uri)) # link event
 
+        if r.hasLocation and r.postStructureCost:
+            g.add((uri, SKG.hasLocation, URIRef(r.hasLocation)))
+
         if r.postStructureCost:
             add_monetary(g, uri, SKG.postStructureCost, r.postStructureCost, SKG.USD_thousands)
-            # g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
+        # g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
 
 def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
 
@@ -182,6 +197,9 @@ def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
 
         g.add((uri, RDF.type, SKG.DamageGeneral)) # rdf type
         g.add((e_uri, SKG.hasDamageGeneral, uri)) # link event
+
+        if r.hasLocation and (r.insuredDamage or r.generalDamageAmount or r.cpi):
+            g.add((uri, SKG.hasLocation, URIRef(r.hasLocation)))
 
         if r.insuredDamage:
             # g.add((uri, SKG.insuredDamageAmount, Literal(r.insuredDamage, datatype=XSD.decimal)))
@@ -204,8 +222,15 @@ def casualties_mapping(rs: list[Casualties], g: Graph):
 
         id = 0
 
+        loc = ""
+        if r.hasLocation:
+            loc = URIRef(r.hasLocation)
+
         if r.dead:
             uri = casualties_iri(e_uri, str(id+1))
+
+            if loc: 
+                g.add((uri, SKG.hasLocation, loc)) 
 
             g.add((uri, RDF.type, SKG.Casualties)) # rdf type
             g.add((e_uri, SKG.hasCasualties, uri)) # link event
@@ -216,6 +241,9 @@ def casualties_mapping(rs: list[Casualties], g: Graph):
         
         if r.injured:
             uri = casualties_iri(e_uri, str(id+1))
+
+            if loc: 
+                g.add((uri, SKG.hasLocation, loc)) 
 
             g.add((uri, RDF.type, SKG.Casualties)) # rdf type
             g.add((e_uri, SKG.hasCasualties, uri)) # link event
@@ -237,4 +265,7 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph):
 
         if r.displacedPersons:
             g.add((uri, SKG.displacedPersons, Literal(r.displacedPersons)))
+
+        if r.hasLocation and (r.affectedPersons or r.displacedPersons):
+            g.add((uri, SKG.hasLocation, URIRef(r.hasLocation)))
         

@@ -6,7 +6,7 @@ import polars as pl
 from polars import DataFrame
 import datetime
 from mappings.iris import EMDAT_EVENT_NS
-from etl.transform.helpers import to_float, to_int
+from transform.helpers import to_float, to_int
 from mappings.emdat import Assistance, Event, Recovery, Source, DamageGeneral, Casualties, AffectedPopulation
 from semantic_processing.location_matcher_single import canonicalize_column
 from dataclasses import fields
@@ -155,7 +155,6 @@ def _event_id(disno: str) -> str:
     """Deterministic hex ID from DisNo."""
     return uuid.uuid5(EMDAT_EVENT_NS, disno).hex
 
-
 def clean_loc(df: DataFrame, col: str):
 
     df = df.with_columns(
@@ -267,13 +266,6 @@ def clean_columns(df: DataFrame) -> DataFrame:
 
     df = clean_loc(df, "hasLocation")
 
-    # df = df.with_columns(
-    #     hasLocation=pl.col("hasLocation").map_elements(
-    #         lambda cell: "|".join(LOCATION_MATCHER.match_cell(cell)),
-    #         return_dtype=pl.String
-    #     )
-    # )
-
     canon_loc_df = canonicalize_column(
         df=df.select("hasLocation"),
         col="hasLocation",
@@ -355,7 +347,12 @@ def transform_emdat(input_path: str) -> dict[type, list[Any]]:
             for f in class_fields:
                 value = row.get(f.name, None)
 
-                if value is None or (isinstance(value, str) and value.strip().lower() == "none"):
+
+                if value is None or (isinstance(value, str) and value.strip().lower() == "none"):             
+                    data[f.name] = None
+
+                # do not propagate
+                elif f.name == "hasLocation" and "|" in str(value) and cls != Event:
                     data[f.name] = None
                 else:
                     data[f.name] = value 
