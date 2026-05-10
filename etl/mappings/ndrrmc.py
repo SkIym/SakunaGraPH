@@ -498,7 +498,7 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
     if prov.reportLink:
         g.add((uri, URIRef(SKG["reportLink"]), Literal(prov.reportLink)))
 
-    g.add((uri, URIRef(PROV["wasAttributedTo"]), URIRef(ORG["NDRRMC"])))
+    g.add((uri, URIRef(PROV["wasAttributedTo"]), URIRef(ORG.NDRRMC)))
     g.add((uri, URIRef(PROV["wasGeneratedBy"]), URIRef(SKG["ndrrmc_website_access"])))
 
 
