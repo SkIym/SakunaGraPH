@@ -599,45 +599,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                 skos:note "In M Php" .
 
 
-###  https://sakuna.ph/amountDSWD
-:amountDSWD rdf:type owl:DatatypeProperty ;
-            rdfs:subPropertyOf owl:topDataProperty ;
-            rdfs:domain :Assistance ;
-            rdfs:range xsd:decimal ;
-            rdfs:label "amount from DWSD"@en .
-
-
-###  https://sakuna.ph/amountLGU
-:amountLGU rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:domain :Assistance ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "amount from LGU"@en .
-
-
-###  https://sakuna.ph/amountNGOs
-:amountNGOs rdf:type owl:DatatypeProperty ;
-            rdfs:subPropertyOf owl:topDataProperty ;
-            rdfs:domain :Assistance ;
-            rdfs:range xsd:decimal ;
-            rdfs:label "amount from NGOs and/or international orgs"@en .
-
-
-###  https://sakuna.ph/amountOCD
-:amountOCD rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:domain :Assistance ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "amount from OCD"@en .
-
-
-###  https://sakuna.ph/amountOtherGOs
-:amountOtherGOs rdf:type owl:DatatypeProperty ;
-                rdfs:subPropertyOf owl:topDataProperty ;
-                rdfs:domain :Assistance ;
-                rdfs:range xsd:decimal ;
-                rdfs:label "amount from other GOs"@en .
-
 
 ###  https://sakuna.ph/announcementsReleased
 :announcementsReleased rdf:type owl:DatatypeProperty ;
