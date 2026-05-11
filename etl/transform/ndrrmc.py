@@ -8,7 +8,7 @@ from datetime import datetime
 import polars as pl
 from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
-from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
+# from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 # from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (
@@ -743,7 +743,7 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
 
     df = df.with_row_index("id", 1)
 
-    # df.write_csv(event_folder_path + "/hakdog.csv")
+    df.write_csv(event_folder_path + "/hakdog.csv")
 
     return df_to_entities(df, ClassDisruption)
 
@@ -1024,6 +1024,6 @@ if __name__ == "__main__":
 
     # load_flight("../data/parsed/ndrrmc_mini/Combined Effects of  Enhanced SWM and TCs FERDIE GENER and HELEN IGME 2024")
 
-    load_incidents("../data/parsed/ndrrmc/El Nino 2023")
+    load_class_suspension("../data/parsed/ndrrmc/Combined Effects of SWM TCs MIRASOL NANDO and OPONG 2025")
 
     # load_housing("../data/parsed/ndrrmc_mini/Magnitude 6 8 Earthquake in Sarangani Davao Occidental/")
