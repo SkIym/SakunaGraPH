@@ -51,6 +51,7 @@ CLASSIFICATION_RULES: list[ClassificationRule] = [
     (["train accident", "rail accident", "derailment"],                              "Rail"),
     
     # ── Technological ─────────────────────────────────────────────────────────
+    (["drowning", "firework", "miscellaneous accident", "observance", "holiday", "election", "boga", "firecracker", "celebration", "year-end"],                            "MiscellaneousAccidentGeneral"),
     (["armed conflict", "armed encounter", "shooting", "ambush",
       "gunfire", "gun fire", "gun battle", "disorganization"],                                           "ArmedConflict"),
     (["industrial explosion", "factory explosion"],                                  "ExplosionIndustrial"),
@@ -66,7 +67,7 @@ CLASSIFICATION_RULES: list[ClassificationRule] = [
     (["radiation", "nuclear"],                                                       "Radiation"),
     (["poisoning", "food poisoning", "contamination"],                               "Poisoning"),
     (["industrial accident"],                                                        "IndustrialAccidentGeneral"),
-    (["drowning", "fireworks", "miscellaneous accident", "observance", "holiday", "election", "boga"],                            "MiscellaneousAccidentGeneral"),
+
 
     # ── Geophysical ───────────────────────────────────────────────────────────
     (["earthquake", "aftershock", "tremor", "seismic"],                              "GroundMovement"),
