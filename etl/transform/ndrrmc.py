@@ -8,7 +8,7 @@ from datetime import datetime
 import polars as pl
 from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
-# from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
+from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 # from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (

@@ -586,7 +586,7 @@ def relief_mapping(g: Graph, reliefs: List[Assistance], event_iri: URIRef):
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "itemCost":
-                add_monetary(g, uri, SKG.itemCost, value, SKG.PHP_millions)
+                add_monetary(g, uri, SKG.contributionAmount, value, SKG.PHP_millions)
             elif f.name == "itemQuantity":
                 g.add((uri, SKG.itemQuantity, Literal(value, datatype=XSD.decimal)))
             elif f.name == "itemCostPerUnit" and value > 0:

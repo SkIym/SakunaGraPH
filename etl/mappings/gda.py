@@ -4,7 +4,7 @@ from rdflib import RDF, RDFS, XSD, BNode, Literal, URIRef, Graph
 from regex import M
 
 from semantic_processing.org_resolver import ORG_RESOLVER
-from .graph import PROV, QUDT, SKG, add_monetary
+from .graph import ORG, PROV, QUDT, SKG, add_monetary
 from .iris import (
     comms_iri, doc_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
     damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, seaport_iri, sub_iri, water_iri
@@ -626,6 +626,7 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
             _add_location(g, uri, r.hasLocation)
 
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.amountNGOs), SKG.PHP_millions)
+            g.add((uri, SKG.contributingOrg, ORG.NGO))
 
 
 # ---------------------------------------------------------------------------
