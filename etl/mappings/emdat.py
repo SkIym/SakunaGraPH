@@ -2,7 +2,7 @@ from dataclasses import dataclass, fields
 from datetime import datetime, date
 from polars import DataFrame
 from rdflib import RDF, RDFS, XSD, Literal, URIRef, Graph
-from .graph import ORG, PROV, SKG, add_monetary
+from .graph import ORG, PROV, SKG, SKOS, add_monetary
 from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_uri, org_iri, prov_iri, recovery_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
 from semantic_processing.org_resolver import ORG_RESOLVER
@@ -187,7 +187,8 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
 
             elif f.name == "contributionAID":
                 add_monetary(g, uri, SKG.contributionAmount, value, SKG.USD_thousands)
-                g.add((uri, SKG.contributingOrg, ORG.USAID))
+                g.add((uri, SKG.contributingOrg, ORG.Unspecified))
+                g.add((uri, SKOS.note, Literal("The total amount (in thousands of US$ at the time of the report) of contributions for immediate relief activities to the country in response to the disaster, sourced from the Financial Tracking System of OCHA (1992–2015). Not maintained after 2015.")))
 
             elif f.name == "internationalOrgsPresent":
                 value = str(value)

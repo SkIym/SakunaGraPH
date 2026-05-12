@@ -1,6 +1,7 @@
 from rdflib import Graph, Namespace, URIRef, BNode, RDF, RDFS, Literal, XSD, OWL
 
 SKG = Namespace("https://sakuna.ph/")
+SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 PROV = Namespace("http://www.w3.org/ns/prov#")
 QUDT   = Namespace("http://qudt.org/schema/qudt/")
 CUR    = Namespace("http://qudt.org/vocab/currency/")
