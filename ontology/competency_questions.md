@@ -362,37 +362,133 @@ WHERE {
 **CQ15.** What assistance was provided in response to disaster events in Isabela, broken down by source, and which organizations contributed?
 
 ```
+SELECT ?event ?eventName ?src ?ic ?contribution ?type ?org
+WHERE {
+    ?event  a                       :DisasterEvent ;
+            :hasAssistance 			?ass ;
+    		prov:wasDerivedFrom/prov:wasAttributedTo ?src .
+
+    ?ass  		:hasLocation    ?location .
+    ?location   :isPartOf*		:0203100000 .
+
+    OPTIONAL { ?ass :itemTypeOrNeeds ?type }
+    OPTIONAL { ?ass :contributingOrg 	?org }
+    OPTIONAL { ?ass :contributionAmount [ qudt:numericValue ?contribution ] }
+    OPTIONAL { ?event :eventName ?eventName }
+
+}    
+```
+
+**CQ16.** Which disaster events triggered a Declaration of Calamity in provinces of Region XII (SOCCSKSARGEN), in which specific locations, and on what date was it resolved?
+
+```
+SELECT ?provName 
+(GROUP_CONCAT(
+        CONCAT(
+            COALESCE(STR(?eventName), "no name"), " - ", 
+            COALESCE(STR(?date), "unknown"), " - ",
+            STR(?locationLabel)
+        ); separator="\n") AS ?event_list)
+WHERE {
+    ?event  a                           :DisasterEvent ;
+            :hasLocation                ?location ;
+            :hasDeclarationOfCalamity   ?dec .
+    ?dec        :hasLocation    ?location .
+    ?prov       a               :Province ;
+                rdfs:label      ?provName ;
+                :isPartOf+      :1200000000 .
+    ?location   :isPartOf*      ?prov ;
+    			rdfs:label		?locationLabel .
     
+    OPTIONAL { ?dec :declarationType    ?type }
+    OPTIONAL { ?dec :resolutionDate     ?date }
+    OPTIONAL { ?event :eventName        ?eventName }
+}
+GROUP BY ?provName
 ```
 
-**CQ16.** Which disaster events triggered a Declaration of Calamity in provinces of Region XII (SOCCSKSARGEN), what type of declaration was issued , and on what date was it resolved?
+**CQ17.** Which disaster events in Mindanao have rescue operations recorded? Include rescue units deployed and equipment used.
 
 ```
+SELECT DISTINCT ?event ?eventName ?unit ?equip
+WHERE {
+    ?event  a                           :DisasterEvent ;
+            :hasRescue                	?res .
+    
+    ?res        :hasLocation    ?location .
+    ?location   :isPartOf*      :Mindanao ;
+    
+    OPTIONAL { ?event :eventName ?eventName }    
+    OPTIONAL { ?res :rescueUnit ?unit }   
+    OPTIONAL { ?res :rescueEquipment ?equip }
 
-```
-
-**CQ17.** What rescue operations were conducted during Landslide (Rock) or Mudslide events in Cordillera Administrative Region (CAR), including rescue units deployed and equipment used?
-
-```
+}
 
 ```
 
 ### Preparedness & Provenance
 
-**CQ18.** What preparedness activities were recorded for disaster events affecting municipalities with 1st income class in Luzon?
+**CQ18.** Which 4th income class municipalities in Region 9 experienced at least one disaster event, and did any of those events have preemptive evacuation recorded?
 
 ```
+SELECT  
+    (CONCAT(?munName, ", ", ?provName) AS ?loc)
+    (IF (MAX(IF (EXISTS { ?event :hasPreemptiveEvacuation ?pre . }, 1, 0)) > 0, "Yes", "No") AS ?didpreempt)
+WHERE {
+    ?event  a               :DisasterEvent ;
+            :hasLocation    ?mun .
 
+    ?mun    a                       :Municipality ;
+            rdfs:label              ?munName ;
+            :isPartOf*             :0900000000 ;
+            :incomeClassification   ?class ;
+            :isPartOf               ?parent .
+   
+    ?parent a           :Province ;
+            rdfs:label  ?provName .
+    
+    FILTER(?class = "4th")  
+}
+GROUP BY ?mun ?munName ?provName
 ```
 
-**CQ19.** What recovery measures were recorded for Flood (General) events in MIMAROPA Region or Region X (Northern Mindanao)?
+**CQ19.** How many technological fire disaster incidents were recorded in DROMIC reports compared to EM-DAT (CRED) entries for the enitre Philippines?
 
 ```
-
+SELECT  ?targetOrgs (COUNT(?event) AS ?number)
+WHERE {
+	VALUES ?targetTypes { :FireMiscellaneous :FireIndustrial }
+    VALUES	?targetOrgs { org:DROMIC org:CRED }
+    ?event  a	:DisasterEvent ;
+			:hasDisasterType ?targetTypes ;
+			prov:wasDerivedFrom/prov:wasAttributedTo ?targetOrgs .
+}
+GROUP BY ?targetOrgs
 ```
 
-**CQ20.** Which disaster events were reported in more than one source?
+**CQ20.** Which disaster events were reported in more than one source? What are their event names and start dates?
 
 ```
+SELECT ?e1 ?eventName1 ?s1 ?d1 ?e2 ?eventName2 ?s2 ?d2
+WHERE {
 
+  ?e1 a :DisasterEvent .
+  ?e2 a :DisasterEvent .
+  ?e1 prov:alternateOf ?e2 .
+  
+  ?e1 prov:wasDerivedFrom/prov:wasAttributedTo ?s1 .
+  ?e2 prov:wasDerivedFrom/prov:wasAttributedTo ?s2 . 
+    
+  ?s1 a prov:Organization .
+  ?s2 a prov:Organization .
+    
+  ?e1 :startDate ?d1 .
+  ?e2 :startDate ?d2 .
+
+  OPTIONAL { ?e1 :eventName ?eventName1 }
+  OPTIONAL { ?e2 :eventName ?eventName2 }
+  
+    
+  FILTER(STR(?e1) < STR(?e2))
+}
 ```
