@@ -1,5 +1,6 @@
 
 import logging
+from typing import Any
 from rdflib import URIRef
 
 from mappings.emdat import AffectedPopulation, Assistance, Casualties, DamageGeneral, Event, Recovery, aff_pop_mapping, assistance_mapping, casualties_mapping, damage_gen_mapping, event_mapping, recovery_mapping, source_mapping
@@ -14,7 +15,7 @@ DATA_DIR = "../data/raw/emdat"
 OUT_DIR = "../data/rdf/events/"
 
 
-def _run_mapping(name: str, fn, entities, cls, g: Graph, *extra) -> None:
+def _run_mapping(name: str, fn, entities: dict[type, list[Any]], cls: type, g: Graph, *extra: URIRef) -> None:
     rows = entities.get(cls, [])
     log.info("→ %s: %d rows", name, len(rows))
     fn(rows, g, *extra)
@@ -24,6 +25,7 @@ def _run_mapping(name: str, fn, entities, cls, g: Graph, *extra) -> None:
 def process_event(input_path: str, g: Graph, src_uri: URIRef):
     log.info("Transforming EM-DAT source: %s", input_path)
     entities = transform_emdat(input_path)
+
     log.info(
         "Transform produced %d entity classes (total rows: %d)",
         len(entities),

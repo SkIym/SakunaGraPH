@@ -68,11 +68,19 @@ def load_csv_df(
     else:
         df = move_col_values(df, MoveArg(source_col="summary_type", dest_col="municipality", remain=None))
 
+    df = move_invalid_region_values(df, "region", "municipality")
+
     if target_cols:
         df = df.with_columns(
             pl.col("province").replace("Province", None)
         )
         df = forward_fill(df, target_cols)
+
+    # filter out summary province-wide rwows
+    df = remove_rows_by_word(df, "municipality", ["province-wide"])
+
+    # filter out ncr value in province column
+    df = remove_values_from_column(df, "province", ["ncr"])
 
     if collapse_key:
         df = collapse(df, collapse_on, collapse_key)
@@ -104,6 +112,33 @@ def df_to_entities(df: pl.DataFrame, cls: Type[T]) -> list[T]:
         entities.append(cls(**data))
 
     return entities
+
+
+def move_invalid_region_values(
+    df: DataFrame,
+    source_col: str,
+    dest_col: str
+) -> DataFrame:
+    
+    is_invalid = (
+        ~pl.col(source_col).str.to_lowercase().is_in([
+            "mimaropa", "calabarzon", "ncr", "car", 
+            "barmm", "armm", "caraga", "soccsksargen", "nir"
+        ])
+        & ~pl.col(source_col).str.to_lowercase().str.contains("region")
+    )
+
+    return df.with_columns(
+        pl.when(is_invalid)
+          .then(pl.col(source_col))
+          .otherwise(pl.col(dest_col))
+          .alias(dest_col),
+
+        pl.when(is_invalid)
+          .then(None)
+          .otherwise(pl.col(source_col))
+          .alias(source_col),
+    )
 
 
 def forward_fill(df: DataFrame, cols: list[str]) -> DataFrame:
@@ -342,6 +377,19 @@ def remove_summary_rows(df: DataFrame, nulls: list[str]):
     # to be continued
 
     return df
+
+def remove_rows_by_word(df: DataFrame, column: str, words: list[str]) -> DataFrame:
+    words_lower = [w.lower() for w in words]
+    return df.filter(~pl.col(column).str.to_lowercase().is_in(words_lower))
+
+def remove_values_from_column(df: DataFrame, column: str, words: list[str]) -> DataFrame:
+    words_lower = [w.lower() for w in words]
+    return df.with_columns(
+        pl.when(pl.col(column).str.to_lowercase().is_in(words_lower))
+        .then(None)
+        .otherwise(pl.col(column))
+        .alias(column)
+    )
 
 def replace_column_whitespace_with_underscore(df: DataFrame) -> DataFrame:
     # Replace all whitespace characters with '_'

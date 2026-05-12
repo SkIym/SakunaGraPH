@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
 from semantic_processing.org_resolver import ORG_RESOLVER
-from .graph import CUR, SKG, Graph, PROV, add_monetary
+from .graph import CUR, SKG, Graph, PROV, add_monetary, ORG
 from .iris import (aff_pop_iri, agri_iri, airport_iri, assistance_iri, casualties_iri,
                    class_dis_iri, comms_iri, doc_iri, event_uri, flight_iri, housing_iri,
                    incident_iri, infra_iri, org_iri, pevac_iri, power_iri, prov_iri,
@@ -498,7 +498,7 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
     if prov.reportLink:
         g.add((uri, URIRef(SKG["reportLink"]), Literal(prov.reportLink)))
 
-    g.add((uri, URIRef(PROV["wasAttributedTo"]), URIRef(SKG["NDRRMC"])))
+    g.add((uri, URIRef(PROV["wasAttributedTo"]), URIRef(ORG.NDRRMC)))
     g.add((uri, URIRef(PROV["wasGeneratedBy"]), URIRef(SKG["ndrrmc_website_access"])))
 
 
@@ -586,7 +586,7 @@ def relief_mapping(g: Graph, reliefs: List[Assistance], event_iri: URIRef):
             if f.name == "hasLocation":
                 g.add((uri, SKG.hasLocation, URIRef(str(value))))
             elif f.name == "itemCost":
-                add_monetary(g, uri, SKG.itemCost, value, SKG.PHP_millions)
+                add_monetary(g, uri, SKG.contributionAmount, value, SKG.PHP_millions)
             elif f.name == "itemQuantity":
                 g.add((uri, SKG.itemQuantity, Literal(value, datatype=XSD.decimal)))
             elif f.name == "itemCostPerUnit" and value > 0:

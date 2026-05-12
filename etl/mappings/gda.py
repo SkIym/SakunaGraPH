@@ -4,7 +4,7 @@ from rdflib import RDF, RDFS, XSD, BNode, Literal, URIRef, Graph
 from regex import M
 
 from semantic_processing.org_resolver import ORG_RESOLVER
-from .graph import PROV, QUDT, SKG, add_monetary
+from .graph import ORG, PROV, QUDT, SKG, add_monetary
 from .iris import (
     comms_iri, doc_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
     damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, seaport_iri, sub_iri, water_iri
@@ -45,27 +45,27 @@ class Preparedness:
     id: str
     agencyLGUsPresentPreparedness: str | None
     announcementsReleased: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class Evacuation:
     id: str
     evacuationPlan: str | None
     evacuationCenters: int | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class Rescue:
     id: str
     rescueEquipment: str | None
     rescueUnit: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class DeclarationOfCalamity:
     id: str
     declarationOfCalamity: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class AffectedPopulation:
@@ -75,7 +75,7 @@ class AffectedPopulation:
     affectedPersons: int | None
     displacedFamilies: int | None
     displacedPersons: int | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class Casualties:
@@ -83,14 +83,14 @@ class Casualties:
     dead: int | None
     injured: int | None
     missing: int | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class HousingDamage:
     id: str
     totallyDamagedHouses: int | None
     partiallyDamagedHouses: int | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class InfrastructureDamage:
@@ -99,44 +99,44 @@ class InfrastructureDamage:
     commercialDamageAmount: float | None
     socialDamageAmount: float | None
     crossSectoralDamageAmount: float | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class DamageGeneral:
     id: str
     generalDamageAmount: float | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class PowerDisruption:
     id: str
     powerAffected: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class CommunicationLineDisruption:
     id: str
     communicationAffected: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class RoadAndBridgesDamage:
     id: str
     roadBridgeAffected: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class SeaportDisruption:
     id: str
     seaportsAffected: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class WaterDisruption:
     id: str
     areDamsAffected: str | None
     isTapAffected: str | None
-
+    hasLocation: URIRef | None
 
 @dataclass
 class Assistance:
@@ -145,10 +145,12 @@ class Assistance:
     agencyLGUsPresentAssistance: str | None
     internationalOrgsPresent: str | None
     amountNGOs: float | None             # stored in millions
-    
+    hasLocation: URIRef | None
+
 @dataclass
 class Relief:  
     id: str
+    hasLocation: URIRef | None
     itemType: str                        # e.g. "Goods", "Water", "Clothing" …
     itemCost: float | None  = None             # stored in millions
     itemQty: str | None = None
@@ -157,6 +159,7 @@ class Relief:
 @dataclass
 class Recovery:
     id: str
+    hasLocation: URIRef | None
     srrDone: str | None
     policyChanges: str | None
     postTraining: str | None
@@ -242,6 +245,9 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
         g.add((uri, RDF.type, SKG.Preparedness))
         g.add((e_uri, SKG.hasPreparedness, uri))
 
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
+
         if r.agencyLGUsPresentPreparedness:
             g.add((uri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentPreparedness)))
             for org in ORG_RESOLVER.split_and_resolve(str(r.agencyLGUsPresentPreparedness)):
@@ -262,6 +268,9 @@ def evacuation_mapping(rs: list[Evacuation], g: Graph) -> None:
         g.add((uri, RDF.type, SKG.PreemptiveEvacuation))
         g.add((e_uri, SKG.hasPreemptiveEvacuation, uri))
 
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
+
         if r.evacuationPlan:
             g.add((uri, SKG.evacuationPlan, Literal(r.evacuationPlan)))
         if r.evacuationCenters is not None:
@@ -279,6 +288,9 @@ def rescue_mapping(rs: list[Rescue], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.Rescue))
         g.add((e_uri, SKG.hasRescue, uri))
+
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
 
         if r.rescueEquipment:
             g.add((uri, SKG.rescueEquipment, Literal(r.rescueEquipment)))
@@ -304,10 +316,12 @@ def calamity_mapping(rs: list[DeclarationOfCalamity], g: Graph) -> None:
                 uri = doc_iri(e_uri)
                 g.add((uri, RDF.type, SKG.DeclarationOfCalamity))
                 g.add((e_uri, SKG.hasDeclarationOfCalamity, uri))
+                _add_location(g, uri, r.hasLocation)
                 g.add((uri, SKG.declarationType, Literal(r.declarationOfCalamity)))
             else:
                 e_uri = event_uri("gda", r.id)
                 uri = sub_iri(e_uri, "preparedness")
+                _add_location(g, uri, r.hasLocation)
                 g.add((uri, RDF.type, SKG.Preparedness))
                 g.add((e_uri, SKG.hasPreparedness, uri))
                 g.add((uri, SKG.announcementsReleased, Literal(r.declarationOfCalamity)))
@@ -324,6 +338,9 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.AffectedPopulation))
         g.add((e_uri, SKG.hasAffectedPopulation, uri))
+
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
 
         if r.affectedBarangays is not None:
             g.add((uri, SKG.affectedBarangays, Literal(r.affectedBarangays, datatype=XSD.int)))
@@ -344,10 +361,12 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph) -> None:
 def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
     for r in rs:
         e_uri = event_uri("gda", r.id)
+
         
         index = 0
         if r.dead is not None:
             uri = casualties_iri(e_uri, str(index+1))
+            _add_location(g, uri, r.hasLocation)
             g.add((uri, RDF.type, SKG.Casualties))
             g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.dead, datatype=XSD.int)))
@@ -356,6 +375,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
 
         if r.injured is not None:
             uri = casualties_iri(e_uri, str(index+1))
+            _add_location(g, uri, r.hasLocation)
             g.add((uri, RDF.type, SKG.Casualties))
             g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.injured, datatype=XSD.int)))
@@ -364,6 +384,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
 
         if r.missing is not None:
             uri = casualties_iri(e_uri, str(index+1))
+            _add_location(g, uri, r.hasLocation)
             g.add((uri, RDF.type, SKG.Casualties))
             g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.missing, datatype=XSD.int)))
@@ -383,6 +404,9 @@ def housing_damage_mapping(rs: list[HousingDamage], g: Graph) -> None:
         g.add((uri, RDF.type, SKG.HousingDamage))
         g.add((e_uri, SKG.hasHousingDamage, uri))
 
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
+
         if r.totallyDamagedHouses is not None:
             g.add((uri, SKG.totallyDamagedHouses, Literal(r.totallyDamagedHouses, datatype=XSD.int)))
         if r.partiallyDamagedHouses is not None:
@@ -400,6 +424,9 @@ def infra_damage_mapping(rs: list[InfrastructureDamage], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.InfrastructureDamage))
         g.add((e_uri, SKG.hasInfrastructureDamage, uri))
+
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
 
         if r.infraDamageAmount is not None:
             # g.add((uri, SKG.infraDamageAmount, Literal(r.infraDamageAmount, datatype=XSD.decimal)))
@@ -435,10 +462,12 @@ def damage_gen_mapping(rs: list[DamageGeneral], g: Graph) -> None:
         g.add((uri, RDF.type, SKG.DamageGeneral))
         g.add((e_uri, SKG.hasDamageGeneral, uri))
 
+
         if r.generalDamageAmount is not None:
             # g.add((uri, SKG.generalDamageAmount, Literal(r.generalDamageAmount, datatype=XSD.decimal)))
 
             add_monetary(g, uri, SKG.generalDamageAmount, _to_millions(r.generalDamageAmount), SKG.PHP_millions)
+            _add_location(g, uri, r.hasLocation)
 
 
 # ---------------------------------------------------------------------------
@@ -455,6 +484,7 @@ def power_disruption_mapping(rs: list[PowerDisruption], g: Graph) -> None:
 
         if r.powerAffected:
             g.add((uri, SKG.remarks, Literal(r.powerAffected)))
+            _add_location(g, uri, r.hasLocation)
 
 
 # ---------------------------------------------------------------------------
@@ -469,8 +499,10 @@ def comms_disruption_mapping(rs: list[CommunicationLineDisruption], g: Graph) ->
         g.add((uri, RDF.type, SKG.CommunicationLineDisruption))
         g.add((e_uri, SKG.hasCommunicationLineDisruption, uri))
 
+            
         if r.communicationAffected:
             g.add((uri, SKG.remarks, Literal(r.communicationAffected)))
+            _add_location(g, uri, r.hasLocation)
 
 
 # ---------------------------------------------------------------------------
@@ -487,6 +519,7 @@ def rnb_damage_mapping(rs: list[RoadAndBridgesDamage], g: Graph) -> None:
 
         if r.roadBridgeAffected:
             g.add((uri, SKG.remarks, Literal(r.roadBridgeAffected)))
+            _add_location(g, uri, r.hasLocation)
 
 
 # ---------------------------------------------------------------------------
@@ -503,6 +536,7 @@ def seaport_disruption_mapping(rs: list[SeaportDisruption], g: Graph) -> None:
 
         if r.seaportsAffected:
             g.add((uri, SKG.remarks, Literal(r.seaportsAffected)))
+            _add_location(g, uri, r.hasLocation)
 
 
 # ---------------------------------------------------------------------------
@@ -524,6 +558,9 @@ def water_disruption_mapping(rs: list[WaterDisruption], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.WaterDisruption))
         g.add((e_uri, SKG.hasWaterDisruption, uri))
+
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
 
         dam_desc = _augment_water_source("Dam", r.areDamsAffected)
         if dam_desc:
@@ -556,6 +593,7 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
         if r.allocatedFunds is not None:
 
             uri = sub_iri(e_uri, "assistance/allocated")
+            _add_location(g, uri, r.hasLocation)
 
             g.add((uri, RDF.type, SKG.Assistance))
             g.add((e_uri, SKG.hasAssistance, uri))
@@ -568,6 +606,7 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
             g.add((muri, RDF.type, SKG.Assistance))
             g.add((e_uri, SKG.hasAssistance, muri))
+            _add_location(g, muri, r.hasLocation)
 
             if r.agencyLGUsPresentAssistance:
                 g.add((muri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentAssistance)))
@@ -584,8 +623,10 @@ def assistance_mapping(rs: list[Assistance], g: Graph) -> None:
 
             g.add((uri, RDF.type, SKG.Assistance))
             g.add((e_uri, SKG.hasAssistance, uri))
+            _add_location(g, uri, r.hasLocation)
 
             add_monetary(g, uri, SKG.contributionAmount, _to_millions(r.amountNGOs), SKG.PHP_millions)
+            g.add((uri, SKG.contributingOrg, ORG.NGO))
 
 
 # ---------------------------------------------------------------------------
@@ -610,6 +651,8 @@ def relief_mapping(rs: list[Relief], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.Assistance))
         g.add((e_uri, SKG.hasAssistance, uri))
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
 
         label = _RELIEF_ITEM_TYPE_LABELS.get(r.itemType.lower(), r.itemType)
         g.add((uri, SKG.itemTypeOrNeeds, Literal(label)))
@@ -637,6 +680,8 @@ def recovery_mapping(rs: list[Recovery], g: Graph) -> None:
 
         g.add((uri, RDF.type, SKG.Recovery))
         g.add((e_uri, SKG.hasRecovery, uri))
+        if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
+            _add_location(g, uri, r.hasLocation)
 
         if r.srrDone:
             g.add((uri, SKG.srrDone, Literal(r.srrDone)))

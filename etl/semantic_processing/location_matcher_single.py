@@ -217,7 +217,7 @@ _ISLAND_GROUP_EXPANSIONS: list[tuple[re.Pattern, list[str]]] = [
         "1300000000",  # NCR
         "1400000000",  # CAR
     ]),
-    (re.compile(r"^visayas?$|^bisayas?$", re.I), [
+    (re.compile(r"^visayas?$|^bisayas?$|^visaya", re.I), [
         "0600000000",  # Region VI  – Western Visayas
         "0700000000",  # Region VII – Central Visayas
         "0800000000",  # Region VIII – Eastern Visayas
@@ -247,7 +247,7 @@ def _override_matches(value: str) -> list[LocationMatch]:
     """
     # Check island-group expansions first — only when value is EXACTLY the island name
     for pattern, psgc_codes in _ISLAND_GROUP_EXPANSIONS:
-        if pattern.fullmatch(value.strip()):
+        if pattern.match(value.strip()):
             _, name2iri = _ensure_loaded()
             iri2name = {v: k for k, v in name2iri.items()}
             results = []

@@ -6,7 +6,7 @@ from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
 from .iris import aff_pop_iri, assistance_iri, event_uri, housing_iri, pevac_iri, prov_iri
-from .graph import SKG, Graph, PROV, add_monetary
+from .graph import ORG, SKG, Graph, PROV, add_monetary
 
 
 @dataclass
@@ -195,6 +195,7 @@ def prov_mapping(g: Graph, prov: Provenance, event_iri: URIRef):
 
     g.add((uri, RDF.type, SKG.Source))
     g.add((event_iri, PROV.wasDerivedFrom, uri))
+    g.add((uri, PROV.wasAttributedTo, ORG.DROMIC))
 
     file_format = prov.reportName[prov.reportName.rfind('.') + 1:] 
 

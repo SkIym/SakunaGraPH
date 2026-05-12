@@ -1,7 +1,7 @@
 
 import logging
 from rdflib import URIRef
-from mappings.gda_mapping import (
+from mappings.gda import (
     Assistance, AffectedPopulation, Casualties, CommunicationLineDisruption,
     DeclarationOfCalamity, DamageGeneral, Evacuation, Event, HousingDamage,
     Incident, InfrastructureDamage, PowerDisruption, Preparedness, Recovery, Relief,
@@ -9,7 +9,7 @@ from mappings.gda_mapping import (
     WaterDisruption, aff_pop_mapping, assistance_mapping, calamity_mapping, casualties_mapping, comms_disruption_mapping, damage_gen_mapping, evacuation_mapping, event_mapping, housing_damage_mapping, incident_mapping, infra_damage_mapping, power_disruption_mapping, preparedness_mapping, recovery_mapping, relief_mapping, rescue_mapping, rnb_damage_mapping, seaport_disruption_mapping, water_disruption_mapping
 )
 
-from mappings.graph import SKG, create_graph, Graph
+from mappings.graph import ORG, SKG, create_graph, Graph
 from transform.gda import transform_gda
 import os
 import argparse

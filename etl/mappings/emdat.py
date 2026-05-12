@@ -2,7 +2,7 @@ from dataclasses import dataclass, fields
 from datetime import datetime, date
 from polars import DataFrame
 from rdflib import RDF, RDFS, XSD, Literal, URIRef, Graph
-from .graph import PROV, SKG, add_monetary
+from .graph import ORG, PROV, SKG, SKOS, add_monetary
 from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_uri, org_iri, prov_iri, recovery_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
 from semantic_processing.org_resolver import ORG_RESOLVER
@@ -30,11 +30,14 @@ class Assistance:
     id: str
     contributionAID: float | None
     internationalOrgsPresent: str
+    hasLocation: URIRef | None
 
 @dataclass
 class Recovery:
     id: str
     postStructureCost: float | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class DamageGeneral:
@@ -42,18 +45,24 @@ class DamageGeneral:
     insuredDamage: float | None
     generalDamageAmount: float | None
     cpi: float | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class Casualties:
     id: str
     dead: int | None
     injured: int | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class AffectedPopulation:
     id: str
     affectedPersons: int | None
     displacedPersons: int | None
+    hasLocation: URIRef | None
+
 
 @dataclass
 class Source:
@@ -74,9 +83,29 @@ def source_mapping(g: Graph, s: Source) -> URIRef:
     g.add((uri, SKG.reportName, Literal(s.reportName)))
     g.add((uri, SKG.obtainedDate, Literal(s.obtainedDate, datatype=XSD.dateTime)))
     g.add((uri, PROV.wasGeneratedBy, URIRef(SKG["em-dat_website_access"])))
-    g.add((uri, PROV.wasDerivedFrom, URIRef(SKG["EM-DAT"])))
+    g.add((uri, PROV.wasAttributedTo, ORG.CRED))
 
     return uri
+
+def _is_incident(loc: URIRef, dtype: str) -> bool:
+
+    if not loc: return False
+    print(loc)
+    if ("|" not in loc
+        and all(
+            l not in loc
+            for l in 
+            ["Philippines", "Mindanao", "Visayas", "Luzon"]
+        )
+        and all(
+            t not in dtype.lower()
+            for t in
+            ["cyclone", "storm", "ground"]
+        )
+    ): return True
+
+    return False
+
 
 def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
@@ -84,7 +113,12 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
         uri = event_uri("emdat", r.id)
 
-        g.add((uri, RDF.type, SKG.MajorEvent)) # rdf type
+        # print(r)
+        if _is_incident(r.hasLocation, r.hasDisasterType): # add type
+            g.add((uri, RDF.type, SKG.Incident))
+        else:
+            g.add((uri, RDF.type, SKG.MajorEvent)) # rdf type
+
         g.add((uri, PROV.wasDerivedFrom, src_uri)) # link source
 
         for f in fields(r):
@@ -100,6 +134,8 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
                 locs = value.split("|")
                 for loc in locs:
                     g.add((uri, SKG.hasLocation, URIRef(loc)))
+
+                
             elif f.name == "startDate":
                 g.add((uri, SKG.startDate, Literal(value, datatype=XSD.date)))
             elif f.name == "endDate":
@@ -146,8 +182,13 @@ def assistance_mapping(rs: list[Assistance], g: Graph):
             if value is None or value == "":
                 continue
 
-            if f.name == "contributionAID":
-                add_monetary(g, uri, SKG.contributionAID, value, SKG.USD_thousands)
+            if f.name == "hasLocation":
+                g.add((uri, SKG.hasLocation, URIRef(value)))
+
+            elif f.name == "contributionAID":
+                add_monetary(g, uri, SKG.contributionAmount, value, SKG.USD_thousands)
+                g.add((uri, SKG.contributingOrg, ORG.Unspecified))
+                g.add((uri, SKOS.note, Literal("The total amount (in thousands of US$ at the time of the report) of contributions for immediate relief activities to the country in response to the disaster, sourced from the Financial Tracking System of OCHA (1992–2015). Not maintained after 2015.")))
 
             elif f.name == "internationalOrgsPresent":
                 value = str(value)
@@ -169,9 +210,12 @@ def recovery_mapping(rs: list[Recovery], g: Graph):
         g.add((uri, RDF.type, SKG.Recovery)) # rdf type
         g.add((e_uri, SKG.hasRecovery, uri)) # link event
 
+        if r.hasLocation and r.postStructureCost:
+            g.add((uri, SKG.hasLocation, URIRef(r.hasLocation)))
+
         if r.postStructureCost:
             add_monetary(g, uri, SKG.postStructureCost, r.postStructureCost, SKG.USD_thousands)
-            # g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
+        # g.add((uri, SKG.postStructureCost, Literal(r.postStructureCost, datatype=XSD.decimal)))
 
 def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
 
@@ -182,6 +226,9 @@ def damage_gen_mapping(rs: list[DamageGeneral], g: Graph):
 
         g.add((uri, RDF.type, SKG.DamageGeneral)) # rdf type
         g.add((e_uri, SKG.hasDamageGeneral, uri)) # link event
+
+        if r.hasLocation and (r.insuredDamage or r.generalDamageAmount or r.cpi):
+            g.add((uri, SKG.hasLocation, URIRef(r.hasLocation)))
 
         if r.insuredDamage:
             # g.add((uri, SKG.insuredDamageAmount, Literal(r.insuredDamage, datatype=XSD.decimal)))
@@ -204,8 +251,15 @@ def casualties_mapping(rs: list[Casualties], g: Graph):
 
         id = 0
 
+        loc = ""
+        if r.hasLocation:
+            loc = URIRef(r.hasLocation)
+
         if r.dead:
             uri = casualties_iri(e_uri, str(id+1))
+
+            if loc: 
+                g.add((uri, SKG.hasLocation, loc)) 
 
             g.add((uri, RDF.type, SKG.Casualties)) # rdf type
             g.add((e_uri, SKG.hasCasualties, uri)) # link event
@@ -216,6 +270,9 @@ def casualties_mapping(rs: list[Casualties], g: Graph):
         
         if r.injured:
             uri = casualties_iri(e_uri, str(id+1))
+
+            if loc: 
+                g.add((uri, SKG.hasLocation, loc)) 
 
             g.add((uri, RDF.type, SKG.Casualties)) # rdf type
             g.add((e_uri, SKG.hasCasualties, uri)) # link event
@@ -237,4 +294,7 @@ def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph):
 
         if r.displacedPersons:
             g.add((uri, SKG.displacedPersons, Literal(r.displacedPersons)))
+
+        if r.hasLocation and (r.affectedPersons or r.displacedPersons):
+            g.add((uri, SKG.hasLocation, URIRef(r.hasLocation)))
         
