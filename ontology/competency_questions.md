@@ -342,15 +342,27 @@ WHERE {
 **CQ14.** Which disaster events caused class suspensions in the National Capital Region (NCR), and at what grade levels were suspensions imposed?
 
 ```
+SELECT ?event ?eventName ?label ?fromLevel ?toLevel
+WHERE {
+    ?event 	a	:DisasterEvent ;
+                :hasClassSuspension	?cls .
 
+    ?cls :hasLocation ?location .
+    ?location :isPartOf* :1300000000 .
+    ?location rdfs:label ?label .
+
+    OPTIONAL { ?event  :eventName     ?eventName }
+    OPTIONAL { ?cls :fromClassLevel   ?fromLevel }
+    OPTIONAL { ?cls :toClassLevel     ?toLevel   }
+    }
 ```
 
 ### Response
 
-**CQ15.** What assistance was provided in response to disaster events in Region V (Bicol Region), broken down by source, and which organizations contributed?
+**CQ15.** What assistance was provided in response to disaster events in Isabela, broken down by source, and which organizations contributed?
 
 ```
-
+    
 ```
 
 **CQ16.** Which disaster events triggered a Declaration of Calamity in provinces of Region XII (SOCCSKSARGEN), what type of declaration was issued , and on what date was it resolved?

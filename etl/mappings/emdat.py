@@ -83,7 +83,7 @@ def source_mapping(g: Graph, s: Source) -> URIRef:
     g.add((uri, SKG.reportName, Literal(s.reportName)))
     g.add((uri, SKG.obtainedDate, Literal(s.obtainedDate, datatype=XSD.dateTime)))
     g.add((uri, PROV.wasGeneratedBy, URIRef(SKG["em-dat_website_access"])))
-    g.add((uri, PROV.wasAttributedTo, URIRef(SKG["EM-DAT"])))
+    g.add((uri, PROV.wasAttributedTo, ORG.CRED))
 
     return uri
 
