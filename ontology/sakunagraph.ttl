@@ -131,14 +131,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                  rdfs:label "contributing org" .
 
 
-###  https://sakuna.ph/contributionAID
-:contributionAID rdf:type owl:ObjectProperty ;
-                 rdfs:domain :Assistance ;
-                 rdfs:range qudt:QuantityValue ;
-                 rdfs:label "AID contribution"@en ;
-                 skos:definition "Aggregate international aid contributed for immediate relief, as reported in EM-DAT / OCHA FTS. Not attributed to a specific organization." .
-
-
 ###  https://sakuna.ph/contributionAmount
 :contributionAmount rdf:type owl:ObjectProperty ;
                     rdfs:domain :Assistance ;
@@ -588,15 +580,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:domain :FlightDisruption ;
              rdfs:range xsd:string ;
              rdfs:label "airport type"@en .
-
-
-###  https://sakuna.ph/allocatedFunds
-:allocatedFunds rdf:type owl:DatatypeProperty ;
-                rdfs:subPropertyOf owl:topDataProperty ;
-                rdfs:domain :Assistance ;
-                rdfs:range xsd:decimal ;
-                rdfs:label "allocated funds"@en ;
-                skos:note "In M Php" .
 
 
 
