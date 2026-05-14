@@ -151,7 +151,7 @@ CLASSIFICATION_RULES: list[ClassificationRule] = [
     (["sand storm", "sandstorm", "dust storm"],                                   "SandStorm"),
     (["blizzard"],                                                                "BlizzardStorm"),
     (["derecho"],                                                                 "Derecho"),
-    (["extratropical storm", "extra-tropical storm"],                             "ExtratropicalStorm"),
+    (["extratropical storm", "extra-tropical storm", "frontal system", "front"],                             "ExtratropicalStorm"),
     (["heat wave", "heat stroke", "extreme heat"],                                "HeatWave"),
     (["cold wave", "cold spell", "cold snap"],                                    "ColdWave"),
     (["severe winter", "snowstorm", "freezing rain"],                             "SevereWinterConditions"),
