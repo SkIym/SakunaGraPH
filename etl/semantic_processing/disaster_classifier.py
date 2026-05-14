@@ -16,7 +16,7 @@ SKG = Namespace("https://sakuna.ph/")
 LEAF_CLASS_QUERY = """
 SELECT DISTINCT ?c ?defi WHERE {
     ?c skos:inScheme skg:DisasterTypeScheme ;
-       skos:definition ?defi .
+       skos:note ?defi .
     FILTER NOT EXISTS {
         ?child skos:broader ?c .
     }
