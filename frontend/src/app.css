@@ -1,0 +1,94 @@
+@import 'tailwindcss';
+/* @import '@fontsource/fira-mono'; */
+@plugin '@tailwindcss/forms';
+@plugin '@tailwindcss/typography';
+@plugin 'flowbite/plugin';
+@source "../node_modules/flowbite-svelte/dist";
+@source "../node_modules/simple-datatables/dist";
+@source "../node_modules/@flowbite-svelte-plugins/datatable/dist";
+
+/* FLOWBITE CONFIG  */
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+
+/* ROOT CSS */
+
+roboto-font {
+  font-family: "Roboto", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 400;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}
+
+
+:root {
+	--font-body: 'Roboto';	/* --font-body:
+		Roboto, Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Oxygen, Ubuntu, Cantarell,
+		'Open Sans', 'Helvetica Neue', sans-serif; */
+	/* --font-body: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace; */
+	--font-mono: 'Fira Mono', monospace;
+	--color-bg-0: rgb(202, 216, 228);
+	--color-bg-1: hsl(209, 36%, 86%);
+	--color-bg-2: hsl(224, 44%, 95%);
+	--color-theme-1: #FCD116; /* for PhilDis color */
+	--color-theme-3: #CE1126;
+	--color-theme-2: #023E8A;
+	--color-theme-4: #7E3AF2;
+	--color-theme-5: #2980B9;
+	--color-theme-6: "#E67E22";
+	--color-text: rgba(0, 0, 0, 0.7);
+	--color-text-nav: rgba(255, 255, 255, 0.7);
+	--column-width: 42rem;
+	--column-margin-top: 4rem;
+	font-family: var(--font-body);
+	color: var(--color-text);
+	--card-bg-linear: linear-gradient(
+        180deg, 
+        /* Changed from 85% to 92% to make it lighter */
+        color-mix(in srgb, var(--color-bg-0) 98%, black) 0%,
+        color-mix(in srgb, var(--color-bg-1) 98%, black) 5%,
+        color-mix(in srgb, var(--color-bg-2) 98%, black) 90%
+    );
+	
+
+    --card-bg-radial: radial-gradient(
+        50% 50% at 50% 50%,
+        rgba(255, 255, 255, 0.15) 0%, /* Reduced opacity of the white glow */
+        rgba(255, 255, 255, 0.05) 100%
+    );
+
+    --card-bg: var(--card-bg-radial), var(--card-bg-linear);
+	
+}
+
+body {
+	min-height: 100vh;
+	margin: 0;
+	background-attachment: fixed;
+	background-color: var(--color-bg-1);
+	background-size: 100vw 100vh;
+	background-image:
+		radial-gradient(50% 50% at 50% 50%, rgba(255, 255, 255, 0.75) 0%, rgba(255, 255, 255, 0) 100%),
+		linear-gradient(180deg, var(--color-bg-0) 0%, var(--color-bg-1) 15%, var(--color-bg-2) 50%);
+}
+
+.datatable-pagination .datatable-active a,
+.datatable-pagination .datatable-active a:focus,
+.datatable-pagination .datatable-active a:hover,
+.datatable-pagination .datatable-active button,
+.datatable-pagination .datatable-active button:focus,
+.datatable-pagination .datatable-active button:hover {
+  background-color: #ffe4de;
+  cursor: default;
+}
+
+.datatable-wrapper .datatable-table tbody tr.selected {
+  background-color: #fff1ee !important;
+}
+
+table:not(.datatable-table) {
+    display: none;
+}

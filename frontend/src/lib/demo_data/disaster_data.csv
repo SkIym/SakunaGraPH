@@ -1,0 +1,526 @@
+name,type,region,province,city_municipality,date,monetary_damage,affected_families,casualties,injured,missing
+Zamboanga del Sur Volcano Lahar 2011,Lahar,IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2011-01-29,1376838,155,0,3,0
+Iligan Cholera Outbreak 2011,Bacterial Disease,X - Northern Mindanao,Lanao del Norte,Iligan City,2011-02-01,10802,1,0,0,0
+Iligan Meningococcemia Outbreak 2011,Bacterial Disease,X - Northern Mindanao,Lanao del Norte,Iligan City,2011-03-11,156193,51,1,2,0
+Isabela City Meningococcemia Outbreak 2011,Bacterial Disease,Bangsamoro,Basilan,Isabela City,2011-05-09,111316544,4,0,0,0
+Tarlac City Storm Surge 2011,Storm Surge,III - Central Luzon,Tarlac,Tarlac City,2011-05-14,35577146,753,46,67,8
+Pasig Drought 2011,Drought,National Capital Region,Metro Manila,Pasig City,2011-05-16,15420,180,0,0,0
+Typhoon Karen,Tropical Cyclone,VIII - Eastern Visayas,Samar,Calbayog City,2011-05-22,419959,1120,6,36,3
+Pasig Meningococcemia Outbreak 2011,Bacterial Disease,National Capital Region,Metro Manila,Pasig City,2011-05-26,695321,5662,364,820,18
+Mayon Volcano Ashfall 2011,Ashfall,V - Bicol Region,Camarines Sur,Naga,2011-06-06,3893023,5,0,0,0
+Mag 7.0 Mawab Earthquake,Earthquake,XI - Davao Region,Davao de Oro,Mawab,2011-06-24,74261636,9,0,0,0
+Mag 7.4 Isabela City Earthquake,Earthquake,Bangsamoro,Basilan,Isabela City,2011-09-08,43686,12312,294,470,50
+General Santos Storm Surge 2011,Storm Surge,XII - Soccsksargen,South Cotabato,General Santos City,2011-09-22,155746093,3,0,0,0
+Mag 3.2 Navotas Earthquake,Earthquake,National Capital Region,Metro Manila,Navotas,2011-10-17,103519,20117,271,1679,238
+Loboc Riverine Flood 2011,Riverine Flood,VII - Central Visayas,Bohol,Loboc,2011-10-27,217499076,1,0,0,0
+Sariaya Mudslide 2011,Mudslide,IV-A - Calabarzon,Quezon,Sariaya,2011-11-03,682248,535,17,47,1
+Metro Manila Volcano Lahar 2011,Lahar,National Capital Region,Metro Manila,Malabon,2011-11-10,35883775,83,0,0,0
+Tagum Landslide (Dry) 2011,Landslide (Dry),XI - Davao Region,Davao del Norte,Tagum City,2011-11-14,8522,105,1,4,0
+Isulan Fire (Misc) 2011,Fire (Misc),XII - Soccsksargen,Sultan Kudarat,Isulan,2011-12-13,2486439,38467,1388,2698,96
+Apo Volcano Volcanic Activity (General) 2011,Volcanic Activity (General),XI - Davao Region,Davao del Norte,Tagum City,2011-12-30,58940768,1026,5,20,1
+Typhoon Agaton,Tropical Cyclone,II - Cagayan Valley,Cagayan,Tuguegarao City,2012-01-08,396125,35,0,0,0
+Baguio Local Wave Event 2012,Local Wave,Cordillera Administrative Region,Benguet,Baguio City,2012-02-01,318561584,5,0,0,0
+Iligan Fire (Industrial) 2012,Fire (Industrial),X - Northern Mindanao,Lanao del Norte,Iligan City,2012-02-29,1121811,2,0,0,0
+Tarlac City Seiche Event 2012,Seiche,III - Central Luzon,Tarlac,Tarlac City,2012-04-05,1547273,1,0,0,0
+Surigao City Cholera Outbreak 2012,Bacterial Disease,XIII - Caraga,Surigao del Norte,Surigao City,2012-04-14,85452518,4,0,0,0
+Dumaguete Oil Spill 2012,Oil Spill,VII - Central Visayas,Negros Oriental,Dumaguete City,2012-05-25,391612229,134,1,10,0
+Mag 4.2 Pili Earthquake,Earthquake,V - Bicol Region,Camarines Sur,Pili,2012-05-25,120917,30,0,2,0
+Roxas City Accident 2012,Miscellaneous Accident (General),VI - Western Visayas,Capiz,Roxas City,2012-05-27,46263,3,0,0,0
+Isulan Conjunctivitis Outbreak 2012,Infectious Disease (General),XII - Soccsksargen,Sultan Kudarat,Isulan,2012-06-04,218585,10,0,1,0
+Surigao City Landslide (Dry) 2012,Landslide (Dry),XIII - Caraga,Surigao del Norte,Surigao City,2012-06-23,12582668,622,33,54,3
+Bayugan Conjunctivitis Outbreak 2012,Infectious Disease (General),XIII - Caraga,Agusan del Sur,Bayugan City,2012-07-02,27162199,229,16,2,0
+Nasugbu Landslide (Dry) 2012,Landslide (Dry),IV-A - Calabarzon,Batangas,Nasugbu,2012-07-04,5543208,761,8,74,3
+Typhoon Bising,Tropical Cyclone,Bangsamoro,Maguindanao,Cotabato City,2012-07-19,1470333,6407,59,376,33
+Hagonoy Coastal Flood 2012,Coastal Flood,III - Central Luzon,Bulacan,Hagonoy,2012-08-03,242586,13795,20,536,73
+Bayugan Local Wave Event 2012,Local Wave,XIII - Caraga,Agusan del Sur,Bayugan City,2012-08-17,427239,30,2,2,0
+La Trinidad Flood (General) 2012,Flood (General),Cordillera Administrative Region,Benguet,La Trinidad,2012-08-29,19592468,2158,11,32,4
+Butuan Flood (General) 2012,Flood (General),XIII - Caraga,Agusan del Norte,Butuan City,2012-08-30,4387270,16605,16,499,71
+Zamboanga del Norte Volcano Lahar 2012,Lahar,IX - Zamboanga Peninsula,Zamboanga del Norte,Dapitan City,2012-09-04,7676753,5572,23,192,13
+Calamba Seiche Event 2012,Seiche,IV-A - Calabarzon,Laguna,Calamba,2012-09-17,502472,24459,1280,537,119
+Carcar Oil Spill 2012,Oil Spill,VII - Central Visayas,Cebu,Carcar,2012-10-09,411871,661,16,37,0
+Borongan Heat Wave 2012,Heat Wave,VIII - Eastern Visayas,Eastern Samar,Borongan City,2012-10-10,139603,3324,10,43,8
+Cauayan Oil Spill 2012,Oil Spill,II - Cagayan Valley,Isabela,Cauayan,2012-10-17,53633975,3405,9,174,18
+Aparri Storm Surge 2012,Storm Surge,II - Cagayan Valley,Cagayan,Aparri,2012-10-22,687972,339,2,2,2
+Mag 5.4 Guinobatan Earthquake,Earthquake,V - Bicol Region,Albay,Guinobatan,2012-10-23,143495,943,21,33,18
+Marawi Drought 2012,Drought,Bangsamoro,Lanao del Sur,Marawi City,2012-12-03,65036,88,0,1,0
+Kidapawan Mudslide 2013,Mudslide,XII - Soccsksargen,Cotabato,Kidapawan City,2013-01-03,26957,1,0,0,0
+Surigao City Flood (General) 2013,Flood (General),XIII - Caraga,Surigao del Norte,Surigao City,2013-01-09,1314111,6387,41,107,21
+Batangas City Coastal Flood 2013,Coastal Flood,IV-A - Calabarzon,Batangas,Batangas City,2013-01-10,39268,25,0,0,0
+La Trinidad Armed Clash 2013,Armed Clash,Cordillera Administrative Region,Benguet,La Trinidad,2013-01-14,22177,70,1,3,0
+Navotas Fire (Industrial) 2013,Fire (Industrial),National Capital Region,Metro Manila,Navotas,2013-01-17,23408441,9799,142,558,14
+Loboc Fire (Misc) 2013,Fire (Misc),VII - Central Visayas,Bohol,Loboc,2013-01-21,1526310,5,0,0,0
+Carcar Fire (Misc) 2013,Fire (Misc),VII - Central Visayas,Cebu,Carcar,2013-01-27,581787,653,2,6,2
+Navotas Accident 2013,Miscellaneous Accident (General),National Capital Region,Metro Manila,Navotas,2013-02-19,89162525,3,0,0,0
+Virac Riverine Flood 2013,Riverine Flood,V - Bicol Region,Catanduanes,Virac,2013-03-07,495553,28914,202,794,120
+Isulan Local Wave Event 2013,Local Wave,XII - Soccsksargen,Sultan Kudarat,Isulan,2013-05-14,26728816,98,5,11,0
+Ormoc Coastal Flood 2013,Coastal Flood,VIII - Eastern Visayas,Leyte,Ormoc City,2013-05-23,9314,14,0,0,0
+Bauang Hepatitis A Outbreak 2013,Viral Disease,I - Ilocos Region,La Union,Bauang,2013-05-26,22712644,53,3,3,0
+Koronadal Riverine Flood 2013,Riverine Flood,XII - Soccsksargen,South Cotabato,Koronadal City,2013-06-14,5360609,1073,6,51,2
+Calumpit Heat Wave 2013,Heat Wave,III - Central Luzon,Bulacan,Calumpit,2013-07-12,277039254,4,0,0,0
+Dipolog HFMD Outbreak 2013,Infectious Disease (General),IX - Zamboanga Peninsula,Zamboanga del Norte,Dipolog City,2013-07-16,8587183,101,2,7,0
+Virac Storm Surge 2013,Storm Surge,V - Bicol Region,Catanduanes,Virac,2013-07-16,369147,1,0,0,0
+San Fernando Flash Flood 2013,Flash Flood,III - Central Luzon,Pampanga,San Fernando,2013-07-16,1586447,2,0,0,0
+Zamboanga del Norte Volcano Volcanic Activity (General) 2013,Volcanic Activity (General),IX - Zamboanga Peninsula,Zamboanga del Norte,Dipolog City,2013-08-22,383917411,18,0,0,0
+Olongapo Flash Flood 2013,Flash Flood,III - Central Luzon,Zambales,Olongapo City,2013-08-22,2464018,11921,46,186,5
+Tanay Accident 2013,Miscellaneous Accident (General),IV-A - Calabarzon,Rizal,Tanay,2013-08-31,39484136,32,0,1,0
+Guinobatan Fire (Industrial) 2013,Fire (Industrial),V - Bicol Region,Albay,Guinobatan,2013-09-05,2617482,41,0,2,0
+Surigao City Flash Flood 2013,Flash Flood,XIII - Caraga,Surigao del Norte,Surigao City,2013-09-25,683860221,6037,17,91,30
+Zamboanga del Norte Volcano Ash Plume 2013,Ash Plume,IX - Zamboanga Peninsula,Zamboanga del Norte,Dapitan City,2013-10-09,16990,10,0,0,0
+Zambales Volcano Ashfall 2013,Ashfall,III - Central Luzon,Zambales,Olongapo City,2013-10-30,387856223,573,2,6,3
+San Fernando Oil Spill 2013,Oil Spill,I - Ilocos Region,La Union,San Fernando,2013-11-11,12899,80,2,1,0
+Tuguegarao Local Wave Event 2013,Local Wave,II - Cagayan Valley,Cagayan,Tuguegarao City,2013-11-29,2247328,2,0,0,0
+Eastern Samar Volcano Ash Plume 2013,Ash Plume,VIII - Eastern Visayas,Eastern Samar,Borongan City,2013-12-15,5975,14,0,0,0
+Legazpi Chickenpox Outbreak 2013,Infectious Disease (General),V - Bicol Region,Albay,Legazpi City,2013-12-26,1442341,5,0,0,0
+Bayombong Fire (Misc) 2014,Fire (Misc),II - Cagayan Valley,Nueva Vizcaya,Bayombong,2014-01-08,10120,15,0,1,0
+La Trinidad Heat Wave 2014,Heat Wave,Cordillera Administrative Region,Benguet,La Trinidad,2014-01-09,52830,5625,19,57,5
+Aklan Volcano Volcanic Activity (General) 2014,Volcanic Activity (General),VI - Western Visayas,Aklan,Kalibo,2014-01-31,1096334,7,0,0,0
+Bayugan Seiche Event 2014,Seiche,XIII - Caraga,Agusan del Sur,Bayugan City,2014-02-07,26464884,1,0,0,0
+Surigao City Accident 2014,Miscellaneous Accident (General),XIII - Caraga,Surigao del Norte,Surigao City,2014-02-13,28533,27280,557,411,22
+Tanauan Fire (Misc) 2014,Fire (Misc),VIII - Eastern Visayas,Leyte,Tanauan,2014-02-25,630744,119,1,3,0
+Pampanga Volcano Lahar 2014,Lahar,III - Central Luzon,Pampanga,San Fernando,2014-02-26,327842953,5,0,0,0
+Borongan Meningococcemia Outbreak 2014,Bacterial Disease,VIII - Eastern Visayas,Eastern Samar,Borongan City,2014-02-27,101549194,4530,146,546,0
+Davao City Seiche Event 2014,Seiche,XI - Davao Region,Davao del Sur,Davao City,2014-03-06,3348516,39,0,3,0
+Roxas City Heat Wave 2014,Heat Wave,VI - Western Visayas,Capiz,Roxas City,2014-04-04,3386900,31384,17,320,83
+La Trinidad Coastal Flood 2014,Coastal Flood,Cordillera Administrative Region,Benguet,La Trinidad,2014-05-20,964743700,2,0,0,0
+Loboc Mudslide 2014,Mudslide,VII - Central Visayas,Bohol,Loboc,2014-05-20,217647517,6299,373,117,82
+Roxas City Landslide (Wet) 2014,Landslide (Wet),VI - Western Visayas,Capiz,Roxas City,2014-07-14,18588,7,0,0,0
+Manila Tsunami 2014,Tsunami,National Capital Region,Metro Manila,Manila,2014-09-13,30945,8,0,0,0
+Marawi Coastal Flood 2014,Coastal Flood,Bangsamoro,Lanao del Sur,Marawi City,2014-09-16,301476,20,0,0,0
+Virac Flood (General) 2014,Flood (General),V - Bicol Region,Catanduanes,Virac,2014-09-20,46005,28705,190,1389,148
+Malaybalay Flood (General) 2014,Flood (General),X - Northern Mindanao,Bukidnon,Malaybalay City,2014-09-21,1662126,26,0,0,0
+Mag 6.9 Kidapawan Earthquake,Earthquake,XII - Soccsksargen,Cotabato,Kidapawan City,2014-09-27,35631566,19213,479,889,252
+Pili Flood (General) 2014,Flood (General),V - Bicol Region,Camarines Sur,Pili,2014-09-28,169444828,813,7,38,2
+Tuguegarao Heat Wave 2014,Heat Wave,II - Cagayan Valley,Cagayan,Tuguegarao City,2014-09-28,648709,631,2,13,0
+Pili Landslide (Dry) 2014,Landslide (Dry),V - Bicol Region,Camarines Sur,Pili,2014-10-13,45498095,250,12,1,0
+Typhoon Falcon,Tropical Cyclone,XI - Davao Region,Davao del Norte,Panabo City,2014-11-04,18573,6,0,0,0
+Typhoon Ambo,Tropical Cyclone,III - Central Luzon,Zambales,Olongapo City,2014-11-18,13774458,371,2,18,0
+Panabo Landslide (Dry) 2014,Landslide (Dry),XI - Davao Region,Davao del Norte,Panabo City,2014-11-30,159498687,9,0,0,0
+Valencia Typhoid Outbreak 2014,Bacterial Disease,X - Northern Mindanao,Bukidnon,Valencia,2014-11-30,3051459,164,9,22,0
+Pavia Tsunami 2014,Tsunami,VI - Western Visayas,Iloilo,Pavia,2014-12-05,65727407,7,0,0,0
+Baguio Fire (Misc) 2014,Fire (Misc),Cordillera Administrative Region,Benguet,Baguio City,2014-12-06,227841107,21429,464,420,84
+Sultan Kudarat Volcano Ashfall 2014,Ashfall,XII - Soccsksargen,Sultan Kudarat,Isulan,2014-12-09,58999997,13,0,0,0
+Panabo Drought 2014,Drought,XI - Davao Region,Davao del Norte,Panabo City,2014-12-09,225075488,6015,15,90,11
+Borongan Local Wave Event 2014,Local Wave,VIII - Eastern Visayas,Eastern Samar,Borongan City,2014-12-10,22346,8844,46,63,245
+Sorsogon City Cholera Outbreak 2014,Bacterial Disease,V - Bicol Region,Sorsogon,Sorsogon City,2014-12-17,35727,358,17,23,1
+Cauayan Armed Clash 2015,Armed Clash,II - Cagayan Valley,Isabela,Cauayan,2015-01-05,164651,2619,36,136,3
+Tanay Riverine Flood 2015,Riverine Flood,IV-A - Calabarzon,Rizal,Tanay,2015-02-03,145582,843,1,1,0
+Loboc Flood (General) 2015,Flood (General),VII - Central Visayas,Bohol,Loboc,2015-02-15,460433,76,0,2,0
+Iligan Fire (Misc) 2015,Fire (Misc),X - Northern Mindanao,Lanao del Norte,Iligan City,2015-03-16,38623340,18,0,1,0
+Agusan del Norte Volcano Volcanic Activity (General) 2015,Volcanic Activity (General),XIII - Caraga,Agusan del Norte,Cabadbaran City,2015-03-17,55186540,6,0,0,0
+Pasig Storm Surge 2015,Storm Surge,National Capital Region,Metro Manila,Pasig City,2015-04-07,305142303,292,16,26,6
+Mag 5.4 Naga Earthquake,Earthquake,V - Bicol Region,Camarines Sur,Naga,2015-04-22,184915,5050,105,284,75
+Passi Seiche Event 2015,Seiche,VI - Western Visayas,Iloilo,Passi City,2015-05-05,460560769,2325,26,22,22
+Bontoc Storm Surge 2015,Storm Surge,Cordillera Administrative Region,Mountain Province,Bontoc,2015-05-09,58896196,201,6,4,1
+General Santos Fire (Industrial) 2015,Fire (Industrial),XII - Soccsksargen,South Cotabato,General Santos City,2015-05-10,5976,305,3,23,0
+Malabang Fire (Industrial) 2015,Fire (Industrial),Bangsamoro,Lanao del Sur,Malabang,2015-05-18,944992,8094,166,90,2
+Tacloban Landslide (Wet) 2015,Landslide (Wet),VIII - Eastern Visayas,Leyte,Tacloban City,2015-05-20,120303438,1,0,0,0
+Bayugan Seiche Event 2015,Seiche,XIII - Caraga,Agusan del Sur,Bayugan City,2015-05-27,2625213,995,55,34,24
+Mag 5.7 Bayombong Earthquake,Earthquake,II - Cagayan Valley,Nueva Vizcaya,Bayombong,2015-06-16,721647302,12,0,0,0
+Matanog Riverine Flood 2015,Riverine Flood,Bangsamoro,Maguindanao,Matanog,2015-06-20,563365,48,0,1,0
+Vigan Riverine Flood 2015,Riverine Flood,I - Ilocos Region,Ilocos Sur,Vigan City,2015-06-22,6242,1,0,0,0
+Bontoc Landslide (Wet) 2015,Landslide (Wet),Cordillera Administrative Region,Mountain Province,Bontoc,2015-08-28,13300,2732,53,196,25
+Angeles Fire (Industrial) 2015,Fire (Industrial),III - Central Luzon,Pampanga,Angeles City,2015-09-25,44768,2,0,0,0
+Isabela City Oil Spill 2015,Oil Spill,Bangsamoro,Basilan,Isabela City,2015-11-01,802876,30,0,1,0
+Malabang Accident 2015,Miscellaneous Accident (General),Bangsamoro,Lanao del Sur,Malabang,2015-11-12,733710,471,0,33,1
+Surigao City Armed Clash 2015,Armed Clash,XIII - Caraga,Surigao del Norte,Surigao City,2015-12-03,36509,431,10,24,3
+Zamboanga del Sur Volcano Ashfall 2015,Ashfall,IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2015-12-12,33397,102,0,3,0
+Surigao del Norte Volcano Ash Plume 2015,Ash Plume,XIII - Caraga,Surigao del Norte,Surigao City,2015-12-14,61358,18,0,0,0
+Nabunturan Flood (General) 2015,Flood (General),XI - Davao Region,Davao de Oro,Nabunturan,2015-12-23,440541844,252,1,7,0
+Surigao City Oil Spill 2015,Oil Spill,XIII - Caraga,Surigao del Norte,Surigao City,2015-12-26,3582250,14,0,0,0
+Cebu City Riverine Flood 2015,Riverine Flood,VII - Central Visayas,Cebu,Cebu City,2015-12-29,44842,30626,136,956,148
+Kidapawan Flash Flood 2015,Flash Flood,XII - Soccsksargen,Cotabato,Kidapawan City,2015-12-31,91967534,14750,2,652,46
+Zamboanga del Norte Volcano Ashfall 2016,Ashfall,IX - Zamboanga Peninsula,Zamboanga del Norte,Dapitan City,2016-01-08,39624,10816,18,373,21
+El Salvador Fire (Industrial) 2016,Fire (Industrial),X - Northern Mindanao,Misamis Oriental,El Salvador City,2016-01-22,59448,28190,350,1462,87
+Bayugan Flood (General) 2016,Flood (General),XIII - Caraga,Agusan del Sur,Bayugan City,2016-01-22,14836,62,0,1,0
+San Fernando Drought 2016,Drought,I - Ilocos Region,La Union,San Fernando,2016-02-01,176611,1,0,0,0
+Agusan del Sur Volcano Lahar 2016,Lahar,XIII - Caraga,Agusan del Sur,Bayugan City,2016-02-07,271349815,1051,4,24,1
+Virac Tsunami 2016,Tsunami,V - Bicol Region,Catanduanes,Virac,2016-02-07,255715570,32,1,0,0
+Bontoc Drought 2016,Drought,Cordillera Administrative Region,Mountain Province,Bontoc,2016-02-15,25398272,30,0,0,0
+South Cotabato Volcano Lava Flow 2016,Lava Flow,XII - Soccsksargen,South Cotabato,General Santos City,2016-02-25,41986,7065,27,15,28
+Pagadian Storm Surge 2016,Storm Surge,IX - Zamboanga Peninsula,Zamboanga del Sur,Pagadian City,2016-02-28,80459,45,2,0,0
+Camalig Drought 2016,Drought,V - Bicol Region,Albay,Camalig,2016-03-23,114543461,4,0,0,0
+Metro Manila Volcano Lava Flow 2016,Lava Flow,National Capital Region,Metro Manila,Navotas,2016-03-28,22404041,1263,5,20,5
+Palo Heat Wave 2016,Heat Wave,VIII - Eastern Visayas,Leyte,Palo,2016-04-08,6653,14,0,0,0
+Pulag Volcano Ash Plume 2016,Ash Plume,Cordillera Administrative Region,Ifugao,Lagawe,2016-04-09,13506,155,0,6,0
+Kidapawan Accident 2016,Miscellaneous Accident (General),XII - Soccsksargen,Cotabato,Kidapawan City,2016-04-17,226095903,1,0,0,0
+Aparri Coastal Flood 2016,Coastal Flood,II - Cagayan Valley,Cagayan,Aparri,2016-04-30,13698256,844,0,35,2
+Escalante Flash Flood 2016,Flash Flood,VI - Western Visayas,Negros Occidental,Escalante City,2016-05-03,9800,17,0,0,0
+Bayugan Fire (Misc) 2016,Fire (Misc),XIII - Caraga,Agusan del Sur,Bayugan City,2016-05-23,632910,2768,88,156,1
+Pili Local Wave Event 2016,Local Wave,V - Bicol Region,Camarines Sur,Pili,2016-05-26,12322830,127,6,13,1
+Sorsogon City Mudslide 2016,Mudslide,V - Bicol Region,Sorsogon,Sorsogon City,2016-06-14,205112,2645,52,131,14
+Caloocan Accident 2016,Miscellaneous Accident (General),National Capital Region,Metro Manila,Caloocan City,2016-07-09,289442,1052,11,43,4
+San Fernando Oil Spill 2016,Oil Spill,III - Central Luzon,Pampanga,San Fernando,2016-07-22,32985897,1176,30,63,3
+Pulag Volcano Lava Flow 2016,Lava Flow,Cordillera Administrative Region,Benguet,Baguio City,2016-08-01,47376,1713,0,46,2
+Isabela Volcano Volcanic Activity (General) 2016,Volcanic Activity (General),II - Cagayan Valley,Isabela,Ilagan,2016-08-05,110231,4185,10,107,3
+Iloilo Volcano Ash Plume 2016,Ash Plume,VI - Western Visayas,Iloilo,Pavia,2016-09-01,7242144,2,0,0,0
+Hibok-Hibok Volcano Ash Plume 2016,Ash Plume,X - Northern Mindanao,Misamis Oriental,El Salvador City,2016-09-23,9104,757,0,12,1
+Guinobatan Meningococcemia Outbreak 2016,Bacterial Disease,V - Bicol Region,Albay,Guinobatan,2016-09-27,83941153,713,28,63,2
+Navotas Mudslide 2016,Mudslide,National Capital Region,Metro Manila,Navotas,2016-10-12,59526310,12540,169,748,126
+Borongan Drought 2016,Drought,VIII - Eastern Visayas,Eastern Samar,Borongan City,2016-10-13,57960850,90,0,1,0
+Isabela City Coastal Flood 2016,Coastal Flood,Bangsamoro,Basilan,Isabela City,2016-11-04,464677,11,0,0,0
+Typhoon Josie,Tropical Cyclone,VIII - Eastern Visayas,Samar,Calbayog City,2016-11-10,172780602,15230,64,105,18
+Parker Volcano Ash Plume 2016,Ash Plume,Bangsamoro,Lanao del Sur,Marawi City,2016-11-12,43176968,1503,5,20,1
+Malolos Dengue Outbreak 2016,Viral Disease,III - Central Luzon,Bulacan,Malolos City,2016-11-25,65661446,66,3,3,0
+Kalibo Landslide (Dry) 2016,Landslide (Dry),VI - Western Visayas,Aklan,Kalibo,2016-11-27,260308,602,30,32,3
+Zambales Volcano Ashfall 2016,Ashfall,III - Central Luzon,Zambales,Iba,2016-11-27,11796,12480,30,184,67
+Isabela City Fire (Industrial) 2016,Fire (Industrial),Bangsamoro,Basilan,Isabela City,2016-12-03,8019,19,0,0,0
+Zamboanga City Accident 2016,Miscellaneous Accident (General),IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2016-12-04,967017,14763,31,1102,88
+Valencia Fire (Industrial) 2016,Fire (Industrial),X - Northern Mindanao,Bukidnon,Valencia,2016-12-27,23122,33748,848,774,29
+Tagbilaran Flood (General) 2017,Flood (General),VII - Central Visayas,Bohol,Tagbilaran City,2017-01-13,91743,13,0,0,0
+Tagum Accident 2017,Miscellaneous Accident (General),XI - Davao Region,Davao del Norte,Tagum City,2017-01-24,6960,4029,36,264,19
+Cebu City Fire (Misc) 2017,Fire (Misc),VII - Central Visayas,Cebu,Cebu City,2017-02-05,35495,5,0,0,0
+Mag 7.1 Digos Earthquake,Earthquake,XI - Davao Region,Davao del Sur,Digos City,2017-02-19,92304345,4,0,0,0
+Parker Volcano Ash Plume 2017,Ash Plume,Bangsamoro,Maguindanao,Cotabato City,2017-03-10,85718,12,0,0,0
+Isulan Rabies Outbreak 2017,Viral Disease,XII - Soccsksargen,Sultan Kudarat,Isulan,2017-03-10,125502,8,0,0,0
+Dapitan Conjunctivitis Outbreak 2017,Infectious Disease (General),IX - Zamboanga Peninsula,Zamboanga del Norte,Dapitan City,2017-03-14,9439,224,5,4,0
+Roxas City Drought 2017,Drought,VI - Western Visayas,Capiz,Roxas City,2017-04-21,147416,18,0,0,0
+Naga Accident 2017,Miscellaneous Accident (General),V - Bicol Region,Camarines Sur,Naga,2017-05-16,6903,893,23,26,4
+Kidapawan HFMD Outbreak 2017,Infectious Disease (General),XII - Soccsksargen,Cotabato,Kidapawan City,2017-05-19,14836,23779,929,1582,2
+Roxas City Fire (Industrial) 2017,Fire (Industrial),VI - Western Visayas,Capiz,Roxas City,2017-05-24,454403725,4,0,0,0
+Typhoon Lando,Tropical Cyclone,IV-A - Calabarzon,Rizal,Antipolo City,2017-05-29,476347948,4356,40,101,14
+Metro Manila Volcano Lahar 2017,Lahar,National Capital Region,Metro Manila,Pasig City,2017-05-31,160350611,1082,4,20,4
+Camalig Armed Clash 2017,Armed Clash,V - Bicol Region,Albay,Camalig,2017-06-05,50027,255,2,9,1
+Manila Mudslide 2017,Mudslide,National Capital Region,Metro Manila,Manila,2017-06-06,103003975,170,2,10,0
+Bauang Coastal Flood 2017,Coastal Flood,I - Ilocos Region,La Union,Bauang,2017-06-07,204615,3970,31,120,22
+Pavia Drought 2017,Drought,VI - Western Visayas,Iloilo,Pavia,2017-06-14,316222752,48064,60,1388,101
+Koronadal Tsunami 2017,Tsunami,XII - Soccsksargen,South Cotabato,Koronadal City,2017-06-14,56193,161,10,7,2
+Iligan Riverine Flood 2017,Riverine Flood,X - Northern Mindanao,Lanao del Norte,Iligan City,2017-07-13,30282488,135,0,6,0
+Enrile Mudslide 2017,Mudslide,II - Cagayan Valley,Cagayan,Enrile,2017-08-06,2140599,14608,122,464,20
+Lapu-Lapu Oil Spill 2017,Oil Spill,VII - Central Visayas,Cebu,Lapu-Lapu City,2017-08-13,56725134,195,0,10,0
+Dumaguete Armed Clash 2017,Armed Clash,VII - Central Visayas,Negros Oriental,Dumaguete City,2017-09-04,179245,35,0,2,0
+Hagonoy Coastal Flood 2017,Coastal Flood,III - Central Luzon,Bulacan,Hagonoy,2017-09-10,875560,6,0,0,0
+Bayombong Leptospirosis Outbreak 2017,Bacterial Disease,II - Cagayan Valley,Nueva Vizcaya,Bayombong,2017-09-14,4193,2758,49,407,13
+Roxas City Landslide (Wet) 2017,Landslide (Wet),VI - Western Visayas,Capiz,Roxas City,2017-09-25,814995,1421,62,82,19
+Lingayen Armed Clash 2017,Armed Clash,I - Ilocos Region,Pangasinan,Lingayen,2017-10-06,71342940,78,0,4,0
+Cagayan de Oro Accident 2017,Miscellaneous Accident (General),X - Northern Mindanao,Misamis Oriental,Cagayan de Oro City,2017-10-15,341808,1,0,0,0
+Isabela City Fire (Industrial) 2017,Fire (Industrial),Bangsamoro,Basilan,Isabela City,2017-10-18,1060356825,11,0,0,0
+Zamboanga del Sur Volcano Lahar 2017,Lahar,IX - Zamboanga Peninsula,Zamboanga del Sur,Pagadian City,2017-10-21,16690,6,0,0,0
+Leyte Volcano Lava Flow 2017,Lava Flow,VIII - Eastern Visayas,Leyte,Ormoc City,2017-10-25,4696777,3003,3,64,8
+South Cotabato Volcano Ash Plume 2017,Ash Plume,XII - Soccsksargen,South Cotabato,General Santos City,2017-11-01,137830627,5554,4,45,20
+Santa Cruz Armed Clash 2017,Armed Clash,IV-A - Calabarzon,Laguna,Santa Cruz,2017-11-07,67043520,6589,33,299,17
+Catbalogan Tsunami 2017,Tsunami,VIII - Eastern Visayas,Samar,Catbalogan City,2017-11-24,453979094,28451,372,1057,91
+Apo Volcano Lava Flow 2017,Lava Flow,XI - Davao Region,Davao de Oro,Maco,2017-11-26,11526158,31,0,0,0
+Koronadal Dengue Outbreak 2017,Viral Disease,XII - Soccsksargen,South Cotabato,Koronadal City,2017-12-06,31804513,374,13,11,1
+Surigao City Fire (Misc) 2017,Fire (Misc),XIII - Caraga,Surigao del Norte,Surigao City,2017-12-30,13038,1635,42,20,6
+Bayugan Seiche Event 2017,Seiche,XIII - Caraga,Agusan del Sur,Bayugan City,2017-12-31,64450,5929,149,227,132
+Borongan Fire (Misc) 2018,Fire (Misc),VIII - Eastern Visayas,Eastern Samar,Borongan City,2018-01-07,6134,375,9,22,0
+Bayugan Landslide (Wet) 2018,Landslide (Wet),XIII - Caraga,Agusan del Sur,Bayugan City,2018-01-08,114655,52,3,1,0
+Bayugan Fire (Industrial) 2018,Fire (Industrial),XIII - Caraga,Agusan del Sur,Bayugan City,2018-01-11,402342,8597,218,567,30
+Negros Oriental Volcano Lahar 2018,Lahar,VII - Central Visayas,Negros Oriental,Dumaguete City,2018-01-20,24397277,1362,2,5,1
+Valencia Riverine Flood 2018,Riverine Flood,X - Northern Mindanao,Bukidnon,Valencia,2018-02-06,1063984730,547,3,14,3
+Parker Volcano Lahar 2018,Lahar,Bangsamoro,Basilan,Isabela City,2018-02-07,5326345,10,0,0,0
+Mag 5.6 Calumpit Earthquake,Earthquake,III - Central Luzon,Bulacan,Calumpit,2018-02-07,1139011,3780,18,50,34
+Kidapawan Fire (Misc) 2018,Fire (Misc),XII - Soccsksargen,Cotabato,Kidapawan City,2018-02-28,73320330,249,1,5,0
+Marikina Heat Wave 2018,Heat Wave,National Capital Region,Metro Manila,Marikina,2018-03-13,876049,21379,36,321,34
+Mag 7.8 Valencia Earthquake,Earthquake,X - Northern Mindanao,Bukidnon,Valencia,2018-03-13,62450739,1424,16,28,4
+Tanay Local Wave Event 2018,Local Wave,IV-A - Calabarzon,Rizal,Tanay,2018-03-14,4144792,19,1,1,0
+Hibok-Hibok Volcano Volcanic Activity (General) 2018,Volcanic Activity (General),X - Northern Mindanao,Lanao del Norte,Iligan City,2018-04-26,43609,840,1,25,0
+Dapitan Seiche Event 2018,Seiche,IX - Zamboanga Peninsula,Zamboanga del Norte,Dapitan City,2018-04-27,127453,341,10,8,6
+Digos Flash Flood 2018,Flash Flood,XI - Davao Region,Davao del Sur,Digos City,2018-05-05,157054,29490,126,1235,98
+Pulag Volcano Lahar 2018,Lahar,Cordillera Administrative Region,Benguet,La Trinidad,2018-05-05,48181,301,0,7,0
+Mawab Measles Outbreak 2018,Viral Disease,XI - Davao Region,Davao de Oro,Mawab,2018-05-06,379374,218,9,11,0
+Catbalogan Fire (Misc) 2018,Fire (Misc),VIII - Eastern Visayas,Samar,Catbalogan City,2018-05-09,3245270,1416,16,112,0
+Dagupan Hepatitis A Outbreak 2018,Viral Disease,I - Ilocos Region,Pangasinan,Dagupan City,2018-06-01,21049312,1096,17,24,2
+Bontoc Armed Clash 2018,Armed Clash,Cordillera Administrative Region,Mountain Province,Bontoc,2018-06-02,85432,3,0,0,0
+Pagadian Storm Surge 2018,Storm Surge,IX - Zamboanga Peninsula,Zamboanga del Sur,Pagadian City,2018-07-13,22830007,40,2,3,0
+Malabang Typhoid Outbreak 2018,Bacterial Disease,Bangsamoro,Lanao del Sur,Malabang,2018-09-01,4049469,1,0,0,0
+Apo Volcano Lava Flow 2018,Lava Flow,XI - Davao Region,Davao del Norte,Panabo City,2018-09-15,15215608,459,0,16,2
+Caloocan Oil Spill 2018,Oil Spill,National Capital Region,Metro Manila,Caloocan City,2018-10-04,11794,491,9,24,4
+Isulan Seiche Event 2018,Seiche,XII - Soccsksargen,Sultan Kudarat,Isulan,2018-10-24,53602040,5,0,0,0
+Dumaguete Drought 2018,Drought,VII - Central Visayas,Negros Oriental,Dumaguete City,2018-11-26,13850279,2614,6,66,5
+Mayon Volcano Ashfall 2018,Ashfall,V - Bicol Region,Sorsogon,Sorsogon City,2018-12-06,230072,44,0,0,0
+Cabadbaran Riverine Flood 2018,Riverine Flood,XIII - Caraga,Agusan del Norte,Cabadbaran City,2018-12-13,724760941,143,0,5,0
+Tacloban Accident 2019,Miscellaneous Accident (General),VIII - Eastern Visayas,Leyte,Tacloban City,2019-01-07,82079,11,0,0,0
+Mag 5.9 Pili Earthquake,Earthquake,V - Bicol Region,Camarines Sur,Pili,2019-01-15,5000018,5296,40,66,92
+Baguio Landslide (Dry) 2019,Landslide (Dry),Cordillera Administrative Region,Benguet,Baguio City,2019-02-07,202643172,23,0,1,0
+Calamba Tsunami 2019,Tsunami,IV-A - Calabarzon,Laguna,Calamba,2019-02-12,7130814,250,8,10,2
+Bontoc Armed Clash 2019,Armed Clash,Cordillera Administrative Region,Mountain Province,Bontoc,2019-02-23,39863,1,0,0,0
+Calbayog Fire (Industrial) 2019,Fire (Industrial),VIII - Eastern Visayas,Samar,Calbayog City,2019-03-02,20160484,322,5,14,0
+Panabo Riverine Flood 2019,Riverine Flood,XI - Davao Region,Davao del Norte,Panabo City,2019-03-03,18541068,3,0,0,0
+Marawi Landslide (Wet) 2019,Landslide (Wet),Bangsamoro,Lanao del Sur,Marawi City,2019-04-12,60525936,4026,29,391,39
+Pagadian Seiche Event 2019,Seiche,IX - Zamboanga Peninsula,Zamboanga del Sur,Pagadian City,2019-05-05,419914,92,3,3,2
+Aparri Heat Wave 2019,Heat Wave,II - Cagayan Valley,Cagayan,Aparri,2019-05-21,25842,2501,7,10,4
+Iloilo City Leptospirosis Outbreak 2019,Bacterial Disease,VI - Western Visayas,Iloilo,Iloilo City,2019-05-22,4707561,68,4,5,0
+Typhoon Umberto,Tropical Cyclone,I - Ilocos Region,Ilocos Norte,Batac City,2019-07-08,756932808,14,0,0,0
+Cagayan de Oro Flash Flood 2019,Flash Flood,X - Northern Mindanao,Misamis Oriental,Cagayan de Oro City,2019-07-11,13815,5,0,0,0
+Tacloban Meningococcemia Outbreak 2019,Bacterial Disease,VIII - Eastern Visayas,Leyte,Tacloban City,2019-07-12,9716,100,3,6,0
+Zamboanga del Norte Volcano Ashfall 2019,Ashfall,IX - Zamboanga Peninsula,Zamboanga del Norte,Dipolog City,2019-07-13,50878,1037,0,18,0
+Surigao City Local Wave Event 2019,Local Wave,XIII - Caraga,Surigao del Norte,Surigao City,2019-07-31,20318680,1073,47,86,12
+Kalibo Storm Surge 2019,Storm Surge,VI - Western Visayas,Aklan,Kalibo,2019-09-03,602326,4481,102,64,62
+Malaybalay Typhoid Outbreak 2019,Bacterial Disease,X - Northern Mindanao,Bukidnon,Malaybalay City,2019-09-23,1805558,1,0,0,0
+Mayon Volcano Ash Plume 2019,Ash Plume,V - Bicol Region,Sorsogon,Sorsogon City,2019-10-10,1164233,19,0,0,0
+Matanog Oil Spill 2019,Oil Spill,Bangsamoro,Maguindanao,Matanog,2019-10-20,123214748,12,0,0,0
+Tacloban Flood (General) 2019,Flood (General),VIII - Eastern Visayas,Leyte,Tacloban City,2019-10-25,919298550,149,1,3,0
+Kalibo Oil Spill 2019,Oil Spill,VI - Western Visayas,Aklan,Kalibo,2019-10-31,13259463,111,2,0,0
+Agusan del Sur Volcano Volcanic Activity (General) 2019,Volcanic Activity (General),XIII - Caraga,Agusan del Sur,Bayugan City,2019-11-10,35177,8,0,0,0
+Bayombong Accident 2019,Miscellaneous Accident (General),II - Cagayan Valley,Nueva Vizcaya,Bayombong,2019-11-15,1696623,637,1,17,2
+Laoag Heat Wave 2019,Heat Wave,I - Ilocos Region,Ilocos Norte,Laoag City,2019-11-18,8491,42,0,1,0
+Calumpit Tsunami 2019,Tsunami,III - Central Luzon,Bulacan,Calumpit,2019-11-27,9880197,2,0,0,0
+Malabon Armed Clash 2019,Armed Clash,National Capital Region,Metro Manila,Malabon,2019-12-05,469215,705,11,11,0
+Mandaue Drought 2020,Drought,VII - Central Visayas,Cebu,Mandaue City,2020-01-09,1812793,23,0,0,0
+Bulusan Volcano Lava Flow 2020,Lava Flow,I - Ilocos Region,Pangasinan,Alaminos,2020-03-01,1824037,193,0,1,0
+Virac Accident 2020,Miscellaneous Accident (General),V - Bicol Region,Catanduanes,Virac,2020-03-03,95534,242,4,12,2
+Mayon Volcano Ashfall 2020,Ashfall,V - Bicol Region,Sorsogon,Sorsogon City,2020-03-05,86674,4,0,0,0
+Catbalogan Seiche Event 2020,Seiche,VIII - Eastern Visayas,Samar,Catbalogan City,2020-03-19,44198645,3887,78,126,112
+Mag 3.4 Angeles Earthquake,Earthquake,III - Central Luzon,Pampanga,Angeles City,2020-04-12,21470918,6,0,0,0
+Dumaguete Fire (Misc) 2020,Fire (Misc),VII - Central Visayas,Negros Oriental,Dumaguete City,2020-04-18,2551136,13,0,0,0
+Zamboanga City Tsunami 2020,Tsunami,IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2020-04-22,32944899,6846,323,553,179
+Malaybalay Drought 2020,Drought,X - Northern Mindanao,Bukidnon,Malaybalay City,2020-05-03,33945803,175,0,1,0
+Lagawe Riverine Flood 2020,Riverine Flood,Cordillera Administrative Region,Ifugao,Lagawe,2020-07-19,4667838,130,0,1,0
+Taal Landslide (Wet) 2020,Landslide (Wet),IV-A - Calabarzon,Batangas,Taal,2020-07-21,50406490,664,7,25,4
+Lagawe Heat Wave 2020,Heat Wave,Cordillera Administrative Region,Ifugao,Lagawe,2020-07-25,193158,7498,21,153,12
+Nueva Vizcaya Volcano Ash Plume 2020,Ash Plume,II - Cagayan Valley,Nueva Vizcaya,Bayombong,2020-08-03,16989472,54,0,1,0
+Lucena Flash Flood 2020,Flash Flood,IV-A - Calabarzon,Quezon,Lucena City,2020-08-27,2795864,274,1,7,0
+Roxas City Flash Flood 2020,Flash Flood,VI - Western Visayas,Capiz,Roxas City,2020-08-28,17822,34,0,0,0
+General Santos Mudslide 2020,Mudslide,XII - Soccsksargen,South Cotabato,General Santos City,2020-09-04,59885,2594,123,106,23
+Bayugan Armed Clash 2020,Armed Clash,XIII - Caraga,Agusan del Sur,Bayugan City,2020-09-06,15447573,63,0,1,0
+Loboc Storm Surge 2020,Storm Surge,VII - Central Visayas,Bohol,Loboc,2020-09-10,765504,1688,30,154,41
+San Fernando Landslide (Wet) 2020,Landslide (Wet),I - Ilocos Region,La Union,San Fernando,2020-10-25,1605901,3,0,0,0
+Cauayan Local Wave Event 2020,Local Wave,II - Cagayan Valley,Isabela,Cauayan,2020-10-26,8414954,1,0,0,0
+Kalibo Flood (General) 2020,Flood (General),VI - Western Visayas,Aklan,Kalibo,2020-10-29,277384642,44,0,1,0
+Capiz Volcano Ash Plume 2020,Ash Plume,VI - Western Visayas,Capiz,Roxas City,2020-11-08,158378667,50,0,1,0
+Metro Manila Volcano Lahar 2020,Lahar,National Capital Region,Metro Manila,Pasig City,2020-12-05,5545271,479,1,18,0
+Cotabato Volcano Lava Flow 2021,Lava Flow,XII - Soccsksargen,Cotabato,Kidapawan City,2021-01-06,854211,26,0,0,0
+Calumpit Typhoid Outbreak 2021,Bacterial Disease,III - Central Luzon,Bulacan,Calumpit,2021-01-22,13069,4,0,0,0
+Taal Volcano Lava Flow 2021,Lava Flow,IV-A - Calabarzon,Batangas,Nasugbu,2021-01-31,215912211,6317,13,243,34
+San Fernando Malaria Outbreak 2021,Infectious Disease (General),I - Ilocos Region,La Union,San Fernando,2021-02-12,112741,50,1,1,0
+Butuan COVID-19 Outbreak 2021,Viral Disease,XIII - Caraga,Agusan del Norte,Butuan City,2021-02-23,122425644,509,22,75,0
+Aparri Drought 2021,Drought,II - Cagayan Valley,Cagayan,Aparri,2021-03-04,645636,159,0,0,0
+Caloocan Oil Spill 2021,Oil Spill,National Capital Region,Metro Manila,Caloocan City,2021-03-05,13799318,6201,123,388,44
+Apo Volcano Ashfall 2021,Ashfall,XI - Davao Region,Davao del Norte,Tagum City,2021-03-13,16642781,3,0,0,0
+Sorsogon City Flood (General) 2021,Flood (General),V - Bicol Region,Sorsogon,Sorsogon City,2021-04-29,305733006,14,0,0,0
+Typhoon Domeng,Tropical Cyclone,XII - Soccsksargen,South Cotabato,Koronadal City,2021-05-03,65826934,470,5,15,2
+Pili Accident 2021,Miscellaneous Accident (General),V - Bicol Region,Camarines Sur,Pili,2021-05-27,585024,528,6,38,0
+Surigao City Drought 2021,Drought,XIII - Caraga,Surigao del Norte,Surigao City,2021-06-03,1620474,34,0,0,0
+Iba Flash Flood 2021,Flash Flood,III - Central Luzon,Zambales,Iba,2021-06-03,2516146,1299,11,52,5
+Calamba Seiche Event 2021,Seiche,IV-A - Calabarzon,Laguna,Calamba,2021-06-05,1014074,33,1,2,0
+Typhoon Maring,Tropical Cyclone,IX - Zamboanga Peninsula,Zamboanga del Sur,Pagadian City,2021-06-06,97189881,2491,3,54,10
+Olongapo Landslide (Dry) 2021,Landslide (Dry),III - Central Luzon,Zambales,Olongapo City,2021-06-11,691427,817,35,40,3
+Cebu City Mudslide 2021,Mudslide,VII - Central Visayas,Cebu,Cebu City,2021-07-24,1473363,176,4,16,0
+Zamboanga City Storm Surge 2021,Storm Surge,IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2021-07-24,78662,11359,350,639,106
+Catbalogan Measles Outbreak 2021,Viral Disease,VIII - Eastern Visayas,Samar,Catbalogan City,2021-09-06,286100,4,0,0,0
+Iba Fire (Misc) 2021,Fire (Misc),III - Central Luzon,Zambales,Iba,2021-09-18,12727,849,3,13,2
+Carcar Drought 2021,Drought,VII - Central Visayas,Cebu,Carcar,2021-09-20,21899095,22664,76,235,3
+Matanog Seiche Event 2021,Seiche,Bangsamoro,Maguindanao,Matanog,2021-10-19,13678373,76,1,1,1
+Butuan Mudslide 2021,Mudslide,XIII - Caraga,Agusan del Norte,Butuan City,2021-10-22,5671,9462,296,469,75
+Pili Cholera Outbreak 2021,Bacterial Disease,V - Bicol Region,Camarines Sur,Pili,2021-10-28,60370976,2129,94,252,1
+Aparri Riverine Flood 2021,Riverine Flood,II - Cagayan Valley,Cagayan,Aparri,2021-11-04,88274,17,0,0,0
+Angeles Mudslide 2021,Mudslide,III - Central Luzon,Pampanga,Angeles City,2021-11-14,1125934,88,4,0,0
+Tarlac City Storm Surge 2021,Storm Surge,III - Central Luzon,Tarlac,Tarlac City,2021-11-15,43869,19,1,0,0
+Iligan Drought 2021,Drought,X - Northern Mindanao,Lanao del Norte,Iligan City,2021-11-24,3728302,53,0,0,0
+Parker Volcano Ashfall 2021,Ashfall,Bangsamoro,Maguindanao,Cotabato City,2021-12-07,1111333,5243,7,76,18
+Roxas City Seiche Event 2021,Seiche,VI - Western Visayas,Capiz,Roxas City,2021-12-08,10539,17,1,0,0
+Manila Fire (Misc) 2021,Fire (Misc),National Capital Region,Metro Manila,Manila,2021-12-13,674198,1295,41,76,5
+San Fernando Landslide (Wet) 2021,Landslide (Wet),III - Central Luzon,Pampanga,San Fernando,2021-12-24,4739242,52,3,2,0
+Sorsogon City Measles Outbreak 2022,Viral Disease,V - Bicol Region,Sorsogon,Sorsogon City,2022-02-09,33487995,100,4,7,0
+Hibok-Hibok Volcano Lahar 2022,Lahar,X - Northern Mindanao,Lanao del Norte,Iligan City,2022-03-06,544698,132,0,2,0
+Tagum Armed Clash 2022,Armed Clash,XI - Davao Region,Davao del Norte,Tagum City,2022-03-18,121958433,12235,93,888,85
+Bayombong Malaria Outbreak 2022,Infectious Disease (General),II - Cagayan Valley,Nueva Vizcaya,Bayombong,2022-03-30,35327569,11118,735,157,31
+Zambales Volcano Lava Flow 2022,Lava Flow,III - Central Luzon,Zambales,Olongapo City,2022-04-16,132276418,235,0,8,0
+Carcar Landslide (Dry) 2022,Landslide (Dry),VII - Central Visayas,Cebu,Carcar,2022-04-23,29008,89,1,2,1
+Kalibo Storm Surge 2022,Storm Surge,VI - Western Visayas,Aklan,Kalibo,2022-04-27,235845808,330,26,33,4
+Cabadbaran Rabies Outbreak 2022,Viral Disease,XIII - Caraga,Agusan del Norte,Cabadbaran City,2022-05-01,13961,9,0,0,0
+Tanauan Heat Wave 2022,Heat Wave,VIII - Eastern Visayas,Leyte,Tanauan,2022-05-03,8833,21,0,0,0
+Bayombong Coastal Flood 2022,Coastal Flood,II - Cagayan Valley,Nueva Vizcaya,Bayombong,2022-05-05,17622155,1,0,0,0
+Lucena Riverine Flood 2022,Riverine Flood,IV-A - Calabarzon,Quezon,Lucena City,2022-05-24,91709822,318,1,6,1
+Ilagan Flash Flood 2022,Flash Flood,II - Cagayan Valley,Isabela,Ilagan,2022-05-30,264435,2,0,0,0
+Tuguegarao Landslide (Dry) 2022,Landslide (Dry),II - Cagayan Valley,Cagayan,Tuguegarao City,2022-06-02,22024,26,0,1,0
+Borongan Landslide (Dry) 2022,Landslide (Dry),VIII - Eastern Visayas,Eastern Samar,Borongan City,2022-06-14,7348358,33,1,3,0
+Eastern Samar Volcano Volcanic Activity (General) 2022,Volcanic Activity (General),VIII - Eastern Visayas,Eastern Samar,Borongan City,2022-06-19,9214,3274,8,72,10
+Lingayen Oil Spill 2022,Oil Spill,I - Ilocos Region,Pangasinan,Lingayen,2022-06-29,2608312,451,10,31,0
+Monkayo Coastal Flood 2022,Coastal Flood,XI - Davao Region,Davao de Oro,Monkayo,2022-07-25,1068296810,2978,9,52,17
+Naga Hepatitis A Outbreak 2022,Viral Disease,V - Bicol Region,Camarines Sur,Naga,2022-07-30,238634,1749,77,18,8
+Dumaguete Flood (General) 2022,Flood (General),VII - Central Visayas,Negros Oriental,Dumaguete City,2022-08-12,194557,1,0,0,0
+Borongan Local Wave Event 2022,Local Wave,VIII - Eastern Visayas,Eastern Samar,Borongan City,2022-08-26,82785,256,5,19,1
+Kidapawan Riverine Flood 2022,Riverine Flood,XII - Soccsksargen,Cotabato,Kidapawan City,2022-08-28,6662522,237,1,4,0
+Mayon Volcano Volcanic Activity (General) 2022,Volcanic Activity (General),V - Bicol Region,Catanduanes,Virac,2022-09-02,1611818,520,0,16,1
+Catbalogan Tsunami 2022,Tsunami,VIII - Eastern Visayas,Samar,Catbalogan City,2022-09-10,23736,20,0,0,0
+Antipolo Flash Flood 2022,Flash Flood,IV-A - Calabarzon,Rizal,Antipolo City,2022-09-20,31355,579,4,27,3
+Kalibo Coastal Flood 2022,Coastal Flood,VI - Western Visayas,Aklan,Kalibo,2022-10-01,8613,6,0,0,0
+Hagonoy Flash Flood 2022,Flash Flood,III - Central Luzon,Bulacan,Hagonoy,2022-10-02,827422,9101,21,324,1
+Tarlac City Heat Wave 2022,Heat Wave,III - Central Luzon,Tarlac,Tarlac City,2022-10-04,219602,24029,10,492,31
+Bauang Seiche Event 2022,Seiche,I - Ilocos Region,La Union,Bauang,2022-10-17,2109201,3791,109,265,41
+Zamboanga City Riverine Flood 2022,Riverine Flood,IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2022-10-17,77002,2361,0,108,10
+Marawi Landslide (Wet) 2022,Landslide (Wet),Bangsamoro,Lanao del Sur,Marawi City,2022-11-15,6099,816,18,27,12
+Alaminos Tsunami 2022,Tsunami,I - Ilocos Region,Pangasinan,Alaminos,2022-11-24,474721,12,0,1,0
+Malaybalay Landslide (Dry) 2022,Landslide (Dry),X - Northern Mindanao,Bukidnon,Malaybalay City,2022-12-09,269074,736,43,44,8
+Sultan Kudarat Volcano Lava Flow 2022,Lava Flow,XII - Soccsksargen,Sultan Kudarat,Isulan,2022-12-16,4900386,7,0,0,0
+Typhoon Crising,Tropical Cyclone,III - Central Luzon,Pampanga,Angeles City,2022-12-17,384707303,259,0,8,1
+Typhoon Karding,Tropical Cyclone,National Capital Region,Metro Manila,Pasig City,2022-12-22,36677,173,0,0,0
+Hagonoy Mudslide 2022,Mudslide,III - Central Luzon,Bulacan,Hagonoy,2022-12-30,239768,137,2,9,1
+Sariaya Influenza Outbreak 2022,Viral Disease,IV-A - Calabarzon,Quezon,Sariaya,2022-12-31,4438,98,0,2,0
+Borongan Heat Wave 2023,Heat Wave,VIII - Eastern Visayas,Eastern Samar,Borongan City,2023-01-09,150797,1,0,0,0
+Bontoc Fire (Industrial) 2023,Fire (Industrial),Cordillera Administrative Region,Mountain Province,Bontoc,2023-01-16,187475871,24,0,0,0
+Dipolog Riverine Flood 2023,Riverine Flood,IX - Zamboanga Peninsula,Zamboanga del Norte,Dipolog City,2023-01-25,27453617,1380,5,62,5
+Bontoc Heat Wave 2023,Heat Wave,Cordillera Administrative Region,Mountain Province,Bontoc,2023-01-26,216777,14,0,0,0
+Hibok-Hibok Volcano Ashfall 2023,Ashfall,X - Northern Mindanao,Lanao del Norte,Iligan City,2023-02-04,134688310,225,0,4,1
+Koronadal Acute Gastroenteritis Outbreak 2023,Infectious Disease (General),XII - Soccsksargen,South Cotabato,Koronadal City,2023-02-05,11059450,915,56,130,0
+Malaybalay Armed Clash 2023,Armed Clash,X - Northern Mindanao,Bukidnon,Malaybalay City,2023-02-11,14765,55,0,2,0
+Cebu Volcano Lava Flow 2023,Lava Flow,VII - Central Visayas,Cebu,Carcar,2023-02-21,11882417,8957,40,159,48
+San Fernando Armed Clash 2023,Armed Clash,I - Ilocos Region,La Union,San Fernando,2023-03-28,705917,19,0,1,0
+Dumaguete Measles Outbreak 2023,Viral Disease,VII - Central Visayas,Negros Oriental,Dumaguete City,2023-04-14,7106,7635,291,803,27
+Typhoon Venus,Tropical Cyclone,Bangsamoro,Lanao del Sur,Marawi City,2023-04-16,639935,9734,69,462,34
+Quezon City Tsunami 2023,Tsunami,National Capital Region,Metro Manila,Quezon City,2023-04-18,162469,1880,98,188,15
+Iba Heat Wave 2023,Heat Wave,III - Central Luzon,Zambales,Iba,2023-04-18,42595932,4,0,0,0
+Kalibo Local Wave Event 2023,Local Wave,VI - Western Visayas,Aklan,Kalibo,2023-04-21,3437273,848,22,38,14
+Tarlac Volcano Volcanic Activity (General) 2023,Volcanic Activity (General),III - Central Luzon,Tarlac,Tarlac City,2023-05-04,192313,18484,38,389,109
+Datu Piang Storm Surge 2023,Storm Surge,Bangsamoro,Maguindanao,Datu Piang,2023-05-07,23200603,18,0,1,0
+Metro Manila Volcano Volcanic Activity (General) 2023,Volcanic Activity (General),National Capital Region,Metro Manila,Marikina,2023-05-10,366518625,10351,24,57,51
+Valencia Armed Clash 2023,Armed Clash,X - Northern Mindanao,Bukidnon,Valencia,2023-05-15,6940322,3,0,0,0
+Zamboanga City Fire (Industrial) 2023,Fire (Industrial),IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2023-05-21,175747912,17431,501,933,66
+Typhoon Isang,Tropical Cyclone,Cordillera Administrative Region,Ifugao,Lagawe,2023-06-05,17537053,11,0,0,0
+Mandaue Storm Surge 2023,Storm Surge,VII - Central Visayas,Cebu,Mandaue City,2023-06-20,30819979,172,10,14,3
+Ormoc Flash Flood 2023,Flash Flood,VIII - Eastern Visayas,Leyte,Ormoc City,2023-06-21,17670,5371,6,21,29
+Kalibo Hepatitis A Outbreak 2023,Viral Disease,VI - Western Visayas,Aklan,Kalibo,2023-06-27,1748,36,1,2,0
+Isulan Local Wave Event 2023,Local Wave,XII - Soccsksargen,Sultan Kudarat,Isulan,2023-07-04,169659,25,0,2,0
+Samar Volcano Lava Flow 2023,Lava Flow,VIII - Eastern Visayas,Samar,Catbalogan City,2023-07-08,399511,591,1,0,2
+Taal Volcano Volcanic Activity (General) 2023,Volcanic Activity (General),IV-A - Calabarzon,Quezon,Sariaya,2023-07-09,13919957,75,0,2,0
+Malaybalay Storm Surge 2023,Storm Surge,X - Northern Mindanao,Bukidnon,Malaybalay City,2023-07-13,77684412,24072,1693,2371,435
+Loboc Storm Surge 2023,Storm Surge,VII - Central Visayas,Bohol,Loboc,2023-07-15,433365731,1,0,0,0
+Dumaguete Mudslide 2023,Mudslide,VII - Central Visayas,Negros Oriental,Dumaguete City,2023-07-21,1907316,14,0,1,0
+Iligan Coastal Flood 2023,Coastal Flood,X - Northern Mindanao,Lanao del Norte,Iligan City,2023-08-03,482674105,66,0,3,0
+Tanay Tsunami 2023,Tsunami,IV-A - Calabarzon,Rizal,Tanay,2023-08-06,170888708,20425,714,2253,70
+El Salvador Flood (General) 2023,Flood (General),X - Northern Mindanao,Misamis Oriental,El Salvador City,2023-08-08,2582089,3907,11,193,18
+Bontoc Oil Spill 2023,Oil Spill,Cordillera Administrative Region,Mountain Province,Bontoc,2023-08-12,55660109,4280,109,127,32
+Metro Manila Volcano Volcanic Activity (General) 2023,Volcanic Activity (General),National Capital Region,Metro Manila,Quezon City,2023-08-13,77575,7,0,0,0
+Bohol Volcano Ashfall 2023,Ashfall,VII - Central Visayas,Bohol,Loboc,2023-08-23,36286,1,0,0,0
+Parker Volcano Lava Flow 2023,Lava Flow,Bangsamoro,Basilan,Isabela City,2023-08-23,3219245,769,1,22,0
+Enrile Landslide (Dry) 2023,Landslide (Dry),II - Cagayan Valley,Cagayan,Enrile,2023-09-18,111754562,6711,232,54,93
+Tacloban Local Wave Event 2023,Local Wave,VIII - Eastern Visayas,Leyte,Tacloban City,2023-09-20,550372,1417,55,88,26
+Tarlac City Conjunctivitis Outbreak 2023,Infectious Disease (General),III - Central Luzon,Tarlac,Tarlac City,2023-10-06,7851,5650,320,512,25
+Candon Riverine Flood 2023,Riverine Flood,I - Ilocos Region,Ilocos Sur,Candon City,2023-10-07,67576,4923,30,82,15
+Bauang Tsunami 2023,Tsunami,I - Ilocos Region,La Union,Bauang,2023-10-31,12885573,24,0,2,0
+Tagum Mudslide 2023,Mudslide,XI - Davao Region,Davao del Norte,Tagum City,2023-10-31,8393792,520,15,49,3
+Sultan Kudarat Volcano Volcanic Activity (General) 2023,Volcanic Activity (General),XII - Soccsksargen,Sultan Kudarat,Isulan,2023-11-07,10082,3,0,0,0
+Kidapawan Seiche Event 2023,Seiche,XII - Soccsksargen,Cotabato,Kidapawan City,2023-11-15,14034128,13,0,1,0
+Metro Manila Volcano Ashfall 2023,Ashfall,National Capital Region,Metro Manila,Caloocan City,2023-11-15,139158,5,0,0,0
+Metro Manila Volcano Ash Plume 2023,Ash Plume,National Capital Region,Metro Manila,Pasig City,2023-11-17,179619667,4445,6,35,18
+Tagum Landslide (Dry) 2023,Landslide (Dry),XI - Davao Region,Davao del Norte,Tagum City,2023-11-23,650708,783,17,69,9
+Mag 5.5 Candon Earthquake,Earthquake,I - Ilocos Region,Ilocos Sur,Candon City,2023-11-30,49336034,10240,391,458,155
+Kalibo Flash Flood 2023,Flash Flood,VI - Western Visayas,Aklan,Kalibo,2023-12-04,424262958,7,0,0,0
+Borongan Malaria Outbreak 2023,Infectious Disease (General),VIII - Eastern Visayas,Eastern Samar,Borongan City,2023-12-18,133824,303,9,44,0
+Ormoc Landslide (Dry) 2023,Landslide (Dry),VIII - Eastern Visayas,Leyte,Ormoc City,2023-12-19,11100,3971,75,140,56
+Davao City Flood (General) 2024,Flood (General),XI - Davao Region,Davao del Sur,Davao City,2024-01-09,20449465,12,0,0,0
+Sultan Kudarat Volcano Ashfall 2024,Ashfall,XII - Soccsksargen,Sultan Kudarat,Isulan,2024-01-12,41361,14,0,0,0
+Parker Volcano Ash Plume 2024,Ash Plume,Bangsamoro,Basilan,Isabela City,2024-01-13,331109,2,0,0,0
+Kidapawan Fire (Misc) 2024,Fire (Misc),XII - Soccsksargen,Cotabato,Kidapawan City,2024-01-26,25424,1987,10,93,6
+Bacolod Landslide (Dry) 2024,Landslide (Dry),VI - Western Visayas,Negros Occidental,Bacolod,2024-02-15,15330,627,23,22,8
+Nueva Vizcaya Volcano Lava Flow 2024,Lava Flow,II - Cagayan Valley,Nueva Vizcaya,Bayombong,2024-02-29,6712273,1,0,0,0
+Bontoc Flash Flood 2024,Flash Flood,Cordillera Administrative Region,Mountain Province,Bontoc,2024-03-16,766853137,1,0,0,0
+Sorsogon City Accident 2024,Miscellaneous Accident (General),V - Bicol Region,Sorsogon,Sorsogon City,2024-03-27,73911,3,0,0,0
+Baguio Oil Spill 2024,Oil Spill,Cordillera Administrative Region,Benguet,Baguio City,2024-04-25,12869012,4303,127,157,6
+Davao City HFMD Outbreak 2024,Infectious Disease (General),XI - Davao Region,Davao del Sur,Davao City,2024-04-30,3417,3030,184,39,11
+Tagum Drought 2024,Drought,XI - Davao Region,Davao del Norte,Tagum City,2024-05-01,1355024,6,0,0,0
+Kalibo Tsunami 2024,Tsunami,VI - Western Visayas,Aklan,Kalibo,2024-05-05,325920026,2,0,0,0
+Cagayan Volcano Lava Flow 2024,Lava Flow,II - Cagayan Valley,Cagayan,Tuguegarao City,2024-05-16,25005584,1,0,0,0
+Surigao del Norte Volcano Ashfall 2024,Ashfall,XIII - Caraga,Surigao del Norte,Surigao City,2024-05-17,1216628,230,1,8,0
+Navotas Chickenpox Outbreak 2024,Infectious Disease (General),National Capital Region,Metro Manila,Navotas,2024-05-17,143253726,168,10,5,0
+Nabunturan Mudslide 2024,Mudslide,XI - Davao Region,Davao de Oro,Nabunturan,2024-05-30,65536248,15645,504,692,75
+Bayugan Landslide (Wet) 2024,Landslide (Wet),XIII - Caraga,Agusan del Sur,Bayugan City,2024-05-30,1792844,2315,52,208,19
+Passi Rabies Outbreak 2024,Viral Disease,VI - Western Visayas,Iloilo,Passi City,2024-06-05,211862,5290,241,389,20
+Isulan Tsunami 2024,Tsunami,XII - Soccsksargen,Sultan Kudarat,Isulan,2024-06-15,35682,3002,57,132,75
+Zamboanga del Sur Volcano Volcanic Activity (General) 2024,Volcanic Activity (General),IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2024-07-24,96570403,274,0,9,1
+Typhoon Tomas,Tropical Cyclone,IX - Zamboanga Peninsula,Zamboanga del Sur,Pagadian City,2024-08-13,675727,14,0,0,0
+Zamboanga City Tuberculosis Outbreak 2024,Bacterial Disease,IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2024-08-28,4375753,21,0,1,0
+Iba Acute Gastroenteritis Outbreak 2024,Infectious Disease (General),III - Central Luzon,Zambales,Iba,2024-09-06,2293626,3,0,0,0
+Typhoon Inday,Tropical Cyclone,III - Central Luzon,Zambales,Iba,2024-09-22,1835794,13343,43,471,67
+Marawi Local Wave Event 2024,Local Wave,Bangsamoro,Lanao del Sur,Marawi City,2024-10-11,191177672,11,0,0,0
+Laoag Landslide (Wet) 2024,Landslide (Wet),I - Ilocos Region,Ilocos Norte,Laoag City,2024-10-16,10355,336,9,23,4
+Mag 6.9 Cebu City Earthquake,Earthquake,VII - Central Visayas,Cebu,Cebu City,2024-10-25,27617,3,0,0,0
+Valencia Fire (Industrial) 2024,Fire (Industrial),X - Northern Mindanao,Bukidnon,Valencia,2024-11-02,342022987,169,0,5,0
+Taal Volcano Lava Flow 2024,Lava Flow,IV-A - Calabarzon,Batangas,Taal,2024-11-15,10292897,827,2,25,2
+Mayon Volcano Lahar 2024,Lahar,V - Bicol Region,Catanduanes,Virac,2024-12-07,2911813,9,0,0,0
+Tarlac Volcano Lahar 2024,Lahar,III - Central Luzon,Tarlac,Tarlac City,2024-12-11,39408,57,0,0,0
+Zamboanga City Fire (Industrial) 2024,Fire (Industrial),IX - Zamboanga Peninsula,Zamboanga del Sur,Zamboanga City,2024-12-23,563382620,596,2,19,0
+Cagayan Volcano Volcanic Activity (General) 2024,Volcanic Activity (General),II - Cagayan Valley,Cagayan,Tuguegarao City,2024-12-23,11464311,4,0,0,0
+Nasugbu COVID-19 Outbreak 2024,Viral Disease,IV-A - Calabarzon,Batangas,Nasugbu,2024-12-26,805662,499,13,52,1
+Tagbilaran Mudslide 2025,Mudslide,VII - Central Visayas,Bohol,Tagbilaran City,2025-01-07,1810724,569,31,47,1
+Sultan Kudarat Volcano Ash Plume 2025,Ash Plume,XII - Soccsksargen,Sultan Kudarat,Isulan,2025-01-08,13729192,3025,2,30,17
+Valencia Armed Clash 2025,Armed Clash,X - Northern Mindanao,Bukidnon,Valencia,2025-01-10,11384,1403,22,107,7
+Hagonoy Seiche Event 2025,Seiche,III - Central Luzon,Bulacan,Hagonoy,2025-01-20,86562960,447,27,13,1
+Hibok-Hibok Volcano Lava Flow 2025,Lava Flow,X - Northern Mindanao,Bukidnon,Malaybalay City,2025-01-27,3472742,1662,0,20,7
+Mag 7.4 Lagawe Earthquake,Earthquake,Cordillera Administrative Region,Ifugao,Lagawe,2025-01-27,9836,10917,81,217,171
+Mandaue Meningococcemia Outbreak 2025,Bacterial Disease,VII - Central Visayas,Cebu,Mandaue City,2025-02-05,5853,930,7,120,3
+Catbalogan Heat Wave 2025,Heat Wave,VIII - Eastern Visayas,Samar,Catbalogan City,2025-03-12,132637,5312,8,148,3
+Apo Volcano Ashfall 2025,Ashfall,XI - Davao Region,Davao del Norte,Tagum City,2025-03-15,2884822,8,0,0,0
+Koronadal Tsunami 2025,Tsunami,XII - Soccsksargen,South Cotabato,Koronadal City,2025-03-22,39544,1,0,0,0
+Pili Drought 2025,Drought,V - Bicol Region,Camarines Sur,Pili,2025-04-08,2496402,70,0,0,0
+Virac Accident 2025,Miscellaneous Accident (General),V - Bicol Region,Catanduanes,Virac,2025-05-08,59614779,201,1,3,1
+Bayombong Flood (General) 2025,Flood (General),II - Cagayan Valley,Nueva Vizcaya,Bayombong,2025-05-12,18218305,1177,0,40,3
+Bayombong Oil Spill 2025,Oil Spill,II - Cagayan Valley,Nueva Vizcaya,Bayombong,2025-05-21,818940,4762,10,379,24
+Mag 3.2 Butuan Earthquake,Earthquake,XIII - Caraga,Agusan del Norte,Butuan City,2025-05-28,385335001,37,1,1,0
+Panabo Coastal Flood 2025,Coastal Flood,XI - Davao Region,Davao del Norte,Panabo City,2025-06-03,32445,2,0,0,0
+Typhoon Umberto,Tropical Cyclone,X - Northern Mindanao,Bukidnon,Valencia,2025-06-14,18427,9668,101,497,28
+Lagawe Coastal Flood 2025,Coastal Flood,Cordillera Administrative Region,Ifugao,Lagawe,2025-06-16,6514,59,0,0,0
+Typhoon Nonoy,Tropical Cyclone,XIII - Caraga,Surigao del Norte,Surigao City,2025-06-18,1356730821,34221,339,250,60
+Mayon Volcano Volcanic Activity (General) 2025,Volcanic Activity (General),V - Bicol Region,Albay,Camalig,2025-06-27,19940,13934,4,516,37
+Angeles Mudslide 2025,Mudslide,III - Central Luzon,Pampanga,Angeles City,2025-07-02,719209,25,0,0,0
+South Cotabato Volcano Ashfall 2025,Ashfall,XII - Soccsksargen,South Cotabato,Koronadal City,2025-07-24,358278,1690,2,13,0
+Naga Landslide (Wet) 2025,Landslide (Wet),V - Bicol Region,Camarines Sur,Naga,2025-07-30,111431,3395,143,61,36
+General Santos Flash Flood 2025,Flash Flood,XII - Soccsksargen,South Cotabato,General Santos City,2025-09-05,914536,14697,55,436,48
+Parker Volcano Volcanic Activity (General) 2025,Volcanic Activity (General),Bangsamoro,Basilan,Isabela City,2025-09-09,201016491,16,0,0,0
+Parker Volcano Lahar 2025,Lahar,Bangsamoro,Maguindanao,Matanog,2025-09-17,57344492,15,0,0,0
+Bontoc HFMD Outbreak 2025,Infectious Disease (General),Cordillera Administrative Region,Mountain Province,Bontoc,2025-10-01,9352,44,2,4,0
+Alaminos Fire (Misc) 2025,Fire (Misc),I - Ilocos Region,Pangasinan,Alaminos,2025-10-06,60307072,7505,272,474,9
+Calbayog Coastal Flood 2025,Coastal Flood,VIII - Eastern Visayas,Samar,Calbayog City,2025-10-14,17317,244,1,9,1
+Nasugbu Flash Flood 2025,Flash Flood,IV-A - Calabarzon,Batangas,Nasugbu,2025-10-21,232178189,1126,2,22,7
+Mag 4.9 Virac Earthquake,Earthquake,V - Bicol Region,Catanduanes,Virac,2025-11-05,36228,8062,250,659,33
+Digos COVID-19 Outbreak 2025,Viral Disease,XI - Davao Region,Davao del Sur,Digos City,2025-12-21,19911401,308,22,35,0
+South Cotabato Volcano Lahar 2025,Lahar,XII - Soccsksargen,South Cotabato,Koronadal City,2025-12-27,410581,116,0,4,0
+Zambales Volcano Ash Plume 2026,Ash Plume,III - Central Luzon,Zambales,Iba,2026-01-11,6142,22,0,0,0
+Bacolod Armed Clash 2026,Armed Clash,VI - Western Visayas,Negros Occidental,Bacolod,2026-02-06,238181043,2,0,0,0
+Borongan HFMD Outbreak 2026,Infectious Disease (General),VIII - Eastern Visayas,Eastern Samar,Borongan City,2026-02-13,1690,8340,194,634,16
+Isabela City Coastal Flood 2026,Coastal Flood,Bangsamoro,Basilan,Isabela City,2026-02-25,17527750,21,0,0,0
+Sorsogon City Storm Surge 2026,Storm Surge,V - Bicol Region,Sorsogon,Sorsogon City,2026-03-02,657274,2,0,0,0
+Caloocan Conjunctivitis Outbreak 2026,Infectious Disease (General),National Capital Region,Metro Manila,Caloocan City,2026-03-14,10937623,3075,17,423,10
+Borongan Mudslide 2026,Mudslide,VIII - Eastern Visayas,Eastern Samar,Borongan City,2026-03-16,1374686,848,32,39,9
+Bauang Coastal Flood 2026,Coastal Flood,I - Ilocos Region,La Union,Bauang,2026-04-08,124376,92,0,0,0
+Parker Volcano Lahar 2026,Lahar,Bangsamoro,Maguindanao,Datu Piang,2026-04-26,3791980,1,0,0,0
+Nasugbu Landslide (Wet) 2026,Landslide (Wet),IV-A - Calabarzon,Batangas,Nasugbu,2026-05-07,1593396,653,3,43,0
+Kalibo Landslide (Wet) 2026,Landslide (Wet),VI - Western Visayas,Aklan,Kalibo,2026-05-09,30107694,3185,93,197,7
+Surigao City Fire (Industrial) 2026,Fire (Industrial),XIII - Caraga,Surigao del Norte,Surigao City,2026-05-17,17047221,1,0,0,0
+Taal Volcano Lahar 2026,Lahar,IV-A - Calabarzon,Quezon,Lucena City,2026-05-21,2641509,5834,6,187,26
+Hagonoy Rabies Outbreak 2026,Viral Disease,III - Central Luzon,Bulacan,Hagonoy,2026-05-28,3037,2,0,0,0
+Marawi Heat Wave 2026,Heat Wave,Bangsamoro,Lanao del Sur,Marawi City,2026-06-07,23072355,583,0,11,1
+El Salvador Flood (General) 2026,Flood (General),X - Northern Mindanao,Misamis Oriental,El Salvador City,2026-06-11,15891,49,0,1,0
+San Fernando Heat Wave 2026,Heat Wave,I - Ilocos Region,La Union,San Fernando,2026-06-14,33605,516,1,13,1
+Pasig Local Wave Event 2026,Local Wave,National Capital Region,Metro Manila,Pasig City,2026-06-16,47272,8,0,0,0
+Dumaguete Landslide (Wet) 2026,Landslide (Wet),VII - Central Visayas,Negros Oriental,Dumaguete City,2026-06-24,99594,322,14,19,4
+Malaybalay Local Wave Event 2026,Local Wave,X - Northern Mindanao,Bukidnon,Malaybalay City,2026-06-25,115265,4,0,0,0
+Bayugan Conjunctivitis Outbreak 2026,Infectious Disease (General),XIII - Caraga,Agusan del Sur,Bayugan City,2026-07-27,9669866,2767,213,205,6
+Sariaya Seiche Event 2026,Seiche,IV-A - Calabarzon,Quezon,Sariaya,2026-07-28,6664284,20760,1191,1713,561
+Tagbilaran Tsunami 2026,Tsunami,VII - Central Visayas,Bohol,Tagbilaran City,2026-08-08,4730186,3561,112,236,42
+Navotas Oil Spill 2026,Oil Spill,National Capital Region,Metro Manila,Navotas,2026-08-17,1092537,10,0,0,0
+Olongapo Local Wave Event 2026,Local Wave,III - Central Luzon,Zambales,Olongapo City,2026-08-22,490543907,5992,243,252,59
+Datu Piang Landslide (Wet) 2026,Landslide (Wet),Bangsamoro,Maguindanao,Datu Piang,2026-08-23,2491612,99,2,2,0
+Palo Tsunami 2026,Tsunami,VIII - Eastern Visayas,Leyte,Palo,2026-09-02,26164,97,3,7,1
+Lapu-Lapu Landslide (Wet) 2026,Landslide (Wet),VII - Central Visayas,Cebu,Lapu-Lapu City,2026-09-19,15240,1,0,0,0
+Bayugan Landslide (Dry) 2026,Landslide (Dry),XIII - Caraga,Agusan del Sur,Bayugan City,2026-09-29,35856,22,1,1,0
+Hibok-Hibok Volcano Ash Plume 2026,Ash Plume,X - Northern Mindanao,Lanao del Norte,Iligan City,2026-11-06,42604,6,0,0,0
+Mandaue Landslide (Dry) 2026,Landslide (Dry),VII - Central Visayas,Cebu,Mandaue City,2026-12-19,4284644,17,0,1,0
+Aklan Volcano Ash Plume 2026,Ash Plume,VI - Western Visayas,Aklan,Kalibo,2026-12-20,1052650,5,0,0,0
+Matanog Fire (Misc) 2017,Fire (Misc),Bangsamoro,Maguindanao,Matanog,2017-04-24,42398130,1477,4,3,7
+Aparri Fire (Misc) 2019,Fire (Misc),II - Cagayan Valley,Cagayan,Aparri,2019-05-06,332563,10,0,0,2
+Datu Piang Fire (Misc) 2021,Fire (Misc),Bangsamoro,Maguindanao,Datu Piang,2021-05-25,51807,13,0,2,4
+Taal Fire (Misc) 2017,Fire (Misc),IV-A - Calabarzon,Batangas,Taal,2017-03-07,710814245,17404,65,102,2
+Typhoon Josie,Tropical Cyclone,Bangsamoro,Maguindanao,Datu Piang,2022-09-28,223467,9,0,2,6
+Mag 5.3 Guinobatan Earthquake,Earthquake,V - Bicol Region,Albay,Guinobatan,2021-02-05,18847382,418,5,13,5
+Enrile Flood (General) 2014,Flood (General),II - Cagayan Valley,Cagayan,Enrile,2014-11-19,6060,7,0,0,2
+Dagupan Fire (Misc) 2014,Fire (Misc),I - Ilocos Region,Pangasinan,Dagupan City,2014-04-27,298510,8,0,0,1
+Typhoon Maymay,Tropical Cyclone,III - Central Luzon,Bulacan,Marilao,2025-09-24,26978327,131,1,15,0
+Cebu City Drought 2025,Drought,VII - Central Visayas,Cebu,Cebu City,2025-02-12,233037,15,0,1,7
+Mawab Fire (Misc) 2021,Fire (Misc),XI - Davao Region,Davao de Oro,Mawab,2021-03-04,1931772088,17230,498,197,9
+Mag 3.9 Lingayen Earthquake,Earthquake,I - Ilocos Region,Pangasinan,Lingayen,2019-10-01,352374,12,0,0,5
+Datu Piang Fire (Misc) 2018,Fire (Misc),Bangsamoro,Maguindanao,Datu Piang,2018-01-22,36416,10,0,2,0
+Tanauan Fire (Misc) 2013,Fire (Misc),VIII - Eastern Visayas,Leyte,Tanauan,2013-03-01,388150,7,0,0,0
+Nasugbu Flood (General) 2014,Flood (General),IV-A - Calabarzon,Batangas,Nasugbu,2014-02-08,91201,18,0,2,7
+Typhoon Josie,Tropical Cyclone,I - Ilocos Region,Pangasinan,Alaminos,2015-07-18,177206,1,0,2,2
+Mawab Flood (General) 2023,Flood (General),XI - Davao Region,Davao de Oro,Mawab,2023-09-10,124299,18,0,0,3
+Lingayen Fire (Misc) 2015,Fire (Misc),I - Ilocos Region,Pangasinan,Lingayen,2015-05-25,40227397,1164,0,18,0
+Typhoon Umberto,Tropical Cyclone,National Capital Region,Metro Manila,Quezon City,2024-08-07,739950962,41468,362,1809,7
+Typhoon Obet,Tropical Cyclone,III - Central Luzon,Bulacan,Calumpit,2017-11-12,44644806,1272,2,7,2
+Typhoon Tomas,Tropical Cyclone,VIII - Eastern Visayas,Leyte,Palo,2024-11-11,306144,13,0,2,3
+Typhoon Samuel,Tropical Cyclone,III - Central Luzon,Bulacan,Calumpit,2024-08-25,484891,18,0,1,2
+Typhoon Maymay,Tropical Cyclone,III - Central Luzon,Bulacan,Hagonoy,2017-08-19,34960585,1039,3,2,1
+Calumpit Flood (General) 2015,Flood (General),III - Central Luzon,Bulacan,Calumpit,2015-09-07,122419,14,0,2,2
+Typhoon Maymay,Tropical Cyclone,XI - Davao Region,Davao de Oro,Maco,2013-09-26,126931,2,0,2,3
