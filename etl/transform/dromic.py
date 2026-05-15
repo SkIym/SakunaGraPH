@@ -286,6 +286,7 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
         collapse_key="municipality",
         match_location=True,
         correct_qty_barangay=False,
+        split_assistance=True,
     )
 
     cost_cols = [c for c in df.columns if any(
