@@ -95,13 +95,21 @@
 	let processedRows = $derived.by(() => {
 		return rawDisasterData.map(row => ({
 			...row,
-
-			// Keep this only if the column exists.
-			// SPARQL rows may not have monetary_damage yet.
 			monetary_damage: row.monetary_damage
 				? (Number(row.monetary_damage) / 1000000).toFixed(2)
 				: row.monetary_damage ?? null
 		}));
+	});
+
+	const PER_PAGE = 50;
+	let currentPage = $state(0);
+	let totalPages = $derived(Math.max(1, Math.ceil(processedRows.length / PER_PAGE)));
+	let pageRows = $derived(processedRows.slice(currentPage * PER_PAGE, (currentPage + 1) * PER_PAGE));
+
+	$effect(() => {
+		// reset to first page when filtered data changes
+		processedRows;
+		currentPage = 0;
 	});
 
 	function jsonToCSV(json) {
@@ -185,8 +193,18 @@
         <p class="text-red-600 text-sm mb-2">{sparqlError}</p>
     {/if}
 
-    <div class="max-w-full w-full mb-10">
-        <TableComponent data={processedRows} />
+    <div class="max-w-full w-full mb-4">
+        <TableComponent data={pageRows} />
+    </div>
+
+    <div class="flex items-center justify-between gap-2 mb-10 text-sm text-gray-600 dark:text-gray-400">
+        <span>{processedRows.length.toLocaleString()} rows total &mdash; page {currentPage + 1} of {totalPages}</span>
+        <div class="flex gap-2">
+            <Button size="xs" color="alternative" disabled={currentPage === 0} onclick={() => currentPage = 0}>«</Button>
+            <Button size="xs" color="alternative" disabled={currentPage === 0} onclick={() => currentPage -= 1}>‹ Prev</Button>
+            <Button size="xs" color="alternative" disabled={currentPage >= totalPages - 1} onclick={() => currentPage += 1}>Next ›</Button>
+            <Button size="xs" color="alternative" disabled={currentPage >= totalPages - 1} onclick={() => currentPage = totalPages - 1}>»</Button>
+        </div>
     </div>
 </section>
 

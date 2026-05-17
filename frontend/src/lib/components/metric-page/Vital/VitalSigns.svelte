@@ -15,17 +15,9 @@
   import { disasterColors, subType, generalizeType, allTypes, seriesColors, seriesNames } from '$lib/components/chart-shapes/chart.svelte.js';
   
   // data prepocessing
-  let tollCount = $derived(disaster.reduce((acc, item) => {
-    let toll = item.casualties?.trim();  
-    acc = acc + parseInt(toll, 10);
-    return acc;
-  }, 0));
+  let tollCount = $derived(disaster.reduce((acc, item) => acc + (Number(item.casualties) || 0), 0));
 
-  let monetaryDamage = $derived(disaster.reduce((acc, item) => {
-    let toll = item.monetary_damage?.trim();  
-    acc = acc + parseInt(toll, 10);
-    return acc;
-  }, 0));
+  let monetaryDamage = $derived(disaster.reduce((acc, item) => acc + (Number(item.monetary_damage) || 0), 0));
 
   const formatter = new Intl.NumberFormat('en-US', {
     notation: 'compact',
@@ -33,11 +25,7 @@
   });
   let formattedMonetaryDamage = $derived(formatter.format(monetaryDamage));
 
-  let affectedFamilies = $derived(disaster.reduce((acc, item) => {
-    let toll = item.affected_families?.trim();  
-    acc = acc + parseInt(toll, 10);
-    return acc;
-  }, 0));
+  let affectedFamilies = $derived(disaster.reduce((acc, item) => acc + (Number(item.affected_families) || 0), 0));
 </script>
 
 <div class="grid grid-cols-1 md:grid-cols-3 gap-4">

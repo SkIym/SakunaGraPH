@@ -2,7 +2,7 @@ import { getSelectedLocations } from '$lib/filter/location_states.svelte';
 import { getSelectedDisasterTypes } from '$lib/filter/disaster_states.svelte';
 import { dateRange } from '$lib/filter/date_states.svelte';
 
-let allData: any[] = $state([]);
+let allData: any[] = $state.raw([]);
 
 export function setAllData(data: any[]) {
     allData = data;
