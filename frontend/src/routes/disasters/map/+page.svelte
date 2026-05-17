@@ -17,9 +17,8 @@ TODO:
     import municities_json from '../../../lib/map/gadm41_PHL_2.json';
     import { Label, Range, Radio, Dropdown, DropdownItem, Button } from 'flowbite-svelte';
     import { ChevronDownOutline, ZoomInOutline, ZoomOutOutline } from "flowbite-svelte-icons";
-    import csv_data from '$lib/demo_data/disaster_data.csv';
     import LocationInfo from '$lib/components/LocationInfo.svelte';
-    import { getSelectedLocationNames, getSelectedDisasterTypeNames, getFilteredCsvData } from '$lib/demo_data/filteredData.svelte';
+    import { getSelectedLocationNames, getSelectedDisasterTypeNames, getFilteredCsvData, getAllData } from '$lib/demo_data/filteredData.svelte';
     import { dateRange } from '$lib/filter/date_states.svelte';
     import { getSelectedAdminLevel, setSelectedAdminLevel, getMapJoinKey, getLocationFullNameKeys, getHoveredLocation } from '$lib/map/adminLevelStates.svelte';
 
@@ -136,7 +135,7 @@ TODO:
     function calcNoOfDisasters(){
         let res = new Map();
         let locationKey = "";
-        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : csv_data;
+        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : getAllData();
 
         if (selectedAdminLevel === "regions"){
             locationKey = "region";
@@ -161,7 +160,7 @@ TODO:
     function calcAffectedFamilies(){
         let res = new Map();
         let locationKey = "";
-        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : csv_data
+        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : getAllData()
 
         if (selectedAdminLevel === "regions"){
             locationKey = "region";
@@ -187,7 +186,7 @@ TODO:
     function calcMonetaryDamages(){
         let res = new Map();
         let locationKey = "";
-        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : csv_data;
+        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : getAllData();
         if (selectedAdminLevel === "regions"){
             locationKey = "region";
         } else if (selectedAdminLevel === "provinces"){
@@ -212,7 +211,7 @@ TODO:
     function calcCasualties(){
         let res = new Map();
         let locationKey = "";
-        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : csv_data;
+        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : getAllData();
         if (selectedAdminLevel === "regions"){
             locationKey = "region";
         } else if (selectedAdminLevel === "provinces"){
@@ -237,7 +236,7 @@ TODO:
     function calcInjured(){
         let res = new Map();
         let locationKey = "";
-        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : csv_data;
+        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : getAllData();
 
         if (selectedAdminLevel === "regions"){
             locationKey = "region";
@@ -263,7 +262,7 @@ TODO:
     function calcMissing(){
         let res = new Map();
         let locationKey = "";
-        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : csv_data;
+        let data = (selectedLocations.length || selectedDisasterTypes.length || dateRange.start != undefined || dateRange.end != undefined) ? filteredCsvData : getAllData();
 
         if (selectedAdminLevel === "regions"){
             locationKey = "region";

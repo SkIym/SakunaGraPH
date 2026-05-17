@@ -1,7 +1,7 @@
 export async function POST({ request, fetch }) {
 	const query = await request.text();
 
-	const response = await fetch('http://localhost:7878/query', {
+	const response = await fetch('http://localhost:7200/repositories/SakunaGraph', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/sparql-query',
