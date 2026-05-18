@@ -9,9 +9,15 @@ import polars as pl
 from rapidfuzz import process, fuzz
 from dataclasses import dataclass
 
+from rdflib import Graph, Namespace, URIRef, Literal
+from rdflib.namespace import RDF, RDFS, OWL
+
 
 BASE_IRI  = "https://sakuna.ph/"
 TTL_PATH  = "../data/rdf/psgc/psgc.ttl"
+
+SAKUNA    = Namespace(BASE_IRI)
+IS_PART_OF = SAKUNA.isPartOf
 
 # ---------------------------------------------------------------------------
 # 1. Data model
@@ -20,7 +26,7 @@ TTL_PATH  = "../data/rdf/psgc/psgc.ttl"
 @dataclass
 class LocationMatch:
     name:  str      # canonical label, e.g. "City of Quezon"
-    iri:   str      # full IRI,        e.g. "https://sakuna.ph/1381050000"
+    iri:   URIRef      # full IRI,        e.g. "https://sakuna.ph/1381050000"
     score: float    # fuzzy confidence 0–100
 
 
@@ -29,37 +35,50 @@ class LocationMatch:
 # ---------------------------------------------------------------------------
 
 _names:    list[str]      | None = None
-_name2iri: dict[str, str] | None = None
+_name2iri: dict[str, URIRef] | None = None
+_graph:    Graph           | None = None   # full rdflib graph, for isPartOf queries
 
 
-def _ensure_loaded() -> tuple[list[str], dict[str, str]]:
-    global _names, _name2iri
+def _ensure_loaded() -> tuple[list[str], dict[str, URIRef]]:
+    global _names, _name2iri, _graph
     if _names is None:
-        _names, _name2iri = _load_locations(TTL_PATH)
+        _names, _name2iri, _graph = _load_locations(TTL_PATH)
     return _names, _name2iri
 
 
-def _load_locations(ttl_path: str) -> tuple[list[str], dict[str, str]]:
+def _load_locations(ttl_path: str) -> tuple[list[str], dict[str, URIRef], Graph]:
+    """
+    Parse psgc.ttl with rdflib.
+    Extracts every NamedIndividual whose :geographicLevel is one of the
+    recognised levels, building the name→IRI lookup used for fuzzy matching.
+    The full Graph is also returned so _match_cell can query :isPartOf.
+    """
     level_map = {"Reg", "Prov", "City", "Mun", "SubMun"}
-    block_re  = re.compile(
-        r":(\w+)\s+a owl:NamedIndividual.*?rdfs:label \"(.+?)\"@en.*?:geographicLevel \"(\w+)\"",
-        re.DOTALL,
-    )
 
-    with open(ttl_path, encoding="utf-8") as f:
-        content = f.read()
+    g = Graph()
+    g.parse(ttl_path, format="turtle")
+    g.bind("", SAKUNA)
 
-    names:    list[str]      = []
-    name2iri: dict[str, str] = {}
+    names:    list[str]         = []
+    name2iri: dict[str, URIRef] = {}
 
-    for m in block_re.finditer(content):
-        psgc_id, label, level = m.group(1), m.group(2).strip(), m.group(3)
-        if level in level_map:
-            iri = f"{BASE_IRI}{psgc_id}"
-            names.append(label)
-            name2iri[label] = iri
+    geo_level_pred = SAKUNA.geographicLevel
 
-    return names, name2iri
+    for subj in g.subjects(RDF.type, OWL.NamedIndividual):
+        level_lit = g.value(subj, geo_level_pred)
+        if level_lit is None:
+            continue
+        level = str(level_lit)
+        if level not in level_map:
+            continue
+        label_lit = g.value(subj, RDFS.label)
+        if label_lit is None:
+            continue
+        label = str(label_lit)
+        names.append(label)
+        name2iri[label] = URIRef(subj)
+
+    return names, name2iri, g
 
 
 # ---------------------------------------------------------------------------
@@ -189,15 +208,12 @@ def _resolve_region_alias(value: str) -> LocationMatch | None:
     # Resolve canonical name from TTL if not cached yet
     if psgc_code not in _psgc2name:
         _, name2iri = _ensure_loaded()
-        iri2name = {v: k for k, v in name2iri.items()}
-        _psgc2name.update({v.split("/")[-1]: k for k, v in name2iri.items()})
-        # Also index by code directly
         for name, full_iri in name2iri.items():
-            code = full_iri.replace(BASE_IRI, "")
+            code = str(full_iri).replace(BASE_IRI, "")
             _psgc2name[code] = name
 
     name = _psgc2name.get(psgc_code, psgc_code)
-    return LocationMatch(name=name, iri=iri, score=100.0)
+    return LocationMatch(name=name, iri=URIRef(iri), score=100.0)
 
 
 # ---------------------------------------------------------------------------
@@ -249,12 +265,12 @@ def _override_matches(value: str) -> list[LocationMatch]:
     for pattern, psgc_codes in _ISLAND_GROUP_EXPANSIONS:
         if pattern.match(value.strip()):
             _, name2iri = _ensure_loaded()
-            iri2name = {v: k for k, v in name2iri.items()}
+            iri2name = {str(v): k for k, v in name2iri.items()}
             results = []
             for code in psgc_codes:
                 iri  = f"{BASE_IRI}{code}"
                 name = iri2name.get(iri, code)
-                results.append(LocationMatch(name=name, iri=iri, score=100.0))
+                results.append(LocationMatch(name=name, iri=URIRef(iri), score=100.0))
             return results
 
     # Broad single-entry overrides (e.g. Philippines)
@@ -340,13 +356,17 @@ def _match_cell(value: str, threshold: int) -> tuple[str | None, str | None, flo
     Handle a single cell value, which may contain multiple locations separated by |.
     Returns (names_str, iris_str, avg_score) where names/iris are | joined.
     Unmatched tokens are skipped; returns (None, None, None) if nothing matched.
+
+    When exactly two distinct IRIs are matched, checks whether one is
+    :isPartOf the other via the loaded PSGC graph. If so, the parent is
+    dropped and only the more granular (child) location is kept.
     """
-    if not value or not isinstance(value, str):
+    if not value:
         return None, None, None
 
     tokens  = [t.strip() for t in value.split("|") if t.strip()]
 
-    matched: list = []
+    matched: list[LocationMatch] = []
     for t in tokens:
         # 1. Island group expansion — must be checked first and only fires on exact names
         expansions = _override_matches(t)
@@ -372,11 +392,24 @@ def _match_cell(value: str, threshold: int) -> tuple[str | None, str | None, flo
 
     # Deduplicate by IRI, preserving first-seen order
     seen_iris: set[str] = set()
-    unique: list = []
+    unique: list[LocationMatch] = []
     for m in matched:
         if m.iri not in seen_iris:
             seen_iris.add(m.iri)
             unique.append(m)
+
+    # isPartOf deduplication — only when exactly 2 distinct IRIs remain.
+    # If iri_a isPartOf iri_b (a is the child, b is the parent), drop b.
+    # If iri_b isPartOf iri_a (b is the child, a is the parent), drop a.
+    if len(unique) == 2 and _graph is not None:
+        a, b = unique[0], unique[1]
+        a_iri, b_iri = URIRef(a.iri), URIRef(b.iri)
+        if (a_iri, IS_PART_OF, b_iri) in _graph:
+            # a is a child of b → b is the parent, drop it
+            unique = [a]
+        elif (b_iri, IS_PART_OF, a_iri) in _graph:
+            # b is a child of a → a is the parent, drop it
+            unique = [b]
 
     names_str = "|".join(m.name  for m in unique)
     iris_str  = "|".join(m.iri   for m in unique)

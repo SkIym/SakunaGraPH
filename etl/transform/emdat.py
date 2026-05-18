@@ -155,7 +155,7 @@ def _event_id(disno: str) -> str:
     """Deterministic hex ID from DisNo."""
     return uuid.uuid5(EMDAT_EVENT_NS, disno).hex
 
-def clean_loc(df: DataFrame, col: str):
+def _clean_loc(df: DataFrame, col: str):
 
     df = df.with_columns(
         pl.col(col)
@@ -186,7 +186,7 @@ def clean_loc(df: DataFrame, col: str):
 
     return df
 
-def normalize_date(df: DataFrame, start_cols: list[str], end_cols: list[str]):
+def _normalize_date(df: DataFrame, start_cols: list[str], end_cols: list[str]):
     """
     If start and end day is empty, fall back to 01 - 31
     """
@@ -228,7 +228,7 @@ def normalize_date(df: DataFrame, start_cols: list[str], end_cols: list[str]):
 
     return df
 
-def clean_columns(df: DataFrame) -> DataFrame:
+def _clean_columns(df: DataFrame) -> DataFrame:
 
     # Strip leading/trailing whitespace from string columns
     df = df.with_columns(
@@ -264,7 +264,7 @@ def clean_columns(df: DataFrame) -> DataFrame:
     )
 
 
-    df = clean_loc(df, "hasLocation")
+    df = _clean_loc(df, "hasLocation")
 
     canon_loc_df = canonicalize_column(
         df=df.select("hasLocation"),
@@ -295,7 +295,7 @@ def clean_columns(df: DataFrame) -> DataFrame:
     )
 
     # normalize start and end dates
-    df = normalize_date(df, ["Start Year", "Start Month", "Start Day"], ["End Year", "End Month", "End Day"])
+    df = _normalize_date(df, ["Start Year", "Start Month", "Start Day"], ["End Year", "End Month", "End Day"])
     
     # normalize entry and last update dates
     df = df.with_columns(
@@ -311,6 +311,7 @@ def clean_columns(df: DataFrame) -> DataFrame:
 
     return df
 
+
 def transform_emdat(input_path: str) -> dict[type, list[Any]]:
     """
     Load the EM-DAT Data sheet with Polars.
@@ -325,7 +326,7 @@ def transform_emdat(input_path: str) -> dict[type, list[Any]]:
     )
 
     df = df.rename(mapping=COLUMN_MAPPINGS)
-    df = clean_columns(df)
+    df = _clean_columns(df)
     df = df.with_columns(
         pl.col("id").map_elements(_event_id)
     )
