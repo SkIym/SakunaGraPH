@@ -331,6 +331,8 @@ def transform_emdat(input_path: str) -> dict[type, list[Any]]:
         pl.col("id").map_elements(_event_id)
     )
 
+    df = df.with_row_index("rowNumber", 1)
+
     # events = df_to_entities(df, Event)
 
     clss: list[type] = [Event, Assistance, Recovery, DamageGeneral, Casualties, AffectedPopulation]
