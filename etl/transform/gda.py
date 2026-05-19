@@ -491,9 +491,15 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     raw_path = Path("../data/raw/static/geog-archive-cleaned.xlsx")
     out_dir = Path("../data/parsed/gda")
 
+    
     df = load_with_tiered_headers(raw_path)
+    df.reset_index(drop=True)          # just resets; index is already row number in pandas
+    
+
     df = df.rename(columns=COLUMN_MAPPING)
     df = df[list(COLUMN_MAPPING.values())]
+    HEADER_OFFSET = 8
+    df.insert(0, "rowNumber", range(HEADER_OFFSET, len(df) + HEADER_OFFSET))
 
     # Drop entirely empty rows/columns and rows missing key fields
     df = df.dropna(how="all")
