@@ -3,7 +3,8 @@
 
 	const links = [
 		{ href: '/', label: 'Home' },
-		{ href: '/map', label: 'Map' }
+		{ href: '/map', label: 'Map' },
+		{ href: '/ontology', label: 'Ontology' }
 	];
 </script>
 
