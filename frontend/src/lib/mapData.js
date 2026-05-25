@@ -103,7 +103,9 @@ PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
 export function buildRegionQuery(psgc, offset = 0, limit = 10, eventType = 'DisasterEvent') {
 	return (
 		P +
-		`SELECT DISTINCT ?event ?eventName ?disasterType ?startDate ?locLabel
+		`SELECT ?event ?disasterType ?startDate
+       (SAMPLE(?eventName) AS ?eventName)
+       (GROUP_CONCAT(DISTINCT ?locLabel; separator="|") AS ?locations)
 WHERE {
   ?event a :${eventType} ;
          :hasDisasterType ?disasterType ;
@@ -113,6 +115,7 @@ WHERE {
   OPTIONAL { ?event    :eventName  ?eventName }
   OPTIONAL { ?location rdfs:label  ?locLabel  }
 }
+GROUP BY ?event ?disasterType ?startDate
 ORDER BY DESC(?startDate)
 LIMIT ${limit}
 OFFSET ${offset}`
@@ -137,7 +140,9 @@ export function buildProvinceQuery(gadmName, offset = 0, limit = 10, eventType =
 	const normalized = gadmName.toLowerCase().replace(/[^a-z0-9]/g, '');
 	return (
 		P +
-		`SELECT DISTINCT ?event ?eventName ?disasterType ?startDate ?locLabel
+		`SELECT ?event ?disasterType ?startDate
+       (SAMPLE(?eventName) AS ?eventName)
+       (GROUP_CONCAT(DISTINCT ?locLabel; separator="|") AS ?locations)
 WHERE {
   ?event a :${eventType} ;
          :hasDisasterType ?disasterType ;
@@ -149,6 +154,7 @@ WHERE {
   OPTIONAL { ?event    :eventName  ?eventName }
   OPTIONAL { ?location rdfs:label  ?locLabel  }
 }
+GROUP BY ?event ?disasterType ?startDate
 ORDER BY DESC(?startDate)
 LIMIT ${limit}
 OFFSET ${offset}`
