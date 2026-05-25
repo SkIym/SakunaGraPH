@@ -5,14 +5,16 @@
 	 */
 
 	let {
-		pathData = [],      // [{d, gid, name, regionPsgc, feature}]
+		pathData = [],       // [{d, gid, name, regionPsgc, feature}]
 		viewBox = '0 0 700 800',
-		view = 'regions',   // 'regions' | 'provinces'
-		selected = null,    // {psgc?, id?, name}
+		view = 'regions',    // 'regions' | 'provinces'
+		selected = null,     // {psgc?, id?, name}
 		interactive = true,
 		strokeWidth = 0.7,
+		strokeColor = '#374151',
+		colorMap = {},       // groupKey → default fill color (for region pastels)
 		onselect = () => {},
-		onhover = () => {}  // onhover(item | null, clientX, clientY)
+		onhover = () => {}   // onhover(item | null, clientX, clientY)
 	} = $props();
 
 	let hoveredKey = $state(null);
@@ -29,9 +31,9 @@
 	function getFill(item) {
 		const gk = groupKey(item);
 		const sk = selectedKey();
-		if (sk && gk === sk) return '#93C5FD';
-		if (interactive && hoveredKey === gk) return '#DBEAFE';
-		return '#ffffff';
+		if (sk && gk === sk) return '#93C5FD';                         // selected — blue-300
+		if (interactive && hoveredKey === gk) return '#BFDBFE';        // hovered  — blue-200
+		return colorMap[gk] ?? '#ffffff';                              // default  — region color or white
 	}
 
 	function handleEnter(item, e) {
@@ -53,7 +55,7 @@
 
 <svg
 	{viewBox}
-	class="w-full h-full transition-[viewBox] duration-500"
+	class="w-full h-full"
 	preserveAspectRatio="xMidYMid meet"
 	style="overflow:visible;"
 >
@@ -62,7 +64,7 @@
 		<path
 			d={item.d}
 			fill={getFill(item)}
-			stroke="#374151"
+			stroke={strokeColor}
 			stroke-width={strokeWidth}
 			stroke-linejoin="round"
 			class={interactive ? 'cursor-pointer' : ''}

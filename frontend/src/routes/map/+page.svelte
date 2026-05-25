@@ -6,6 +6,7 @@
 		regionPsgcFromCC1,
 		formatProvName,
 		REGION_LABELS,
+		REGION_COLORS,
 		buildRegionQuery,
 		buildRegionCountQuery,
 		buildProvinceQuery,
@@ -20,6 +21,7 @@
 
 	let pathData = $state([]);
 	let fullViewBox = `0 0 ${SVG_W} ${SVG_H}`;
+	let tightViewBox = $state(`0 0 ${SVG_W} ${SVG_H}`); // snug around Philippines for thumbnail
 	let detailViewBox = $state(null);
 	let mapLoading = $state(true);
 	let mapError = $state('');
@@ -57,6 +59,18 @@
 				regionPsgc: regionPsgcFromCC1(f.properties.CC_1),
 				feature: f
 			}));
+
+			// Compute tight bounding box of all provinces for the mini thumbnail
+			let bx0 = Infinity, by0 = Infinity, bx1 = -Infinity, by1 = -Infinity;
+			for (const item of pathData) {
+				try {
+					const [[x0, y0], [x1, y1]] = pathGen.bounds(item.feature);
+					bx0 = Math.min(bx0, x0); by0 = Math.min(by0, y0);
+					bx1 = Math.max(bx1, x1); by1 = Math.max(by1, y1);
+				} catch {}
+			}
+			const tp = 8; // tight padding
+			tightViewBox = `${bx0 - tp} ${by0 - tp} ${bx1 - bx0 + tp * 2} ${by1 - by0 + tp * 2}`;
 
 			mapLoading = false;
 		} catch (e) {
@@ -148,6 +162,9 @@
 
 	// ── Map interaction handlers ─────────────────────────────────────────────
 	function handleMapSelect(item) {
+		// Clear hover tooltip immediately so it doesn't linger after click
+		tooltipItem = null;
+
 		if (view === 'regions') {
 			const psgc = item.regionPsgc;
 			const name = REGION_LABELS[psgc] ?? `Region ${psgc}`;
@@ -164,6 +181,15 @@
 		page = 1;
 		results = null;
 	}
+
+	// ── Per-view map rendering props ─────────────────────────────────────────
+	// Region view: pastel fills per region, near-invisible internal province borders
+	// Province view: all white, clearly drawn individual borders
+	const mapColorMap = $derived(view === 'regions' ? REGION_COLORS : {});
+	const mapStrokeColor = $derived(
+		view === 'regions' ? 'rgba(55,65,81,0.18)' : '#374151'
+	);
+	const mapStrokeWidth = $derived(view === 'regions' ? 0.4 : 0.65);
 
 	function deselect() {
 		selected = null;
@@ -304,15 +330,17 @@
 						</svg>
 						<span class="text-[9px] font-semibold uppercase tracking-wider text-slate-400">Back</span>
 					</div>
-					<div style="width:96px; height:72px; pointer-events:none;">
+					<div style="width:96px; height:84px; pointer-events:none;">
 						{#if pathData.length > 0}
 							<PhilMap
 								{pathData}
-								viewBox={fullViewBox}
+								viewBox={tightViewBox}
 								{view}
 								{selected}
+								colorMap={mapColorMap}
 								interactive={false}
-								strokeWidth={0.2}
+								strokeWidth={0.15}
+								strokeColor="rgba(55,65,81,0.35)"
 							/>
 						{/if}
 					</div>
@@ -333,7 +361,9 @@
 							{view}
 							selected={null}
 							interactive={true}
-							strokeWidth={0.55}
+							strokeWidth={mapStrokeWidth}
+							strokeColor={mapStrokeColor}
+							colorMap={mapColorMap}
 							onselect={handleMapSelect}
 							onhover={(item, x, y) => { tooltipItem = item; tooltipX = x; tooltipY = y; }}
 						/>
