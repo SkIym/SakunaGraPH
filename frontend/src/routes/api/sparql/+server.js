@@ -3,7 +3,7 @@ import { env } from '$env/dynamic/private';
 
 // Default points at a local GraphDB instance — override via GRAPHDB_ENDPOINT env var
 const GRAPHDB_ENDPOINT =
-	env.GRAPHDB_ENDPOINT ?? 'http://localhost:7200/repositories/sakuna';
+	env.GRAPHDB_ENDPOINT ?? 'http://localhost:7200/repositories/SakunaGraph';
 
 // Block all SPARQL Update operations — this endpoint is strictly read-only
 const WRITE_PATTERNS = [

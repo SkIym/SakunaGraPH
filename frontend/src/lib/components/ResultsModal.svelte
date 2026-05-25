@@ -9,7 +9,6 @@
 	const totalPages = $derived(Math.ceil(bindings.length / PAGE_SIZE) || 1);
 	const pageRows = $derived(bindings.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE));
 
-	// Smart pagination: first, last, window around current, with null = ellipsis
 	const paginationPages = $derived(() => {
 		if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i);
 		const visible = new Set([0, totalPages - 1, page]);
@@ -45,8 +44,8 @@
 <div
 	role="dialog"
 	aria-modal="true"
-	class="fixed inset-0 z-50 flex items-center justify-center p-4"
-	style="background:rgba(15,23,42,0.35);backdrop-filter:blur(4px);"
+	class="fixed inset-0 z-50 flex items-center justify-center p-6"
+	style="background:rgba(15,23,42,0.4); backdrop-filter:blur(4px);"
 	onclick={onBackdrop}
 	onkeydown={(e) => e.key === 'Escape' && onclose?.()}
 	tabindex="-1"
@@ -54,18 +53,19 @@
 	<!-- Modal panel -->
 	<div
 		role="document"
-		class="flex w-full max-w-5xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
-		style="max-height:88vh;"
+		class="flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
+		style="max-height:80vh;"
 		onclick={(e) => e.stopPropagation()}
 		onkeydown={(e) => e.stopPropagation()}
 	>
 		<!-- Header -->
-		<div class="flex shrink-0 items-center justify-between border-b border-slate-100 px-6 py-4">
+		<div class="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4">
 			<div>
-				<h2 class="text-base font-semibold text-slate-800">Query Results</h2>
+				<h2 class="text-sm font-semibold text-slate-800">Query Results</h2>
 				<p class="mt-0.5 text-xs text-slate-400">
 					{bindings.length}
-					{bindings.length === 1 ? 'result' : 'results'} · page {page + 1} of {totalPages}
+					{bindings.length === 1 ? 'result' : 'results'}
+					{#if totalPages > 1}· page {page + 1} of {totalPages}{/if}
 				</p>
 			</div>
 			<button
@@ -75,8 +75,8 @@
 			>
 				<svg
 					xmlns="http://www.w3.org/2000/svg"
-					width="18"
-					height="18"
+					width="16"
+					height="16"
 					viewBox="0 0 24 24"
 					fill="none"
 					stroke="currentColor"
@@ -92,11 +92,11 @@
 		<!-- Table -->
 		<div class="flex-1 overflow-auto">
 			{#if bindings.length === 0}
-				<div class="flex h-48 flex-col items-center justify-center gap-3 text-slate-400">
+				<div class="flex h-40 flex-col items-center justify-center gap-3 text-slate-400">
 					<svg
 						xmlns="http://www.w3.org/2000/svg"
-						width="36"
-						height="36"
+						width="32"
+						height="32"
 						viewBox="0 0 24 24"
 						fill="none"
 						stroke="currentColor"
@@ -114,12 +114,12 @@
 					<thead class="sticky top-0 z-10 border-b border-slate-200 bg-slate-50">
 						<tr>
 							<th
-								class="w-10 px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
+								class="w-9 px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-400"
 								>#</th
 							>
 							{#each vars as v}
 								<th
-									class="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+									class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
 									>?{v}</th
 								>
 							{/each}
@@ -127,20 +127,18 @@
 					</thead>
 					<tbody class="divide-y divide-slate-100">
 						{#each pageRows as row, i}
-							<tr class="transition-colors hover:bg-slate-50/70">
-								<td class="px-4 py-2.5 font-mono text-xs text-slate-300"
+							<tr class="transition-colors hover:bg-slate-50/80">
+								<td class="px-3 py-2 font-mono text-xs text-slate-300"
 									>{page * PAGE_SIZE + i + 1}</td
 								>
 								{#each vars as v}
 									{@const cell = cellDisplay(row, v)}
-									<td class="max-w-xs px-4 py-2.5">
+									<td class="max-w-[240px] px-3 py-2">
 										{#if cell.isUri}
 											<span
 												class="block truncate font-mono text-xs text-indigo-600"
-												title={cell.full}
+												title={cell.full}>{cell.text}</span
 											>
-												{cell.text}
-											</span>
 										{:else}
 											<span class="text-xs text-slate-700">{cell.text}</span>
 										{/if}
@@ -153,10 +151,10 @@
 			{/if}
 		</div>
 
-		<!-- Pagination footer -->
+		<!-- Pagination — centered -->
 		{#if totalPages > 1}
 			<div
-				class="flex shrink-0 items-center justify-between border-t border-slate-100 bg-slate-50 px-6 py-3"
+				class="flex shrink-0 flex-col items-center gap-2 border-t border-slate-100 bg-slate-50 px-5 py-3"
 			>
 				<p class="text-xs text-slate-400">
 					{page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, bindings.length)} of {bindings.length}
@@ -172,7 +170,9 @@
 
 					{#each paginationPages() as p}
 						{#if p === null}
-							<span class="flex h-7 w-5 items-center justify-center text-xs text-slate-400">…</span>
+							<span class="flex h-7 w-5 items-center justify-center text-xs text-slate-400"
+								>…</span
+							>
 						{:else}
 							<button
 								onclick={() => (page = p)}

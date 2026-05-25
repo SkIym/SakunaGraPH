@@ -28,29 +28,34 @@
 
 		// SPARQL-tuned syntax colours
 		const sparqlHighlight = HighlightStyle.define([
-			{ tag: t.keyword, color: '#6d28d9', fontWeight: '600' },
-			{ tag: t.variableName, color: '#0369a1' },
-			{ tag: t.string, color: '#15803d' },
-			{ tag: t.comment, color: '#94a3b8', fontStyle: 'italic' },
-			{ tag: t.number, color: '#b45309' },
-			{ tag: t.atom, color: '#0e7490' }, // IRIs <...>
-			{ tag: t.operator, color: '#6366f1' },
-			{ tag: t.punctuation, color: '#64748b' },
-			{ tag: t.name, color: '#0284c7' } // builtins like FILTER, REGEX
+			{ tag: t.keyword, color: '#E34DA0', fontWeight: '600' }, // SELECT, WHERE, PREFIX …
+			{ tag: t.variableName, color: '#6b7280' },               // ?event, ?type …
+			{ tag: t.atom, color: '#6b7280' },                       // :DisasterEvent, IRIs
+			{ tag: t.name, color: '#6b7280' },                       // FILTER, REGEX, builtins
+			{ tag: t.string, color: '#6b7280' },                     // "literals"
+			{ tag: t.number, color: '#6b7280' },
+			{ tag: t.operator, color: '#9ca3af' },
+			{ tag: t.punctuation, color: '#9ca3af' },                // ; . , { }
+			{ tag: t.comment, color: '#9ca3af', fontStyle: 'italic' }
 		]);
 
 		// Visual chrome theme (borders, padding, font)
 		const uiTheme = EditorView.theme({
 			'&': {
 				background: '#ffffff',
-				color: '#1e293b',
-				fontSize: '13.5px'
+				color: '#4b5563',
+				fontSize: '13.5px',
+				height: '260px'
+			},
+			'.cm-scroller': {
+				overflow: 'auto',
+				height: '260px'
 			},
 			'.cm-content': {
 				padding: '14px 16px',
-				minHeight: '200px',
+				minHeight: '260px',
 				fontFamily: '"JetBrains Mono","Fira Code","Courier New",monospace',
-				caretColor: '#6366f1',
+				caretColor: '#E34DA0',
 				lineHeight: '1.7'
 			},
 			'.cm-focused': { outline: 'none' },
@@ -64,12 +69,12 @@
 			},
 			'.cm-activeLineGutter': { background: '#f0f4ff' },
 			'.cm-activeLine': { background: '#f8f9ff' },
-			'.cm-selectionBackground, ::selection': { background: '#ddd6fe !important' },
-			'.cm-cursor': { borderLeftColor: '#6366f1' },
+			'.cm-selectionBackground, ::selection': { background: '#fce7f3 !important' },
+			'.cm-cursor': { borderLeftColor: '#E34DA0' },
 			'.cm-matchingBracket': {
-				background: '#e0e7ff',
+				background: '#fce7f3',
 				borderRadius: '2px',
-				outline: '1px solid #a5b4fc'
+				outline: '1px solid #fbcfe8'
 			},
 			'.cm-tooltip': {
 				border: '1px solid #e2e8f0',

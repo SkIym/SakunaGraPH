@@ -4,6 +4,7 @@ downloads
 typings
 helper.py
 etl/data/
+CLAUDE.md
 __pycache__/
 __pycache__
 data/*

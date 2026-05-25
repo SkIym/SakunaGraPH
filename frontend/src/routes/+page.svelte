@@ -2,63 +2,77 @@
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import SparqlEditor from '$lib/components/SparqlEditor.svelte';
 	import ResultsModal from '$lib/components/ResultsModal.svelte';
+	import { COMPETENCY_QUESTIONS } from '$lib/competency_queries.js';
 
-	// --- Preset example queries ---
+	// --- Default query shown on load ---
+	const DEFAULT_QUERY = `PREFIX :     <https://sakuna.ph/>
+
+SELECT DISTINCT ?event ?disasterType
+WHERE {
+  ?event a :DisasterEvent ;
+         :hasDisasterType ?disasterType .
+}
+LIMIT 10`;
+
+	// --- Quick-access presets shown as chips ---
 	const PRESETS = [
 		{
-			label: 'Sample triples',
-			query: `SELECT ?subject ?predicate ?object
-WHERE {
-  ?subject ?predicate ?object .
-}
-LIMIT 10`
-		},
-		{
-			label: 'Distinct classes',
-			query: `PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
-
-SELECT DISTINCT ?class
-WHERE {
-  ?instance a ?class .
-}
-ORDER BY ?class
-LIMIT 20`
-		},
-		{
 			label: 'Disaster events',
-			query: `PREFIX sakuna: <https://sakuna.ph/ontology#>
-PREFIX rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+			query: DEFAULT_QUERY
+		},
+		{
+			label: 'Events by type',
+			query: `PREFIX :     <https://sakuna.ph/>
 
-SELECT ?event ?type ?date
+SELECT ?disasterType (COUNT(DISTINCT ?event) AS ?count)
 WHERE {
-  ?event a sakuna:DisasterEvent ;
-         sakuna:hasDisasterType ?type ;
-         sakuna:startDate       ?date .
+  ?event a :DisasterEvent ;
+         :hasDisasterType ?disasterType .
 }
-ORDER BY DESC(?date)
+GROUP BY ?disasterType
+ORDER BY DESC(?count)
 LIMIT 10`
 		},
 		{
-			label: 'Named graphs',
-			query: `SELECT DISTINCT ?g
+			label: 'Named events',
+			query: `PREFIX :    <https://sakuna.ph/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+
+SELECT DISTINCT ?event ?name ?disasterType
 WHERE {
-  GRAPH ?g { ?s ?p ?o }
+  ?event a :DisasterEvent ;
+         :hasDisasterType ?disasterType ;
+         owl:topDataProperty ?name .
+  FILTER(datatype(?name) = xsd:string)
 }
-LIMIT 20`
+LIMIT 10`
+		},
+		{
+			label: 'Ontology classes',
+			query: `PREFIX : <https://sakuna.ph/>
+
+SELECT DISTINCT ?class (COUNT(?inst) AS ?count)
+WHERE {
+  ?inst a ?class .
+  FILTER(STRSTARTS(STR(?class), "https://sakuna.ph/"))
+}
+GROUP BY ?class
+ORDER BY DESC(?count)
+LIMIT 15`
 		}
 	];
 
-	const DEFAULT_QUERY = PRESETS[0].query;
-
 	// --- State ---
 	let query = $state(DEFAULT_QUERY);
-	let editorKey = $state(0); // increment to remount editor (reset)
+	let editorKey = $state(0);
+	let selectedCQ = $state('');
 	let results = $state(null);
 	let loading = $state(false);
 	let error = $state('');
 	let showModal = $state(false);
 
-	// --- Security: client-side guard (server repeats this check) ---
+	// --- Security: client-side write-op guard (server enforces this too) ---
 	const WRITE_PATTERNS = [
 		/\bINSERT\b/i,
 		/\bDELETE\b/i,
@@ -74,10 +88,25 @@ LIMIT 20`
 		return WRITE_PATTERNS.some((p) => p.test(q));
 	}
 
+	function loadQuery(q) {
+		query = q;
+		editorKey++;
+		error = '';
+	}
+
+	function onCQSelect() {
+		if (!selectedCQ) return;
+		loadQuery(COMPETENCY_QUESTIONS[parseInt(selectedCQ)].query);
+	}
+
+	function loadPreset(preset) {
+		selectedCQ = '';
+		loadQuery(preset.query);
+	}
+
 	async function runQuery() {
 		error = '';
 		const trimmed = query.trim();
-
 		if (!trimmed) {
 			error = 'Please enter a SPARQL query.';
 			return;
@@ -87,7 +116,6 @@ LIMIT 20`
 				'Write operations (INSERT, DELETE, CLEAR, DROP, etc.) are not permitted. This is a read-only interface.';
 			return;
 		}
-
 		loading = true;
 		try {
 			const res = await fetch('/api/sparql', {
@@ -109,12 +137,6 @@ LIMIT 20`
 		}
 	}
 
-	function loadPreset(preset) {
-		query = preset.query;
-		editorKey++;
-		error = '';
-	}
-
 	function handleKeyDown(e) {
 		if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
 			e.preventDefault();
@@ -127,50 +149,21 @@ LIMIT 20`
 	<title>SakunaGraPH</title>
 </svelte:head>
 
-<!-- Floating node animation (fixed background) -->
 <NodeCanvas />
 
-<!-- Main content -->
 <main
-	class="relative flex min-h-screen flex-col items-center justify-center px-4 py-16"
+	class="relative flex min-h-[calc(100vh-52px)] flex-col items-center justify-center px-4 py-12"
 	style="z-index:1;"
 >
 	<!-- ── Brand ── -->
-	<div class="mb-10 text-center">
-		<!-- Graph icon -->
-		<div class="mb-5 flex justify-center">
-			<div
-				class="flex h-14 w-14 items-center justify-center rounded-2xl bg-indigo-600 shadow-lg shadow-indigo-200"
-			>
-				<svg
-					xmlns="http://www.w3.org/2000/svg"
-					width="28"
-					height="28"
-					viewBox="0 0 24 24"
-					fill="none"
-					stroke="white"
-					stroke-width="1.8"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				>
-					<circle cx="18" cy="5" r="3" />
-					<circle cx="6" cy="12" r="3" />
-					<circle cx="18" cy="19" r="3" />
-					<line x1="8.59" y1="13.51" x2="15.42" y2="17.49" />
-					<line x1="15.41" y1="6.51" x2="8.59" y2="10.49" />
-				</svg>
-			</div>
-		</div>
-
+	<div class="mb-8 text-center">
 		<h1
-			class="text-5xl font-extrabold tracking-tight text-slate-900"
-			style="letter-spacing:-0.02em;"
+			style="font-family:'Playfair Display',Georgia,serif; font-weight:900; font-size:clamp(3.5rem,8vw,6.5rem); line-height:1.05; letter-spacing:-0.02em; color:#1e293b;"
 		>
-			Sakuna<span class="text-indigo-600">GraPH</span>
+			Sakuna<span style="color:#29769E;">GraPH</span>
 		</h1>
-
 		<p
-			class="mt-3 text-xs font-semibold uppercase tracking-widest text-slate-400"
+			class="mt-3 text-xs font-semibold uppercase text-slate-400"
 			style="letter-spacing:0.18em;"
 		>
 			An Ontology-Based Knowledge Graph for Disaster Data Integration
@@ -184,9 +177,7 @@ LIMIT 20`
 			style="backdrop-filter:blur(12px);"
 		>
 			<!-- macOS-style title bar -->
-			<div
-				class="flex items-center border-b border-slate-200/80 bg-slate-50/80 px-4 py-3"
-			>
+			<div class="flex items-center border-b border-slate-200/80 bg-slate-50/80 px-4 py-3">
 				<div class="flex items-center gap-1.5">
 					<div class="h-3 w-3 rounded-full bg-red-400"></div>
 					<div class="h-3 w-3 rounded-full bg-yellow-400"></div>
@@ -194,6 +185,39 @@ LIMIT 20`
 				</div>
 				<span class="ml-3 font-mono text-xs text-slate-400">SPARQL Query</span>
 				<span class="ml-auto font-mono text-xs text-slate-300">Ctrl+Enter to run</span>
+			</div>
+
+			<!-- Competency question dropdown -->
+			<div class="border-b border-slate-100 px-4 py-2.5">
+				<div class="relative">
+					<select
+						bind:value={selectedCQ}
+						onchange={onCQSelect}
+						class="w-full cursor-pointer appearance-none rounded-lg border border-slate-200 bg-white px-3 py-2 pr-8 text-xs text-slate-600 transition-all focus:border-indigo-300 focus:outline-none focus:ring-1 focus:ring-indigo-100"
+					>
+						<option value="">Custom Query</option>
+						{#each COMPETENCY_QUESTIONS as cq, i}
+							<option value={String(i)}>{cq.label}</option>
+						{/each}
+					</select>
+					<div
+						class="pointer-events-none absolute inset-y-0 right-2.5 flex items-center text-slate-400"
+					>
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							width="13"
+							height="13"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="m6 9 6 6 6-6" />
+						</svg>
+					</div>
+				</div>
 			</div>
 
 			<!-- CodeMirror editor -->
@@ -232,16 +256,19 @@ LIMIT 20`
 			<!-- Action bar -->
 			<div class="flex items-center justify-between px-4 pb-4">
 				<button
-					onclick={() => loadPreset(PRESETS[0])}
+					onclick={() => {
+						selectedCQ = '';
+						loadQuery(DEFAULT_QUERY);
+					}}
 					class="text-xs text-slate-400 transition-colors hover:text-slate-600"
 				>
-					Reset to default
+					Reset
 				</button>
 
 				<button
 					onclick={runQuery}
 					disabled={loading}
-					class="flex items-center gap-2 rounded-xl bg-indigo-600 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-indigo-300 transition-all duration-150 hover:bg-indigo-700 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
+					class="flex items-center gap-2 rounded-xl bg-red-700 px-5 py-2.5 text-sm font-semibold text-white shadow-sm shadow-red-200 transition-all duration-150 hover:bg-red-800 active:scale-95 disabled:cursor-not-allowed disabled:opacity-60"
 				>
 					{#if loading}
 						<svg
@@ -276,12 +303,12 @@ LIMIT 20`
 			</div>
 		</div>
 
-		<!-- ── Preset query chips ── -->
-		<div class="mt-5 flex flex-wrap justify-center gap-2">
+		<!-- Quick-access preset chips -->
+		<div class="mt-4 flex flex-wrap justify-center gap-2">
 			{#each PRESETS as preset}
 				<button
 					onclick={() => loadPreset(preset)}
-					class="rounded-full border border-slate-200 bg-white/70 px-3 py-1.5 font-mono text-xs text-slate-500 shadow-sm backdrop-blur-sm transition-all hover:border-indigo-300 hover:bg-white hover:text-indigo-600 hover:shadow-indigo-100"
+					class="rounded-full border border-slate-200 bg-white/70 px-3 py-1.5 font-mono text-xs text-slate-500 shadow-sm backdrop-blur-sm transition-all hover:border-indigo-300 hover:bg-white hover:text-indigo-600"
 				>
 					{preset.label}
 				</button>
@@ -289,8 +316,8 @@ LIMIT 20`
 		</div>
 	</div>
 
-	<!-- ── Footer ── -->
-	<footer class="mt-14 flex items-center gap-3 text-xs text-slate-300">
+	<!-- Footer -->
+	<footer class="mt-12 flex items-center gap-3 text-xs text-slate-300">
 		<span>Read-only access</span>
 		<span class="h-1 w-1 rounded-full bg-slate-300"></span>
 		<span>Powered by GraphDB</span>
@@ -299,7 +326,6 @@ LIMIT 20`
 	</footer>
 </main>
 
-<!-- Results modal -->
 {#if showModal && results}
 	<ResultsModal {results} onclose={() => (showModal = false)} />
 {/if}
