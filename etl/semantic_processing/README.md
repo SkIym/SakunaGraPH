@@ -93,10 +93,6 @@ Public surface used by `pipeline/build_alignment.py`:
 `score_all_pairs`, `write_alignments`, `build_clusters`, `save_registry`,
 `load_registry`, `get_known_pairs`.
 
-### `typhoon_names.json`
-Static lookup of PAGASA typhoon names. Used by `event_resolver` for
-proper-noun matching when labels mention named cyclones.
-
 ## Conventions
 
 - All matchers expose a module-level singleton (`LOCATION_MATCHER`,
