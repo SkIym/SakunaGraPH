@@ -54,9 +54,9 @@
 
 			pathData = geojson.features.map((f) => ({
 				d: pathGen(f),
-				gid: f.properties.GID_1,
-				name: f.properties.NAME_1,
-				regionPsgc: regionPsgcFromCC1(f.properties.CC_1),
+				gid: f.properties.adm2_psgc,
+				name: f.properties.adm2_en,
+				regionPsgc: f.properties.adm1_psgc,
 				feature: f
 			}));
 

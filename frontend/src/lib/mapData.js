@@ -15,31 +15,33 @@ export const REGION_LABELS = {
 	'1200000000': 'Region XII — SOCCSKSARGEN',
 	'1300000000': 'National Capital Region (NCR)',
 	'1400000000': 'Cordillera Administrative Region (CAR)',
-	'1500000000': 'Region XV — BARMM',
 	'1600000000': 'Region XIII — Caraga',
-	'1700000000': 'Region IV-B — MIMAROPA'
+	'1700000000': 'Region IV-B — MIMAROPA',
+	'1800000000': 'Region XVIII — Negros Island Region (NIR)',
+	'1900000000': 'Region XV — BARMM'
 };
 
 // Subtle pastel fill per region — used in "By Region" view so each region
 // reads as a solid block rather than 81 province-sized fragments.
 export const REGION_COLORS = {
-	'0100000000': '#FEF3C7', // Region I   — amber-100
-	'0200000000': '#D1FAE5', // Region II  — emerald-100
-	'0300000000': '#DBEAFE', // Region III — blue-100
-	'0400000000': '#EDE9FE', // Region IVA — violet-100
-	'0500000000': '#FCE7F3', // Region V   — pink-100
-	'0600000000': '#CFFAFE', // Region VI  — cyan-100
-	'0700000000': '#FEF9C3', // Region VII — yellow-100
-	'0800000000': '#FFE4E6', // Region VIII— rose-100
-	'0900000000': '#DCFCE7', // Region IX  — green-100
-	'1000000000': '#E0E7FF', // Region X   — indigo-100
-	'1100000000': '#FFEDD5', // Region XI  — orange-100
-	'1200000000': '#CCFBF1', // Region XII — teal-100
-	'1300000000': '#FFF1F2', // NCR        — rose-50
-	'1400000000': '#F3F4F6', // CAR        — gray-100
-	'1500000000': '#FDF4FF', // BARMM      — fuchsia-50
-	'1600000000': '#F0FDF4', // Caraga     — green-50
-	'1700000000': '#FFFBEB'  // MIMAROPA   — amber-50
+	'0100000000': '#FEF3C7', // Region I    — amber-100
+	'0200000000': '#D1FAE5', // Region II   — emerald-100
+	'0300000000': '#DBEAFE', // Region III  — blue-100
+	'0400000000': '#EDE9FE', // Region IVA  — violet-100
+	'0500000000': '#FCE7F3', // Region V    — pink-100
+	'0600000000': '#CFFAFE', // Region VI   — cyan-100
+	'0700000000': '#FEF9C3', // Region VII  — yellow-100
+	'0800000000': '#FFE4E6', // Region VIII — rose-100
+	'0900000000': '#DCFCE7', // Region IX   — green-100
+	'1000000000': '#E0E7FF', // Region X    — indigo-100
+	'1100000000': '#FFEDD5', // Region XI   — orange-100
+	'1200000000': '#CCFBF1', // Region XII  — teal-100
+	'1300000000': '#FFF1F2', // NCR         — rose-50
+	'1400000000': '#F3F4F6', // CAR         — gray-100
+	'1600000000': '#F0FDF4', // Caraga      — green-50
+	'1700000000': '#FFFBEB', // MIMAROPA    — amber-50
+	'1800000000': '#FDE68A', // NIR         — amber-200
+	'1900000000': '#FDF4FF'  // BARMM       — fuchsia-50
 };
 
 // GADM concatenates words; map known tricky cases to proper display names
