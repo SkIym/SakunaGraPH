@@ -1,5 +1,225 @@
 <script>
+	import { onMount } from 'svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
+	import PhilMap from '$lib/components/map/PhilMap.svelte';
+	import {
+		regionPsgcFromCC1,
+		formatProvName,
+		REGION_LABELS,
+		buildRegionQuery,
+		buildRegionCountQuery,
+		buildProvinceQuery,
+		buildProvinceCountQuery,
+		bindingDisplay,
+		formatDisasterType
+	} from '$lib/mapData.js';
+
+	// ── Map data (loaded once) ───────────────────────────────────────────────
+	const SVG_W = 700;
+	const SVG_H = 800;
+
+	let pathData = $state([]);
+	let fullViewBox = `0 0 ${SVG_W} ${SVG_H}`;
+	let detailViewBox = $state(null);
+	let mapLoading = $state(true);
+	let mapError = $state('');
+	let pathGen = null; // d3 geoPath, kept as plain variable
+
+	// ── UI state ─────────────────────────────────────────────────────────────
+	let view = $state('regions');  // 'regions' | 'provinces'
+	let selected = $state(null);   // {type, psgc, id, name, rawName?}
+
+	// ── Results state ────────────────────────────────────────────────────────
+	const PAGE_SIZE = 10;
+	let results = $state(null);
+	let totalCount = $state(0);
+	let page = $state(1);
+	let queryLoading = $state(false);
+	let queryError = $state('');
+
+	const totalPages = $derived(Math.max(1, Math.ceil(totalCount / PAGE_SIZE)));
+
+	// ── Load GeoJSON + build paths ───────────────────────────────────────────
+	onMount(async () => {
+		try {
+			const { geoMercator, geoPath } = await import('d3-geo');
+			const res = await fetch('/data/regions.geojson');
+			if (!res.ok) throw new Error(`HTTP ${res.status}`);
+			const geojson = await res.json();
+
+			const projection = geoMercator().fitSize([SVG_W, SVG_H], geojson);
+			pathGen = geoPath(projection);
+
+			pathData = geojson.features.map((f) => ({
+				d: pathGen(f),
+				gid: f.properties.GID_1,
+				name: f.properties.NAME_1,
+				regionPsgc: regionPsgcFromCC1(f.properties.CC_1),
+				feature: f
+			}));
+
+			mapLoading = false;
+		} catch (e) {
+			mapError = `Map failed to load: ${e.message}`;
+			mapLoading = false;
+		}
+	});
+
+	// ── Recompute detail viewBox whenever selection or view changes ──────────
+	$effect(() => {
+		if (!selected || !pathGen || pathData.length === 0) {
+			detailViewBox = null;
+			return;
+		}
+		const sk = view === 'regions' ? selected.psgc : selected.id;
+		const items = pathData.filter((p) =>
+			view === 'regions' ? p.regionPsgc === sk : p.gid === sk
+		);
+		if (items.length === 0) { detailViewBox = null; return; }
+
+		let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+		for (const item of items) {
+			try {
+				const [[fx0, fy0], [fx1, fy1]] = pathGen.bounds(item.feature);
+				x0 = Math.min(x0, fx0); y0 = Math.min(y0, fy0);
+				x1 = Math.max(x1, fx1); y1 = Math.max(y1, fy1);
+			} catch {}
+		}
+		const pad = 25;
+		detailViewBox = `${x0 - pad} ${y0 - pad} ${x1 - x0 + pad * 2} ${y1 - y0 + pad * 2}`;
+	});
+
+	// ── When selection or page changes, fetch SPARQL data ───────────────────
+	// Single effect tracks both `selected` and `page` to avoid double-fetching.
+	$effect(() => {
+		if (!selected) { results = null; totalCount = 0; return; }
+		const _p = page; // explicit read so effect re-runs on page change
+		if (_p < 1) return;
+		void fetchPage();
+	});
+
+	async function fetchPage() {
+		if (!selected) return;
+		queryLoading = true;
+		queryError = '';
+		const offset = (page - 1) * PAGE_SIZE;
+
+		const dataQuery =
+			selected.type === 'region'
+				? buildRegionQuery(selected.psgc, offset, PAGE_SIZE)
+				: buildProvinceQuery(selected.rawName, offset, PAGE_SIZE);
+
+		const countQuery =
+			selected.type === 'region'
+				? buildRegionCountQuery(selected.psgc)
+				: buildProvinceCountQuery(selected.rawName);
+
+		try {
+			// Run both queries in parallel
+			const [dataRes, countRes] = await Promise.all([
+				fetch('/api/sparql', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ query: dataQuery })
+				}),
+				fetch('/api/sparql', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ query: countQuery })
+				})
+			]);
+
+			const [dataJson, countJson] = await Promise.all([dataRes.json(), countRes.json()]);
+
+			if (!dataRes.ok) {
+				queryError = dataJson.error ?? 'Query failed.';
+				return;
+			}
+			results = dataJson;
+
+			const countBinding = countJson?.results?.bindings?.[0]?.count?.value;
+			totalCount = countBinding ? parseInt(countBinding, 10) : 0;
+		} catch {
+			queryError = 'Could not reach server.';
+		} finally {
+			queryLoading = false;
+		}
+	}
+
+	// ── Map interaction handlers ─────────────────────────────────────────────
+	function handleMapSelect(item) {
+		if (view === 'regions') {
+			const psgc = item.regionPsgc;
+			const name = REGION_LABELS[psgc] ?? `Region ${psgc}`;
+			selected = { type: 'region', psgc, name, id: psgc };
+		} else {
+			selected = {
+				type: 'province',
+				psgc: null,
+				id: item.gid,
+				name: formatProvName(item.name),
+				rawName: item.name
+			};
+		}
+		page = 1;
+		results = null;
+	}
+
+	function deselect() {
+		selected = null;
+		results = null;
+		queryError = '';
+	}
+
+	function switchView(v) {
+		if (view === v) return;
+		view = v;
+		deselect();
+	}
+
+	// ── Hover tooltip state ──────────────────────────────────────────────────
+	let tooltipItem = $state(null);
+	let tooltipX = $state(0);
+	let tooltipY = $state(0);
+
+	function getHoverLabel(item) {
+		if (!item) return '';
+		if (view === 'regions') return REGION_LABELS[item.regionPsgc] ?? formatProvName(item.name);
+		return formatProvName(item.name);
+	}
+
+	// ── Pagination helpers ───────────────────────────────────────────────────
+	const paginationPages = $derived.by(() => {
+		if (totalPages <= 7) return Array.from({ length: totalPages }, (_, i) => i + 1);
+		const pages = [];
+		if (page <= 4) {
+			for (let i = 1; i <= 5; i++) pages.push(i);
+			pages.push('…', totalPages);
+		} else if (page >= totalPages - 3) {
+			pages.push(1, '…');
+			for (let i = totalPages - 4; i <= totalPages; i++) pages.push(i);
+		} else {
+			pages.push(1, '…', page - 1, page, page + 1, '…', totalPages);
+		}
+		return pages;
+	});
+
+	// Result column display helpers
+	function colValue(row, col) {
+		const v = row[col];
+		if (!v) return '—';
+		if (col === 'disasterType') return formatDisasterType(bindingDisplay(v));
+		if (col === 'startDate') return v.value?.split('T')[0] ?? v.value ?? '—';
+		return bindingDisplay(v);
+	}
+
+	const DISPLAY_COLS = ['eventName', 'disasterType', 'startDate', 'locLabel'];
+	const COL_LABELS = {
+		eventName: 'Event',
+		disasterType: 'Type',
+		startDate: 'Date',
+		locLabel: 'Location'
+	};
 </script>
 
 <svelte:head>
@@ -8,54 +228,264 @@
 
 <NodeCanvas />
 
-<main
-	class="relative flex min-h-[calc(100vh-52px)] flex-col items-center justify-center px-4"
-	style="z-index:1;"
->
+<!-- ── Hover tooltip (fixed, follows cursor) ─────────────────────────────── -->
+{#if tooltipItem}
 	<div
-		class="flex flex-col items-center text-center"
+		class="fixed z-50 pointer-events-none rounded-lg bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-white shadow-lg"
+		style="left:{tooltipX + 16}px; top:{tooltipY}px; transform:translateY(-50%); backdrop-filter:blur(4px);"
 	>
-		<!-- Icon -->
+		{getHoverLabel(tooltipItem)}
+	</div>
+{/if}
+
+<!-- ── Full-screen layout container ─────────────────────────────────────── -->
+<div
+	class="relative"
+	style="height: calc(100vh - 52px); z-index: 1; overflow: hidden;"
+>
+	<!-- ── View toggle — hidden when a region/province is selected ──────────── -->
+	{#if !selected}
 		<div
-			class="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl border border-slate-200/80 bg-white/70 shadow-lg shadow-slate-200/60"
-			style="backdrop-filter:blur(12px);"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				width="30"
-				height="30"
-				viewBox="0 0 24 24"
-				fill="none"
-				stroke="#6366f1"
-				stroke-width="1.6"
-				stroke-linecap="round"
-				stroke-linejoin="round"
-			>
-				<polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21" />
-				<line x1="9" y1="3" x2="9" y2="18" />
-				<line x1="15" y1="6" x2="15" y2="21" />
-			</svg>
-		</div>
-
-		<h1
-			style="font-family:'Playfair Display',Georgia,serif; font-weight:900; font-size:clamp(2.5rem,6vw,4.5rem); line-height:1.05; letter-spacing:-0.02em; color:#1e293b;"
-		>
-			Map
-		</h1>
-
-		<p
-			class="mt-3 text-xs font-semibold uppercase text-slate-400"
-			style="letter-spacing:0.18em;"
-		>
-			Interactive Philippine Disaster Map
-		</p>
-
-		<div
-			class="mt-8 flex items-center gap-2 rounded-full border border-slate-200/80 bg-white/70 px-5 py-2.5 shadow-sm"
+			class="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-1 rounded-full border border-slate-200/80 bg-white/80 p-1 shadow-sm"
 			style="backdrop-filter:blur(10px);"
 		>
-			<span class="h-2 w-2 animate-pulse rounded-full bg-indigo-400"></span>
-			<span class="text-sm text-slate-500">Coming soon</span>
+			<button
+				onclick={() => switchView('regions')}
+				class="rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-150
+				{view === 'regions' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+			>
+				By Region
+			</button>
+			<button
+				onclick={() => switchView('provinces')}
+				class="rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-150
+				{view === 'provinces' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+			>
+				By Province
+			</button>
 		</div>
+	{/if}
+
+	<!-- ── Map panel (left side, shrinks on selection) ─────────────────────── -->
+	<div
+		class="absolute top-0 left-0 h-full transition-all duration-500 ease-out"
+		style="width: {selected ? '42%' : '100%'};"
+	>
+		{#if selected}
+			<!-- Zoomed detail map fills the whole panel -->
+			<div class="absolute inset-0 p-4">
+				{#if pathData.length > 0}
+					<PhilMap
+						{pathData}
+						viewBox={detailViewBox ?? fullViewBox}
+						{view}
+						{selected}
+						interactive={false}
+						strokeWidth={1.4}
+					/>
+				{/if}
+			</div>
+
+			<!-- Compact back button + mini thumbnail — upper-left corner -->
+			<div class="absolute top-3 left-3 z-10">
+				<!-- svelte-ignore a11y_no_static_element_interactions -->
+				<div
+					class="cursor-pointer rounded-xl border border-slate-200/80 bg-white/90 p-2 shadow-md hover:bg-slate-50 transition-colors"
+					style="backdrop-filter:blur(8px);"
+					role="button"
+					tabindex="0"
+					title="Back to full map"
+					onclick={deselect}
+					onkeydown={(e) => e.key === 'Enter' && deselect()}
+				>
+					<div class="flex items-center gap-1.5 mb-1.5">
+						<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-500">
+							<path d="M19 12H5"/><path d="m12 5-7 7 7 7"/>
+						</svg>
+						<span class="text-[9px] font-semibold uppercase tracking-wider text-slate-400">Back</span>
+					</div>
+					<div style="width:96px; height:72px; pointer-events:none;">
+						{#if pathData.length > 0}
+							<PhilMap
+								{pathData}
+								viewBox={fullViewBox}
+								{view}
+								{selected}
+								interactive={false}
+								strokeWidth={0.2}
+							/>
+						{/if}
+					</div>
+				</div>
+			</div>
+		{:else}
+			<!-- Full centered map (before selection) -->
+			<div class="flex flex-col items-center justify-center h-full px-6 pt-12">
+				{#if mapLoading}
+					<p class="text-slate-400 text-sm">Loading map…</p>
+				{:else if mapError}
+					<p class="text-red-500 text-sm text-center">{mapError}</p>
+				{:else}
+					<div class="w-full" style="max-height: calc(100vh - 120px); max-width: min(90vh * 0.875, 100%);">
+						<PhilMap
+							{pathData}
+							viewBox={fullViewBox}
+							{view}
+							selected={null}
+							interactive={true}
+							strokeWidth={0.55}
+							onselect={handleMapSelect}
+							onhover={(item, x, y) => { tooltipItem = item; tooltipX = x; tooltipY = y; }}
+						/>
+					</div>
+					<p class="mt-2 text-xs text-slate-400 font-medium">
+						Click a {view === 'regions' ? 'region' : 'province'} to explore disaster data
+					</p>
+				{/if}
+			</div>
+		{/if}
 	</div>
-</main>
+
+	<!-- ── Results panel (right side, appears on selection) ────────────────── -->
+	<div
+		class="absolute top-0 right-0 h-full border-l border-slate-200/60 bg-white/80 transition-all duration-500 ease-out overflow-hidden"
+		style="backdrop-filter:blur(12px); width: {selected ? '58%' : '0%'};"
+	>
+		{#if selected}
+			<!-- Outer flex: two spacers push content to vertical center -->
+			<div class="flex flex-col h-full">
+				<div class="flex-1 min-h-0"></div>
+
+				<!-- Content block — vertically centered, max 85% of panel height -->
+				<div
+					class="flex flex-col mx-6"
+					style="max-height: 85vh; overflow: hidden;"
+				>
+					<!-- Header -->
+					<div class="pb-4 flex-shrink-0">
+						<div class="flex items-start justify-between gap-3">
+							<div>
+								<p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">
+									{selected.type === 'region' ? 'Region' : 'Province'}
+								</p>
+								<h2
+									class="font-bold text-slate-800 leading-tight"
+									style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.2rem,2.8vw,1.8rem);"
+								>
+									{selected.name}
+								</h2>
+								{#if !queryLoading && totalCount > 0}
+									<p class="mt-2 font-bold leading-none" style="color:#dc2626; font-size:clamp(1.4rem,3vw,2rem);">
+										{totalCount.toLocaleString()}
+										<span class="text-base font-semibold" style="color:#dc2626;">
+											disaster event{totalCount === 1 ? '' : 's'}
+										</span>
+									</p>
+								{:else if queryLoading && !results}
+									<div class="mt-2 flex items-center gap-2 text-slate-400 text-sm">
+										<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+										</svg>
+										Querying…
+									</div>
+								{/if}
+							</div>
+							<button
+								onclick={deselect}
+								class="mt-1 flex-shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
+								title="Close"
+							>
+								<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+									<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+								</svg>
+							</button>
+						</div>
+					</div>
+
+					<!-- Divider -->
+					<div class="border-t border-slate-100 flex-shrink-0"></div>
+
+					<!-- Results body — scrollable -->
+					<div class="overflow-y-auto py-4 flex-1 min-h-0">
+						{#if queryError}
+							<div class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+								{queryError}
+							</div>
+
+						{:else if results}
+							{@const rows = results.results?.bindings ?? []}
+							{#if rows.length === 0}
+								<div class="py-10 text-center text-slate-400 text-sm">
+									No disaster events found for this area.
+								</div>
+							{:else}
+								<div class="overflow-x-auto rounded-xl border border-slate-200/80 shadow-sm">
+									<table class="w-full text-xs">
+										<thead>
+											<tr class="bg-slate-50 border-b border-slate-200">
+												{#each DISPLAY_COLS as col}
+													<th class="px-3 py-2.5 text-left font-semibold text-slate-500 uppercase tracking-wider whitespace-nowrap">
+														{COL_LABELS[col]}
+													</th>
+												{/each}
+											</tr>
+										</thead>
+										<tbody class="divide-y divide-slate-100">
+											{#each rows as row, i}
+												<tr class="hover:bg-blue-50/40 transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}">
+													{#each DISPLAY_COLS as col}
+														<td class="px-3 py-2 text-slate-600 max-w-[160px] truncate" title={row[col]?.value ?? ''}>
+															{colValue(row, col)}
+														</td>
+													{/each}
+												</tr>
+											{/each}
+										</tbody>
+									</table>
+								</div>
+								{#if queryLoading}
+									<div class="mt-3 text-center text-xs text-slate-400">Updating…</div>
+								{/if}
+							{/if}
+						{/if}
+					</div>
+
+					<!-- Pagination -->
+					{#if totalPages > 1}
+						<div class="flex-shrink-0 border-t border-slate-100 pt-3 pb-2 flex flex-col items-center gap-2">
+							<span class="text-xs text-slate-400">Page {page} of {totalPages}</span>
+							<div class="flex items-center gap-1">
+								<button
+									onclick={() => { page = Math.max(1, page - 1); }}
+									disabled={page === 1 || queryLoading}
+									class="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+								>← Prev</button>
+
+								{#each paginationPages as p}
+									{#if p === '…'}
+										<span class="px-1 text-slate-400 text-xs">…</span>
+									{:else}
+										<button
+											onclick={() => { page = p; }}
+											disabled={queryLoading}
+											class="rounded-lg w-7 h-7 text-xs font-medium border transition-colors
+											{page === p ? 'bg-slate-800 text-white border-slate-800' : 'border-slate-200 text-slate-600 hover:bg-slate-50'}"
+										>{p}</button>
+									{/if}
+								{/each}
+
+								<button
+									onclick={() => { page = Math.min(totalPages, page + 1); }}
+									disabled={page === totalPages || queryLoading}
+									class="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+								>Next →</button>
+							</div>
+						</div>
+					{/if}
+				</div>
+
+				<div class="flex-1 min-h-0"></div>
+			</div>
+		{/if}
+	</div>
+</div>

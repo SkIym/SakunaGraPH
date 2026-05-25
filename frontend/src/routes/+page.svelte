@@ -158,7 +158,7 @@ LIMIT 15`
 	<!-- ── Brand ── -->
 	<div class="mb-8 text-center">
 		<h1
-			style="font-family:'Playfair Display',Georgia,serif; font-weight:900; font-size:clamp(3.5rem,8vw,6.5rem); line-height:1.05; letter-spacing:-0.02em; color:#1e293b;"
+			style="font-family:'Playfair Display',Georgia,serif; font-weight:900; font-size:clamp(3.5rem,8vw,6.5rem); line-height:1.05; letter-spacing:0.060em; color:#1e293b;"
 		>
 			Sakuna<span style="color:#29769E;">GraPH</span>
 		</h1>
