@@ -5,7 +5,7 @@ These are the prefixes for the namespaces needed to run SPARQL queries against t
 
 ```
 PREFIX :     <https://sakuna.ph/>
-PREFIX org:     <https://sakuna.ph/org>
+PREFIX org:     <https://sakuna.ph/org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
