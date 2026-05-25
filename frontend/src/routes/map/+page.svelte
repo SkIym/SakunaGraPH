@@ -187,9 +187,9 @@
 	// Province view: all white, clearly drawn individual borders
 	const mapColorMap = $derived(view === 'regions' ? REGION_COLORS : {});
 	const mapStrokeColor = $derived(
-		view === 'regions' ? 'rgba(55,65,81,0.18)' : '#374151'
+		view === 'regions' ? 'rgba(55,65,81,0.42)' : '#374151'
 	);
-	const mapStrokeWidth = $derived(view === 'regions' ? 0.4 : 0.65);
+	const mapStrokeWidth = $derived(view === 'regions' ? 0.5 : 0.65);
 
 	function deselect() {
 		selected = null;
@@ -254,7 +254,7 @@
 
 <NodeCanvas />
 
-<!-- ── Hover tooltip (fixed, follows cursor) ─────────────────────────────── -->
+<!-- ── Cursor-following hover tooltip ────────────────────────────────────── -->
 {#if tooltipItem}
 	<div
 		class="fixed z-50 pointer-events-none rounded-lg bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-white shadow-lg"
@@ -347,14 +347,15 @@
 				</div>
 			</div>
 		{:else}
-			<!-- Full centered map (before selection) -->
-			<div class="flex flex-col items-center justify-center h-full px-6 pt-12">
+			<!-- Full map — row layout: map on left, label on right -->
+			<div class="flex items-center justify-center h-full gap-10 px-8 pt-12">
 				{#if mapLoading}
 					<p class="text-slate-400 text-sm">Loading map…</p>
 				{:else if mapError}
 					<p class="text-red-500 text-sm text-center">{mapError}</p>
 				{:else}
-					<div class="w-full" style="max-height: calc(100vh - 120px); max-width: min(90vh * 0.875, 100%);">
+					<!-- Map — flex-shrink:0 + fixed aspect-ratio keeps width stable on hover -->
+					<div style="height: calc(100vh - 120px); aspect-ratio: 7/8; flex-shrink: 0; flex-grow: 0; max-width: 58%;">
 						<PhilMap
 							{pathData}
 							viewBox={fullViewBox}
@@ -368,9 +369,38 @@
 							onhover={(item, x, y) => { tooltipItem = item; tooltipX = x; tooltipY = y; }}
 						/>
 					</div>
-					<p class="mt-2 text-xs text-slate-400 font-medium">
-						Click a {view === 'regions' ? 'region' : 'province'} to explore disaster data
-					</p>
+
+					<!-- Beside-map label — fixed width so layout never shifts on hover -->
+					<!-- <div class="pointer-events-none flex-shrink-0" style="width: 200px;">
+						<p
+							class="font-bold text-slate-700 leading-snug"
+							style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.2rem,2vw,1.8rem); overflow-wrap:break-word; word-break:break-word;"
+						>
+							{tooltipItem ? getHoverLabel(tooltipItem) : 'Philippines'}
+						</p>
+						<p class="text-[10px] font-medium uppercase tracking-widest text-slate-400 mt-1">
+							{tooltipItem ? (view === 'regions' ? 'Region' : 'Province') : 'Hover to explore'}
+						</p>
+						<p class="mt-3 text-[11px] text-slate-400 leading-relaxed">
+							Click a {view === 'regions' ? 'region' : 'province'} to explore disaster data.
+						</p>
+					</div> -->
+
+
+					<div class="pointer-events-none flex-shrink-0" style="width: 300px;">
+						<p
+							class="font-black text-slate-700 leading-snug"
+							style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.8rem, 3vw, 2.5rem); overflow-wrap:break-word; word-break:break-word;"
+						>
+							{tooltipItem ? getHoverLabel(tooltipItem) : 'Philippines'}
+						</p>
+						<p class="text-[10px] font-medium uppercase tracking-widest text-slate-400 mt-1">
+							{tooltipItem ? (view === 'regions' ? 'Region' : 'Province') : 'Hover to explore'}
+						</p>
+						<p class="mt-3 text-[14px] text-slate-400 leading-relaxed whitespace-nowrap">
+							Click a {view === 'regions' ? 'region' : 'province'} to explore disaster data.
+						</p>
+					</div>
 				{/if}
 			</div>
 		{/if}

@@ -4,6 +4,8 @@
 	import ResultsModal from '$lib/components/ResultsModal.svelte';
 	import { COMPETENCY_QUESTIONS } from '$lib/competency_queries.js';
 
+	const GraPH_color = '#305bb2' 
+
 	// --- Default query shown on load ---
 	const DEFAULT_QUERY = `PREFIX :     <https://sakuna.ph/>
 
@@ -158,9 +160,9 @@ LIMIT 15`
 	<!-- ── Brand ── -->
 	<div class="mb-8 text-center">
 		<h1
-			style="font-family:'Playfair Display',Georgia,serif; font-weight:900; font-size:clamp(3.5rem,8vw,6.5rem); line-height:1.05; letter-spacing:0.060em; color:#1e293b;"
+			style="font-family:'Playfair Display',Georgia,serif; font-weight:900; font-size:clamp(3.5rem,8vw,6.5rem); line-height:1.05; letter-spacing:0.055em; color:#1e293b;"
 		>
-			Sakuna<span style="color:#29769E;">GraPH</span>
+			Sakuna<span style="color:{GraPH_color};">GraPH</span>
 		</h1>
 		<p
 			class="mt-3 text-xs font-semibold uppercase text-slate-400"
