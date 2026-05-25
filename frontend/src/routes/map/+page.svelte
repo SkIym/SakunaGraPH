@@ -34,11 +34,14 @@
 	// ── Results state ────────────────────────────────────────────────────────
 	const PAGE_SIZE = 10;
 	let results = $state(null);
-	let totalCount = $state(0);
+	let majorCount = $state(0);
+	let incidentCount = $state(0);
+	let resultMode = $state('major');  // 'major' | 'incidents'
 	let page = $state(1);
 	let queryLoading = $state(false);
 	let queryError = $state('');
 
+	const totalCount = $derived(resultMode === 'major' ? majorCount : incidentCount);
 	const totalPages = $derived(Math.max(1, Math.ceil(totalCount / PAGE_SIZE)));
 
 	// ── Load GeoJSON + build paths ───────────────────────────────────────────
@@ -103,56 +106,58 @@
 		detailViewBox = `${x0 - pad} ${y0 - pad} ${x1 - x0 + pad * 2} ${y1 - y0 + pad * 2}`;
 	});
 
-	// ── When selection or page changes, fetch SPARQL data ───────────────────
-	// Single effect tracks both `selected` and `page` to avoid double-fetching.
+	// ── When selection, mode, or page changes, fetch SPARQL data ───────────
 	$effect(() => {
-		if (!selected) { results = null; totalCount = 0; return; }
-		const _p = page; // explicit read so effect re-runs on page change
+		if (!selected) { results = null; majorCount = 0; incidentCount = 0; return; }
+		const _p = page;
+		const _mode = resultMode;
 		if (_p < 1) return;
 		void fetchPage();
 	});
+
+	function sparql(query) {
+		return fetch('/api/sparql', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ query })
+		});
+	}
+
+	function countVal(json) {
+		const v = json?.results?.bindings?.[0]?.count?.value;
+		return v ? parseInt(v, 10) : 0;
+	}
 
 	async function fetchPage() {
 		if (!selected) return;
 		queryLoading = true;
 		queryError = '';
 		const offset = (page - 1) * PAGE_SIZE;
+		const activeType  = resultMode === 'major' ? 'MajorEvent' : 'DisasterEvent';
 
-		const dataQuery =
-			selected.type === 'region'
-				? buildRegionQuery(selected.psgc, offset, PAGE_SIZE)
-				: buildProvinceQuery(selected.rawName, offset, PAGE_SIZE);
-
-		const countQuery =
-			selected.type === 'region'
-				? buildRegionCountQuery(selected.psgc)
-				: buildProvinceCountQuery(selected.rawName);
+		const isRegion = selected.type === 'region';
+		const dataQ = isRegion
+			? buildRegionQuery(selected.psgc, offset, PAGE_SIZE, activeType)
+			: buildProvinceQuery(selected.rawName, offset, PAGE_SIZE, activeType);
+		const majorCountQ = isRegion
+			? buildRegionCountQuery(selected.psgc, 'MajorEvent')
+			: buildProvinceCountQuery(selected.rawName, 'MajorEvent');
+		const incidentCountQ = isRegion
+			? buildRegionCountQuery(selected.psgc, 'DisasterEvent')
+			: buildProvinceCountQuery(selected.rawName, 'DisasterEvent');
 
 		try {
-			// Run both queries in parallel
-			const [dataRes, countRes] = await Promise.all([
-				fetch('/api/sparql', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ query: dataQuery })
-				}),
-				fetch('/api/sparql', {
-					method: 'POST',
-					headers: { 'Content-Type': 'application/json' },
-					body: JSON.stringify({ query: countQuery })
-				})
+			const [dataRes, majorCountRes, incidentCountRes] = await Promise.all([
+				sparql(dataQ), sparql(majorCountQ), sparql(incidentCountQ)
+			]);
+			const [dataJson, majorCountJson, incidentCountJson] = await Promise.all([
+				dataRes.json(), majorCountRes.json(), incidentCountRes.json()
 			]);
 
-			const [dataJson, countJson] = await Promise.all([dataRes.json(), countRes.json()]);
-
-			if (!dataRes.ok) {
-				queryError = dataJson.error ?? 'Query failed.';
-				return;
-			}
+			if (!dataRes.ok) { queryError = dataJson.error ?? 'Query failed.'; return; }
 			results = dataJson;
-
-			const countBinding = countJson?.results?.bindings?.[0]?.count?.value;
-			totalCount = countBinding ? parseInt(countBinding, 10) : 0;
+			majorCount    = countVal(majorCountJson);
+			incidentCount = countVal(incidentCountJson);
 		} catch {
 			queryError = 'Could not reach server.';
 		} finally {
@@ -162,8 +167,10 @@
 
 	// ── Map interaction handlers ─────────────────────────────────────────────
 	function handleMapSelect(item) {
-		// Clear hover tooltip immediately so it doesn't linger after click
 		tooltipItem = null;
+		resultMode = 'major';
+		page = 1;
+		results = null;
 
 		if (view === 'regions') {
 			const psgc = item.regionPsgc;
@@ -178,8 +185,12 @@
 				rawName: item.name
 			};
 		}
+	}
+
+	function switchResultMode(mode) {
+		if (resultMode === mode) return;
+		resultMode = mode;
 		page = 1;
-		results = null;
 	}
 
 	// ── Per-view map rendering props ─────────────────────────────────────────
@@ -422,33 +433,57 @@
 					style="max-height: 85vh; overflow: hidden;"
 				>
 					<!-- Header -->
-					<div class="pb-4 flex-shrink-0">
+					<div class="pb-3 flex-shrink-0">
 						<div class="flex items-start justify-between gap-3">
-							<div>
+							<div class="min-w-0">
 								<p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">
 									{selected.type === 'region' ? 'Region' : 'Province'}
 								</p>
 								<h2
 									class="font-bold text-slate-800 leading-tight"
-									style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.2rem,2.8vw,1.8rem);"
+									style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.1rem,2.5vw,1.6rem);"
 								>
 									{selected.name}
 								</h2>
-								{#if !queryLoading && totalCount > 0}
-									<p class="mt-2 font-bold leading-none" style="color:#dc2626; font-size:clamp(1.4rem,3vw,2rem);">
-										{totalCount.toLocaleString()}
-										<span class="text-base font-semibold" style="color:#dc2626;">
-											disaster event{totalCount === 1 ? '' : 's'}
-										</span>
-									</p>
-								{:else if queryLoading && !results}
+
+								{#if queryLoading && !results}
 									<div class="mt-2 flex items-center gap-2 text-slate-400 text-sm">
 										<svg class="animate-spin" xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
 											<path d="M21 12a9 9 0 1 1-6.219-8.56"/>
 										</svg>
 										Querying…
 									</div>
+								{:else}
+									<!-- Primary count (active mode) -->
+									<p class="mt-2 font-bold leading-none" style="color:#dc2626; font-size:clamp(1.3rem,2.5vw,1.8rem);">
+										{totalCount.toLocaleString()}
+										<span class="font-semibold" style="color:#dc2626; font-size:clamp(0.8rem,1.4vw,1rem);">
+											{resultMode === 'major' ? 'major disaster event' : 'incident'}{totalCount === 1 ? '' : 's'}
+										</span>
+									</p>
+									<!-- Secondary count (inactive mode) -->
+									<p class="mt-0.5 text-xs text-slate-400">
+										{#if resultMode === 'major'}
+											{incidentCount.toLocaleString()} incident{incidentCount === 1 ? '' : 's'}
+										{:else}
+											{majorCount.toLocaleString()} major disaster event{majorCount === 1 ? '' : 's'}
+										{/if}
+									</p>
 								{/if}
+
+								<!-- Toggle -->
+								<div class="mt-2.5 flex gap-1 rounded-full border border-slate-200 bg-slate-50 p-0.5 w-fit">
+									<button
+										onclick={() => switchResultMode('major')}
+										class="rounded-full px-3 py-1 text-[11px] font-semibold transition-all duration-150
+										{resultMode === 'major' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+									>Major Events</button>
+									<button
+										onclick={() => switchResultMode('incidents')}
+										class="rounded-full px-3 py-1 text-[11px] font-semibold transition-all duration-150
+										{resultMode === 'incidents' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+									>Incidents</button>
+								</div>
 							</div>
 							<button
 								onclick={deselect}

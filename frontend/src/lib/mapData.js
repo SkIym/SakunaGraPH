@@ -100,12 +100,12 @@ PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
 `;
 
 /** Build paginated data query for a selected region (by PSGC code) */
-export function buildRegionQuery(psgc, offset = 0, limit = 10) {
+export function buildRegionQuery(psgc, offset = 0, limit = 10, eventType = 'DisasterEvent') {
 	return (
 		P +
 		`SELECT DISTINCT ?event ?eventName ?disasterType ?startDate ?locLabel
 WHERE {
-  ?event a :DisasterEvent ;
+  ?event a :${eventType} ;
          :hasDisasterType ?disasterType ;
          :startDate ?startDate ;
          :hasLocation ?location .
@@ -120,12 +120,12 @@ OFFSET ${offset}`
 }
 
 /** Build count query for a selected region */
-export function buildRegionCountQuery(psgc) {
+export function buildRegionCountQuery(psgc, eventType = 'DisasterEvent') {
 	return (
 		P +
 		`SELECT (COUNT(DISTINCT ?event) AS ?count)
 WHERE {
-  ?event a :DisasterEvent ;
+  ?event a :${eventType} ;
          :hasLocation ?location .
   ?location :isPartOf* :${psgc} .
 }`
@@ -133,13 +133,13 @@ WHERE {
 }
 
 /** Build paginated data query for a selected province (by name matching) */
-export function buildProvinceQuery(gadmName, offset = 0, limit = 10) {
+export function buildProvinceQuery(gadmName, offset = 0, limit = 10, eventType = 'DisasterEvent') {
 	const normalized = gadmName.toLowerCase().replace(/[^a-z0-9]/g, '');
 	return (
 		P +
 		`SELECT DISTINCT ?event ?eventName ?disasterType ?startDate ?locLabel
 WHERE {
-  ?event a :DisasterEvent ;
+  ?event a :${eventType} ;
          :hasDisasterType ?disasterType ;
          :startDate ?startDate ;
          :hasLocation ?location .
@@ -156,13 +156,13 @@ OFFSET ${offset}`
 }
 
 /** Build count query for a province */
-export function buildProvinceCountQuery(gadmName) {
+export function buildProvinceCountQuery(gadmName, eventType = 'DisasterEvent') {
 	const normalized = gadmName.toLowerCase().replace(/[^a-z0-9]/g, '');
 	return (
 		P +
 		`SELECT (COUNT(DISTINCT ?event) AS ?count)
 WHERE {
-  ?event a :DisasterEvent ;
+  ?event a :${eventType} ;
          :hasLocation ?location .
   ?location :isPartOf* ?prov .
   ?prov a :Province ; rdfs:label ?provLabel .
