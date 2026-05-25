@@ -1,7 +1,7 @@
 @prefix : <https://sakuna.ph/> .
 @prefix baw: <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#> .
 @prefix cur: <http://qudt.org/vocab/currency/> .
-@prefix geo: <http://www.opengis.net/ont/geosparql#a> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
 @prefix xml: <http://www.w3.org/XML/1998/namespace> .
@@ -576,7 +576,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:domain :FlightDisruption ;
              rdfs:range xsd:string ;
              rdfs:label "airport type"@en .
-
 
 
 ###  https://sakuna.ph/announcementsReleased
@@ -1384,7 +1383,7 @@ qudt:QuantityValue rdf:type owl:Class .
 
 
 ###  http://www.opengis.net/ont/geosparql#Feature
-<http://www.opengis.net/ont/geosparql#Feature> rdf:type owl:Class .
+geo:Feature rdf:type owl:Class .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact
@@ -1789,7 +1788,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/Location
 :Location rdf:type owl:Class ;
-          rdfs:subClassOf <http://www.opengis.net/ont/geosparql#Feature> ;
+          rdfs:subClassOf geo:Feature ;
           rdfs:label "Location"@en ;
           skos:definition "Represents tiered locations (administrative levels) in the Philippines." .
 
@@ -2550,9 +2549,9 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                   :DisasterType ;
          skos:broader :Climatological ;
          skos:inScheme :DisasterTypeScheme ;
+         skos:altLabel "Glacial Lake Outburst" ;
          skos:definition "A flood that occurs when water dammed by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake).  " ;
          skos:note "Glacial: Occurs when water held back by a glacier or moraine is suddenly released. Glacial lakes can be at the front of the glacier (marginal lake) or below the ice sheet (sub-glacial lake)." ;
-         skos:altLabel "Glacial Lake Outburst" ;
          skos:prefLabel "Glacial"@en .
 
 
@@ -2562,8 +2561,8 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                                  :DisasterType ;
                         skos:broader :Infestation ;
                         skos:inScheme :DisasterTypeScheme ;
-                        skos:note "Infestation of grasshoppers (insects)." ;
                         skos:definition "Infestation of grasshoppers (insects)." ;
+                        skos:note "Infestation of grasshoppers (insects)." ;
                         skos:prefLabel "Grasshopper Infestation"@en .
 
 
@@ -2649,8 +2648,8 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                                     :DisasterType ;
                            skos:broader :IndustrialAccident ;
                            skos:inScheme :DisasterTypeScheme ;
-                           skos:note "Industrial accident (general): Any form of general industrial accidents." ;
                            skos:definition "Disaster type term used in EM-DAT to describe technological accidents of an industrial nature/involving industrial buildings (e.g. factories)." ;
+                           skos:note "Industrial accident (general): Any form of general industrial accidents." ;
                            skos:prefLabel "Industrial Accident (General)"@en .
 
 
@@ -2751,8 +2750,8 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                             :DisasterType ;
                    skos:broader :Infestation ;
                    skos:inScheme :DisasterTypeScheme ;
-                   skos:note "Infestation of locusts (insects)." ;
                    skos:definition "Infestation of locusts (insects)." ;
+                   skos:note "Infestation of locusts (insects)." ;
                    skos:prefLabel "Locust Infestation"@en .
 
 
@@ -3010,7 +3009,7 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                  :DisasterType ;
         skos:broader :WaveAction ;
         skos:inScheme :DisasterTypeScheme ;
-        skos:definition "A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient. "; 
+        skos:definition "A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient. " ;
         skos:note "Seiche: A standing wave of water in a large semi- or fully-enclosed body of water (lakes or bays) created by strong winds and/or a large barometric pressure gradient." ;
         skos:prefLabel "Seiche"@en .
 
@@ -3076,8 +3075,8 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                      :Thunderstorms ,
                      :Tornado ,
                      :TropicalCyclone ;
-        skos:definition "Can be weather disturbances brought by monsoons (southwest or northeast monsoons), low pressure areas and shear lines that can bring effects like flooding, flashfloods, thunderstorms, and heavy rains." ;
-        skos:prefLabel "Storm"@en .
+       skos:definition "Can be weather disturbances brought by monsoons (southwest or northeast monsoons), low pressure areas and shear lines that can bring effects like flooding, flashfloods, thunderstorms, and heavy rains." ;
+       skos:prefLabel "Storm"@en .
 
 
 ###  https://sakuna.ph/StormGeneral
@@ -3309,8 +3308,8 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                            :DisasterType ;
                   skos:broader :Infestation ;
                   skos:inScheme :DisasterTypeScheme ;
-                  skos:note "Infestation of worms." ;
                   skos:definition "Infestation of worms." ;
+                  skos:note "Infestation of worms." ;
                   skos:prefLabel "Worms Infestation"@en .
 
 

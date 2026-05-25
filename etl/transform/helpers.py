@@ -30,7 +30,9 @@ def load_csv_df(
     match_location: bool = True,
     correct_qty_barangay: bool = True,
     schema_overrides: Mapping[str, pl.DataType] | None = None,
-    move_values: MoveArg | None = None
+    move_values: MoveArg | None = None,
+    region_switch: bool = False,
+    split_assistance: bool = False, 
 ) -> pl.DataFrame:
     
     df = pl.read_csv(
@@ -46,12 +48,11 @@ def load_csv_df(
         pl.col("municipality").str.replace("(capital)", "", literal=True)
     )
 
-    if "assistance" in path:
+    if split_assistance:
         df = split_merged_cost_columns(df)
         df = split_merged_cost_values(df)
 
     if correct_qty_barangay:
-
         df = correct_qty_barangay_column(df)
 
     if replace_ws:
@@ -68,7 +69,8 @@ def load_csv_df(
     else:
         df = move_col_values(df, MoveArg(source_col="summary_type", dest_col="municipality", remain=None))
 
-    df = move_invalid_region_values(df, "region", "municipality")
+    if region_switch:
+        df = move_invalid_region_values(df, "region", "municipality")
 
     if target_cols:
         df = df.with_columns(
@@ -77,7 +79,7 @@ def load_csv_df(
         df = forward_fill(df, target_cols)
 
     # filter out summary province-wide rwows
-    df = remove_rows_by_word(df, "municipality", ["province-wide"])
+    df = remove_rows_by_word(df, "municipality", ["province-wide", "plgu"])
 
     # filter out ncr value in province column
     df = remove_values_from_column(df, "province", ["ncr"])

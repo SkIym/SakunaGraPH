@@ -21,10 +21,8 @@ etl/
 ├── transform/              # Data cleaning and normalization to dataclasses
 ├── semantic_processing/    # NLP-based disaster classification and location matching
 ├── mappings/               # Dataclass-to-RDF triple mapping logic + IRI generation
-├── udfs/                   # User-defined functions for morph_kgc (GDA RML)
 ├── pipeline/               # Orchestration scripts that run the full ETL per source
-├── config.ini              # morph_kgc configuration (GDA RML pipeline)
-└── disaster_classes.json   # 74 disaster type definitions for semantic classification
+
 ```
 
 ## Pipeline Overview

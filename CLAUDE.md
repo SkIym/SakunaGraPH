@@ -61,7 +61,7 @@ Raw files (PDF/XLSX/Web)
 **`semantic_processing/`** — Three key singletons, each pre-loaded once and reused across the pipeline:
 - `LOCATION_MATCHER` (`location_matcher_v2.py`) — Resolves messy location strings to PSGC IRIs by loading `psgc.ttl` and doing multi-tier fuzzy matching (City → Province → Region).
 - `ORG_RESOLVER` (`org_resolver.py`) — Maps org names to canonical IRIs via fuzzy matching against `constants/org_registry.json`.
-- `DISASTER_CLASSIFIER` (`disaster_classifier.py`) — Classifies disaster types using sentence-transformers cosine similarity against ontology definitions in `disaster_classes.json`.
+- `DISASTER_CLASSIFIER` (`disaster_classifier.py`) — Classifies disaster types using sentence-transformers cosine similarity against ontology definitions
 
 **`mappings/`** — Each source has a mapping module with 10–20+ functions that accept dataclasses and emit rdflib triples. All IRIs are minted deterministically via UUID5 in `mappings/iris.py`. The IRI namespace is `https://sakuna.ph/{source}/{uuid}` for events; sub-resources extend as `{event_iri}/{segment}/{optional_id}`.
 

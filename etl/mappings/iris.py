@@ -1,9 +1,7 @@
-from rdflib import Namespace, URIRef
-# import hashlib
-
-SKG = Namespace("https://sakuna.ph/")
-
+from rdflib import  URIRef
 import uuid
+
+from .graph import SKG
 
 # ontology namespace seed
 SKG_EVENT_NS = uuid.UUID("f47ac10b-58cc-4372-a567-0e02b2c3d479")
@@ -32,7 +30,10 @@ def event_uri(source: str, source_record_id: str) -> URIRef:
     Re-running on the same CSV always produces the same IRI.
     """
     uid = uuid.uuid5(SKG_EVENT_NS, source_record_id)
-    return URIRef(f"https://sakuna.ph/{source}/{uid}")
+    return URIRef(SKG[f"{source}/{uid}"])
+
+def row_iri(source:str, num: int) -> URIRef:
+    return URIRef(SKG[f"{source}_row_{num}"])
 
 def prov_iri(report: str) -> URIRef:
     return URIRef(SKG[report
@@ -55,7 +56,7 @@ def sub_iri(event_id: URIRef, segment: str, r_id: str | None = None) -> URIRef:
     return URIRef(f"{base}/{r_id}" if r_id is not None else base)
 
 
-# Named aliases — same as before but delegate to sub_iri
+# Named aliases 
 def incident_iri    (e: URIRef, r: str | None = None): return sub_iri(e, "related_incident", r)
 def aff_pop_iri     (e: URIRef, r: str | None = None): return sub_iri(e, "affected_population", r)
 def casualties_iri  (e: URIRef, r: str | None = None): return sub_iri(e, "casualties", r)

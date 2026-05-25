@@ -105,6 +105,7 @@ def load_aff_pop(event_folder_path: str) -> list[AffectedPopulation] | None:
         target_cols=["region", "province", "municipality"],
         collapse_on="qty",
         collapse_key="affectedBarangays",
+        region_switch=True
     )
 
     df = to_int(df, [
@@ -127,6 +128,7 @@ def load_infra(event_folder_path: str) -> list[Infrastructure] | None:
         target_cols=["region", "province", "municipality"],
         collapse_on="qty",
         collapse_key="infraDamageType",
+        region_switch=True
     )
 
     df = to_int(df, ["numberInfraDamaged"])
@@ -154,8 +156,8 @@ def load_relief(event_folder_path: str) -> list[Assistance] | None:
             target_cols=["region", "province", "municipality"],
             collapse_on="qty",
             collapse_key="itemCost",
-            match_location=True,
-            schema_overrides={"QUANTITY": pl.Utf8()}
+            schema_overrides={"QUANTITY": pl.Utf8()},
+            region_switch=True
         )
 
         df = to_float(df, ["itemCost", "itemCostPerUnit", "itemQuantity"])
@@ -217,7 +219,7 @@ def load_casualties(event_folder_path: str) -> list[Casualties] | None:
         target_cols=["region", "province", "municipality", "summary_type"],
         collapse_on="qty",
         collapse_key="validated",
-        match_location=True,
+        region_switch=True,
         schema_overrides={"AGE": pl.Utf8()}
     )
 
@@ -253,7 +255,7 @@ def load_incidents(event_folder_path: str) -> List[Incident] | None:
         target_cols=["region", "province", "municipality"],
         collapse_on="qty",
         collapse_key="hasOrigType",
-        match_location=True,
+        region_switch=True,
         replace_ws=True
     )
 
@@ -325,6 +327,7 @@ def load_housing(event_folder_path: str) -> List[Housing] | None:
         src_path,
         mapping=HOUSES_MAPPING,
         match_location=False,  # location handled after housing-specific cleanup
+        region_switch=True
     )
 
     # custom fill
@@ -397,7 +400,7 @@ def load_agri(event_folder_path: str) -> List[Agriculture] | None:
         collapse_on="qty",
         collapse_key="agriDamageClassification",
         replace_ws=True,
-        match_location=True,
+        region_switch=True,
     )
 
     # --- Type normalization ---
@@ -452,7 +455,7 @@ def load_pevac(event_folder_path: str) -> List[PEvacuation] | None:
             collapse_on="qty",
             collapse_key="preemptPersons",
             replace_ws=True,
-            match_location=True,
+            region_switch=True,
         )
 
         evac_df = to_int(
@@ -550,7 +553,7 @@ def load_rnb(event_folder_path: str) -> List[RNB] | None:
         collapse_on="qty",
         collapse_key="roadBridgeType",
         replace_ws=True,
-        match_location=True,
+        region_switch=True,
     )
 
     # normalize passable datetime
@@ -594,7 +597,7 @@ def load_power(event_folder_path: str) -> List[Power] | None:
         collapse_on="qty",
         collapse_key="disruptionType",
         replace_ws=True,
-        match_location=True,
+        region_switch=True,
     )
 
     # normalize interruption datetime
@@ -638,7 +641,7 @@ def load_comms(event_folder_path: str) -> List[CommunicationLines] | None:
         collapse_on="qty",
         collapse_key="province",
         replace_ws=True,
-        match_location=True,
+        region_switch=True,
     )
 
     # normalize interruption datetime
@@ -681,7 +684,7 @@ def load_docalamity(event_folder_path: str) -> List[DOC] | None:
         target_cols=["region", "province", "municipality"],
         collapse_on="qty",
         collapse_key="resolutionNo",
-        match_location=True
+        region_switch=True,
     )
 
     df = normalize_datetime(
@@ -720,7 +723,7 @@ def load_class_suspension(event_folder_path: str) -> List[ClassDisruption] | Non
         collapse_on="qty",
         collapse_key="fromClassLevel",
         replace_ws=True,
-        match_location=True
+        region_switch=True,
     )
 
     df = normalize_datetime(
@@ -768,7 +771,7 @@ def load_work_suspension(event_folder_path: str) -> List[WorkDisruption] | None:
         collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
-        match_location=True
+        region_switch=True,
     )
 
     df = normalize_datetime(
@@ -815,7 +818,7 @@ def load_stranded_events(event_folder_path: str) -> List[Stranded] | None:
         collapse_on="qty",
         collapse_key="province",
         replace_ws=True,
-        match_location=True
+        region_switch=True,
     )
 
     df = to_int(df, ["strandedPassengers", 
@@ -850,7 +853,7 @@ def load_water(event_folder_path: str) -> List[WaterDisruption] | None:
         collapse_on="qty",
         collapse_key="interruptionDate",
         replace_ws=True,
-        match_location=True,
+        region_switch=True,
     )
 
     # normalize interruption datetime
@@ -895,7 +898,7 @@ def load_seaport(event_folder_path: str) -> List[Seaport] | None:
         collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
-        match_location=True
+        region_switch=True,
     )
 
     df = normalize_datetime(
@@ -943,7 +946,7 @@ def load_airport(event_folder_path: str) -> List[Airport] | None:
         collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
-        match_location=True
+        region_switch=True,
     )
 
     df = normalize_datetime(
@@ -991,7 +994,7 @@ def load_flight(event_folder_path: str) -> List[Flight] | None:
         collapse_on="qty",
         collapse_key="cancellationDate",
         replace_ws=True,
-        match_location=True
+        region_switch=True,
     )
 
     df = normalize_datetime(

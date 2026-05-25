@@ -12,3 +12,4 @@ logs/*
 ontology/catalog-v001.xml
 .DS_Store
 data/
+*.exe

@@ -7,7 +7,7 @@ from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import ORG, PROV, QUDT, SKG, add_monetary
 from .iris import (
     comms_iri, doc_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
-    damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, seaport_iri, sub_iri, water_iri
+    damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, row_iri, seaport_iri, sub_iri, water_iri
 )
 
 
@@ -25,6 +25,7 @@ class Event:
     hasLocation: URIRef 
     startDate: date 
     endDate: date 
+    rowNumber: int
     reference: str | None
     remarks: str | None
     otherDescription: str | None
@@ -193,7 +194,13 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef) -> None:
         else:
             g.add((uri, RDF.type, SKG.MajorEvent))
 
-        g.add((uri, PROV.wasDerivedFrom, src_uri))
+        row_uri = row_iri("gda", r.rowNumber)
+        g.add((row_uri, RDF.type, PROV.Entity))
+        g.add((row_uri, PROV.value, Literal(r.rowNumber)))
+        g.add((row_uri, PROV.wasDerivedFrom, src_uri)) # link source
+
+        g.add((uri, PROV.wasDerivedFrom, row_uri)) # link source row
+
 
         if r.eventName:
             g.add((uri, SKG.eventName, Literal(r.eventName)))

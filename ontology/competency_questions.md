@@ -5,7 +5,7 @@ These are the prefixes for the namespaces needed to run SPARQL queries against t
 
 ```
 PREFIX :     <https://sakuna.ph/>
-PREFIX org:     <https://sakuna.ph/org>
+PREFIX org:     <https://sakuna.ph/org/>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX prov: <http://www.w3.org/ns/prov#>
 PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
@@ -188,7 +188,7 @@ WHERE {
     ?event 	a	:DisasterEvent ;
     		:hasDisasterType ?dtype ;
     		:hasPreemptiveEvacuation ?pevac ;
-    		prov:wasDerivedFrom/prov:wasAttributedTo ?source .
+    		prov:wasDerivedFrom+/prov:wasAttributedTo ?source .
     
     ?dtype		skos:broader* :TropicalCyclone .
     ?location 	:isPartOf* 	:0400000000 .
@@ -367,7 +367,7 @@ SELECT ?event ?eventName ?src ?ic ?contribution ?type ?org
 WHERE {
     ?event  a                       :DisasterEvent ;
             :hasAssistance 			?ass ;
-    		prov:wasDerivedFrom/prov:wasAttributedTo ?src .
+    		prov:wasDerivedFrom+/prov:wasAttributedTo ?src .
 
     ?ass  		:hasLocation    ?location .
     ?location   :isPartOf*		:0203100000 .
@@ -462,7 +462,7 @@ WHERE {
     VALUES	?targetOrgs { org:DROMIC org:CRED }
     ?event  a	:DisasterEvent ;
 			:hasDisasterType ?targetTypes ;
-			prov:wasDerivedFrom/prov:wasAttributedTo ?targetOrgs .
+			prov:wasDerivedFrom+/prov:wasAttributedTo ?targetOrgs .
 }
 GROUP BY ?targetOrgs
 ```
@@ -477,8 +477,8 @@ WHERE {
   ?e2 a :DisasterEvent .
   ?e1 prov:alternateOf ?e2 .
   
-  ?e1 prov:wasDerivedFrom/prov:wasAttributedTo ?s1 .
-  ?e2 prov:wasDerivedFrom/prov:wasAttributedTo ?s2 . 
+  ?e1 prov:wasDerivedFrom+/prov:wasAttributedTo ?s1 .
+  ?e2 prov:wasDerivedFrom+/prov:wasAttributedTo ?s2 . 
     
   ?s1 a prov:Organization .
   ?s2 a prov:Organization .
