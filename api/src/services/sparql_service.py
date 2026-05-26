@@ -2,16 +2,16 @@ import asyncio
 import json
 import re
 from typing import Any
-
-import google as genai
+from google import genai
 import httpx
 
 from src.config import settings
 from src.services.ontology_context import load_ontology_context
 
-genai.configure(api_key=settings.gemini_api_key)
-_model = genai.GenerativeModel(settings.gemini_model)
-
+# genai.configure(api_key=settings.gemini_api_key)
+# _model = genai.GenerativeModel(settings.gemini_model)
+client = genai.Client(api_key=settings.gemini_api_key)
+_model = client.models
 
 def _extract_sparql(text: str) -> str:
     match = re.search(r"```(?:sparql)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)

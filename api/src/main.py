@@ -25,10 +25,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+app.mount("/data", StaticFiles(directory="data"), name="data")
 
 from src.routers import ask as ask_router
+from src.routers import ontology as ontology_router
 app.include_router(ask_router.router)
+app.include_router(ontology_router.router)
 
 
 @app.get("/health", tags=["meta"])

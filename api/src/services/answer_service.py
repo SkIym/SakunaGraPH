@@ -3,9 +3,10 @@ from typing import Any
 from google import genai
 from src.config import settings
 
-genai.configure(api_key=settings.gemini_api_key) # type: ignore
-_model = genai.GenerativeModel(settings.gemini_model) # type: ignore
-
+# genai.configure(api_key=settings.gemini_api_key) # type: ignore
+# _model = genai.GenerativeModel(settings.gemini_model) # type: ignore
+client = genai.Client(api_key=settings.gemini_api_key)
+_model = client.models
 
 def build_grounding_prompt(nl_query: str, sparql_results: dict[Any, Any]) -> str:
     bindings = sparql_results.get("results", {}).get("bindings", [])
@@ -32,5 +33,5 @@ def build_grounding_prompt(nl_query: str, sparql_results: dict[Any, Any]) -> str
 
 async def ground_answer(nl_query: str, sparql_results: dict[Any, Any]) -> str:
     prompt = build_grounding_prompt(nl_query, sparql_results)
-    response = await _model.generate_content_async(prompt)
+    response = await _model.generate_content(prompt)
     return response.text

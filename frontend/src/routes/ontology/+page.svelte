@@ -1,5 +1,6 @@
 <script>
 	import { onMount, tick } from 'svelte';
+	import { PUBLIC_API_URL } from '$env/static/public';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 
 	// ── Tab state ─────────────────────────────────────────────────────────────
@@ -60,7 +61,7 @@
 			import('d3-selection')
 		]);
 
-		const res = await fetch('/data/ontology-graph.json');
+		const res = await fetch(`${PUBLIC_API_URL}/ontology/graph`);
 		const graphData = await res.json();
 		const nodes = graphData.nodes.map(n => ({ ...n }));
 		const links = graphData.links.map(l => ({ ...l }));
@@ -371,7 +372,7 @@
 			document.head.appendChild(st);
 		}
 
-		const res = await fetch('/data/disaster-taxonomy.json');
+		const res = await fetch(`${PUBLIC_API_URL}/ontology/taxonomy`);
 		const treeData = await res.json();
 		taxLoading = false;
 
@@ -582,7 +583,7 @@
 			import('d3-selection')
 		]);
 
-		const res = await fetch('/data/psgc-nodes.json');
+		const res = await fetch(`${PUBLIC_API_URL}/ontology/psgc`);
 		const data = await res.json();
 		psgcLoading = false;
 
@@ -845,7 +846,7 @@
 		<!-- Info panel -->
 		{#if selectedNode}
 			<div
-				class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none"
+				class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl"
 				style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
 			>
 				<div class="px-8 py-7">
@@ -857,6 +858,19 @@
 					</h2>
 					<div class="mt-3 h-0.5 rounded-full" style="width:40px; background:{GROUP_COLOR[selectedNode.group]};"></div>
 					<p class="mt-4 text-[15px] text-slate-500 leading-relaxed">{selectedNode.definition}</p>
+					{#if selectedNode.dataProperties?.length}
+						<div class="mt-5 pt-4 border-t border-slate-100">
+							<p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Data Properties</p>
+							<div class="flex flex-col gap-1.5">
+								{#each selectedNode.dataProperties as prop}
+									<div class="flex items-center justify-between gap-3">
+										<span class="text-[13px] text-slate-600">{prop.label || prop.range}</span>
+										<span class="text-[11px] font-mono text-slate-400 bg-slate-50 rounded-md px-2 py-0.5 flex-shrink-0">{prop.range}</span>
+									</div>
+								{/each}
+							</div>
+						</div>
+					{/if}
 					<p class="mt-5 text-[12px] uppercase tracking-widest text-slate-300">Click node or background to deselect</p>
 				</div>
 			</div>
@@ -915,7 +929,7 @@
 			<!-- Taxonomy info panel — bottom-right, vertical card -->
 			{#if taxSelected}
 				<div
-					class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none"
+					class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl"
 					style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
 				>
 					<div class="px-8 py-7">
@@ -988,7 +1002,7 @@
 			<!-- PSGC info panel — bottom-right, vertical card -->
 			{#if psgcSelected}
 				<div
-					class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none"
+					class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl"
 					style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
 				>
 					<div class="px-8 py-7 flex flex-col gap-3">
