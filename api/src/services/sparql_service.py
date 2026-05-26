@@ -11,7 +11,6 @@ from src.services.ontology_context import load_ontology_context
 # genai.configure(api_key=settings.gemini_api_key)
 # _model = genai.GenerativeModel(settings.gemini_model)
 client = genai.Client(api_key=settings.gemini_api_key)
-_model = client.models
 
 def _extract_sparql(text: str) -> str:
     match = re.search(r"```(?:sparql)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)
@@ -28,7 +27,9 @@ def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
         "Return ONLY the SPARQL query inside a ```sparql code block, no explanation.\n\n"
         f"Question: {nl_query}"
     )
-    response = _model.generate_content(prompt)
+    response = client.models.generate_content(
+        model=settings.gemini_model,
+        contents=prompt)
     return _extract_sparql(response.text)
 
 
@@ -72,7 +73,9 @@ async def sparql_with_correction(
                 f"Error:\n{result}\n\n"
                 "Fix the query and return ONLY the corrected SPARQL inside a ```sparql code block."
             )
-            response = _model.generate_content(correction_prompt)
+            response = client.models.generate_content(
+                model=settings.gemini_model,
+                contents=correction_prompt)
             sparql = _extract_sparql(response.text)
 
     return sparql, {}
