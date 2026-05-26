@@ -22,6 +22,13 @@
 		"@codemirror/language": "^6.0.0",
 		"@codemirror/legacy-modes": "^6.0.0",
 		"codemirror": "^6.0.0",
-		"d3-geo": "^3.1.1"
+		"d3-color": "^3.1.0",
+		"d3-drag": "^3.0.0",
+		"d3-force": "^3.0.0",
+		"d3-geo": "^3.1.1",
+		"d3-hierarchy": "^3.1.2",
+		"d3-scale": "^4.0.2",
+		"d3-selection": "^3.0.0",
+		"d3-zoom": "^3.0.0"
 	}
 }

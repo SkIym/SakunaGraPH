@@ -1,6 +1,8 @@
 <script>
 	import { onMount } from 'svelte';
 
+	let { interactive = true } = $props();
+
 	let canvas;
 	let animFrame;
 
@@ -46,8 +48,10 @@
 
 		resize();
 		window.addEventListener('resize', resize);
-		window.addEventListener('mousemove', onMouseMove);
-		document.addEventListener('mouseleave', onMouseLeave);
+		if (interactive) {
+			window.addEventListener('mousemove', onMouseMove);
+			document.addEventListener('mouseleave', onMouseLeave);
+		}
 
 		function loop(ts) {
 			const w = canvas.width;
@@ -136,8 +140,10 @@
 
 		return () => {
 			window.removeEventListener('resize', resize);
-			window.removeEventListener('mousemove', onMouseMove);
-			document.removeEventListener('mouseleave', onMouseLeave);
+			if (interactive) {
+				window.removeEventListener('mousemove', onMouseMove);
+				document.removeEventListener('mouseleave', onMouseLeave);
+			}
 			cancelAnimationFrame(animFrame);
 		};
 	});
