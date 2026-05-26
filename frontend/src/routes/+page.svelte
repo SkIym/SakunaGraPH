@@ -153,10 +153,11 @@ LIMIT 15`
 
 <NodeCanvas />
 
-<main
-	class="relative flex min-h-[calc(100vh-52px)] flex-col items-center justify-center px-4 py-12"
-	style="z-index:1;"
->
+<main class="relative" style="z-index:1;">
+
+<!-- ── Hero section: full viewport ── -->
+<section class="relative flex min-h-[calc(100vh-52px)] flex-col items-center justify-center px-4 py-12">
+
 	<!-- ── Brand ── -->
 	<div class="mb-8 text-center">
 		<h1
@@ -318,14 +319,80 @@ LIMIT 15`
 		</div>
 	</div>
 
+	<!-- Scroll hint -->
+	<div class="absolute bottom-6 flex flex-col items-center gap-1 animate-bounce opacity-40">
+		<span class="text-[10px] uppercase tracking-widest text-slate-400">scroll</span>
+		<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400">
+			<path d="m6 9 6 6 6-6"/>
+		</svg>
+	</div>
+
+</section>
+
+<!-- ── Team section ── -->
+<section class="flex min-h-[calc(100vh-52px)] flex-col items-center justify-center px-4 py-20">
+
+	<p class="text-[10px] font-bold uppercase tracking-widest text-slate-300">Built by</p>
+	<div class="mt-8 flex items-start gap-16">
+		<div class="flex flex-col items-center gap-4">
+			<img
+				src="/Elle.jpg"
+				alt="Judelle Clareese E. Gaza"
+				class="h-52 w-52 rounded-full object-cover ring-2 ring-slate-200 shadow-lg"
+			/>
+			<div class="text-center">
+				<p class="text-base font-semibold text-slate-700">Judelle Clareese E. Gaza</p>
+				<p class="mt-0.5 text-xs text-slate-400">UPD BS Computer Science</p>
+				<p class="text-xs text-slate-400">Web Science Laboratory</p>
+				<div class="mt-3 flex items-center justify-center gap-3">
+					<a href="https://www.instagram.com/gaza_judelle/" target="_blank" rel="noopener noreferrer" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-pink-100 hover:text-pink-600 hover:scale-110">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+					</a>
+					<a href="https://github.com/ElleDiablo" target="_blank" rel="noopener noreferrer" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-slate-800 hover:text-white hover:scale-110">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+					</a>
+					<a href="https://www.linkedin.com/in/judelle-gaza/" target="_blank" rel="noopener noreferrer" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-blue-600 hover:text-white hover:scale-110">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+					</a>
+				</div>
+			</div>
+		</div>
+		<div class="flex flex-col items-center gap-4">
+			<img
+				src="/Abram.jpg"
+				alt="Abram Josh C. Marcelo"
+				class="h-52 w-52 rounded-full object-cover ring-2 ring-slate-200 shadow-lg"
+			/>
+			<div class="text-center">
+				<p class="text-base font-semibold text-slate-700">Abram Josh C. Marcelo</p>
+				<p class="mt-0.5 text-xs text-slate-400">UPD BS Computer Science</p>
+				<p class="text-xs text-slate-400">Web Science Laboratory</p>
+				<div class="mt-3 flex items-center justify-center gap-3">
+					<a href="https://www.instagram.com/abrammsq/?hl=en" target="_blank" rel="noopener noreferrer" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-pink-100 hover:text-pink-600 hover:scale-110">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"/></svg>
+					</a>
+					<a href="https://github.com/SkIym" target="_blank" rel="noopener noreferrer" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-slate-800 hover:text-white hover:scale-110">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.2c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.4 5.4 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4"/><path d="M9 18c-4.51 2-5-2-7-2"/></svg>
+					</a>
+					<a href="https://www.linkedin.com/in/ajcmarcelo/" target="_blank" rel="noopener noreferrer" class="flex h-9 w-9 items-center justify-center rounded-full bg-slate-100 text-slate-500 transition-all hover:bg-blue-600 hover:text-white hover:scale-110">
+						<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 8a6 6 0 0 1 6 6v7h-4v-7a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7h-4v-7a6 6 0 0 1 6-6z"/><rect width="4" height="12" x="2" y="9"/><circle cx="4" cy="4" r="2"/></svg>
+					</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
 	<!-- Footer -->
-	<footer class="mt-12 flex items-center gap-3 text-xs text-slate-300">
+	<footer class="mt-20 flex items-center gap-3 text-xs text-slate-300">
 		<span>Read-only access</span>
 		<span class="h-1 w-1 rounded-full bg-slate-300"></span>
 		<span>Powered by GraphDB</span>
 		<span class="h-1 w-1 rounded-full bg-slate-300"></span>
 		<span>SPARQL 1.1</span>
 	</footer>
+
+</section>
+
 </main>
 
 {#if showModal && results}
