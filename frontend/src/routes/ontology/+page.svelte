@@ -427,8 +427,9 @@
 			.attr('stroke',       d => taxColor(d))
 			.attr('stroke-width', d => d.depth <= 1 ? 2.5 : 1.8);
 
-		// Labels for branch nodes — centered below circle, category color throughout
-		nodeSel.filter(d => !!d.children)
+		// Labels for branch nodes and shallow leaves (depth ≤ 2) — centered below circle
+		// Armed Conflict is a leaf at depth 2, so it uses horizontal labels like its siblings
+		nodeSel.filter(d => !!d.children || d.depth <= 2)
 			.append('text')
 			.attr('text-anchor', 'middle')
 			.attr('dy', d => rScale(d) + 12)
@@ -438,8 +439,8 @@
 			.attr('pointer-events', 'none')
 			.text(d => d.data.label);
 
-		// Labels for leaf nodes — diagonal to avoid horizontal crowding
-		nodeSel.filter(d => !d.children)
+		// Diagonal labels only for leaf nodes deeper than depth 2
+		nodeSel.filter(d => !d.children && d.depth > 2)
 			.append('text')
 			.attr('text-anchor', 'end')
 			.attr('x', 0)
@@ -529,7 +530,7 @@
 		await tick();
 		try {
 			const bounds = g.node().getBBox();
-			const padX = 60, padTop = 60, padBottom = 120;
+			const padX = 60, padTop = 160, padBottom = 60;
 			const scale = Math.min(
 				W  / (bounds.width  + padX * 2),
 				H  / (bounds.height + padTop + padBottom),
@@ -781,7 +782,7 @@
 		class="absolute top-4 left-1/2 -translate-x-1/2 z-30 flex items-center gap-1 rounded-full border border-slate-200/70 bg-white/88 px-2 py-1.5 shadow-md"
 		style="backdrop-filter:blur(12px);"
 	>
-		<span class="pl-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-400 border-r border-slate-200">SakunaGraPH</span>
+		<span class="pl-2 pr-3 text-[10px] font-bold uppercase tracking-widest text-slate-600 border-r border-slate-200">SakunaGraPH</span>
 		{#each TABS as tab}
 			<button
 				onclick={() => activeTab = tab.id}
@@ -816,7 +817,7 @@
 
 		<!-- Legend -->
 		<div
-			class="absolute bottom-6 left-6 rounded-2xl border border-slate-200/70 bg-white/85 px-5 py-4 shadow-lg"
+			class="absolute bottom-6 left-6 rounded-2xl bg-white/85 px-5 py-4 shadow-2xl"
 			style="backdrop-filter:blur(12px);"
 		>
 			<p class="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Legend</p>
@@ -844,18 +845,20 @@
 		<!-- Info panel -->
 		{#if selectedNode}
 			<div
-				class="absolute top-1/2 right-40 -translate-y-1/2 rounded-2xl border border-slate-200/60 bg-white/88 px-7 py-6 shadow-xl pointer-events-none"
-				style="backdrop-filter:blur(16px); width:300px; max-height:80vh; overflow:hidden;"
+				class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none"
+				style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
 			>
-				<p class="text-[10px] font-bold uppercase tracking-widest mb-2" style="color:{GROUP_COLOR[selectedNode.group]};">
-					{GROUP_LABEL[selectedNode.group]}
-				</p>
-				<h2 class="font-black text-slate-800 leading-tight" style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.6rem,2.5vw,2.2rem); overflow-wrap:break-word;">
-					{selectedNode.label}
-				</h2>
-				<div class="mt-3 h-0.5 w-10 rounded-full" style="background:{GROUP_COLOR[selectedNode.group]};"></div>
-				<p class="mt-3 text-[13px] text-slate-500 leading-relaxed">{selectedNode.definition}</p>
-				<p class="mt-5 text-[10px] uppercase tracking-widest text-slate-300">Click node or background to deselect</p>
+				<div class="px-8 py-7">
+					<p class="text-[13px] font-bold uppercase tracking-widest mb-2" style="color:{GROUP_COLOR[selectedNode.group]};">
+						{GROUP_LABEL[selectedNode.group]}
+					</p>
+					<h2 class="font-black text-slate-800 leading-tight" style="font-family:'Playfair Display', Georgia,serif; font-weight:900; font-size:1.8rem;">
+						{selectedNode.label}
+					</h2>
+					<div class="mt-3 h-0.5 rounded-full" style="width:40px; background:{GROUP_COLOR[selectedNode.group]};"></div>
+					<p class="mt-4 text-[15px] text-slate-500 leading-relaxed">{selectedNode.definition}</p>
+					<p class="mt-5 text-[12px] uppercase tracking-widest text-slate-300">Click node or background to deselect</p>
+				</div>
 			</div>
 		{/if}
 	</div>
@@ -882,7 +885,7 @@
 
 			<!-- Taxonomy legend -->
 			<div
-				class="absolute bottom-6 left-6 rounded-2xl border border-slate-200/70 bg-white/85 px-4 py-4 shadow-lg"
+				class="absolute bottom-6 left-6 rounded-2xl bg-white/85 px-4 py-4 shadow-2xl"
 				style="backdrop-filter:blur(12px); max-width:300px; min-width: 200px;"
 			>
 				<p class="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Category</p>
@@ -909,26 +912,22 @@
 				</div>
 			</div>
 
-			<!-- Taxonomy info panel — bottom-center, wide two-column card -->
+			<!-- Taxonomy info panel — bottom-right, vertical card -->
 			{#if taxSelected}
 				<div
-					class="absolute bottom-25 left-1/2 -translate-x-1/2 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none flex gap-0"
-					style="backdrop-filter:blur(18px); width:min(920px, 94vw);"
+					class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none"
+					style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
 				>
-					<!-- Left: category + name -->
-					<div class="px-8 py-6 flex-shrink-0" style="width:280px; border-right:1px solid #e2e8f0;">
-						<p class="text-[12px] font-bold uppercase tracking-widest mb-2" style="color:{TAX_COLOR[taxSelected.group]};">
+					<div class="px-8 py-7">
+						<p class="text-[13px] font-bold uppercase tracking-widest mb-2" style="color:{TAX_COLOR[taxSelected.group]};">
 							{taxSelected.group}
 						</p>
-						<h2 class="font-black text-slate-800 leading-tight" style="font-size:1.4rem;">
+						<h2 class="font-black text-slate-800 leading-tight" style="font-family:'Playfair Display', Georgia,serif; font-weight:900; font-size:1.8rem;">
 							{taxSelected.label}
 						</h2>
-						<div class="mt-3 h-0.5 rounded-full" style="width:36px; background:{TAX_COLOR[taxSelected.group]};"></div>
-					</div>
-					<!-- Right: definition -->
-					<div class="flex-1 px-8 py-6">
-						<p class="text-[14px] text-slate-500 leading-relaxed">{taxSelected.definition}</p>
-						<p class="mt-4 text-[11px] uppercase tracking-widest text-slate-300">Click node or canvas to deselect</p>
+						<div class="mt-3 h-0.5 rounded-full" style="width:40px; background:{TAX_COLOR[taxSelected.group]};"></div>
+						<p class="mt-4 text-[15px] text-slate-500 leading-relaxed">{taxSelected.definition}</p>
+						<p class="mt-5 text-[12px] uppercase tracking-widest text-slate-300">Click node or canvas to deselect</p>
 					</div>
 				</div>
 			{/if}
@@ -957,7 +956,7 @@
 
 			<!-- Island legend -->
 			<div
-				class="absolute bottom-6 left-6 rounded-2xl border border-slate-200/70 bg-white/85 px-5 py-4 shadow-lg"
+				class="absolute bottom-6 left-6 rounded-2xl  bg-white/85 px-5 py-4 shadow-2xl"
 				style="backdrop-filter:blur(12px);"
 			>
 				<p class="mb-3 text-[10px] font-bold uppercase tracking-widest text-slate-400">Island Group</p>
@@ -986,54 +985,56 @@
 				<p class="mt-3 text-[10px] text-slate-300">HUCs link directly to region</p>
 			</div>
 
-			<!-- PSGC info panel -->
+			<!-- PSGC info panel — bottom-right, vertical card -->
 			{#if psgcSelected}
 				<div
-					class="absolute top-1/2 right-8 -translate-y-1/2 rounded-2xl border border-slate-200/60 bg-white/90 px-6 py-5 shadow-xl pointer-events-none"
-					style="backdrop-filter:blur(16px); width:280px;"
+					class="absolute bottom-6 right-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl pointer-events-none"
+					style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
 				>
-					<p class="text-[10px] font-bold uppercase tracking-widest mb-1.5" style="color:{ISLAND_COLOR[psgcSelected.island]};">
-						{psgcSelected.cityType ?? psgcSelected.level} · {psgcSelected.regionLabel ?? psgcSelected.island}
-					</p>
-					<h2 class="font-black text-slate-800 leading-tight text-xl">
-						{psgcSelected.fullName ?? psgcSelected.label}
-					</h2>
-					<div class="mt-2 h-0.5 w-8 rounded-full" style="background:{ISLAND_COLOR[psgcSelected.island]};"></div>
-					<div class="mt-3 flex flex-col gap-2">
-						<div>
-							<p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">PSGC Code</p>
-							<p class="text-[13px] text-slate-600 font-mono">{psgcSelected.psgcCode}</p>
-						</div>
-						<div>
-							<p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Geographic Level</p>
-							<p class="text-[13px] text-slate-600">{psgcSelected.level}</p>
-						</div>
-						{#if psgcSelected.cityType}
+					<div class="px-8 py-7 flex flex-col gap-3">
+						<p class="text-[13px] font-bold uppercase tracking-widest" style="color:{ISLAND_COLOR[psgcSelected.island]};">
+							{psgcSelected.cityType ?? psgcSelected.level} · {psgcSelected.regionLabel ?? psgcSelected.island}
+						</p>
+						<h2 class="font-black text-slate-800 leading-tight" style="font-family:'Playfair Display', Georgia,serif; font-weight:900; font-size:1.8rem;">
+							{psgcSelected.fullName ?? psgcSelected.label}
+						</h2>
+						<div class="h-0.5 rounded-full" style="width:40px; background:{ISLAND_COLOR[psgcSelected.island]};"></div>
+						<div class="flex flex-col gap-3 mt-1">
 							<div>
-								<p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">City Classification</p>
-								<p class="text-[13px] text-slate-600">
-									{psgcSelected.cityType === 'HUC' ? 'Highly Urbanized City' : psgcSelected.cityType === 'ICC' ? 'Independent Component City' : psgcSelected.cityType}
-								</p>
+								<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">PSGC Code</p>
+								<p class="text-[14px] text-slate-600 font-mono">{psgcSelected.psgcCode}</p>
 							</div>
-						{/if}
-						{#if psgcSelected.incomeClass}
 							<div>
-								<p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Income Classification</p>
-								<p class="text-[13px] text-slate-600">{psgcSelected.incomeClass} class</p>
+								<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Geographic Level</p>
+								<p class="text-[14px] text-slate-600">{psgcSelected.level}</p>
 							</div>
-						{/if}
-						<div>
-							<p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Population (2020)</p>
-							<p class="text-[13px] text-slate-600">{psgcSelected.population.toLocaleString()}</p>
+							{#if psgcSelected.cityType}
+								<div>
+									<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">City Classification</p>
+									<p class="text-[14px] text-slate-600">
+										{psgcSelected.cityType === 'HUC' ? 'Highly Urbanized City' : psgcSelected.cityType === 'ICC' ? 'Independent Component City' : psgcSelected.cityType}
+									</p>
+								</div>
+							{/if}
+							{#if psgcSelected.incomeClass}
+								<div>
+									<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Income Classification</p>
+									<p class="text-[14px] text-slate-600">{psgcSelected.incomeClass} class</p>
+								</div>
+							{/if}
+							<div>
+								<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold">Population (2020)</p>
+								<p class="text-[14px] text-slate-600">{psgcSelected.population.toLocaleString()}</p>
+							</div>
 						</div>
 						{#if psgcSelected.note}
-							<div class="pt-1 border-t border-slate-100">
-								<p class="text-[9px] uppercase tracking-wider text-slate-400 font-bold">Note</p>
-								<p class="text-[12px] text-slate-500 italic leading-snug">{psgcSelected.note}</p>
+							<div class="pt-2 border-t border-slate-100">
+								<p class="text-[10px] uppercase tracking-wider text-slate-400 font-bold mb-0.5">Note</p>
+								<p class="text-[14px] text-slate-500 italic leading-snug">{psgcSelected.note}</p>
 							</div>
 						{/if}
+						<p class="mt-1 text-[12px] uppercase tracking-widest text-slate-300">Click node or canvas to deselect</p>
 					</div>
-					<p class="mt-4 text-[10px] uppercase tracking-widest text-slate-300">Click node or canvas to deselect</p>
 				</div>
 			{/if}
 		</div>

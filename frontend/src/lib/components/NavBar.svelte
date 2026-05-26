@@ -9,14 +9,14 @@
 </script>
 
 <nav
-	class="fixed left-0 right-0 top-0 z-20 flex items-center justify-center gap-1 px-6"
-	style="height:52px; background:rgba(255,255,255,0.75); backdrop-filter:blur(12px); border-bottom:1px solid rgba(226,232,240,0.7);"
+	class="fixed left-0 right-0 top-0 z-20 flex items-center justify-center gap-1 px-6 bg-transparent"
+    style="height:52px;"
 >
 	{#each links as link}
 		{@const active = $page.url.pathname === link.href}
 		<a
 			href={link.href}
-			class="relative px-4 pt-1.5 pb-0 text-sm font-medium transition-colors duration-150 rounded-lg
+			class="relative px-4 pb-0 text-sm  transition-colors duration-150 rounded-lg
 			{active
 				? 'text-slate-800'
 				: 'text-slate-400 hover:text-slate-600 hover:bg-slate-100/70'}"
