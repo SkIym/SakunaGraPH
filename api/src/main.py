@@ -29,8 +29,10 @@ app.mount("/data", StaticFiles(directory="data"), name="data")
 
 from src.routers import ask as ask_router
 from src.routers import ontology as ontology_router
+from src.routers import map as map_router
 app.include_router(ask_router.router)
 app.include_router(ontology_router.router)
+app.include_router(map_router.router)
 
 
 @app.get("/health", tags=["meta"])

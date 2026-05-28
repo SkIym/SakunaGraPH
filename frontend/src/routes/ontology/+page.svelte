@@ -61,7 +61,7 @@
 			import('d3-selection')
 		]);
 
-		const res = await fetch(`${PUBLIC_API_URL}/ontology/graph`);
+		const res = await fetch(`api/ontology/graph`);
 		const graphData = await res.json();
 		const nodes = graphData.nodes.map(n => ({ ...n }));
 		const links = graphData.links.map(l => ({ ...l }));
@@ -372,7 +372,7 @@
 			document.head.appendChild(st);
 		}
 
-		const res = await fetch(`${PUBLIC_API_URL}/ontology/taxonomy`);
+		const res = await fetch(`api/ontology/taxonomy`);
 		const treeData = await res.json();
 		taxLoading = false;
 
@@ -583,7 +583,7 @@
 			import('d3-selection')
 		]);
 
-		const res = await fetch(`${PUBLIC_API_URL}/ontology/psgc`);
+		const res = await fetch(`api/ontology/psgc`);
 		const data = await res.json();
 		psgcLoading = false;
 
