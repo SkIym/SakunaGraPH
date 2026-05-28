@@ -7,10 +7,6 @@
 		formatProvName,
 		REGION_LABELS,
 		REGION_COLORS,
-		buildRegionQuery,
-		buildRegionCountQuery,
-		buildProvinceQuery,
-		buildProvinceCountQuery,
 		bindingDisplay,
 		formatDisasterType
 	} from '$lib/mapData.js';
@@ -106,7 +102,7 @@
 		detailViewBox = `${x0 - pad} ${y0 - pad} ${x1 - x0 + pad * 2} ${y1 - y0 + pad * 2}`;
 	});
 
-	// ── When selection, mode, or page changes, fetch SPARQL data ───────────
+	// ── When selection, mode, or page changes, fetch data ───────────────────
 	$effect(() => {
 		if (!selected) { results = null; majorCount = 0; incidentCount = 0; return; }
 		const _p = page;
@@ -115,50 +111,27 @@
 		void fetchPage();
 	});
 
-	function sparql(query) {
-		return fetch('/api/sparql', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ query })
-		});
-	}
-
-	function countVal(json) {
-		const v = json?.results?.bindings?.[0]?.count?.value;
-		return v ? parseInt(v, 10) : 0;
-	}
-
 	async function fetchPage() {
 		if (!selected) return;
 		queryLoading = true;
 		queryError = '';
 		expandedRows = new Set();
-		const offset = (page - 1) * PAGE_SIZE;
-		const activeType  = resultMode === 'major' ? 'MajorEvent' : 'DisasterEvent';
 
-		const isRegion = selected.type === 'region';
-		const dataQ = isRegion
-			? buildRegionQuery(selected.psgc, offset, PAGE_SIZE, activeType)
-			: buildProvinceQuery(selected.rawName, offset, PAGE_SIZE, activeType);
-		const majorCountQ = isRegion
-			? buildRegionCountQuery(selected.psgc, 'MajorEvent')
-			: buildProvinceCountQuery(selected.rawName, 'MajorEvent');
-		const incidentCountQ = isRegion
-			? buildRegionCountQuery(selected.psgc, 'DisasterEvent')
-			: buildProvinceCountQuery(selected.rawName, 'DisasterEvent');
+		const scope = selected.type === 'region' ? 'region' : 'province';
+		const id    = selected.type === 'region' ? selected.psgc : selected.rawName;
+		const params = new URLSearchParams({ scope, id, mode: resultMode, page: String(page) });
 
 		try {
-			const [dataRes, majorCountRes, incidentCountRes] = await Promise.all([
-				sparql(dataQ), sparql(majorCountQ), sparql(incidentCountQ)
-			]);
-			const [dataJson, majorCountJson, incidentCountJson] = await Promise.all([
-				dataRes.json(), majorCountRes.json(), incidentCountRes.json()
-			]);
+			const res = await fetch(`/api/map/events?${params}`);
+			const data = await res.json();
 
-			if (!dataRes.ok) { queryError = dataJson.error ?? 'Query failed.'; return; }
-			results = dataJson;
-			majorCount    = countVal(majorCountJson);
-			incidentCount = countVal(incidentCountJson);
+			if (!res.ok) { queryError = data.message ?? 'Query failed.'; return; }
+
+			// Wrap bindings back into the shape the template already expects:
+			// results.results.bindings — avoids touching any template code
+			results       = { results: { bindings: data.events } };
+			majorCount    = data.majorCount;
+			incidentCount = data.incidentCount;
 		} catch {
 			queryError = 'Could not reach server.';
 		} finally {
