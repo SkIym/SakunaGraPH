@@ -502,56 +502,64 @@
 											</tr>
 										</thead>
 										<tbody class="divide-y divide-slate-100">
-											{#each rows as row, i}
-												{@const rowKey = row.event?.value ?? String(i)}
-												{@const locs = (row.locations?.value ?? '').split('|').filter(Boolean)}
-												{@const expanded = expandedRows.has(rowKey)}
-												{@const expandable = locs.length > 1}
-												<!-- svelte-ignore a11y_click_events_have_key_events -->
-												<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-												<tr
-													class="transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}
-													{expandable ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-blue-50/40'}"
-													onclick={() => {
-														if (!expandable) return;
-														if (expanded) expandedRows = new Set([...expandedRows].filter(k => k !== rowKey));
-														else expandedRows = new Set([...expandedRows, rowKey]);
-													}}
-												>
-													{#each DISPLAY_COLS as col}
-														{#if col === 'locations'}
-															<td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
-																{#if locs.length === 0}
-																	<span class="text-slate-300">—</span>
-																{:else if expanded}
-																	<div class="flex flex-col gap-0.5 text-xs leading-snug">
-																		{#each locs as loc}
-																			<span>{loc}</span>
-																		{/each}
-																	</div>
-																{:else}
-																	<div class="text-xs leading-snug">
-																		<span>{locs[0]}</span>
-																		{#if expandable}
-																			<span class="ml-1 text-blue-400 text-[10px] font-medium whitespace-nowrap">+{locs.length - 1} more</span>
-																		{/if}
-																	</div>
-																{/if}
-															</td>
-														{:else}
-															<td class="px-3 py-2 text-slate-600 max-w-[160px] truncate" title={row[col]?.value ?? ''}>
-																{colValue(row, col)}
-															</td>
-														{/if}
-													{/each}
-												</tr>
-											{/each}
+											{#if queryLoading}
+												{#each Array(PAGE_SIZE) as _, i}
+													<tr class="{i % 2 === 0 ? '' : 'bg-slate-50/40'}">
+														<td class="px-3 py-2"><div class="h-3 w-32 rounded-full bg-slate-200 animate-pulse"></div></td>
+														<td class="px-3 py-2"><div class="h-3 w-20 rounded-full bg-slate-200 animate-pulse"></div></td>
+														<td class="px-3 py-2"><div class="h-3 w-16 rounded-full bg-slate-200 animate-pulse"></div></td>
+														<td class="px-3 py-2"><div class="h-3 w-24 rounded-full bg-slate-200 animate-pulse"></div></td>
+													</tr>
+												{/each}
+											{:else}
+												{#each rows as row, i}
+													{@const rowKey = row.event?.value ?? String(i)}
+													{@const locs = (row.locations?.value ?? '').split('|').filter(Boolean)}
+													{@const expanded = expandedRows.has(rowKey)}
+													{@const expandable = locs.length > 1}
+													<!-- svelte-ignore a11y_click_events_have_key_events -->
+													<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+													<tr
+														class="transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}
+														{expandable ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-blue-50/40'}"
+														onclick={() => {
+															if (!expandable) return;
+															if (expanded) expandedRows = new Set([...expandedRows].filter(k => k !== rowKey));
+															else expandedRows = new Set([...expandedRows, rowKey]);
+														}}
+													>
+														{#each DISPLAY_COLS as col}
+															{#if col === 'locations'}
+																<td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
+																	{#if locs.length === 0}
+																		<span class="text-slate-300">—</span>
+																	{:else if expanded}
+																		<div class="flex flex-col gap-0.5 text-xs leading-snug">
+																			{#each locs as loc}
+																				<span>{loc}</span>
+																			{/each}
+																		</div>
+																	{:else}
+																		<div class="text-xs leading-snug">
+																			<span>{locs[0]}</span>
+																			{#if expandable}
+																				<span class="ml-1 text-blue-400 text-[10px] font-medium whitespace-nowrap">+{locs.length - 1} more</span>
+																			{/if}
+																		</div>
+																	{/if}
+																</td>
+															{:else}
+																<td class="px-3 py-2 text-slate-600 max-w-[160px] truncate" title={row[col]?.value ?? ''}>
+																	{colValue(row, col)}
+																</td>
+															{/if}
+														{/each}
+													</tr>
+												{/each}
+											{/if}
 										</tbody>
 									</table>
 								</div>
-								{#if queryLoading}
-									<div class="mt-3 text-center text-xs text-slate-400">Updating…</div>
-								{/if}
 							{/if}
 						{/if}
 					</div>
