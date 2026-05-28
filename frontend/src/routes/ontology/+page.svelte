@@ -858,7 +858,7 @@
 					</h2>
 					<div class="mt-3 h-0.5 rounded-full" style="width:40px; background:{GROUP_COLOR[selectedNode.group]};"></div>
 					<p class="mt-4 text-[15px] text-slate-500 leading-relaxed">{selectedNode.definition}</p>
-					{#if selectedNode.dataProperties?.length}
+					<!-- {#if selectedNode.dataProperties?.length}
 						<div class="mt-5 pt-4 border-t border-slate-100">
 							<p class="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-2">Data Properties</p>
 							<div class="flex flex-col gap-1.5">
@@ -870,7 +870,7 @@
 								{/each}
 							</div>
 						</div>
-					{/if}
+					{/if} -->
 					<p class="mt-5 text-[12px] uppercase tracking-widest text-slate-300">Click node or background to deselect</p>
 				</div>
 			</div>
