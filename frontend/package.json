@@ -21,6 +21,7 @@
 	"dependencies": {
 		"@codemirror/language": "^6.0.0",
 		"@codemirror/legacy-modes": "^6.0.0",
+		"@sveltejs/adapter-node": "^5.5.4",
 		"codemirror": "^6.0.0",
 		"d3-color": "^3.1.0",
 		"d3-drag": "^3.0.0",
