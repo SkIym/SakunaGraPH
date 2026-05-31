@@ -1423,16 +1423,17 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 #################################################################
 
 ###  http://qudt.org/schema/qudt/CurrencyUnit
-qudt:CurrencyUnit rdf:type owl:Class .
-
+qudt:CurrencyUnit rdf:type owl:Class ;
+    rdfs:label "Currency Unit"@en .
 
 ###  http://qudt.org/schema/qudt/QuantityValue
-qudt:QuantityValue rdf:type owl:Class .
-
+qudt:QuantityValue rdf:type owl:Class ;
+    rdfs:label "Quantity Value"@en .
 
 ###  http://www.opengis.net/ont/geosparql#Feature
-geo:Feature rdf:type owl:Class .
-
+geo:Feature rdf:type owl:Class ;
+    rdfs:label "Feature"@en ;
+    skos:definition "A discrete spatial phenomenon in a universe of discourse."@en .
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact
 baw:Impact rdf:type owl:Class ;
@@ -1544,30 +1545,41 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/AirportDisruption
 :AirportDisruption rdf:type owl:Class ;
-                   rdfs:subClassOf :Impact ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :affectedDescription ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :cancellationDateTime ;
-                                     owl:someValuesFrom xsd:dateTime
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :portOrTerminalName ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :portStatus ;
-                                     owl:someValuesFrom xsd:string
-                                   ] ,
-                                   [ rdf:type owl:Restriction ;
-                                     owl:onProperty :resumptionDateTime ;
-                                     owl:someValuesFrom xsd:dateTime
-                                   ] ;
-                   rdfs:label "Airport Disruption" ;
-                   skos:altLabel "Flight Disruption" ;
-                   skos:definition "Represents disruptions on airports." .
+    rdfs:subClassOf :Impact ,
+                    [ rdf:type owl:Restriction ;
+                        owl:onProperty :affectedDescription ;
+                        owl:someValuesFrom xsd:string
+                    ] ,
+                    [ rdf:type owl:Restriction ;
+                        owl:onProperty :cancellationDateTime ;
+                        owl:someValuesFrom xsd:dateTime
+                    ] ,
+                    [ rdf:type owl:Restriction ;
+                        owl:onProperty :portOrTerminalName ;
+                        owl:someValuesFrom xsd:string
+                    ] ,
+                    [ rdf:type owl:Restriction ;
+                        owl:onProperty :portStatus ;
+                        owl:someValuesFrom xsd:string
+                    ] ,
+                    [ rdf:type owl:Restriction ;
+                        owl:onProperty :resumptionDateTime ;
+                        owl:someValuesFrom xsd:dateTime
+                    ] ;
+    owl:disjointWith [ owl:intersectionOf ( 
+                            :ClassSuspension
+                            :CommunicationLineDisruption
+                            :PowerDisruption
+                            :RoadAndBridgesDamage
+                            :SeaportDisruption
+                            :WaterDisruption
+                            :WorkSuspension
+                                ) ;
+            rdf:type owl:Class
+            ] ;
+    rdfs:label "Airport Disruption" ;
+    skos:altLabel "Flight Disruption" ;
+    skos:definition "Represents disruptions on airports." .
 
 
 ###  https://sakuna.ph/Assistance
@@ -1586,7 +1598,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
                             owl:someValuesFrom :Municipality
                           ] ;
           rdfs:label "Barangay"@en ;
-          skos:definition "adm level 4" .
+          skos:definition "Administrative Level 4" .
 
 
 ###  https://sakuna.ph/Casualties
@@ -1616,7 +1628,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :City rdf:type owl:Class ;
       rdfs:subClassOf :Location ;
       rdfs:label "City" ;
-      skos:definition "adm level 3" .
+      skos:definition "Administrative Level 3" .
 
 
 ###  https://sakuna.ph/ClassSuspension
@@ -1681,7 +1693,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :Country rdf:type owl:Class ;
          rdfs:subClassOf :Location ;
          rdfs:label "Country" ;
-         skos:definition "adm level 0" .
+         skos:definition "Administrative Level 0" .
 
 
 ###  https://sakuna.ph/DamageGeneral
@@ -1729,8 +1741,9 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/FlightDisruption
 :FlightDisruption rdf:type owl:Class ;
-                  rdfs:subClassOf :Impact ;
-                  rdfs:label "Flight Disruption" .
+    rdfs:subClassOf :Impact ;
+    skos:definition "Represents flight disruptions." ;
+    rdfs:label "Flight Disruption" .
 
 
 ###  https://sakuna.ph/HousingDamage
@@ -1822,12 +1835,13 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/IslandGroup
 :IslandGroup rdf:type owl:Class ;
-             rdfs:subClassOf :Location ,
-                             [ rdf:type owl:Restriction ;
-                               owl:onProperty :isPartOf ;
-                               owl:someValuesFrom :Country
-                             ] ;
-             rdfs:label "Island Group" .
+    rdfs:subClassOf :Location ,
+                    [ rdf:type owl:Restriction ;
+                    owl:onProperty :isPartOf ;
+                    owl:someValuesFrom :Country
+                    ] ;
+    skos:definition "Represents island groups" ;
+    rdfs:label "Island Group" .
 
 
 ###  https://sakuna.ph/Location
@@ -1852,7 +1866,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
                                 owl:someValuesFrom :Province
                               ] ;
               rdfs:label "Municipality"@en ;
-              skos:definition "adm level 3" .
+              skos:definition "Administrative Level 3" .
 
 
 ###  https://sakuna.ph/PowerDisruption
@@ -1927,7 +1941,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
                             owl:someValuesFrom :Region
                           ] ;
           rdfs:label "Province"@en ;
-          skos:definition "adm level 2" .
+          skos:definition "Administrative Level 2" .
 
 
 ###  https://sakuna.ph/Recovery
@@ -1961,7 +1975,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
                           owl:someValuesFrom :IslandGroup
                         ] ;
         rdfs:label "Region"@en ;
-        skos:definition "adm level 1" .
+        skos:definition "Administrative Level 1" .
 
 
 ###  https://sakuna.ph/Rescue
@@ -2116,6 +2130,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 ###  https://sakuna.ph/SubMunicipality
 :SubMunicipality rdf:type owl:Class ;
                  rdfs:subClassOf :Location ;
+                skos:definition "Administrative division below the city or municipality level. Can refer to recognized districts under the City of Manila. " ;
                  rdfs:label "SubMunicipality" .
 
 
