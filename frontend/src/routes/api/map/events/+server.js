@@ -7,74 +7,107 @@ const P = `PREFIX :    <https://sakuna.ph/>
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
 PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
 `;
 
 // ── Query builders ────────────────────────────────────────────────────────────
-
 function regionEventsQuery(psgc, offset, limit, eventType) {
 	return P + `
-SELECT ?event ?disasterType ?startDate
-       (SAMPLE(?eventName) AS ?eventName)
-       (GROUP_CONCAT(DISTINCT ?locLabel; separator="|") AS ?locations)
-WHERE {
-  ?event a :${eventType} ;
-         :hasDisasterType ?disasterType ;
-         :startDate ?startDate ;
-         :hasLocation ?location .
-  ?location :isPartOf* :${psgc} .
-  OPTIONAL { ?event    :eventName  ?eventName }
-  OPTIONAL { ?location rdfs:label  ?locLabel  }
-}
-GROUP BY ?event ?disasterType ?startDate
-ORDER BY DESC(?startDate)
-LIMIT ${limit}
-OFFSET ${offset}`;
-}
-
-function regionCountQuery(psgc, eventType) {
-	return P + `
-SELECT (COUNT(DISTINCT ?event) AS ?count)
-WHERE {
-  ?event a :${eventType} ;
-         :hasLocation ?location .
-  ?location :isPartOf* :${psgc} .
-}`;
+    SELECT ?event ?startDate
+        (SAMPLE(?eventName)                              AS ?eventName)
+        (GROUP_CONCAT(DISTINCT ?locLabel; separator="|") AS ?locations)
+        (GROUP_CONCAT(DISTINCT ?dtype;   separator=",")  AS ?disasterType)
+        (SAMPLE(?alts)                                   AS ?alternates)
+        (SAMPLE(?srcLabel)                               AS ?source)
+    WHERE {
+    ?event a :${eventType} ;
+            :hasDisasterType ?dtype ;
+            :startDate ?startDate ;
+            :hasLocation ?location .
+    ?location :isPartOf* :${psgc} .
+    OPTIONAL { ?event    :eventName  ?eventName }
+    OPTIONAL { ?location rdfs:label  ?locLabel  }
+    OPTIONAL {
+        SELECT ?event (GROUP_CONCAT(DISTINCT ?alt; separator=",") AS ?alts)
+        WHERE { ?event prov:alternateOf ?alt }
+        GROUP BY ?event
+    }
+    OPTIONAL { ?event prov:wasDerivedFrom+/prov:wasAttributedTo ?agent .
+                ?agent skos:prefLabel ?srcLabel }
+    }
+    GROUP BY ?event ?startDate
+    ORDER BY DESC(?startDate)
+    LIMIT ${limit}
+    OFFSET ${offset}`;
 }
 
 function provinceEventsQuery(normalized, offset, limit, eventType) {
 	return P + `
-SELECT ?event ?disasterType ?startDate
-       (SAMPLE(?eventName) AS ?eventName)
-       (GROUP_CONCAT(DISTINCT ?locLabel; separator="|") AS ?locations)
-WHERE {
-  ?event a :${eventType} ;
-         :hasDisasterType ?disasterType ;
-         :startDate ?startDate ;
-         :hasLocation ?location .
-  ?location :isPartOf* ?prov .
-  ?prov a :Province ; rdfs:label ?provLabel .
-  FILTER(REPLACE(LCASE(STR(?provLabel)), "[^a-z0-9]", "") = "${normalized}")
-  OPTIONAL { ?event    :eventName  ?eventName }
-  OPTIONAL { ?location rdfs:label  ?locLabel  }
+    SELECT ?event ?startDate
+        (SAMPLE(?eventName)                              AS ?eventName)
+        (GROUP_CONCAT(DISTINCT ?locLabel; separator="|") AS ?locations)
+        (GROUP_CONCAT(DISTINCT ?dtype;   separator=",")  AS ?disasterTypes)
+        (SAMPLE(?alts)                                   AS ?alternates)
+        (SAMPLE(?srcLabel)                               AS ?source)
+    WHERE {
+    ?event a :${eventType} ;
+            :hasDisasterType ?dtype ;
+            :startDate ?startDate ;
+            :hasLocation ?location .
+    ?location :isPartOf* ?prov .
+    ?prov a :Province ; rdfs:label ?provLabel .
+    FILTER(REPLACE(LCASE(STR(?provLabel)), "[^a-z0-9]", "") = "${normalized}")
+    OPTIONAL { ?event    :eventName  ?eventName }
+    OPTIONAL { ?location rdfs:label  ?locLabel  }
+    OPTIONAL {
+        SELECT ?event (GROUP_CONCAT(DISTINCT ?alt; separator=",") AS ?alts)
+        WHERE { ?event prov:alternateOf ?alt }
+        GROUP BY ?event
+    }
+    OPTIONAL { ?event prov:wasDerivedFrom+/prov:wasAttributedTo ?agent .
+                ?agent skos:prefLabel ?srcLabel }
+    }
+    GROUP BY ?event ?startDate
+    ORDER BY DESC(?startDate)
+    LIMIT ${limit}
+    OFFSET ${offset}`;
 }
-GROUP BY ?event ?disasterType ?startDate
-ORDER BY DESC(?startDate)
-LIMIT ${limit}
-OFFSET ${offset}`;
+
+function regionCountQuery(psgc, eventType) {
+    return P + `
+    SELECT (COUNT(DISTINCT ?event) AS ?count)
+    WHERE {
+    ?event a :${eventType} ;
+            :startDate ?startDate ;
+            :hasLocation ?location .
+    ?location :isPartOf* :${psgc} .
+    OPTIONAL {
+    ?event prov:alternateOf ?alt .
+    ?alt :startDate ?altDate .
+    FILTER(?altDate < ?startDate || (?altDate = ?startDate && STR(?alt) < STR(?event)))
+    }
+    FILTER(!BOUND(?altDate))
+    }`;
 }
 
 function provinceCountQuery(normalized, eventType) {
-	return P + `
-SELECT (COUNT(DISTINCT ?event) AS ?count)
-WHERE {
-  ?event a :${eventType} ;
-         :hasLocation ?location .
-  ?location :isPartOf* ?prov .
-  ?prov a :Province ; rdfs:label ?provLabel .
-  FILTER(REPLACE(LCASE(STR(?provLabel)), "[^a-z0-9]", "") = "${normalized}")
-}`;
+  return P + `
+    SELECT (COUNT(DISTINCT ?event) AS ?count)
+    WHERE {
+    ?event a :${eventType} ;
+            :startDate ?startDate ;
+            :hasLocation ?location .
+    ?location :isPartOf* ?prov .
+    ?prov a :Province ; rdfs:label ?provLabel .
+    FILTER(REPLACE(LCASE(STR(?provLabel)), "[^a-z0-9]", "") = "${normalized}")
+    OPTIONAL {
+    ?event prov:alternateOf ?alt .
+    ?alt :startDate ?altDate .
+    FILTER(?altDate < ?startDate || (?altDate = ?startDate && STR(?alt) < STR(?event)))
+    }
+    FILTER(!BOUND(?altDate))
+    }`;
 }
-
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
 function extractCount(result) {
@@ -97,7 +130,7 @@ export async function GET({ url }) {
 		throw error(400, 'scope must be "region" or "province"');
 	}
 
-	const activeType = mode === 'major' ? 'MajorEvent' : 'DisasterEvent';
+	const activeType = mode === 'major' ? 'MajorEvent' : 'Incident';
 	const offset     = (page - 1) * PAGE_SIZE;
 
 	let eventsQ, majorCountQ, incidentCountQ;
@@ -105,12 +138,12 @@ export async function GET({ url }) {
 	if (scope === 'region') {
 		eventsQ        = regionEventsQuery(id, offset, PAGE_SIZE, activeType);
 		majorCountQ    = regionCountQuery(id, 'MajorEvent');
-		incidentCountQ = regionCountQuery(id, 'DisasterEvent');
+		incidentCountQ = regionCountQuery(id, 'Incident');
 	} else {
 		const normalized = id.toLowerCase().replace(/[^a-z0-9]/g, '');
 		eventsQ        = provinceEventsQuery(normalized, offset, PAGE_SIZE, activeType);
 		majorCountQ    = provinceCountQuery(normalized, 'MajorEvent');
-		incidentCountQ = provinceCountQuery(normalized, 'DisasterEvent');
+		incidentCountQ = provinceCountQuery(normalized, 'Incident');
 	}
 
 	const [eventsRes, majorCountRes, incidentCountRes] = await Promise.all([

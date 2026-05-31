@@ -116,6 +116,7 @@
 		queryLoading = true;
 		queryError = '';
 		expandedRows = new Set();
+        expandedAlternates = new Set();
 
 		const scope = selected.type === 'region' ? 'region' : 'province';
 		const id    = selected.type === 'region' ? selected.psgc : selected.rawName;
@@ -132,6 +133,9 @@
 			results       = { results: { bindings: data.events } };
 			majorCount    = data.majorCount;
 			incidentCount = data.incidentCount;
+            groupedResults = groupByAlternates(data.events);
+            console.log('sample alternates value:', data.events[0]?.alternates?.value);
+            console.log('sample event IRI:', data.events[0]?.event?.value);
 		} catch {
 			queryError = 'Could not reach server.';
 		} finally {
@@ -233,6 +237,83 @@
 	};
 
 	let expandedRows = $state(new Set());
+    let expandedAlternates = $state(new Set());
+    let groupedResults = $state(null);
+
+    function groupByAlternates(bindings) {
+        const byIri = new Map();
+        for (const row of bindings) {
+            if (row.event?.value) byIri.set(row.event.value, row);
+        }
+
+        // Build adjacency: for each IRI, collect all known alts that exist on this page
+        const adjAlts = new Map();
+        for (const row of bindings) {
+            const iri = row.event?.value;
+            if (!iri) continue;
+            const alts = (row.alternates?.value ?? '')
+            .split(',').map(s => s.trim()).filter(s => s && byIri.has(s));
+            adjAlts.set(iri, alts);
+        }
+
+        // Union-find to cluster all connected alternates
+        const parent = new Map();
+        function find(x) {
+            if (!parent.has(x)) parent.set(x, x);
+            if (parent.get(x) !== x) parent.set(x, find(parent.get(x)));
+            return parent.get(x);
+        }
+        function union(x, y) {
+            const px = find(x), py = find(y);
+            if (px !== py) parent.set(px, py);
+        }
+
+        for (const [iri, alts] of adjAlts) {
+            for (const alt of alts) union(iri, alt);
+        }
+
+        // Group IRIs by root
+        const clusters = new Map(); // root -> [iri, ...]
+        for (const iri of byIri.keys()) {
+            const root = find(iri);
+            if (!clusters.has(root)) clusters.set(root, []);
+            clusters.get(root).push(iri);
+        }
+
+        // For each cluster, elect rep by earliest startDate, IRI tiebreak
+        const output = [];
+        const seen = new Set();
+        for (const row of bindings) {
+            const iri = row.event?.value;
+            if (!iri || seen.has(iri)) continue;
+
+            const root = find(iri);
+            const clusterIris = clusters.get(root) ?? [iri];
+
+            // Mark all cluster members seen so we don't emit duplicate groups
+            for (const m of clusterIris) seen.add(m);
+
+            if (clusterIris.length === 1) {
+            output.push({ row, subs: [] });
+            continue;
+            }
+
+            const members = clusterIris.map(m => byIri.get(m)).filter(Boolean);
+            members.sort((a, b) => {
+            const da = a.startDate?.value ?? '';
+            const db = b.startDate?.value ?? '';
+            if (da !== db) return da < db ? -1 : 1;
+            const ia = a.event?.value ?? '';
+            const ib = b.event?.value ?? '';
+            return ia < ib ? -1 : ia > ib ? 1 : 0;
+            });
+
+            const [rep, ...subs] = members;
+            output.push({ row: rep, subs });
+        }
+
+        return output;
+    }
 </script>
 
 <svelte:head>
@@ -512,50 +593,155 @@
 													</tr>
 												{/each}
 											{:else}
-												{#each rows as row, i}
-													{@const rowKey = row.event?.value ?? String(i)}
-													{@const locs = (row.locations?.value ?? '').split('|').filter(Boolean)}
-													{@const expanded = expandedRows.has(rowKey)}
-													{@const expandable = locs.length > 1}
-													<!-- svelte-ignore a11y_click_events_have_key_events -->
-													<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-													<tr
-														class="transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}
-														{expandable ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-blue-50/40'}"
-														onclick={() => {
-															if (!expandable) return;
-															if (expanded) expandedRows = new Set([...expandedRows].filter(k => k !== rowKey));
-															else expandedRows = new Set([...expandedRows, rowKey]);
-														}}
-													>
-														{#each DISPLAY_COLS as col}
-															{#if col === 'locations'}
-																<td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
-																	{#if locs.length === 0}
-																		<span class="text-slate-300">—</span>
-																	{:else if expanded}
-																		<div class="flex flex-col gap-0.5 text-xs leading-snug">
-																			{#each locs as loc}
-																				<span>{loc}</span>
-																			{/each}
-																		</div>
-																	{:else}
-																		<div class="text-xs leading-snug">
-																			<span>{locs[0]}</span>
-																			{#if expandable}
-																				<span class="ml-1 text-blue-400 text-[10px] font-medium whitespace-nowrap">+{locs.length - 1} more</span>
-																			{/if}
-																		</div>
-																	{/if}
-																</td>
-															{:else}
-																<td class="px-3 py-2 text-slate-600 max-w-[160px] truncate" title={row[col]?.value ?? ''}>
-																	{colValue(row, col)}
-																</td>
-															{/if}
-														{/each}
-													</tr>
-												{/each}
+												{#each groupedResults ?? [] as { row, subs }, i}
+                                                {@const rowKey = row.event?.value ?? String(i)}
+                                                {@const locs = (row.locations?.value ?? '').split('|').filter(Boolean)}
+                                                {@const dtypes = (row.disasterType?.value ?? row.disasterTypes?.value ?? '')
+                                                    .split(',').map(s => s.trim()).filter(Boolean)}
+                                                {@const expanded = expandedRows.has(rowKey)}
+                                                {@const expandable = locs.length > 1}
+                                                {@const hasAlts = subs.length > 0}
+                                                {@const altsExpanded = expandedAlternates.has(rowKey)}
+
+                                                <!-- Representative row -->
+                                                <!-- svelte-ignore a11y_click_events_have_key_events -->
+                                                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                                                <tr
+                                                    class="transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}
+                                                    {expandable || hasAlts ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-blue-50/40'}"
+                                                    onclick={() => {
+                                                    if (expandable) {
+                                                        if (expanded) expandedRows = new Set([...expandedRows].filter(k => k !== rowKey));
+                                                        else expandedRows = new Set([...expandedRows, rowKey]);
+                                                    }
+                                                    }}
+                                                >
+                                                    <!-- Event name + alternates badge -->
+                                                    <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName?.value ?? ''}>
+                                                    <div class="flex flex-col gap-1">
+                                                        <span class="truncate">{colValue(row, 'eventName')}</span>
+                                                        {#if hasAlts}
+                                                            <button
+                                                                class="w-fit rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-600 hover:bg-violet-200 transition-colors"
+                                                                onclick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (altsExpanded) expandedAlternates = new Set([...expandedAlternates].filter(k => k !== rowKey));
+                                                                else expandedAlternates = new Set([...expandedAlternates, rowKey]);
+                                                                }}
+                                                            >
+                                                                {altsExpanded ? '▾' : '▸'} {subs.length} alternate{subs.length > 1 ? 's' : ''}
+                                                            </button>
+                                                            {/if}
+                                                            {#if row.source?.value}
+                                                            <span class="w-fit rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                                                                {row.source.value}
+                                                            </span>
+                                                        {/if}
+                                                    </div>
+                                                    </td>
+
+                                                    <!-- Disaster type: first + +N more -->
+                                                    <td class="px-3 py-2 text-slate-600">
+                                                    {#if dtypes.length === 0}
+                                                        <span class="text-slate-300">—</span>
+                                                    {:else}
+                                                        <div class="flex flex-col gap-0.5">
+                                                        <span>{formatDisasterType(dtypes[0])}</span>
+                                                        {#if dtypes.length > 1}
+                                                            <button
+                                                            class="w-fit text-blue-400 text-[10px] font-medium"
+                                                            onclick={(e) => {
+                                                                e.stopPropagation();
+                                                                // reuse expandedRows with a dtype- prefix key
+                                                                const dtKey = 'dt-' + rowKey;
+                                                                if (expandedRows.has(dtKey)) expandedRows = new Set([...expandedRows].filter(k => k !== dtKey));
+                                                                else expandedRows = new Set([...expandedRows, dtKey]);
+                                                            }}
+                                                            >
+                                                            {expandedRows.has('dt-' + rowKey)
+                                                                ? dtypes.slice(1).map(formatDisasterType).join(', ')
+                                                                : `+${dtypes.length - 1} more`}
+                                                            </button>
+                                                        {/if}
+                                                        </div>
+                                                    {/if}
+                                                    </td>
+
+                                                    <!-- Date -->
+                                                    <td class="px-3 py-2 text-slate-600 whitespace-nowrap">
+                                                    {colValue(row, 'startDate')}
+                                                    </td>
+
+                                                    <!-- Locations -->
+                                                    <td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
+                                                    {#if locs.length === 0}
+                                                        <span class="text-slate-300">—</span>
+                                                    {:else if expanded}
+                                                        <div class="flex flex-col gap-0.5 text-xs leading-snug">
+                                                        {#each locs as loc}<span>{loc}</span>{/each}
+                                                        </div>
+                                                    {:else}
+                                                        <div class="text-xs leading-snug">
+                                                        <span>{locs[0]}</span>
+                                                        {#if expandable}
+                                                            <span class="ml-1 text-blue-400 text-[10px] font-medium whitespace-nowrap">+{locs.length - 1} more</span>
+                                                        {/if}
+                                                        </div>
+                                                    {/if}
+                                                    </td>
+                                                </tr>
+
+                                                <!-- Alternate sub-rows -->
+                                                {#if altsExpanded}
+                                                    {#each subs as sub, si}
+                                                    {@const subLocs = (sub.locations?.value ?? '').split('|').filter(Boolean)}
+                                                    {@const subTypes = (sub.disasterType?.value ?? sub.disasterTypes?.value ?? '')
+                                                        .split(',').map(s => s.trim()).filter(Boolean)}
+                                                    {@const subKey = sub.event?.value ?? `sub-${i}-${si}`}
+                                                    {@const subExpanded = expandedRows.has(subKey)}
+                                                    <tr class="bg-violet-50/60 border-l-2 border-violet-300">
+                                                        <td class="pl-6 pr-3 py-1.5 text-slate-500 max-w-[160px]">
+                                                        <div class="flex flex-col gap-0.5">
+                                                            <span class="truncate text-xs">{sub.eventName?.value ? bindingDisplay(sub.eventName) : '—'}</span>
+                                                            {#if sub.source?.value}
+                                                            <span class="w-fit rounded-full bg-slate-200 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 uppercase tracking-wide">
+                                                                {sub.source.value}
+                                                            </span>
+                                                            {/if}
+                                                        </div>
+                                                        </td>
+                                                        <td class="px-3 py-1.5 text-slate-500 text-xs">
+                                                        {subTypes.length ? formatDisasterType(subTypes[0]) : '—'}
+                                                        {#if subTypes.length > 1}
+                                                            <span class="text-slate-400"> +{subTypes.length - 1}</span>
+                                                        {/if}
+                                                        </td>
+                                                        <td class="px-3 py-1.5 text-slate-500 text-xs whitespace-nowrap">
+                                                        {sub.startDate?.value?.split('T')[0] ?? '—'}
+                                                        </td>
+                                                        <!-- svelte-ignore a11y_click_events_have_key_events -->
+                                                        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
+                                                        <td
+                                                        class="px-3 py-1.5 text-slate-500 align-top text-xs {subLocs.length > 1 ? 'cursor-pointer' : ''}"
+                                                        style="max-width:180px;"
+                                                        onclick={() => {
+                                                            if (subLocs.length <= 1) return;
+                                                            if (subExpanded) expandedRows = new Set([...expandedRows].filter(k => k !== subKey));
+                                                            else expandedRows = new Set([...expandedRows, subKey]);
+                                                        }}
+                                                        >
+                                                        {#if subLocs.length === 0}
+                                                            <span class="text-slate-300">—</span>
+                                                        {:else if subExpanded}
+                                                            <div class="flex flex-col gap-0.5">{#each subLocs as l}<span>{l}</span>{/each}</div>
+                                                        {:else}
+                                                            {subLocs[0]}{#if subLocs.length > 1}<span class="ml-1 text-blue-400 text-[10px]">+{subLocs.length - 1}</span>{/if}
+                                                        {/if}
+                                                        </td>
+                                                    </tr>
+                                                    {/each}
+                                                {/if}
+                                                {/each}
 											{/if}
 										</tbody>
 									</table>
