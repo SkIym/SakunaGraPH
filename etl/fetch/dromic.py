@@ -1,5 +1,3 @@
-# scraper.py — DROMIC situation report scraper (stateful + idempotent)
-
 from __future__ import annotations
 
 import argparse
@@ -36,13 +34,13 @@ def parse_args() -> argparse.Namespace:
         "--last-scrape-date",
         type=str,
         default=None,
-        help="Override last scrape date (YYYY-MM-DD). Defaults to value in state file.",
+        help="Override last scrape date (YYYY-MM-DD). Defaults to value in manifest file.",
     )
     parser.add_argument(
-        "--state-file",
+        "--manifest-file",
         type=str,
-        default="../logs/dromic/scrape_state.json",
-        help="Path to the persistent scrape state file.",
+        default=None,
+        help="Path to the manifest file. Defaults to <download_dir>/manifest.json.",
     )
     parser.add_argument(
         "--max-pages",
@@ -51,33 +49,6 @@ def parse_args() -> argparse.Namespace:
         help="Maximum number of listing pages to scrape.",
     )
     return parser.parse_args()
-
-
-# =============================================================================
-# STATE
-# =============================================================================
-
-@dataclass
-class ScrapeState:
-    last_scrape_date: Optional[str] = None
-    scraped_urls: list[str] = field(default_factory=lambda: [])
-
-
-def load_state(path: Path) -> ScrapeState:
-    if path.exists():
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-        return ScrapeState(
-            last_scrape_date=data.get("last_scrape_date"),
-            scraped_urls=data.get("scraped_urls", []),
-        )
-    return ScrapeState()
-
-
-def save_state(path: Path, state: ScrapeState) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(asdict(state), f, indent=2)
 
 
 # =============================================================================
@@ -93,17 +64,35 @@ class ManifestEntry:
     page: int
 
 
-def load_manifest(path: Path) -> list[ManifestEntry]:
+@dataclass
+class Manifest:
+    last_scrape_date: Optional[str] = None
+    entries: list[ManifestEntry] = field(default_factory=list[ManifestEntry])
+
+
+def load_manifest(path: Path) -> Manifest:
     if path.exists():
         with path.open("r", encoding="utf-8") as f:
-            return [ManifestEntry(**entry) for entry in json.load(f)]
-    return []
+            data = json.load(f)
+        return Manifest(
+            last_scrape_date=data.get("last_scrape_date"),
+            entries=[ManifestEntry(**e) for e in data.get("entries", [])],
+        )
+    return Manifest()
 
 
-def save_manifest(path: Path, entries: list[ManifestEntry]) -> None:
+def save_manifest(path: Path, manifest: Manifest) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
-        json.dump([asdict(e) for e in entries], f, indent=2, ensure_ascii=False)
+        json.dump(
+            {
+                "last_scrape_date": manifest.last_scrape_date,
+                "entries": [asdict(e) for e in manifest.entries],
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
 
 # =============================================================================
@@ -170,9 +159,10 @@ def resolve_filename(
 def download_file(
     url: str,
     download_dir: Path,
-    manifest: list[ManifestEntry],
+    manifest: Manifest,
     post_url: str,
     page: int,
+    manifest_path: Path,
     filename_hint: Optional[str] = None,
 ) -> bool:
     """Download a file, record it in the manifest, and return success."""
@@ -189,15 +179,16 @@ def download_file(
         dest.write_bytes(r.content)
         log.info("Saved: %s", filename)
 
-        manifest.append(
+        manifest.entries.append(
             ManifestEntry(
                 filename=filename,
                 download_url=url,
                 downloaded_at=datetime.now(timezone.utc).isoformat(timespec="seconds") + "Z",
                 post_url=post_url,
-                page=page
+                page=page,
             )
         )
+        save_manifest(manifest_path, manifest)
         return True
 
     except Exception:
@@ -238,24 +229,22 @@ def handle_page(
     driver: WebDriver,
     wait: WebDriverWait[WebDriver],
     scraped_urls: set[str],
-    state: ScrapeState,
-    state_path: Path,
-    manifest: list[ManifestEntry],
+    manifest: Manifest,
     manifest_path: Path,
     last_scrape_date: datetime,
     download_dir: Path,
-    page: int
+    page: int,
 ) -> bool:
     """
     Process all posts on the current listing page.
 
-    Returns True if the scraper should stop (post published date is older then last scraped date meaning we've gone past new content).
+    Returns True if the scraper should stop (post published date is older than
+    last scraped date, meaning we've gone past new content).
     """
     read_mores = driver.find_elements(
         By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]"
     )
     log.info("Found %d posts on page", len(read_mores))
-
 
     for i in range(len(read_mores)):
         # Re-query after each navigation to avoid stale element refs
@@ -267,8 +256,8 @@ def handle_page(
 
         btn = read_mores[i]
         post_url = btn.get_attribute("href")
-        
-        if not post_url: 
+
+        if not post_url:
             log.info("Skipping a post. No read more found")
             continue
 
@@ -286,13 +275,12 @@ def handle_page(
 
             if post_date <= last_scrape_date:
                 log.info("Post is older than last scrape date — stopping")
-
                 driver.back()
                 wait.until(EC.presence_of_all_elements_located(
                     (By.XPATH, "//a[contains(.,'Read More')]")
                 ))
                 return True
-            
+
             elif post_url in scraped_urls:
                 log.info("Skipping. Post already scraped.")
                 navigated_away = False
@@ -302,17 +290,15 @@ def handle_page(
                 ))
 
             else:
-
                 file_url, file_name = extract_first_download_link(driver)
 
                 if file_url:
-                    success = download_file(file_url, download_dir, manifest, post_url, page,  file_name)
+                    success = download_file(
+                        file_url, download_dir, manifest, post_url, page,
+                        manifest_path, file_name,
+                    )
                     if success:
                         scraped_urls.add(post_url)
-                        state.scraped_urls = list(scraped_urls)
-
-                        save_state(state_path, state)
-                        save_manifest(manifest_path, manifest)
                 else:
                     log.warning("No downloadable link found for: %s", post_url)
 
@@ -320,7 +306,6 @@ def handle_page(
             log.exception("Error processing post: %s", post_url)
 
         finally:
-            # Always return to the listing page if we navigated away
             if navigated_away:
                 try:
                     driver.back()
@@ -390,25 +375,22 @@ def main() -> None:
 
     download_dir = Path(f"../data/raw/dromic-new/{args.year}")
     log_dir = Path("../logs/dromic")
-    state_path = Path(os.path.join(download_dir, "scrape_state.json"))
-    manifest_path = Path(os.path.join(download_dir, "manifest.json"))
+    manifest_path = Path(args.manifest_file) if args.manifest_file else download_dir / "manifest.json"
     log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
     download_dir.mkdir(parents=True, exist_ok=True)
     setup_logging(log_file)
 
-    state = load_state(state_path)
     manifest = load_manifest(manifest_path)
-
 
     if args.last_scrape_date:
         last_scrape_date = datetime.strptime(args.last_scrape_date, "%Y-%m-%d")
-    elif state.last_scrape_date and not args.page:
-        last_scrape_date = datetime.strptime(state.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
+    elif manifest.last_scrape_date and not args.page:
+        last_scrape_date = datetime.strptime(manifest.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
     else:
         last_scrape_date = datetime.min
 
-    scraped_urls: set[str] = set(state.scraped_urls)
+    scraped_urls: set[str] = {e.post_url for e in manifest.entries}
 
     opts = Options()
     opts.add_experimental_option(
@@ -439,13 +421,11 @@ def main() -> None:
                 driver=driver,
                 wait=wait,
                 scraped_urls=scraped_urls,
-                state=state,
-                state_path=state_path,
                 manifest=manifest,
                 manifest_path=manifest_path,
                 last_scrape_date=last_scrape_date,
                 download_dir=download_dir,
-                page=page
+                page=page,
             )
 
             if should_stop:
@@ -458,8 +438,8 @@ def main() -> None:
                 break
     finally:
         driver.quit()
-        state.last_scrape_date = datetime.now(timezone.utc).strftime("%Y-%m-%d, %H:%M:%S")
-        save_state(state_path, state)
+        manifest.last_scrape_date = datetime.now(timezone.utc).strftime("%Y-%m-%d, %H:%M:%S")
+        save_manifest(manifest_path, manifest)
         log.info("Done. Manifest written to: %s", manifest_path)
 
 
