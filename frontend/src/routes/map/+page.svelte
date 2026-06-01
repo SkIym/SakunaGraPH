@@ -10,22 +10,26 @@
 		bindingDisplay,
 		formatDisasterType
 	} from '$lib/mapData.js';
+	import cityPathsRaw from '$lib/data/gadm41_PHL_2_paths.json';
 
-	// ── Map data (loaded once) ───────────────────────────────────────────────
+	// ── Map data ─────────────────────────────────────────────────────────────
 	const SVG_W = 700;
 	const SVG_H = 800;
 
-	let pathData = $state([]);
+	const cityPathData = cityPathsRaw;
+
+	let pathData = $state.raw([]);
+
 	let fullViewBox = `0 0 ${SVG_W} ${SVG_H}`;
-	let tightViewBox = $state(`0 0 ${SVG_W} ${SVG_H}`); // snug around Philippines for thumbnail
+	let tightViewBox = $state(`0 0 ${SVG_W} ${SVG_H}`);
 	let detailViewBox = $state(null);
 	let mapLoading = $state(true);
 	let mapError = $state('');
-	let pathGen = null; // d3 geoPath, kept as plain variable
+	let pathGen = null;
 
 	// ── UI state ─────────────────────────────────────────────────────────────
-	let view = $state('regions');  // 'regions' | 'provinces'
-	let selected = $state(null);   // {type, psgc, id, name, rawName?}
+	let view = $state('regions');  // 'regions' | 'provinces' | 'cities'
+	let selected = $state(null);   // {type, psgc?, id, name, rawName?, province?, bounds?}
 
 	// ── Results state ────────────────────────────────────────────────────────
 	const PAGE_SIZE = 10;
@@ -80,10 +84,18 @@
 
 	// ── Recompute detail viewBox whenever selection or view changes ──────────
 	$effect(() => {
-		if (!selected || !pathGen || pathData.length === 0) {
-			detailViewBox = null;
+		if (!selected || !pathGen) { detailViewBox = null; return; }
+
+		// City: use pre-computed bounds stored on the selected item
+		if (view === 'cities') {
+			if (!selected.bounds) { detailViewBox = null; return; }
+			const [[x0, y0], [x1, y1]] = selected.bounds;
+			const pad = 12;
+			detailViewBox = `${x0 - pad} ${y0 - pad} ${x1 - x0 + pad * 2} ${y1 - y0 + pad * 2}`;
 			return;
 		}
+
+		if (pathData.length === 0) { detailViewBox = null; return; }
 		const sk = view === 'regions' ? selected.psgc : selected.id;
 		const items = pathData.filter((p) =>
 			view === 'regions' ? p.regionPsgc === sk : p.gid === sk
@@ -118,9 +130,10 @@
 		expandedRows = new Set();
         expandedAlternates = new Set();
 
-		const scope = selected.type === 'region' ? 'region' : 'province';
+		const scope = selected.type === 'region' ? 'region' : selected.type === 'city' ? 'city' : 'province';
 		const id    = selected.type === 'region' ? selected.psgc : selected.rawName;
 		const params = new URLSearchParams({ scope, id, mode: resultMode, page: String(page) });
+		if (selected.type === 'city' && selected.province) params.set('province', selected.province);
 
 		try {
 			const res = await fetch(`/api/map/events?${params}`);
@@ -154,6 +167,16 @@
 			const psgc = item.regionPsgc;
 			const name = REGION_LABELS[psgc] ?? `Region ${psgc}`;
 			selected = { type: 'region', psgc, name, id: psgc };
+		} else if (view === 'cities') {
+			selected = {
+				type: 'city',
+				psgc: null,
+				id: item.gid,
+				name: item.name,
+				rawName: item.name,
+				province: item.province,
+				bounds: item.bounds
+			};
 		} else {
 			selected = {
 				type: 'province',
@@ -174,11 +197,9 @@
 	// ── Per-view map rendering props ─────────────────────────────────────────
 	// Region view: pastel fills per region, near-invisible internal province borders
 	// Province view: all white, clearly drawn individual borders
-	const mapColorMap = $derived(view === 'regions' ? REGION_COLORS : {});
-	const mapStrokeColor = $derived(
-		view === 'regions' ? 'rgba(55,65,81,0.42)' : '#374151'
-	);
-	const mapStrokeWidth = $derived(view === 'regions' ? 0.5 : 0.65);
+	const mapColorMap    = $derived(view !== 'provinces' ? REGION_COLORS : {});
+	const mapStrokeColor = $derived(view === 'regions' ? 'rgba(55,65,81,0.42)' : '#374151');
+	const mapStrokeWidth = $derived(view === 'regions' ? 0.5 : view === 'cities' ? 0.3 : 0.65);
 
 	function deselect() {
 		selected = null;
@@ -192,6 +213,56 @@
 		deselect();
 	}
 
+	// ── Search ────────────────────────────────────────────────────────────────
+	let searchQuery = $state('');
+	let searchOpen  = $state(false);
+
+	function normalize(s) {
+		return s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+	}
+
+	function getSearchResults(q) {
+		const lq = normalize(q.trim());
+		if (!lq) return [];
+		const out = [];
+
+		for (const [psgc, name] of Object.entries(REGION_LABELS)) {
+			if (normalize(name).includes(lq))
+				out.push({ type: 'region', psgc, name });
+		}
+		for (const p of pathData) {
+			const name = formatProvName(p.name);
+			if (normalize(name).includes(lq))
+				out.push({ type: 'province', item: p, name });
+		}
+		for (const c of cityPathData) {
+			if (normalize(c.name).includes(lq) || normalize(c.province).includes(lq))
+				out.push({ type: 'city', item: c, name: c.name, sub: c.province });
+		}
+
+		return out.slice(0, 12);
+	}
+
+	function selectFromSearch(result) {
+		searchQuery = '';
+		searchOpen  = false;
+		tooltipItem = null;
+		resultMode  = 'major';
+		page        = 1;
+		results     = null;
+
+		if (result.type === 'region') {
+			view     = 'regions';
+			selected = { type: 'region', psgc: result.psgc, name: result.name, id: result.psgc };
+		} else if (result.type === 'province') {
+			view     = 'provinces';
+			selected = { type: 'province', psgc: null, id: result.item.gid, name: formatProvName(result.item.name), rawName: result.item.name };
+		} else {
+			view     = 'cities';
+			selected = { type: 'city', psgc: null, id: result.item.gid, name: result.item.name, rawName: result.item.name, province: result.item.province, bounds: result.item.bounds };
+		}
+	}
+
 	// ── Hover tooltip state ──────────────────────────────────────────────────
 	let tooltipItem = $state(null);
 	let tooltipX = $state(0);
@@ -200,6 +271,7 @@
 	function getHoverLabel(item) {
 		if (!item) return '';
 		if (view === 'regions') return REGION_LABELS[item.regionPsgc] ?? formatProvName(item.name);
+		if (view === 'cities') return `${item.name}, ${item.province}`;
 		return formatProvName(item.name);
 	}
 
@@ -357,6 +429,13 @@
 			>
 				By Province
 			</button>
+			<button
+				onclick={() => switchView('cities')}
+				class="rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-150
+				{view === 'cities' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
+			>
+				By City
+			</button>
 		</div>
 	{/if}
 
@@ -368,14 +447,14 @@
 		{#if selected}
 			<!-- Zoomed detail map fills the whole panel -->
 			<div class="absolute inset-0 p-4">
-				{#if pathData.length > 0}
+				{#if view === 'cities' ? cityPathData : pathData.length > 0}
 					<PhilMap
-						{pathData}
+						pathData={view === 'cities' ? cityPathData : pathData}
 						viewBox={detailViewBox ?? fullViewBox}
 						{view}
 						{selected}
 						interactive={false}
-						strokeWidth={1.4}
+						strokeWidth={view === 'cities' ? 0.3 : 1.4}
 					/>
 				{/if}
 			</div>
@@ -425,7 +504,7 @@
 					<!-- Map — flex-shrink:0 + fixed aspect-ratio keeps width stable on hover -->
 					<div style="height: calc(100vh - 120px); aspect-ratio: 7/8; flex-shrink: 0; flex-grow: 0; max-width: 58%;">
 						<PhilMap
-							{pathData}
+							pathData={view === 'cities' ? cityPathData : pathData}
 							viewBox={fullViewBox}
 							{view}
 							selected={null}
@@ -455,19 +534,77 @@
 					</div> -->
 
 
-					<div class="pointer-events-none flex-shrink-0" style="width: 300px;">
+					<div class="flex-shrink-0" style="width: 300px;">
 						<p
-							class="font-black text-slate-700 leading-snug"
+							class="font-black text-slate-700 leading-snug pointer-events-none"
 							style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.8rem, 3vw, 2.5rem); overflow-wrap:break-word; word-break:break-word;"
 						>
 							{tooltipItem ? getHoverLabel(tooltipItem) : 'Philippines'}
 						</p>
-						<p class="text-[10px] font-medium uppercase tracking-widest text-slate-400 mt-1">
-							{tooltipItem ? (view === 'regions' ? 'Region' : 'Province') : 'Hover to explore'}
+						<p class="text-[10px] font-medium uppercase tracking-widest text-slate-400 mt-1 pointer-events-none">
+							{tooltipItem
+								? (view === 'regions' ? 'Region' : view === 'cities' ? 'City / Municipality' : 'Province')
+								: 'Hover to explore'}
 						</p>
-						<p class="mt-3 text-[14px] text-slate-400 leading-relaxed whitespace-nowrap">
-							Click a {view === 'regions' ? 'region' : 'province'} to explore disaster data.
+						<p class="mt-1 text-[13px] text-slate-400 leading-relaxed pointer-events-none">
+							Click a {view === 'regions' ? 'region' : view === 'cities' ? 'city' : 'province'} to explore disaster data.
 						</p>
+
+						<!-- Search bar -->
+						<div class="relative mt-4">
+							<div class="flex items-center gap-2 rounded-xl border border-slate-200 bg-white/95 px-3 py-2 shadow-sm focus-within:border-slate-400 transition-colors">
+								<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 flex-shrink-0">
+									<circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+								</svg>
+								<input
+									type="text"
+									placeholder="Search region, province, or city…"
+									bind:value={searchQuery}
+									onfocus={() => searchOpen = true}
+									onblur={() => setTimeout(() => searchOpen = false, 120)}
+									class="flex-1 bg-transparent text-sm text-slate-700 placeholder-slate-400 focus:outline-none min-w-0"
+								/>
+								{#if searchQuery}
+									<button
+										onmousedown={() => { searchQuery = ''; }}
+										class="text-slate-300 hover:text-slate-500 transition-colors flex-shrink-0"
+									>
+										<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+											<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+										</svg>
+									</button>
+								{/if}
+							</div>
+
+							{#if searchOpen && searchQuery.trim()}
+								{@const hits = getSearchResults(searchQuery)}
+								{#if hits.length > 0}
+									<div class="absolute top-full left-0 right-0 z-30 mt-1 max-h-60 overflow-y-auto rounded-xl border border-slate-200 bg-white shadow-lg">
+										{#each hits as result}
+											<button
+												class="flex w-full items-center gap-2.5 px-3 py-2 text-left hover:bg-slate-50 transition-colors border-b border-slate-50 last:border-0"
+												onmousedown={() => selectFromSearch(result)}
+											>
+												<span class="flex-shrink-0 rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide
+													{result.type === 'region'   ? 'bg-blue-100 text-blue-600'    :
+													 result.type === 'province' ? 'bg-emerald-100 text-emerald-600' :
+													                              'bg-violet-100 text-violet-600'}">
+													{result.type === 'region' ? 'Region' : result.type === 'province' ? 'Province' : 'City'}
+												</span>
+												<span class="flex-1 text-sm text-slate-700 truncate">{result.name}</span>
+												{#if result.sub}
+													<span class="flex-shrink-0 text-xs text-slate-400 truncate max-w-[90px]">{result.sub}</span>
+												{/if}
+											</button>
+										{/each}
+									</div>
+								{:else}
+									<div class="absolute top-full left-0 right-0 z-30 mt-1 rounded-xl border border-slate-200 bg-white shadow-lg px-3 py-3 text-sm text-slate-400">
+										No results for "{searchQuery}"
+									</div>
+								{/if}
+							{/if}
+						</div>
 					</div>
 				{/if}
 			</div>
@@ -494,7 +631,7 @@
 						<div class="flex items-start justify-between gap-3">
 							<div class="min-w-0">
 								<p class="text-[10px] font-semibold uppercase tracking-widest text-slate-400 mb-1">
-									{selected.type === 'region' ? 'Region' : 'Province'}
+									{selected.type === 'region' ? 'Region' : selected.type === 'city' ? 'City / Municipality' : 'Province'}
 								</p>
 								<h2
 									class="font-bold text-slate-800 leading-tight"
