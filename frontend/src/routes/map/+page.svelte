@@ -756,7 +756,15 @@
                                                     <!-- Event name + alternates badge -->
                                                     <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName?.value ?? ''}>
                                                     <div class="flex flex-col gap-1">
-                                                        <span class="truncate">{colValue(row, 'eventName')}</span>
+                                                        {#if row.event?.value}
+                                                            <a
+                                                                href="/events/{row.event.value.replace('https://sakuna.ph/', '')}"
+                                                                class="truncate hover:text-blue-600 hover:underline transition-colors"
+                                                                onclick={(e) => e.stopPropagation()}
+                                                            >{colValue(row, 'eventName')}</a>
+                                                        {:else}
+                                                            <span class="truncate">{colValue(row, 'eventName')}</span>
+                                                        {/if}
                                                         {#if hasAlts}
                                                             <button
                                                                 class="w-fit rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-600 hover:bg-violet-200 transition-colors"
