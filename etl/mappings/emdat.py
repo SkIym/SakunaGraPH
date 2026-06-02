@@ -132,7 +132,7 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
         for f in fields(r):
 
-            if f.name == "id": continue
+            if f.name == "id" or f.name == "rowNumber": continue
 
             value = getattr(r, f.name)
             if value is None or value == "":

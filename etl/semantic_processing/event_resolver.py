@@ -45,6 +45,7 @@ BLOCKING_LOCATION_PREFIX_LEN = 4
 
 # ── Resolution gates ──────────────────────────────────────────────────────────
 DATE_HARD_GATE_DAYS = 5            # Gate 1: dates must be within this many days
+DATE_HARD_GATE_DAYS_INCIDENT = 2   # Gate 1: Incident-typed pairs (point events)
                                     # Gate 2: disaster type must be exact or same parent
 LABEL_FUZZY_THRESHOLD = 0.70        # Gate 3a: minimum fuzzy similarity when both labels present
 PROPER_NOUN_MIN_LEN   = 4           # Gate 3a: minimum length for a capitalised token to count
@@ -508,14 +509,15 @@ def year_windows(d: date | None) -> list[str]:
 
 
 def generate_blocking_keys(event: DisasterEvent) -> list[str]:
-    """Generate blocking keys: {disaster_type}|{year}|"""
     dtype = event.disaster_type or "unknown"
+    # Normalize wet/dry variants to the same bucket as their base concept
+    dtype_base = _WET_DRY_RE.sub("", dtype)
     years = year_windows(event.start_date)
     keys: list[str] = []
     for year in years:
-        keys.append(f"{dtype}|{year}|")
+        keys.append(f"{dtype_base}|{year}|")
     for year in years:
-        fallback = f"{dtype}|{year}|*"
+        fallback = f"{dtype_base}|{year}|*"
         if fallback not in keys:
             keys.append(fallback)
     return keys
@@ -550,8 +552,14 @@ def generate_candidate_pairs(
             if pair_id in seen:
                 continue
             seen.add(pair_id)
+            
             if a.start_date and b.start_date:
-                if abs((a.start_date - b.start_date).days) > BLOCKING_DATE_TOLERANCE_DAYS:
+                threshold = (
+                    DATE_HARD_GATE_DAYS_INCIDENT
+                    if a.rdf_type == RDF_TYPE_INCIDENT or b.rdf_type == RDF_TYPE_INCIDENT
+                    else BLOCKING_DATE_TOLERANCE_DAYS
+                )
+                if abs((a.start_date - b.start_date).days) > threshold:
                     continue
 
             print(a.source, b.source)
@@ -632,7 +640,12 @@ def _gate_date(a: DisasterEvent, b: DisasterEvent) -> tuple[int | None, bool | N
     if not a.start_date or not b.start_date:
         return None, None
     delta = abs((a.start_date - b.start_date).days)
-    return delta, delta <= DATE_HARD_GATE_DAYS
+    threshold = (
+        DATE_HARD_GATE_DAYS_INCIDENT
+        if a.rdf_type == RDF_TYPE_INCIDENT or b.rdf_type == RDF_TYPE_INCIDENT
+        else DATE_HARD_GATE_DAYS
+    )
+    return delta, delta <= threshold
 
 
 # ── Gate 2: Disaster type ─────────────────────────────────────────────────────
@@ -650,6 +663,13 @@ def _resolve_concept(event: DisasterEvent) -> str | None:
     return None
 
 
+_WET_DRY_RE = re.compile(r"(Wet|Dry)$")
+
+def _base_concept(concept: str) -> str:
+    """Strip trailing 'Wet' or 'Dry' to get the agnostic base name."""
+    return _WET_DRY_RE.sub("", concept)
+
+
 def _gate_type(a: DisasterEvent, b: DisasterEvent) -> bool | None:
     ca = _resolve_concept(a)
     cb = _resolve_concept(b)
@@ -657,9 +677,19 @@ def _gate_type(a: DisasterEvent, b: DisasterEvent) -> bool | None:
     if not ca or not cb:
         return None
 
+    # Exact match
     if ca == cb:
         return True
 
+    # Wet/dry agnostic match — LandslideWet vs LandslideDry, etc.
+    # Only fires when at least one side actually carries a wet/dry suffix,
+    # and both strip down to the same non-empty base name.
+    base_a = _base_concept(ca)
+    base_b = _base_concept(cb)
+    if (base_a != ca or base_b != cb) and base_a == base_b and base_a:
+        return True
+
+    # Same-parent match (existing logic)
     parent_a = DISASTER_TYPE_HIERARCHY.get(ca)
     parent_b = DISASTER_TYPE_HIERARCHY.get(cb)
 
