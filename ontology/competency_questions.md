@@ -358,7 +358,7 @@ WHERE {
     }
 ```
 
-### Response
+### Response & Preparedness
 
 **CQ15.** What assistance was provided in response to disaster events in Isabela, broken down by source, and which organizations contributed?
 
@@ -427,8 +427,6 @@ WHERE {
 
 ```
 
-### Preparedness & Provenance
-
 **CQ18.** Which 4th income class municipalities in Region 9 experienced at least one disaster event, and did any of those events have preemptive evacuation recorded?
 
 ```
@@ -452,6 +450,8 @@ WHERE {
 }
 GROUP BY ?mun ?munName ?provName
 ```
+
+### Provenance
 
 **CQ19.** How many technological fire disaster incidents were recorded in DROMIC reports compared to EM-DAT (CRED) entries for the enitre Philippines?
 
