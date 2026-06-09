@@ -17,7 +17,7 @@ Source-specific modules that translate parsed records into RDF triples for the S
 
 ### Source mappings
 
-**`gda_mapping.py`** — Government Disaster Assessment (GDA) records. Defines dataclasses and `*_mapping` functions for:
+**`gda.py`** — Government Disaster Assessment (GDA) records. Defines dataclasses and `*_mapping` functions for:
 - `Event` / `Incident` (events tagged `eventClass == "I"` are emitted as `SKG.Incident`, otherwise `SKG.MajorEvent`; incidents are linked back to their parent event via `SKG.hasRelatedIncident`)
 - `Preparedness`, `Evacuation` (preemptive), `Rescue`, `DeclarationOfCalamity` — declaration text without "calamity" is downgraded to a `Preparedness` announcement
 - `AffectedPopulation`, `Casualties` (split into one `SKG.Casualties` node per `DEAD`/`INJURED`/`MISSING` count)

@@ -64,14 +64,60 @@ Builds `orgs.ttl` from `org_registry.json`.
 
 ### `disaster_classifier.py`
 Sentence-embedding classifier that maps free-text incident descriptions to
-leaf disaster types in the SakunaGraPH ontology.
+leaf disaster types in the SakunaGraPH ontology. Classification is a two-layer
+pipeline: a fast keyword rule layer narrows the candidate set, then a
+SentenceTransformer resolves the final label via cosine similarity.
 
 - Loads leaf `skos:Concept`s in `skg:DisasterTypeScheme` (concepts with no
   narrower children) plus their `skos:definition` from `sakunagraph.ttl`.
 - Encodes each definition with a SentenceTransformer model (default
-  `all-mpnet-base-v2`) and scores incoming texts via cosine similarity.
-- `classify(texts)` returns `(class_label, score)` per input.
+  `all-mpnet-base-v2`) at init time; incoming texts are scored via cosine
+  similarity against this embedding matrix.
+- `classify(texts)` returns `(class_label, score)` per input. Score is `1.0`
+  for hard rule wins, cosine similarity otherwise.
 - Exposes a module-level `DISASTER_CLASSIFIER` singleton.
+
+**Routing logic (`_route`)** — for each input text:
+
+1. Run all classification rules and collect every label whose triggers fire
+   (`_rule_candidates`). Rules do not short-circuit; all matching labels are
+   gathered.
+2. **No candidates** — transformer runs over the full label space.
+3. **Single unambiguous candidate** — returned immediately as a hard rule win
+   (score `1.0`); transformer is skipped.
+4. **Ambiguous candidates** — if all fired labels share an ambiguity group
+   (e.g. `LandslideWet` vs `LandslideDry`), the transformer resolves among
+   the full union of that group's labels, not just the ones that fired.
+5. **Mixed or multi-group candidates** — transformer resolves over the union
+   of all fired labels and their sibling groups.
+
+#### `classification_rules.py`
+Defines the rule table and ambiguity groups consumed by `DisasterClassifier`.
+
+**`CLASSIFICATION_RULES`** is an ordered list of `ClassificationRule` entries,
+each of the form `([trigger_tokens], label)` or
+`([trigger_tokens], label, [context_tokens])`. Matching is case-insensitive
+substring: any trigger token must appear in the text, and if context tokens are
+present, at least one must also appear (AND requirement). Rules span all IRDR
+hazard categories: hydrological, mass movement, wave action, transport,
+technological, geophysical, meteorological, climatological, biological, and
+extraterrestrial.
+
+**`AMBIGUOUS_GROUPS`** is a list of `frozenset[str]` groupings for labels that
+must never be hard-won against each other — e.g. wet/dry mass-movement pairs
+(`LandslideWet`/`LandslideDry`) and industrial/miscellaneous splits
+(`FireIndustrial`/`FireMiscellaneous`). When all fired candidates belong to the
+same group, the transformer resolves among the entire group so plausible
+siblings that did not fire are still considered.
+
+Key helpers:
+- `labels_are_ambiguous(candidates)` — returns `True` if all candidates share
+  at least one ambiguity group.
+- `ambiguous_candidate_set(candidates)` — returns the union of all groups the
+  candidates belong to, used to build the restricted label space passed to the
+  transformer.
+- `_WET_CONTEXT` — shared context token list for wet mass-movement rules
+  (rain, flood, typhoon, etc.).
 
 ### `event_resolver.py`
 End-to-end entity resolution for `DisasterEvent`s across sources (NDRRMC,

@@ -13,8 +13,7 @@ Arguments:
 
 Outputs (per year):
 - Downloads → `../data/raw/dromic-new/{year}/`
-- Manifest → `../logs/dromic/{year}_manifest.json` — provenance record per file (`filename`, `download_url`, `downloaded_at`, `post_url`, `page`)
-- Scrape state → `../logs/dromic/{year}_scrape_state.json` — tracks `last_scrape_date` and `scraped_urls` so re-runs only fetch new posts
+- Manifest → `../logs/dromic/{year}_manifest.json` — ptracks `last_scrape_date` and provenance record per file `entities`: (`filename`, `download_url`, `downloaded_at`, `post_url`, `page`)
 - Log → `../logs/dromic/{year}_scraper_{timestamp}.log`
 
 Behavior:

@@ -3,7 +3,7 @@
 Per-source ETL drivers and the cross-source entity-resolution stage. Each
 `run_*.py` script transforms one upstream dataset into a Turtle graph under
 `../data/rdf/events/`; `build_alignment.py` then ingests those graphs and
-produces `owl:sameAs` alignments plus a dedup registry.
+produces `prov:alternateOf` alignments plus a dedup registry.
 
 All scripts are intended to be run from the `etl/` directory so that the
 relative `../data/...` paths resolve correctly.
@@ -38,15 +38,37 @@ Steps:
    flight).
 3. Subgraphs are merged into a per-batch main graph and serialized to
    `../data/rdf/events/{--out}-{index}.ttl`.
-4. The script loops until `file_no` (89) batches have been written.
 
 CLI: `python run_ndrrmc.py [--out ndrrmc] [--start 0] [--count 10]`
 
-Notes:
-- Workers re-initialize `logging.basicConfig` because
-  `ProcessPoolExecutor` does not inherit the parent's root logger config.
-- The hard-coded `file_no = 89` is the current event count and should be
-  updated when new sitreps are added.
+## `run_dromic.py`
+
+Builds DROMIC event graphs per year from the parsed reports tree under
+`../data/parsed/dromic/[year]/`. This driver produces one subgraph per year
+subfolder, or iterates over all year subfolders when `--all` is passed.
+
+Steps:
+1. For a given year directory, walk every event subfolder (skipping any folder
+   listed in `_needs_rerun.txt` for that year).
+2. Per event folder, `load_event` reads `metadata.json` and `event_mapping`
+   mints the event IRI; `load_provenance` + `prov_mapping` attach the
+   provenance chain from `source.json`.
+3. `load_aff_pop` is called for affected-population and pre-emptive evacuation
+   data; non-empty results are passed to `aff_pop_mapping` and `pevac_mapping`
+   respectively.
+4. `load_housing` populates housing damage via `housing_mapping` if present.
+5. `load_assistance` + `assistance_mapping` handle assistance data; failures
+   are caught, logged, and the offending folder name is appended to
+   `_needs_rerun.txt` for later inspection rather than aborting the run.
+6. All per-event subgraphs are merged into a single year graph and serialized
+   to `../data/rdf/events/{--out}-{year}.ttl`.
+
+**`_needs_rerun.txt` mechanic** — each year directory may contain this file.
+Folders listed there are silently skipped during `run()`, and any folder whose
+`load_assistance` call raises an exception is automatically appended to it,
+making failed events easy to retry in isolation.
+
+CLI: `python run_dromic.py [--year 2026]`
 
 ## `run_gda.py`
 Builds `gda.ttl` from the cleaned Geographical Disaster Archive workbook at
@@ -79,10 +101,9 @@ Stages:
 3. **Score** — `score_all_pairs` runs the date / type / label / PSGC gates
    and produces scored pairs.
 4. **Align** — pairs flagged `is_match` are written to
-   `alignments.ttl` as `owl:sameAs`; `build_clusters` groups them and
+   `alignments.ttl` as `prov:alternateOf`; `build_clusters` groups them and
    `save_registry` persists the dedup registry to `dedup_registry.json`.
-5. **Merge** — currently commented out; would materialize `canonical.ttl`
-   from the alignments via `merge_graphs`.
+
 
 Logging is mirrored to stdout and `../logs/pipeline_<timestamp>.txt`.
 
