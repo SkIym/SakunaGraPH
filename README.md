@@ -4,7 +4,7 @@ A knowledge graph for Philippine disaster data integration based on an ontology.
 
 ## Overview
 
-SakunaGraPH integrates disaster data from multiple Philippine and international sources into a unified RDF knowledge graph. It combines an OWL ontology for disaster modeling with an ETL pipeline that extracts, transforms, and loads data into a triplestore. A WIP querying interface to talk to the knowledge graph is available at sakunagraph.upcsweb.dev.
+SakunaGraPH integrates disaster data from multiple Philippine and international sources into a unified RDF knowledge graph. It combines an OWL ontology for disaster modeling with an ETL pipeline that extracts, transforms, and loads data into a triplestore. A WIP querying interface to talk to the knowledge graph is available at [sakunagraph.upcsweb.dev](https://sakunagraph.upcsweb.dev).
 
 ## Project Structure
 
@@ -13,8 +13,7 @@ SakunaGraPH/
 ├── ontology/       # OWL ontology and SKOS disaster type scheme
 ├── frontend/       # querying interface with an interactive graph and map view
 ├── etl/            # ETL pipeline (fetch, parse, transform, map, load)
-├── logs/           # Pipeline execution logs
-└── requirements.txt
+└── logs/           # Pipeline execution logs
 ```
 
 ## Data Sources
@@ -30,7 +29,7 @@ SakunaGraPH/
 - **Ontology**: OWL 2, RDFS, SKOS, PROV, QUDT, beAware
 - **ETL**: Python (rdflib, docling, Polars, pdfplumber, sentence-transformers)
 - **Triplestore**: GraphDB
-- **Frontend**: Sveltekit
+- **UI / endpoint demo**: Sveltekit
 
 ## Getting Started
 
