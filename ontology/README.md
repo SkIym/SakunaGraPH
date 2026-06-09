@@ -7,8 +7,6 @@ OWL ontology for modeling Philippine disaster events, their impacts, responses, 
 | File | Description |
 |------|-------------|
 | `sakunagraph.ttl` | Main ontology (Turtle format) |
-| `sakunaph.owl` | WebProtege export (RDF/XML format) |
-| `beAWARE_ontology.owl` | Imported base ontology for disaster events and locations |
 | `pitfall-scanner-results*.xml` | OOPS! pitfall scanner validation results |
 
 ## Namespace
@@ -55,13 +53,15 @@ Base IRI: https://sakuna.ph/
 
 ## Disaster Type Scheme
 
-`skg-disaster-type-scheme.ttl` defines a two-tier SKOS hierarchy based on EM-DAT:
+A two-tier SKOS hierarchy based on EM-DAT is defined inside the ontology:
 
 - **Natural**: Biological, Climatological, Extraterrestrial, Geophysical, Hydrological, Meteorological
 - **Technological**: Industrial accidents, transport accidents, armed conflicts
 
-Each leaf concept includes a `skos:definition` used by the ETL semantic classifier for fuzzy matching.
+Each leaf concept includes a `skos:note` used by the ETL semantic classifier for fuzzy matching.
 
 ## Validation
 
 Ontology quality checked with [OOPS! Pitfall Scanner](https://oops.linkeddata.es/). Results in `pitfall-scanner-results*.xml`. Remaining minor pitfalls (missing annotations) are acknowledged but deprioritized.
+
+Twenty competency questions are answered and executed against the graph via their equivalent SPARQL queries. See [competency questions](competency_questions.md) for more info. 
