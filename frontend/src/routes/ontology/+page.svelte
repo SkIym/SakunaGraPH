@@ -1,6 +1,5 @@
 <script>
 	import { onMount, tick } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 
 	// ── Tab state ─────────────────────────────────────────────────────────────
