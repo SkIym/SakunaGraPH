@@ -121,18 +121,68 @@ Key helpers:
 
 ### `event_resolver.py`
 End-to-end entity resolution for `DisasterEvent`s across sources (NDRRMC,
-DROMIC, EM-DAT, GDA). Combines extractor, blocker, scorer, aligner, and
-cluster builder in a single module.
+DROMIC, EM-DAT, GDA). Combines config, models, extractor, blocker, scorer,
+aligner, and cluster builder in a single module, organized into six internal
+sections.
 
-Resolution gates (all must pass for two events to be merged):
-1. **Date gate** — start dates within `DATE_HARD_GATE_DAYS` (5).
-2. **Type gate** — same disaster concept or shared parent concept.
-3. **Label/location gate** — fuzzy label similarity ≥ threshold or shared
-   proper-noun token; falls back to location-token overlap when labels are
-   absent.
-4. **PSGC gate** — when at least one side is an `Incident`, requires a shared
-   PSGC prefix at region (2-digit), province (4-digit), or exact (10-digit)
-   level.
+**Resolution gates** — all applicable gates must pass (no gate may return
+`False`) for two events to be considered a match. A gate returning `None`
+means data is missing or the gate is inactive; this is a non-blocking skip.
+
+1. **Date gate** — start dates must be within `DATE_HARD_GATE_DAYS` (5) for
+   `MajorEvent`/`DisasterEvent` pairs, or `DATE_HARD_GATE_DAYS_INCIDENT` (2)
+   when either event is an `Incident`.
+2. **Type gate** — disaster concepts must match exactly, share a wet/dry base
+   name (e.g. `LandslideWet` vs `LandslideDry`), share the same parent
+   concept, or one must be the direct parent of the other. Returns `None` when
+   either concept is unresolvable.
+3. **Label/location gate** — when both events carry a label, passes if fuzzy
+   similarity ≥ `LABEL_FUZZY_THRESHOLD` (0.70) or at least one capitalised
+   proper-noun token (≥ 4 chars) is shared. When labels are absent, the gate
+   is skipped (`None`).
+4. **PSGC gate** — activates when either event is an `Incident`. Extracts
+   10-digit PSGC codes from `location_uris` and checks for a shared prefix at
+   region (2-digit), province (4-digit), or exact (10-digit) level. Returns
+   `None` if either side has no resolvable PSGC codes (non-blocking skip);
+   returns `False` (hard reject) if codes exist on both sides but no prefix
+   matches at any level.
+
+**Internal sections:**
+
+- **Config** — gate thresholds (`DATE_HARD_GATE_DAYS`, `LABEL_FUZZY_THRESHOLD`,
+  `PSGC_MATCH_LEVELS`, etc.), `SOURCE_PRIORITY` list, `DISASTER_TYPE_ALIASES`
+  for normalising free-text type literals, and `DISASTER_TYPE_HIERARCHY` — a
+  flat `label → parent` dict covering all IRDR hazard classes used by the type
+  gate.
+- **Models** — `DisasterEvent` dataclass carrying URI, source, label,
+  disaster type (literal + URI), dates, location literal, `rdf_type`
+  (`Incident` / `DisasterEvent` / `MajorEvent`), `location_uris` (for Gate 4),
+  and `blocking_keys`.  `ScoreBreakdown` dataclass holding per-gate verdicts
+  and the final `is_match` flag.
+- **Extractor** — `extract_events_from_graph` walks an rdflib `Graph` for
+  `skg:DisasterEvent`, `skg:MajorEvent`, and `skg:Incident` typed nodes,
+  resolving labels, disaster types, dates, and location URIs. NDRRMC
+  `Incident`-typed nodes are skip-listed at extraction time (report-level
+  artefacts). `load_all_sources` iterates every `.ttl` under a directory and
+  returns a flat event list.
+- **Blocker** — `generate_candidate_pairs` builds an inverted index keyed by
+  `{disaster_type_base}|{year}` buckets (wet/dry suffixes are stripped to the
+  same bucket), then yields unique cross-source pairs. An early date-tolerance
+  filter inside the blocker mirrors Gate 1 to avoid surfacing pairs that would
+  be immediately rejected. `blocking_stats` reports total/possible/candidate
+  counts and the reduction ratio.
+- **Scorer** — `score_pair` runs all four gates and returns a `ScoreBreakdown`.
+  `score_all_pairs` iterates the candidate list and optionally prints matched
+  pairs to stdout when `verbose=True`.
+- **Aligner** — `build_clusters` uses union-find to group matched URIs;
+  `pick_canonical` selects the authoritative URI from a cluster using
+  `SOURCE_PRIORITY`. `write_alignments` serialises `prov:alternateOf` triples
+  (both pairwise and via a shared canonical URI) plus a `prov:Activity`
+  run-record to `alignments.ttl`. `save_registry` / `load_registry` persist
+  the dedup registry as JSON; `get_known_pairs` returns the flat set of all
+  clustered member URIs for incremental runs. `expand_clusters` handles
+  incremental updates by merging new matches into existing registry clusters
+  rather than reprocessing from scratch.
 
 Public surface used by `pipeline/build_alignment.py`:
 `load_all_sources`, `generate_candidate_pairs`, `blocking_stats`,
