@@ -51,7 +51,7 @@ qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterLocation
 baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
                         owl:inverseOf baw:isLocationOfDisaster ;
-                        rdfs:domain :DisasterEvent ;
+                        rdfs:domain baw:NaturalDisaster ;
                         rdfs:range baw:Location ;
                         rdfs:label "has disaster location" ;
                         skos:definition "Represents the location where a natural disaster takes place." .
@@ -61,8 +61,8 @@ baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
 baw:hasDisasterOccurrence rdf:type owl:ObjectProperty ;
                           owl:inverseOf baw:isOfDisasterType ,
                                         :hasDisasterType ;
-                          rdfs:domain :DisasterType ;
-                          rdfs:range :DisasterEvent ;
+                          rdfs:domain baw:NaturalDisasterType ;
+                          rdfs:range baw:NaturalDisaster ;
                           rdfs:label "has disaster occurrence" ;
                           skos:definition "Links a natural disaster type to a natural disaster." .
 
@@ -88,7 +88,7 @@ baw:hasIncidentOccurrence rdf:type owl:ObjectProperty ;
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfDisaster
 baw:isLocationOfDisaster rdf:type owl:ObjectProperty ;
                          rdfs:domain baw:Location ;
-                         rdfs:range :DisasterEvent ;
+                         rdfs:range baw:NaturalDisaster ;
                          rdfs:label "is location of disaster" ;
                          skos:definition "Links a location to a natural disaster occurrence." .
 
@@ -105,6 +105,8 @@ baw:isLocationOfIncident rdf:type owl:ObjectProperty ;
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType
 baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                      owl:equivalentProperty :hasDisasterType ;
+                     rdfs:domain baw:NaturalDisaster ;
+                     rdfs:range baw:NaturalDisasterType ;
                      rdfs:label "is of disaster type" .
 
 
@@ -515,6 +517,13 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
     rdfs:range qudt:QuantityValue .
 
 
+:incidentDerivedFrom rdf:type owl:ObjectProperty ;
+    rdfs:label "incident related to a major event was derived from" ;
+    rdfs:comment "chain property to handle source linking for incidents derived from major events";
+    rdfs:subPropertyOf prov:wasDerivedFrom ;
+    owl:propertyChainAxiom ( :isRelatedTo prov:wasDerivedFrom ) .
+
+
 #################################################################
 #    Data properties
 #################################################################
@@ -522,7 +531,7 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd
 baw:hasDisasterEnd rdf:type owl:DatatypeProperty ;
                    owl:equivalentProperty :endDate ;
-                   rdfs:domain :DisasterEvent ;
+                   rdfs:domain baw:NaturalDisaster ;
                    rdfs:range xsd:dateTime ;
                    rdfs:label "has disaster end" ;
                    skos:definition "Indicates the end of the disaster." .
@@ -531,7 +540,7 @@ baw:hasDisasterEnd rdf:type owl:DatatypeProperty ;
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterStart
 baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      owl:equivalentProperty :startDate ;
-                     rdfs:domain :DisasterEvent ;
+                     rdfs:domain baw:NaturalDisaster ;
                      rdfs:range xsd:dateTime ;
                      rdfs:label "has disaster start" ;
                      skos:definition "Indicates the start of the disaster." .
