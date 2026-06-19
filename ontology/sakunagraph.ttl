@@ -318,6 +318,12 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
     rdfs:subPropertyOf :hasPreparedness ;
     rdfs:label "has preemptive evacuation" .
 
+:hasWarning rdf:type owl:ObjectProperty ;
+    rdfs:domain :DisasterEvent ;
+    rdfs:range :PreemptiveEvacuation ;
+    rdfs:subPropertyOf :hasPreparedness ;
+    rdfs:label "has warning" .
+
 
 ###  https://sakuna.ph/hasPreparedness
 :hasPreparedness rdf:type owl:ObjectProperty ;
@@ -382,7 +388,7 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 :hasRescue rdf:type owl:ObjectProperty ;
     rdfs:domain :DisasterEvent ;
     rdfs:range :Rescue ;
-    rdfs:subPropertyOf :hasPreparedness ;
+    rdfs:subPropertyOf :hasResponse ;
     rdfs:label "has rescue" .
 
 
@@ -639,12 +645,12 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:label "airport type"@en .
 
 
-###  https://sakuna.ph/announcementsReleased
-:announcementsReleased rdf:type owl:DatatypeProperty ;
-                       rdfs:domain :Preparedness ;
+###  https://sakuna.ph/warningReleased
+:warningReleased rdf:type owl:DatatypeProperty ;
+                       rdfs:domain :Warning ;
                        rdfs:range xsd:string ;
-                       rdfs:label "announcements released" ;
-                       skos:definition "Announcements released during preparation for a disaster." .
+                       rdfs:label "warning released" ;
+                       skos:definition "Warning or announcements released during preparation for a disaster." .
 
 
 ###  https://sakuna.ph/cancellationDateTime
@@ -864,7 +870,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                          ] ;
              rdfs:range xsd:string ;
              rdfs:label "has barangay" .
-
 
 ###  https://sakuna.ph/incidentActionsTaken
 :incidentActionsTaken rdf:type owl:DatatypeProperty ;
@@ -1426,6 +1431,10 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
             rdfs:range xsd:string ;
             rdfs:label "urban or rural" .
 
+:warningTimeStamp rdf:type owl:DatatypeProperty ;
+            rdfs:domain :Warning ;
+            rdfs:range  xsd:dateTime ;
+            rdfs:label "warning time stamp" .
 
 #################################################################
 #    Classes
@@ -1989,7 +1998,7 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/Rescue
 :Rescue rdf:type owl:Class ;
-        rdfs:subClassOf :Preparedness ,
+        rdfs:subClassOf :Response ,
                         [ rdf:type owl:Restriction ;
                           owl:onProperty :rescueEquipment ;
                           owl:someValuesFrom xsd:string
@@ -2141,6 +2150,11 @@ baw:NaturalDisaster rdf:type owl:Class ;
                  rdfs:subClassOf :Location ;
                 skos:definition "Administrative division below the city or municipality level. Can refer to recognized districts under the City of Manila. " ;
                  rdfs:label "SubMunicipality" .
+
+:Warning rdf:type owl:Class ;
+    rdfs:subClassOf :Preparedness ;
+    rdfs:label "Warning" ;
+    skos:definition "Warnings or announcements released before an impending disaster event. " .
 
 
 ###  https://sakuna.ph/WaterDisruption

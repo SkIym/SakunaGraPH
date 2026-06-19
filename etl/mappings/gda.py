@@ -249,8 +249,8 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
         e_uri = event_uri("gda", r.id)
         uri = sub_iri(e_uri, "preparedness")
 
-        g.add((uri, RDF.type, SKG.Preparedness))
-        g.add((e_uri, SKG.hasPreparedness, uri))
+        g.add((uri, RDF.type, SKG.Warning))
+        g.add((e_uri, SKG.hasWarning, uri))
 
         if any(v is not None for k, v in vars(r).items() if k != "id" and k != "hasLocation"):
             _add_location(g, uri, r.hasLocation)
@@ -260,7 +260,7 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
             for org in ORG_RESOLVER.split_and_resolve(str(r.agencyLGUsPresentPreparedness)):
                     g.add((uri, SKG.contributingOrg, org))
         if r.announcementsReleased:
-            g.add((uri, SKG.announcementsReleased, Literal(r.announcementsReleased)))
+            g.add((uri, SKG.warningReleased, Literal(r.announcementsReleased)))
 
 
 # ---------------------------------------------------------------------------
@@ -329,9 +329,9 @@ def calamity_mapping(rs: list[DeclarationOfCalamity], g: Graph) -> None:
                 e_uri = event_uri("gda", r.id)
                 uri = sub_iri(e_uri, "preparedness")
                 _add_location(g, uri, r.hasLocation)
-                g.add((uri, RDF.type, SKG.Preparedness))
-                g.add((e_uri, SKG.hasPreparedness, uri))
-                g.add((uri, SKG.announcementsReleased, Literal(r.declarationOfCalamity)))
+                g.add((uri, RDF.type, SKG.Warning))
+                g.add((e_uri, SKG.hasWarning, uri))
+                g.add((uri, SKG.warningReleased, Literal(r.declarationOfCalamity)))
 
 
 # ---------------------------------------------------------------------------
