@@ -273,7 +273,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph):
             g.add((uri, RDF.type, SKG.Casualties)) # rdf type
             g.add((e_uri, SKG.hasCasualties, uri)) # link event
             g.add((uri, SKG.casualtyCount, Literal(r.dead)))
-            g.add((uri, SKG.casualtyType, Literal("DEAD", datatype=SKG.casualtyDatatype)))
+            g.add((uri, SKG.isOfCasualtyType, SKG.Dead))
 
             id += 1
         
@@ -286,7 +286,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph):
             g.add((uri, RDF.type, SKG.Casualties)) # rdf type
             g.add((e_uri, SKG.hasCasualties, uri)) # link event
             g.add((uri, SKG.casualtyCount, Literal(r.injured)))
-            g.add((uri, SKG.casualtyType, Literal("INJURED", datatype=SKG.casualtyDatatype)))
+            g.add((uri, SKG.isOfCasualtyType, SKG.Injured))
 
 def aff_pop_mapping(rs: list[AffectedPopulation], g: Graph):
 

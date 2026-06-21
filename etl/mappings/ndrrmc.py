@@ -60,12 +60,16 @@ class AffectedPopulation(LocationRecord):
     displacedPersons: int
 
 
-CasualtDatatype = TypingLiteral["DEAD", "INJURED", "MISSING"]
+CasualtyDatatype = TypingLiteral["DEAD", "INJURED", "MISSING"]
 
+def casualty_type_to_iri(ctyp: str) -> URIRef:
+    if "dead" in ctyp.lower(): return SKG.Dead
+    if "injured" in ctyp.lower(): return SKG.Injured
+    if "missing" in ctyp.lower(): return SKG.Missing
 
 @dataclass
 class Casualties(LocationRecord):
-    casualtyType: CasualtDatatype
+    casualtyType: str
     casualtyCount: int
     casualtyDataSource: str | None
     casualtyCause: str | None
@@ -552,7 +556,7 @@ def casualties_mapping(g: Graph, cas: List[Casualties], event_iri: URIRef):
 
         g.add((uri, RDF.type, SKG.Casualties))
         g.add((event_iri, SKG.hasCasualties, uri))
-        g.add((uri, SKG.casualtyType, Literal(c.casualtyType, datatype=SKG.casualtyDatatype)))
+        g.add((uri, SKG.isOfCasualtyType, casualty_type_to_iri(c.casualtyType)))
         g.add((uri, SKG.casualtyCount, Literal(c.casualtyCount if c.casualtyCount else 1, datatype=XSD.int)))
         g.add((uri, SKG.hasLocation, URIRef(c.hasLocation)))
 

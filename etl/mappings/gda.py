@@ -377,7 +377,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
             g.add((uri, RDF.type, SKG.Casualties))
             g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.dead, datatype=XSD.int)))
-            g.add((uri, SKG.casualtyType, Literal("DEAD", datatype=SKG.casualtyDatatype)))
+            g.add((uri, SKG.isOfCasualtyType, SKG.Dead))
             index+=1
 
         if r.injured is not None:
@@ -386,7 +386,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
             g.add((uri, RDF.type, SKG.Casualties))
             g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.injured, datatype=XSD.int)))
-            g.add((uri, SKG.casualtyType, Literal("INJURED", datatype=SKG.casualtyDatatype)))
+            g.add((uri, SKG.isOfCasualtyType, SKG.Injured))
             index+=1
 
         if r.missing is not None:
@@ -395,7 +395,7 @@ def casualties_mapping(rs: list[Casualties], g: Graph) -> None:
             g.add((uri, RDF.type, SKG.Casualties))
             g.add((e_uri, SKG.hasCasualties, uri))
             g.add((uri, SKG.casualtyCount, Literal(r.missing, datatype=XSD.int)))
-            g.add((uri, SKG.casualtyType, Literal("MISSING", datatype=SKG.casualtyDatatype)))
+            g.add((uri, SKG.isOfCasualtyType, SKG.Missing))
             index+=1
 
 
