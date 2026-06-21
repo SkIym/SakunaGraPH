@@ -36,12 +36,20 @@ qudt:conversionOffset rdf:type owl:AnnotationProperty .
 qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
 
 
-#################################################################
-#    Datatypes
-#################################################################
+:Temperature rdf:type baw:ClimateParameterType .
+:Magnitude rdf:type baw:ClimateParameterType .
+:MagnitudeScale rdf:type baw:ClimateParameterType .
+:WindSpeed rdf:type baw:ClimateParameterType .
+:Precipitation rdf:type baw:ClimateParameterType .
+:Humidity rdf:type baw:ClimateParameterType .
+:AtmosphericPressure rdf:type baw:ClimateParameterType .
+:Depth rdf:type baw:ClimateParameterType .
+:Intensity rdf:type baw:ClimateParameterType .
+:FloodDepth rdf:type baw:ClimateParameterType .
 
-###  https://sakuna.ph/casualtyDatatype
-:casualtyDatatype rdf:type rdfs:Datatype .
+:Dead rdf:type :CasualtyType .
+:Missing rdf:type :CasualtyType .
+:Injured rdf:type :CasualtyType .
 
 
 #################################################################
@@ -595,6 +603,25 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                      skos:definition "Indicates the start of the disaster." .
 
 
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasUnit
+baw:hasUnit rdf:type owl:DatatypeProperty ;
+            rdfs:domain baw:ClimateParameter ;
+            rdfs:range xsd:string ;
+            rdfs:label "has unit" ;
+            rdfs:seeAlso baw:hasValue ;
+            skos:definition "Indicates the measurement unit of a climate parameter. Should be used together with property hasValue." ;
+            skos:example "Celsius for temperature measurements." .
+
+
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasValue
+baw:hasValue rdf:type owl:DatatypeProperty ;
+             rdfs:domain baw:ClimateParameter ;
+             rdfs:range xsd:float ;
+             rdfs:label "has value" ;
+             rdfs:seeAlso baw:hasUnit ;
+             skos:definition "Indicates the measurement value of a climate parameter. Should be used together with property hasUnit." .
+
+
 ###  https://sakuna.ph/affectedBarangays
 :affectedBarangays rdf:type owl:DatatypeProperty ;
                    rdfs:domain :AffectedPopulation ;
@@ -727,10 +754,10 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 
 
 ###  https://sakuna.ph/casualtyType
-:casualtyType rdf:type owl:DatatypeProperty ;
+:isOfCasualtyType rdf:type owl:DatatypeProperty ;
               rdfs:domain :Casualties ;
-              rdfs:range :casualtyDatatype ;
-              rdfs:label "type of casualty" .
+              rdfs:range :CasualtyType ;
+              rdfs:label "is of casualty type" .
 
 
 ###  https://sakuna.ph/cityClass
@@ -1697,11 +1724,16 @@ baw:NaturalDisaster rdf:type owl:Class ;
                               owl:someValuesFrom xsd:string
                             ] ,
                             [ rdf:type owl:Restriction ;
-                              owl:onProperty :casualtyType ;
-                              owl:someValuesFrom :casualtyDatatype
+                              owl:onProperty :isOfCasualtyType ;
+                              owl:someValuesFrom :CasualtyType
                             ] ;
             rdfs:label "Casualties"@en ;
             skos:definition "Represents the number of deaths, injured, and missing due to a disaster." .
+
+:CasualtyType rdf:type owl:Class ;
+                         rdfs:label "Casualty Type" ;
+                         skos:definition "Represents various types of casualties" ;
+                         skos:example "Dead, injured, missing" .
 
 
 ###  https://sakuna.ph/City
