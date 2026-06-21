@@ -142,7 +142,7 @@ WHERE {
 
     ?cas  :hasLocation  ?location ;
           :casualtyCount ?casualtyCount ;
-          :casualtyType  ?casualtyType .
+          :isOfCasualtyType  ?casualtyType .
 }
 GROUP BY ?provName ?casualtyType
 ORDER BY DESC(?total)`

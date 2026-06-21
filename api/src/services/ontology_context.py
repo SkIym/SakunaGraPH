@@ -18,7 +18,7 @@ PREFIX cur:  <http://qudt.org/vocab/currency/>
 - :Incident               — individual occurrence linked to a MajorEvent via :hasRelatedIncident
 - :DisasterType           — type/category of a disaster (instances form a skos:broader* hierarchy)
 - :AffectedPopulation     — affected/displaced persons and families (:affectedPersons, :affectedFamilies, :displacedPersons, :displacedFamilies, :evacuationCenters)
-- :Casualties             — deaths, injured, missing (:casualtyCount, :casualtyType ["dead"|"injured"|"missing"], :casualtyCause)
+- :Casualties             — deaths, injured, missing (:casualtyCount, :isOfCasualtyType ["dead"|"injured"|"missing"], :casualtyCause)
 - :HousingDamage          — :totallyDamagedHouses, :partiallyDamagedHouses
 - :InfrastructureDamage   — :infraDamageAmount, :commercialDamageAmount, :socialDamageAmount (values via qudt:numericValue)
 - :AgricultureDamage      — :agriDamageAmount, :productionLossCost, :productionLossVolume
