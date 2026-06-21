@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+This file provides guidance to agents when working with code in this repository.
 
 ## Project Overview
 
@@ -21,7 +21,7 @@ python -m pipeline.run_emdat [--out emdat.ttl]
 python -m pipeline.run_dromic
 
 # Prerequisites for NDRRMC:
-python ./parse/ndrrmc-v311.py        # PDF → CSV (pdfplumber)
+python ./parse/ndrrmc.py        # PDF → CSV (pdfplumber)
 python ./transform/psgc_datafile.py  # PSGC XLSX → psgc.ttl
 
 # Cross-source entity resolution (run after all source TTLs are generated):
@@ -75,7 +75,7 @@ Raw files (PDF/XLSX/Web)
 |---|---|
 | `../data/raw/{source}/` | Raw input files (XLSX, PDF) |
 | `../data/parsed/{source}/` | Intermediate CSV/structured data |
-| `../data/rdf/events/` | Per-source Turtle output (e.g., `ndrrmc-0.ttl`) |
+| `../data/rdf/events/{source}` | Per-source Turtle output (e.g., `ndrrmc-0.ttl`) |
 | `../data/rdf/psgc/` | PSGC RDF graph (`psgc.ttl`) |
 | `../data/rdf/resolution/` | `alignments.ttl`, `dedup_registry.json` |
 | `../logs/` | Execution logs, scrape state, manifests |
@@ -84,8 +84,7 @@ Raw files (PDF/XLSX/Web)
 
 - **RDF/OWL**: rdflib (graph creation & Turtle serialization)
 - **Data wrangling**: Polars (primary), Pandas (compatibility)
-- **PDF extraction**: pdfplumber
+- **PDF extraction**: pdfplumber, docling
 - **Web scraping**: Selenium (DROMIC, stateful with JSON state file)
-- **NLP/matching**: sentence-transformers, thefuzz, spaCy
-- **RML mapping**: morph-kgc (used for GDA via `mappings/gda_mappings.rml.ttl`)
+- **NLP/matching**: sentence-transformers, thefuzz
 - **Graph store**: GraphDB
