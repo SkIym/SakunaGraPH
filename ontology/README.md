@@ -1,13 +1,28 @@
 # SakunaGraPH Ontology
 
-OWL ontology for modeling Philippine disaster events, their impacts, responses, and geographic context. Extends the [beAWARE ontology](https://github.com/beAWARE-project/ontology) with domain-specific classes for Philippine disaster management.
+SakunaGraPH is an OWL ontology for modeling Philippine disaster knowledge. It captures disaster events, incidents, impacts, responses, preparedness actions, geographic hierarchy, and source provenance. The model extends the [beAWARE ontology](https://github.com/beAWARE-project/ontology) and is used by the ETL pipeline to populate the knowledge graph.
 
-## Files
+## What is in this folder
 
-| File | Description |
-|------|-------------|
-| `sakunagraph.ttl` | Main ontology (Turtle format) |
-| `pitfall-scanner-results*.xml` | OOPS! pitfall scanner validation results |
+| File | Purpose |
+|------|---------|
+| `sakunagraph.ttl` | Main ontology in Turtle format |
+| `competency_questions.md` | SPARQL competency questions used to validate the graph |
+| `run_cqs.py` | Helper script that runs the competency questions against a local GraphDB repository |
+| `catalog-v001.xml` | Ontology catalog used by RDF/OWL tooling |
+| `pitfall-scanner-results*.xml` | OOPS! validation output |
+| `neontometrics-2.csv` | Ontology metrics export |
+
+## Scope
+
+The ontology models:
+
+- disaster events and incidents
+- impact categories such as casualties, affected population, damage, and service disruptions
+- preparedness and response actions such as evacuation, rescue, assistance, and calamity declarations
+- Philippine administrative geography down to barangay level
+- provenance for source documents and reports
+- a SKOS disaster-type classification aligned with EM-DAT
 
 ## Namespace
 
@@ -15,53 +30,79 @@ OWL ontology for modeling Philippine disaster events, their impacts, responses, 
 Base IRI: https://sakuna.ph/
 ```
 
-## Imports
+## Imported Vocabularies
 
-- **GeoSPARQL 1.1** — geospatial representation and queries
-- **W3C PROV** — provenance tracking for data sources and reports
-- **W3C SKOS** — concept scheme organization (disaster types)
-- **QUDT** — quantities, units, and currency handling for monetary values
-- **beAWARE** — base disaster event and location concepts
+- `geo:` GeoSPARQL 1.1 for spatial features
+- `prov:` PROV-O for source and provenance modeling
+- `skos:` SKOS for the disaster-type concept scheme
+- `qudt:` QUDT for numeric quantities and currency values
+- `baw:` beAWARE classes and properties reused by SakunaGraPH
 
-## Core Concepts
+## Core Model
 
-### Disaster Events
-- `DisasterEvent` — top-level event class (major events vs. incidents)
-- `DisasterType` — hierarchical classification via SKOS (natural vs. technological)
-- `Incident` — sub-events within a major disaster event
+### Events
+
+- `:DisasterEvent` is the top-level class for all modeled events.
+- `:MajorEvent` represents large, aggregated events.
+- `:Incident` represents localized sub-events related to a larger event.
 
 ### Impact
-- `AffectedPopulation` — displaced families, served individuals, evacuation centers
-- `Casualties` — deaths, injuries, missing persons (by casualty type)
-- `HousingDamage`, `InfrastructureDamage`, `AgriculturalDamage` — sectoral damage
-- `PowerDisruption`, `CommunicationLineDisruption`, `WaterDisruption` — lifeline impacts
-- `RoadAndBridgesDamage`, `SeaportDisruption`, `AirportDisruption` — transport impacts
 
-### Response & Recovery
-- `Relief`, `Assistance` — aid distribution and fund allocation
-- `PreemptiveEvacuation`, `Rescue` — preparedness and response actions
-- `Recovery` — reconstruction costs, insured damages
-- `DeclarationOfCalamity` — government declarations
+- `:AffectedPopulation` for displaced and affected families or persons
+- `:Casualties` for deaths, injuries, and missing persons
+- `:HousingDamage`, `:InfrastructureDamage`, `:AgricultureDamage`
+- `:PowerDisruption`, `:CommunicationLineDisruption`, `:WaterDisruption`
+- `:RoadAndBridgesDamage`, `:SeaportDisruption`, `:AirportDisruption`
+- `:ClassSuspension`, `:WorkSuspension`, `:FlightDisruption`, `:StrandedEvent`
+
+### Preparedness and Response
+
+- `:PreemptiveEvacuation`
+- `:Rescue`
+- `:Assistance`
+- `:DeclarationOfCalamity`
+- `:Recovery`
+- `:Warning`
 
 ### Geography
-- `Region`, `Province`, `Municipality`, `Barangay` — Philippine administrative hierarchy
-- Linked to PSGC codes via `isPartOf` relationships
+
+- `:Country`, `:IslandGroup`, `:Region`, `:Province`, `:City`, `:Municipality`, `:Barangay`, `:SubMunicipality`
+- Geographic membership is modeled through `:isPartOf` chains rather than a separate region property
 
 ### Provenance
-- `prov:Entity` — source reports and documents
-- Tracks report names, dates obtained, recording agencies
+
+- `:Source` stores report metadata such as report name, URL, format, and acquisition dates
+- `prov:wasDerivedFrom` and related provenance links connect events to their source materials
 
 ## Disaster Type Scheme
 
-A two-tier SKOS hierarchy based on EM-DAT is defined inside the ontology:
+The ontology includes a SKOS concept scheme for disaster classification based on EM-DAT.
 
-- **Natural**: Biological, Climatological, Extraterrestrial, Geophysical, Hydrological, Meteorological
-- **Technological**: Industrial accidents, transport accidents, armed conflicts
+Top-level branches:
 
-Each leaf concept includes a `skos:note` used by the ETL semantic classifier for fuzzy matching.
+- `:Natural`
+- `:Technological`
 
-## Validation
+Examples of major branches and leaves:
 
-Ontology quality checked with [OOPS! Pitfall Scanner](https://oops.linkeddata.es/). Results in `pitfall-scanner-results*.xml`. Remaining minor pitfalls (missing annotations) are acknowledged but deprioritized.
+- Natural: `:Biological`, `:Climatological`, `:Geophysical`, `:Hydrological`, `:Meteorological`
+- Technological: `:ArmedConflict`, `:IndustrialAccident`, `:MiscellaneousAccident`, `:Transport`
 
-Twenty competency questions are answered and executed against the graph via their equivalent SPARQL queries. See [competency questions](competency_questions.md) for more info. 
+Leaf concepts include `skos:note` annotations that support fuzzy matching in the ETL semantic classifier.
+
+## Validation And Queries
+
+The ontology has been checked with [OOPS! Pitfall Scanner](https://oops.linkeddata.es/). The reported XML files in this folder contain the validation results.
+
+Twenty competency questions are documented in [`competency_questions.md`](competency_questions.md). The questions are also runnable against a local GraphDB repository through [`run_cqs.py`](run_cqs.py):
+
+```bash
+python run_cqs.py
+```
+
+The script expects GraphDB to be available at `http://localhost:7200/repositories/SakunaGraph` and writes an HTML results file next to the script.
+
+## Notes
+
+- The ontology is intentionally aligned with the ETL pipeline, so class and property names reflect the structure of the source disaster reports.
+- For the full class and property inventory, inspect `sakunagraph.ttl` directly.

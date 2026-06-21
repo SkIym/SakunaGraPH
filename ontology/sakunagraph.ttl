@@ -48,6 +48,14 @@ qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
 #    Object Properties
 #################################################################
 
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasClimateParameterMeasurement
+baw:hasClimateParameterMeasurement rdf:type owl:ObjectProperty ;
+                                   rdfs:domain :DisasterEvent ;
+                                   rdfs:range baw:ClimateParameter ;
+                                   rdfs:label "has disaster climate parameter" ;
+                                   skos:definition "Associates a natural disaster occurrence to a climate parameter measurement." .
+
+
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterLocation
 baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
                         owl:inverseOf baw:isLocationOfDisaster ;
@@ -65,6 +73,15 @@ baw:hasDisasterOccurrence rdf:type owl:ObjectProperty ;
                           rdfs:range baw:NaturalDisaster ;
                           rdfs:label "has disaster occurrence" ;
                           skos:definition "Links a natural disaster type to a natural disaster." .
+
+
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentClimateParameter
+baw:hasIncidentClimateParameter rdf:type owl:ObjectProperty ;
+                                owl:inverseOf baw:isClimateParameterOfIncident ;
+                                rdfs:domain baw:Incident ;
+                                rdfs:range baw:ClimateParameter ;
+                                rdfs:label "has incident climate parameter" ;
+                                skos:definition "Associates an incident to a climate parameter measurement." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasIncidentLocation
@@ -85,6 +102,21 @@ baw:hasIncidentOccurrence rdf:type owl:ObjectProperty ;
                           skos:definition "Links an incident type to an incident." .
 
 
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasMeasurementLocation
+baw:hasMeasurementLocation rdf:type owl:ObjectProperty ;
+                           owl:inverseOf baw:isLocationOfMeasurement ;
+                           rdfs:domain baw:ClimateParameter ;
+                           rdfs:range baw:Location ;
+                           rdfs:label "has measurement location" ;
+                           skos:definition "Represents the location where a climate parameter measurement was taken." .
+
+
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isClimateParameterOfIncident
+baw:isClimateParameterOfIncident rdfs:domain baw:ClimateParameter ;
+                                 rdfs:range baw:Incident ;
+                                 rdfs:label "is climate parameter of incident" .
+
+
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfDisaster
 baw:isLocationOfDisaster rdf:type owl:ObjectProperty ;
                          rdfs:domain baw:Location ;
@@ -102,6 +134,20 @@ baw:isLocationOfIncident rdf:type owl:ObjectProperty ;
                          skos:definition "Links a location to an incident occurrence." .
 
 
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isLocationOfMeasurement
+baw:isLocationOfMeasurement rdfs:domain :Location ;
+                            rdfs:range baw:ClimateParameter ;
+                            rdfs:label "is location of measurement" .
+
+
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfClimateParameterType
+baw:isOfClimateParameterType rdf:type owl:ObjectProperty ;
+                             rdfs:domain baw:ClimateParameter ;
+                             rdfs:range baw:ClimateParameterType ;
+                             rdfs:label "is of climate parameter type" ;
+                             skos:definition "Associates a climate parameter with a respective type." .
+
+
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType
 baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                      owl:equivalentProperty :hasDisasterType ;
@@ -112,16 +158,14 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/agriDamageAmount
 :agriDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:label "agriculture damage amount" ;
-    rdfs:domain :AgricultureDamage ;
-    rdfs:range qudt:QuantityValue .
+                  rdfs:domain :AgricultureDamage ;
+                  rdfs:range qudt:QuantityValue .
 
 
 ###  https://sakuna.ph/commercialDamageAmount
 :commercialDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:label "commerical damage amount" ;
-    rdfs:domain :InfrastructureDamage ;
-    rdfs:range qudt:QuantityValue .
+                        rdfs:domain :InfrastructureDamage ;
+                        rdfs:range qudt:QuantityValue .
 
 
 ###  https://sakuna.ph/contributingOrg
@@ -140,97 +184,95 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/crossSectoralDamageAmount
 :crossSectoralDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:label "cross-sectoral damage amount" ;
-    rdfs:domain :InfrastructureDamage ;
-    skos:example "health government, transmission lines" ;
-    rdfs:range qudt:QuantityValue .
+                           rdfs:domain :InfrastructureDamage ;
+                           rdfs:range qudt:QuantityValue .
 
 
 ###  https://sakuna.ph/generalDamageAmount
 :generalDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:domain :DamageGeneral ;
-    rdfs:range qudt:QuantityValue ;
-    rdfs:label "general total damage amount"@en .
+                     rdfs:domain :DamageGeneral ;
+                     rdfs:range qudt:QuantityValue ;
+                     rdfs:label "general total damage amount"@en .
 
 
 ###  https://sakuna.ph/hasAffectedPopulation
 :hasAffectedPopulation rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :AffectedPopulation ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has affected population" .
+                       rdfs:subPropertyOf :hasImpact ;
+                       rdfs:domain :DisasterEvent ;
+                       rdfs:range :AffectedPopulation ;
+                       rdfs:label "has affected population" .
 
 
 ###  https://sakuna.ph/hasAgricultureDamage
 :hasAgricultureDamage rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :AgricultureDamage ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has agriculture damage" .
+                      rdfs:subPropertyOf :hasImpact ;
+                      rdfs:domain :DisasterEvent ;
+                      rdfs:range :AgricultureDamage ;
+                      rdfs:label "has agriculture damage" .
 
 
 ###  https://sakuna.ph/hasAirportDisruption
 :hasAirportDisruption rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :AirportDisruption ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has airport disruption" .
+                      rdfs:subPropertyOf :hasImpact ;
+                      rdfs:domain :DisasterEvent ;
+                      rdfs:range :AirportDisruption ;
+                      rdfs:label "has airport disruption" .
 
 
 ###  https://sakuna.ph/hasAssistance
 :hasAssistance rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :Assistance ;
-    rdfs:subPropertyOf :hasResponse ;
-    rdfs:label "has assistance" .
+               rdfs:subPropertyOf :hasResponse ;
+               rdfs:domain :DisasterEvent ;
+               rdfs:range :Assistance ;
+               rdfs:label "has assistance" .
 
 
 ###  https://sakuna.ph/hasCasualties
 :hasCasualties rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :Casualties ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has casualties" .
+               rdfs:subPropertyOf :hasImpact ;
+               rdfs:domain :DisasterEvent ;
+               rdfs:range :Casualties ;
+               rdfs:label "has casualties" .
 
 
-###  https://sakuna.ph/hasClassDisruption
+###  https://sakuna.ph/hasClassSuspension
 :hasClassSuspension rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :ClassSuspension ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has class disruption" .
+                    rdfs:subPropertyOf :hasImpact ;
+                    rdfs:domain :DisasterEvent ;
+                    rdfs:range :ClassSuspension ;
+                    rdfs:label "has class disruption" .
 
 
 ###  https://sakuna.ph/hasCommunicationLineDisruption
 :hasCommunicationLineDisruption rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :CommunicationLineDisruption ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has communication line disruption" .
+                                rdfs:subPropertyOf :hasImpact ;
+                                rdfs:domain :DisasterEvent ;
+                                rdfs:range :CommunicationLineDisruption ;
+                                rdfs:label "has communication line disruption" .
 
 
 ###  https://sakuna.ph/hasDamageGeneral
 :hasDamageGeneral rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :DamageGeneral ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has damage (general)" .
+                  rdfs:subPropertyOf :hasImpact ;
+                  rdfs:domain :DisasterEvent ;
+                  rdfs:range :DamageGeneral ;
+                  rdfs:label "has damage (general)" .
 
 
 ###  https://sakuna.ph/hasDeclarationOfCalamity
 :hasDeclarationOfCalamity rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :DeclarationOfCalamity ;
-    rdfs:subPropertyOf :hasResponse ;
-    rdfs:label "has declaration of calamity" .
+                          rdfs:subPropertyOf :hasResponse ;
+                          rdfs:domain :DisasterEvent ;
+                          rdfs:range :DeclarationOfCalamity ;
+                          rdfs:label "has declaration of calamity" .
 
 
 ###  https://sakuna.ph/hasDisasterSubtype
 :hasDisasterSubtype rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :DisasterType ;
-    rdfs:subPropertyOf :hasDisasterType ;
-    rdfs:label "has disaster subtype" .
+                    rdfs:subPropertyOf :hasDisasterType ;
+                    rdfs:domain :DisasterEvent ;
+                    rdfs:range :DisasterType ;
+                    rdfs:label "has disaster subtype" .
 
 
 ###  https://sakuna.ph/hasDisasterType
@@ -242,10 +284,10 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasHousingDamage
 :hasHousingDamage rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :HousingDamage ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has housing damage" .
+                  rdfs:subPropertyOf :hasImpact ;
+                  rdfs:domain :DisasterEvent ;
+                  rdfs:range :HousingDamage ;
+                  rdfs:label "has housing damage" .
 
 
 ###  https://sakuna.ph/hasImpact
@@ -257,10 +299,10 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasInfrastructureDamage
 :hasInfrastructureDamage rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :InfrastructureDamage ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has infrastructure damage" .
+                         rdfs:subPropertyOf :hasImpact ;
+                         rdfs:domain :DisasterEvent ;
+                         rdfs:range :InfrastructureDamage ;
+                         rdfs:label "has infrastructure damage" .
 
 
 ###  https://sakuna.ph/hasLocation
@@ -305,24 +347,18 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasPowerDisruption
 :hasPowerDisruption rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :PowerDisruption ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has power disruption" .
+                    rdfs:subPropertyOf :hasImpact ;
+                    rdfs:domain :DisasterEvent ;
+                    rdfs:range :PowerDisruption ;
+                    rdfs:label "has power disruption" .
 
 
 ###  https://sakuna.ph/hasPreemptiveEvacuation
 :hasPreemptiveEvacuation rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :PreemptiveEvacuation ;
-    rdfs:subPropertyOf :hasPreparedness ;
-    rdfs:label "has preemptive evacuation" .
-
-:hasWarning rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :PreemptiveEvacuation ;
-    rdfs:subPropertyOf :hasPreparedness ;
-    rdfs:label "has warning" .
+                         rdfs:subPropertyOf :hasPreparedness ;
+                         rdfs:domain :DisasterEvent ;
+                         rdfs:range :PreemptiveEvacuation ;
+                         rdfs:label "has preemptive evacuation" .
 
 
 ###  https://sakuna.ph/hasPreparedness
@@ -348,10 +384,10 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasRecovery
 :hasRecovery rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :Recovery ;
-    rdfs:subPropertyOf :hasResponse ;
-    rdfs:label "has recovery" .
+             rdfs:subPropertyOf :hasResponse ;
+             rdfs:domain :DisasterEvent ;
+             rdfs:range :Recovery ;
+             rdfs:label "has recovery" .
 
 
 ###  https://sakuna.ph/hasRegion
@@ -378,18 +414,18 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasRelief
 :hasRelief rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :Relief ;
-    rdfs:subPropertyOf :hasResponse ;
-    rdfs:label "has relief" .
+           rdfs:subPropertyOf :hasResponse ;
+           rdfs:domain :DisasterEvent ;
+           rdfs:range :Relief ;
+           rdfs:label "has relief" .
 
 
 ###  https://sakuna.ph/hasRescue
 :hasRescue rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :Rescue ;
-    rdfs:subPropertyOf :hasResponse ;
-    rdfs:label "has rescue" .
+           rdfs:subPropertyOf :hasResponse ;
+           rdfs:domain :DisasterEvent ;
+           rdfs:range :Rescue ;
+           rdfs:label "has rescue" .
 
 
 ###  https://sakuna.ph/hasResponse
@@ -401,63 +437,79 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/hasRoadAndBridgesDamage
 :hasRoadAndBridgesDamage rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :RoadAndBridgesDamage ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has road and bridges damage" .
+                         rdfs:subPropertyOf :hasImpact ;
+                         rdfs:domain :DisasterEvent ;
+                         rdfs:range :RoadAndBridgesDamage ;
+                         rdfs:label "has road and bridges damage" .
 
 
 ###  https://sakuna.ph/hasSeaportDisruption
 :hasSeaportDisruption rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range :SeaportDisruption ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has seaport disruption" .
+                      rdfs:subPropertyOf :hasImpact ;
+                      rdfs:domain :DisasterEvent ;
+                      rdfs:range :SeaportDisruption ;
+                      rdfs:label "has seaport disruption" .
 
 
 ###  https://sakuna.ph/hasStrandedEvent
 :hasStrandedEvent rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :StrandedEvent ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has stranded event" .
+                  rdfs:subPropertyOf :hasImpact ;
+                  rdfs:domain :DisasterEvent ;
+                  rdfs:range :StrandedEvent ;
+                  rdfs:label "has stranded event" .
+
+
+###  https://sakuna.ph/hasWarning
+:hasWarning rdf:type owl:ObjectProperty ;
+            rdfs:subPropertyOf :hasPreparedness ;
+            rdfs:domain :DisasterEvent ;
+            rdfs:range :PreemptiveEvacuation ;
+            rdfs:label "has warning" .
 
 
 ###  https://sakuna.ph/hasWaterDisruption
 :hasWaterDisruption rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :WaterDisruption ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has water disruption" .
+                    rdfs:subPropertyOf :hasImpact ;
+                    rdfs:domain :DisasterEvent ;
+                    rdfs:range :WaterDisruption ;
+                    rdfs:label "has water disruption" .
 
 
-###  https://sakuna.ph/hasWorkDisruption
+###  https://sakuna.ph/hasWorkSuspension
 :hasWorkSuspension rdf:type owl:ObjectProperty ;
-    rdfs:domain :DisasterEvent ;
-    rdfs:range  :WorkSuspension ;
-    rdfs:subPropertyOf :hasImpact ;
-    rdfs:label "has work disruption" .
+                   rdfs:subPropertyOf :hasImpact ;
+                   rdfs:domain :DisasterEvent ;
+                   rdfs:range :WorkSuspension ;
+                   rdfs:label "has work disruption" .
 
 
 ###  https://sakuna.ph/housingDamageAmount
 :housingDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:label "housing damage amount" ;
-    rdfs:domain :HousingDamage ;
-    rdfs:range qudt:QuantityValue .
+                     rdfs:domain :HousingDamage ;
+                     rdfs:range qudt:QuantityValue .
+
+
+###  https://sakuna.ph/incidentDerivedFrom
+:incidentDerivedFrom rdf:type owl:ObjectProperty ;
+                     rdfs:subPropertyOf prov:wasDerivedFrom ;
+                     owl:propertyChainAxiom ( :isRelatedTo
+                                              prov:wasDerivedFrom
+                                            ) ;
+                     rdfs:comment "chain property to handle source linking for incidents derived from major events" ;
+                     rdfs:label "incident related to a major event was derived from" .
 
 
 ###  https://sakuna.ph/infraDamageAmount
 :infraDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:label "infrastructure damage amount" ;
-    rdfs:domain :InfrastructureDamage ;
-    rdfs:range qudt:QuantityValue .
+                   rdfs:domain :InfrastructureDamage ;
+                   rdfs:range qudt:QuantityValue .
 
 
 ###  https://sakuna.ph/insuredDamageAmount
 :insuredDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:domain :DamageGeneral ;
-    rdfs:range qudt:QuantityValue ;
-    rdfs:label "insured damage amount"@en .
+                     rdfs:domain :DamageGeneral ;
+                     rdfs:range qudt:QuantityValue ;
+                     rdfs:label "insured damage amount"@en .
 
 
 ###  https://sakuna.ph/isPartOf
@@ -511,23 +563,14 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/productionLossCost
 :productionLossCost rdf:type owl:ObjectProperty ;
-    rdfs:label "production loss cost" ;
-    rdfs:domain :AgricultureDamage ;
-    rdfs:range qudt:QuantityValue .
+                    rdfs:domain :AgricultureDamage ;
+                    rdfs:range qudt:QuantityValue .
 
 
 ###  https://sakuna.ph/socialDamageAmount
 :socialDamageAmount rdf:type owl:ObjectProperty ;
-    rdfs:label "social damage amount" ;
-    rdfs:domain :InfrastructureDamage ;
-    rdfs:range qudt:QuantityValue .
-
-
-:incidentDerivedFrom rdf:type owl:ObjectProperty ;
-    rdfs:label "incident related to a major event was derived from" ;
-    rdfs:comment "chain property to handle source linking for incidents derived from major events";
-    rdfs:subPropertyOf prov:wasDerivedFrom ;
-    owl:propertyChainAxiom ( :isRelatedTo prov:wasDerivedFrom ) .
+                    rdfs:domain :InfrastructureDamage ;
+                    rdfs:range qudt:QuantityValue .
 
 
 #################################################################
@@ -643,14 +686,6 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
              rdfs:domain :FlightDisruption ;
              rdfs:range xsd:string ;
              rdfs:label "airport type"@en .
-
-
-###  https://sakuna.ph/warningReleased
-:warningReleased rdf:type owl:DatatypeProperty ;
-                       rdfs:domain :Warning ;
-                       rdfs:range xsd:string ;
-                       rdfs:label "warning released" ;
-                       skos:definition "Warning or announcements released during preparation for a disaster." .
 
 
 ###  https://sakuna.ph/cancellationDateTime
@@ -870,6 +905,7 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
                          ] ;
              rdfs:range xsd:string ;
              rdfs:label "has barangay" .
+
 
 ###  https://sakuna.ph/incidentActionsTaken
 :incidentActionsTaken rdf:type owl:DatatypeProperty ;
@@ -1431,10 +1467,21 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
             rdfs:range xsd:string ;
             rdfs:label "urban or rural" .
 
+
+###  https://sakuna.ph/warningReleased
+:warningReleased rdf:type owl:DatatypeProperty ;
+                 rdfs:domain :Warning ;
+                 rdfs:range xsd:string ;
+                 rdfs:label "warning released" ;
+                 skos:definition "Warning or announcements released during preparation for a disaster." .
+
+
+###  https://sakuna.ph/warningTimeStamp
 :warningTimeStamp rdf:type owl:DatatypeProperty ;
-            rdfs:domain :Warning ;
-            rdfs:range  xsd:dateTime ;
-            rdfs:label "warning time stamp" .
+                  rdfs:domain :Warning ;
+                  rdfs:range xsd:dateTime ;
+                  rdfs:label "warning time stamp" .
+
 
 #################################################################
 #    Classes
@@ -1442,16 +1489,32 @@ baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
 
 ###  http://qudt.org/schema/qudt/CurrencyUnit
 qudt:CurrencyUnit rdf:type owl:Class ;
-    rdfs:label "Currency Unit"@en .
+                  rdfs:label "Currency Unit"@en .
+
 
 ###  http://qudt.org/schema/qudt/QuantityValue
 qudt:QuantityValue rdf:type owl:Class ;
-    rdfs:label "Quantity Value"@en .
+                   rdfs:label "Quantity Value"@en .
+
 
 ###  http://www.opengis.net/ont/geosparql#Feature
 geo:Feature rdf:type owl:Class ;
-    rdfs:label "Feature"@en ;
-    skos:definition "A discrete spatial phenomenon in a universe of discourse."@en .
+            rdfs:label "Feature"@en ;
+            skos:definition "A discrete spatial phenomenon in a universe of discourse."@en .
+
+
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#ClimateParameter
+baw:ClimateParameter rdf:type owl:Class ;
+                     rdfs:label "Climate Parameter" ;
+                     skos:definition "Represents the actual manifestation of a climate parameter measurement." .
+
+
+###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#ClimateParameterType
+baw:ClimateParameterType rdf:type owl:Class ;
+                         rdfs:label "Climate Parameter Type" ;
+                         skos:definition "Represents various types of climate-related parameters." ;
+                         skos:example "Temperature, humidity, etc." .
+
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact
 baw:Impact rdf:type owl:Class ;
@@ -1563,41 +1626,40 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/AirportDisruption
 :AirportDisruption rdf:type owl:Class ;
-    rdfs:subClassOf :Impact ,
-                    [ rdf:type owl:Restriction ;
-                        owl:onProperty :affectedDescription ;
-                        owl:someValuesFrom xsd:string
-                    ] ,
-                    [ rdf:type owl:Restriction ;
-                        owl:onProperty :cancellationDateTime ;
-                        owl:someValuesFrom xsd:dateTime
-                    ] ,
-                    [ rdf:type owl:Restriction ;
-                        owl:onProperty :portOrTerminalName ;
-                        owl:someValuesFrom xsd:string
-                    ] ,
-                    [ rdf:type owl:Restriction ;
-                        owl:onProperty :portStatus ;
-                        owl:someValuesFrom xsd:string
-                    ] ,
-                    [ rdf:type owl:Restriction ;
-                        owl:onProperty :resumptionDateTime ;
-                        owl:someValuesFrom xsd:dateTime
-                    ] ;
-    owl:disjointWith [ owl:intersectionOf ( 
-                            :ClassSuspension
-                            :CommunicationLineDisruption
-                            :PowerDisruption
-                            :RoadAndBridgesDamage
-                            :SeaportDisruption
-                            :WaterDisruption
-                            :WorkSuspension
-                                ) ;
-            rdf:type owl:Class
-            ] ;
-    rdfs:label "Airport Disruption" ;
-    skos:altLabel "Flight Disruption" ;
-    skos:definition "Represents disruptions on airports." .
+                   rdfs:subClassOf :Impact ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :affectedDescription ;
+                                     owl:someValuesFrom xsd:string
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :cancellationDateTime ;
+                                     owl:someValuesFrom xsd:dateTime
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :portOrTerminalName ;
+                                     owl:someValuesFrom xsd:string
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :portStatus ;
+                                     owl:someValuesFrom xsd:string
+                                   ] ,
+                                   [ rdf:type owl:Restriction ;
+                                     owl:onProperty :resumptionDateTime ;
+                                     owl:someValuesFrom xsd:dateTime
+                                   ] ;
+                   owl:disjointWith [ owl:intersectionOf ( :ClassSuspension
+                                                           :CommunicationLineDisruption
+                                                           :PowerDisruption
+                                                           :RoadAndBridgesDamage
+                                                           :SeaportDisruption
+                                                           :WaterDisruption
+                                                           :WorkSuspension
+                                                         ) ;
+                                      rdf:type owl:Class
+                                    ] ;
+                   rdfs:label "Airport Disruption" ;
+                   skos:altLabel "Flight Disruption" ;
+                   skos:definition "Represents disruptions on airports." .
 
 
 ###  https://sakuna.ph/Assistance
@@ -1759,9 +1821,9 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/FlightDisruption
 :FlightDisruption rdf:type owl:Class ;
-    rdfs:subClassOf :Impact ;
-    skos:definition "Represents flight disruptions." ;
-    rdfs:label "Flight Disruption" .
+                  rdfs:subClassOf :Impact ;
+                  rdfs:label "Flight Disruption" ;
+                  skos:definition "Represents flight disruptions." .
 
 
 ###  https://sakuna.ph/HousingDamage
@@ -1853,13 +1915,13 @@ baw:NaturalDisaster rdf:type owl:Class ;
 
 ###  https://sakuna.ph/IslandGroup
 :IslandGroup rdf:type owl:Class ;
-    rdfs:subClassOf :Location ,
-                    [ rdf:type owl:Restriction ;
-                    owl:onProperty :isPartOf ;
-                    owl:someValuesFrom :Country
-                    ] ;
-    skos:definition "Represents island groups" ;
-    rdfs:label "Island Group" .
+             rdfs:subClassOf :Location ,
+                             [ rdf:type owl:Restriction ;
+                               owl:onProperty :isPartOf ;
+                               owl:someValuesFrom :Country
+                             ] ;
+             rdfs:label "Island Group" ;
+             skos:definition "Represents island groups" .
 
 
 ###  https://sakuna.ph/Location
@@ -1994,6 +2056,10 @@ baw:NaturalDisaster rdf:type owl:Class ;
                         ] ;
         rdfs:label "Region"@en ;
         skos:definition "Administrative Level 1" .
+
+
+###  https://sakuna.ph/Relief
+:Relief rdf:type owl:Class .
 
 
 ###  https://sakuna.ph/Rescue
@@ -2148,13 +2214,15 @@ baw:NaturalDisaster rdf:type owl:Class ;
 ###  https://sakuna.ph/SubMunicipality
 :SubMunicipality rdf:type owl:Class ;
                  rdfs:subClassOf :Location ;
-                skos:definition "Administrative division below the city or municipality level. Can refer to recognized districts under the City of Manila. " ;
-                 rdfs:label "SubMunicipality" .
+                 rdfs:label "SubMunicipality" ;
+                 skos:definition "Administrative division below the city or municipality level. Can refer to recognized districts under the City of Manila. " .
 
+
+###  https://sakuna.ph/Warning
 :Warning rdf:type owl:Class ;
-    rdfs:subClassOf :Preparedness ;
-    rdfs:label "Warning" ;
-    skos:definition "Warnings or announcements released before an impending disaster event. " .
+         rdfs:subClassOf :Preparedness ;
+         rdfs:label "Warning" ;
+         skos:definition "Warnings or announcements released before an impending disaster event. " .
 
 
 ###  https://sakuna.ph/WaterDisruption
@@ -3405,19 +3473,27 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 
 
 :agriDamageAmount rdfs:comment "From Department of Geography digitized archives" ;
-                  rdfs:label "agriculture damage amount"@en .
+                  rdfs:label "agriculture damage amount"@en ,
+                             "agriculture damage amount" .
 
 
 :commercialDamageAmount rdfs:comment "In M PHP" ;
-                        rdfs:label "commercial damage amount"@en ;
+                        rdfs:label "commercial damage amount"@en ,
+                                   "commerical damage amount" ;
                         skos:altLabel "private damage amount" .
 
 
+:crossSectoralDamageAmount rdfs:label "cross-sectoral damage amount" ;
+                           skos:example "health government, transmission lines" .
+
+
 :housingDamageAmount rdfs:comment "In monetary value" ;
-                     rdfs:label "housing damage amount"@en .
+                     rdfs:label "housing damage amount"@en ,
+                                "housing damage amount" .
 
 
-:infraDamageAmount rdfs:label "infrastructure damage amount"@en .
+:infraDamageAmount rdfs:label "infrastructure damage amount"@en ,
+                              "infrastructure damage amount" .
 
 
 :postStructureCost rdfs:comment "Cost of Structure Built post-disaster" ;
@@ -3425,7 +3501,8 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                    skos:altLabel "reconstruction cost" .
 
 
-:productionLossCost rdfs:label "production loss cost"@en .
+:productionLossCost rdfs:label "production loss cost"@en ,
+                               "production loss cost" .
 
 
 :socialDamageAmount rdfs:label "social damage amount" .
