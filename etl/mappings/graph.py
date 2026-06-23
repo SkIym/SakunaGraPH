@@ -1,6 +1,7 @@
 from rdflib import Graph, Namespace, URIRef, BNode, RDF, RDFS, Literal, XSD, OWL
 
 SKG = Namespace("https://sakuna.ph/")
+BAW = Namespace("https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#")
 SKOS = Namespace("http://www.w3.org/2004/02/skos/core#")
 PROV = Namespace("http://www.w3.org/ns/prov#")
 QUDT   = Namespace("http://qudt.org/schema/qudt/")
@@ -11,6 +12,7 @@ GEO = Namespace("http://www.opengis.net/ont/geosparql#")
 def create_graph() -> Graph:
     g = Graph()
     g.bind("", SKG)
+    g.bind("baw", BAW)
     g.bind("xsd", "http://www.w3.org/2001/XMLSchema#")
     g.bind("qudt", QUDT)
     g.bind("prov", PROV)

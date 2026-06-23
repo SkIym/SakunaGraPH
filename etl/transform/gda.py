@@ -419,8 +419,13 @@ def load_with_tiered_headers(path: str | Path) -> pd.DataFrame:
 
 def to_type_iri(dtype: str | None) -> list[str] | None:
 
-    if dtype is None: return []
+    if dtype is None or pd.isna(dtype):
+        return []
 
+    dtype = str(dtype).strip()
+    if dtype.lower() in ("", "none", "nan"):
+        return []
+    
     # Subtype incidents are handled separately
     if "[" in dtype:
         print(dtype)

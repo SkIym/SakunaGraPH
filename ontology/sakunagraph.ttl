@@ -471,7 +471,7 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 :hasWarning rdf:type owl:ObjectProperty ;
             rdfs:subPropertyOf :hasPreparedness ;
             rdfs:domain :DisasterEvent ;
-            rdfs:range :PreemptiveEvacuation ;
+            rdfs:range :Warning ;
             rdfs:label "has warning" .
 
 
@@ -1054,24 +1054,11 @@ baw:hasValue rdf:type owl:DatatypeProperty ;
           rdfs:label "latitude"@en .
 
 
-###  https://sakuna.ph/locationStatus
-:locationStatus rdf:type owl:DatatypeProperty ;
-                rdfs:comment "Capital or Poblacion" ;
-                rdfs:label "location status" .
-
-
 ###  https://sakuna.ph/longitude
 :longitude rdf:type owl:DatatypeProperty ;
            rdfs:subPropertyOf owl:topDataProperty ;
            rdfs:range xsd:decimal ;
            rdfs:label "longitude"@en .
-
-
-###  https://sakuna.ph/magnitude
-:magnitude rdf:type owl:DatatypeProperty ;
-           rdfs:subPropertyOf owl:topDataProperty ;
-           rdfs:range xsd:decimal ;
-           rdfs:label "magnitude"@en .
 
 
 ###  https://sakuna.ph/noFamiliesAssisted

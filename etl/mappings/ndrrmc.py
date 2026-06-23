@@ -1,16 +1,16 @@
 # NDRRMC MAPPINGS HERE (rdflib)
-from dataclasses import dataclass, fields
+from dataclasses import dataclass, field, fields
 from typing import List, Literal as TypingLiteral
 from rdflib import URIRef, Literal, RDFS
 from rdflib.namespace import RDF, XSD
 from datetime import datetime
 
 from semantic_processing.org_resolver import ORG_RESOLVER
-from .graph import CUR, SKG, Graph, PROV, add_monetary, ORG
+from .graph import BAW, CUR, SKG, Graph, PROV, add_monetary, ORG
 from .iris import (aff_pop_iri, agri_iri, airport_iri, assistance_iri, casualties_iri,
-                   class_dis_iri, comms_iri, doc_iri, event_uri, flight_iri, housing_iri,
+                   class_dis_iri, climate_param_iri, comms_iri, doc_iri, event_uri, flight_iri, housing_iri,
                    incident_iri, infra_iri, org_iri, pevac_iri, power_iri, prov_iri,
-                   relief_iri, rnb_iri, seaport_iri, stranded_iri, water_iri, work_dis_iri)
+                   relief_iri, rnb_iri, seaport_iri, stranded_iri, warning_iri, water_iri, work_dis_iri)
 
 
 # ── Dataclasses ───────────────────────────────────────────────────────────────
@@ -24,6 +24,24 @@ class LocationRecord:
 
 
 @dataclass
+class ClimateParameterMeasurement:
+    id: str
+    parameter: str | None
+    value: float | None
+    unit: str | None
+    location: str | None = None
+    hasLocation: URIRef | None = None
+    parameterText: str | None = None
+
+
+@dataclass
+class Warning:
+    id: str
+    warningReleased: str
+    warningTimeStamp: datetime | None = None
+
+
+@dataclass
 class Event:
     eventName: str
     hasDisasterType: str
@@ -31,6 +49,8 @@ class Event:
     endDate: datetime | None
     id: str
     remarks: str | None = None
+    climateParameters: list[ClimateParameterMeasurement] = field(default_factory=list)
+    warnings: list[Warning] = field(default_factory=list)
 
 
 @dataclass
@@ -484,6 +504,34 @@ def event_mapping(g: Graph, ev: Event) -> URIRef:
         g.add((uri, URIRef(SKG["endDate"]), Literal(ev.endDate, datatype=XSD.dateTime)))
     if ev.remarks:
         g.add((uri, URIRef(SKG["remarks"]), Literal(ev.remarks)))
+
+    for measurement in ev.climateParameters:
+        if measurement.value is None:
+            continue
+
+        measure_uri = climate_param_iri(uri, measurement.id)
+        g.add((measure_uri, RDF.type, BAW.ClimateParameter))
+        g.add((uri, BAW.hasClimateParameterMeasurement, measure_uri))
+
+        if measurement.parameter:
+            g.add((measure_uri, BAW.isOfClimateParameterType, URIRef(SKG[measurement.parameter])))
+        g.add((measure_uri, BAW.hasValue, Literal(measurement.value, datatype=XSD.float)))
+        if measurement.unit:
+            g.add((measure_uri, BAW.hasUnit, Literal(measurement.unit)))
+        if measurement.hasLocation:
+            g.add((measure_uri, BAW.hasMeasurementLocation, URIRef(measurement.hasLocation)))
+
+    for warning in ev.warnings:
+        if not warning.warningReleased:
+            continue
+
+        warn_uri = warning_iri(uri, warning.id)
+        g.add((warn_uri, RDF.type, SKG.Warning))
+        g.add((uri, SKG.hasWarning, warn_uri))
+        g.add((warn_uri, SKG.warningReleased, Literal(warning.warningReleased)))
+
+        if warning.warningTimeStamp:
+            g.add((warn_uri, SKG.warningTimeStamp, Literal(warning.warningTimeStamp, datatype=XSD.dateTime)))
 
     return uri
 

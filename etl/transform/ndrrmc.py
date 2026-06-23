@@ -9,14 +9,14 @@ import polars as pl
 from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-# from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
+from semantic_processing.climate_parameter_extractor_llm import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, AIRPORT_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
     POWER_MAPPING, RNB_MAPPING, SEAPORT_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WORK_MAPPING,
-    AffectedPopulation, Agriculture, Airport, Casualties, ClassDisruption, CommunicationLines, Event, Flight,
-    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, WorkDisruption, WaterDisruption
+    AffectedPopulation, Agriculture, Airport, Casualties, ClassDisruption, ClimateParameterMeasurement, CommunicationLines, Event, Flight,
+    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, Warning, WorkDisruption, WaterDisruption
 )
 
 from transform.helpers import (
@@ -30,6 +30,46 @@ def _event_id(event_name: str, start_date: str | None) -> str:
     """Deterministic hex ID from event name + start date."""
     key = f"{event_name.strip().lower()}:{start_date or ''}"
     return uuid.uuid5(NDRRMC_EVENT_NS, key).hex
+
+
+def _load_climate_parameters(remarks_text: str) -> list[ClimateParameterMeasurement]:
+    extracted = PARAMS_EXTRACTOR.extract(remarks_text)
+    measurements: list[ClimateParameterMeasurement] = []
+
+    for idx, item in enumerate(extracted, 1):
+        # matched_location = None
+        # if item.location:
+        #     try:
+        #         matched = LOCATION_MATCHER.match([item.location])
+        #         matched_location = matched[0] if matched else None
+        #     except Exception:
+        #         matched_location = None
+
+        measurements.append(
+            ClimateParameterMeasurement(
+                id=str(idx),
+                parameter=item.parameter,
+                parameterText=item.parameterText,
+                value=item.value,
+                unit=item.unit,
+                location=item.location,
+                # hasLocation=matched_location,
+            )
+        )
+
+    return measurements
+
+
+def _load_warnings(remarks_text: str) -> list[Warning]:
+    extracted = PARAMS_EXTRACTOR.extract_warnings(remarks_text)
+    return [
+        Warning(
+            id=str(idx),
+            warningReleased=item.warningReleased,
+            warningTimeStamp=item.warningTimeStamp,
+        )
+        for idx, item in enumerate(extracted, 1)
+    ]
 
 
 def load_events(folder_path: str) -> list[Event]:
@@ -56,7 +96,8 @@ def load_events(folder_path: str) -> list[Event]:
 
         # Extract disaster-specific params from narrative text
         remarks_text = meta.get("remarks") or ""
-        # params = PARAMS_EXTRACTOR.extract(remarks_text)
+        params = _load_climate_parameters(remarks_text)
+        warnings = _load_warnings(remarks_text)
 
         events.append(Event(
             id=_event_id(meta.get("eventName", folder), meta.get("startDate")),
@@ -65,16 +106,8 @@ def load_events(folder_path: str) -> list[Event]:
             endDate=datetime.fromisoformat(meta["endDate"]) if meta.get("endDate") else None,
             remarks=remarks_text or None,
             hasDisasterType=pred,
-            # windSpeed=params.windSpeed,
-            # gustSpeed=params.gustSpeed,
-            # centralPressure=params.centralPressure,
-            # signalNumber=params.signalNumber,
-            # stormCategory=params.stormCategory,
-            # internationalName=params.internationalName,
-            # magnitude=params.magnitude,
-            # earthquakeDepth=params.earthquakeDepth,
-            # epicenterLatitude=params.epicenterLatitude,
-            # epicenterLongitude=params.epicenterLongitude,
+            climateParameters=params,
+            warnings=warnings,
         ))
 
     return events
