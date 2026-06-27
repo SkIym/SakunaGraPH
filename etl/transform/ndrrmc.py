@@ -9,7 +9,7 @@ import polars as pl
 from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-from semantic_processing.climate_parameter_extractor_llm import PARAMS_EXTRACTOR
+from semantic_processing.climate_parameter_extractor import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, AIRPORT_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,

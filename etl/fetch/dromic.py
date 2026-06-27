@@ -10,7 +10,7 @@ import re
 import sys
 import time
 from dataclasses import asdict, dataclass, field
-from datetime import date, datetime, timezone
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
 from urllib.parse import parse_qs, unquote, urlparse
@@ -36,13 +36,7 @@ def parse_args() -> argparse.Namespace:
         "--last-scrape-date",
         type=str,
         default=None,
-        help="Override last scrape date (YYYY-MM-DD). Defaults to value in state file.",
-    )
-    parser.add_argument(
-        "--state-file",
-        type=str,
-        default="../logs/dromic/scrape_state.json",
-        help="Path to the persistent scrape state file.",
+        help="Override last scrape date (YYYY-MM-DD). Defaults to value in manifest.",
     )
     parser.add_argument(
         "--max-pages",
@@ -51,33 +45,6 @@ def parse_args() -> argparse.Namespace:
         help="Maximum number of listing pages to scrape.",
     )
     return parser.parse_args()
-
-
-# =============================================================================
-# STATE
-# =============================================================================
-
-@dataclass
-class ScrapeState:
-    last_scrape_date: Optional[str] = None
-    scraped_urls: list[str] = field(default_factory=lambda: [])
-
-
-def load_state(path: Path) -> ScrapeState:
-    if path.exists():
-        with path.open("r", encoding="utf-8") as f:
-            data = json.load(f)
-        return ScrapeState(
-            last_scrape_date=data.get("last_scrape_date"),
-            scraped_urls=data.get("scraped_urls", []),
-        )
-    return ScrapeState()
-
-
-def save_state(path: Path, state: ScrapeState) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(asdict(state), f, indent=2)
 
 
 # =============================================================================
@@ -93,17 +60,40 @@ class ManifestEntry:
     page: int
 
 
-def load_manifest(path: Path) -> list[ManifestEntry]:
-    if path.exists():
-        with path.open("r", encoding="utf-8") as f:
-            return [ManifestEntry(**entry) for entry in json.load(f)]
-    return []
+@dataclass
+class Manifest:
+    last_scrape_date: Optional[str] = None
+    entries: list[ManifestEntry] = field(default_factory=list)
 
 
-def save_manifest(path: Path, entries: list[ManifestEntry]) -> None:
+def load_manifest(path: Path) -> Manifest:
+    if not path.exists():
+        return Manifest()
+
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if isinstance(data, list):
+        return Manifest(entries=[ManifestEntry(**entry) for entry in data])
+
+    return Manifest(
+        last_scrape_date=data.get("last_scrape_date"),
+        entries=[ManifestEntry(**entry) for entry in data.get("entries", [])],
+    )
+
+
+def save_manifest(path: Path, manifest: Manifest) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("w", encoding="utf-8") as f:
-        json.dump([asdict(e) for e in entries], f, indent=2, ensure_ascii=False)
+        json.dump(
+            {
+                "last_scrape_date": manifest.last_scrape_date,
+                "entries": [asdict(entry) for entry in manifest.entries],
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
 
 
 # =============================================================================
@@ -170,7 +160,7 @@ def resolve_filename(
 def download_file(
     url: str,
     download_dir: Path,
-    manifest: list[ManifestEntry],
+    manifest: Manifest,
     post_url: str,
     page: int,
     filename_hint: Optional[str] = None,
@@ -189,7 +179,7 @@ def download_file(
         dest.write_bytes(r.content)
         log.info("Saved: %s", filename)
 
-        manifest.append(
+        manifest.entries.append(
             ManifestEntry(
                 filename=filename,
                 download_url=url,
@@ -238,9 +228,7 @@ def handle_page(
     driver: WebDriver,
     wait: WebDriverWait[WebDriver],
     scraped_urls: set[str],
-    state: ScrapeState,
-    state_path: Path,
-    manifest: list[ManifestEntry],
+    manifest: Manifest,
     manifest_path: Path,
     last_scrape_date: datetime,
     download_dir: Path,
@@ -309,9 +297,6 @@ def handle_page(
                     success = download_file(file_url, download_dir, manifest, post_url, page,  file_name)
                     if success:
                         scraped_urls.add(post_url)
-                        state.scraped_urls = list(scraped_urls)
-
-                        save_state(state_path, state)
                         save_manifest(manifest_path, manifest)
                 else:
                     log.warning("No downloadable link found for: %s", post_url)
@@ -390,25 +375,25 @@ def main() -> None:
 
     download_dir = Path(f"../data/raw/dromic-new/{args.year}")
     log_dir = Path("../logs/dromic")
-    state_path = Path(os.path.join(download_dir, "scrape_state.json"))
     manifest_path = Path(os.path.join(download_dir, "manifest.json"))
     log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
 
     download_dir.mkdir(parents=True, exist_ok=True)
     setup_logging(log_file)
 
-    state = load_state(state_path)
     manifest = load_manifest(manifest_path)
 
 
     if args.last_scrape_date:
         last_scrape_date = datetime.strptime(args.last_scrape_date, "%Y-%m-%d")
-    elif state.last_scrape_date and not args.page:
-        last_scrape_date = datetime.strptime(state.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
+    elif manifest.last_scrape_date and not args.page:
+        last_scrape_date = datetime.strptime(manifest.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
     else:
         last_scrape_date = datetime.min
 
-    scraped_urls: set[str] = set(state.scraped_urls)
+    scraped_urls: set[str] = {
+        entry.post_url for entry in manifest.entries if entry.post_url
+    }
 
     opts = Options()
     opts.add_experimental_option(
@@ -439,8 +424,6 @@ def main() -> None:
                 driver=driver,
                 wait=wait,
                 scraped_urls=scraped_urls,
-                state=state,
-                state_path=state_path,
                 manifest=manifest,
                 manifest_path=manifest_path,
                 last_scrape_date=last_scrape_date,
@@ -458,8 +441,8 @@ def main() -> None:
                 break
     finally:
         driver.quit()
-        state.last_scrape_date = datetime.now(timezone.utc).strftime("%Y-%m-%d, %H:%M:%S")
-        save_state(state_path, state)
+        manifest.last_scrape_date = datetime.now(timezone.utc).strftime("%Y-%m-%d, %H:%M:%S")
+        save_manifest(manifest_path, manifest)
         log.info("Done. Manifest written to: %s", manifest_path)
 
 
