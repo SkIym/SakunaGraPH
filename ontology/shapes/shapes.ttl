@@ -1,0 +1,1065 @@
+@prefix : <https://sakuna.ph/> .
+@prefix baw: <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sgsh: <https://sakuna.ph/shapes/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sgsh:ShapeGraph a owl:Ontology ;
+    rdfs:comment "SHACL validation shapes for SakunaGraPH data, derived from sakunagraph.ttl class restrictions and property domains/ranges." .
+
+#################################################################
+# Helper literal shapes
+#################################################################
+
+sgsh:IntegerLiteralShape a sh:NodeShape ;
+    rdfs:comment "Reusable literal shape for ontology integer fields; accepts xsd:int and xsd:integer to tolerate common RDF serializer output." ;
+    sh:or (
+        [ sh:datatype xsd:int ]
+        [ sh:datatype xsd:integer ]
+    ) .
+
+sgsh:DecimalLiteralShape a sh:NodeShape ;
+    rdfs:comment "Reusable literal shape for ontology decimal fields; accepts decimal and integer lexical datatypes for numeric quantities." ;
+    sh:or (
+        [ sh:datatype xsd:decimal ]
+        [ sh:datatype xsd:int ]
+        [ sh:datatype xsd:integer ]
+    ) .
+
+#################################################################
+# Core event and classification shapes
+#################################################################
+
+sgsh:DisasterEventShape a sh:NodeShape ;
+    rdfs:comment "Validates common DisasterEvent fields and event-to-impact, preparedness, response, location, disaster type, and climate-parameter links." ;
+    sh:targetClass :DisasterEvent, :Incident, :MajorEvent, baw:NaturalDisaster ;
+    sh:property
+        [ rdfs:comment "eventName follows the DisasterEvent data property range xsd:string." ;
+          sh:path :eventName ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "startDate follows the DisasterEvent data property range xsd:dateTime and should not be later than endDate when both are present." ;
+          sh:path :startDate ;
+          sh:datatype xsd:dateTime ;
+          sh:lessThanOrEquals :endDate ],
+        [ rdfs:comment "endDate follows the DisasterEvent data property range xsd:dateTime." ;
+          sh:path :endDate ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "entryDate follows the DisasterEvent data property range xsd:dateTime." ;
+          sh:path :entryDate ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "lastUpdateDate follows the DisasterEvent or Source data property range xsd:dateTime." ;
+          sh:path :lastUpdateDate ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "reference follows the DisasterEvent data property range xsd:string." ;
+          sh:path :reference ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "remarks follows the shared event, impact, preparedness, and response data property range xsd:string." ;
+          sh:path :remarks ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "hasDisasterType values must be DisasterType resources." ;
+          sh:path :hasDisasterType ;
+          sh:class :DisasterType ],
+        [ rdfs:comment "hasDisasterSubtype values must be DisasterType resources." ;
+          sh:path :hasDisasterSubtype ;
+          sh:class :DisasterType ],
+        [ rdfs:comment "beAWARE isOfDisasterType values must be beAWARE NaturalDisasterType resources." ;
+          sh:path baw:isOfDisasterType ;
+          sh:class baw:NaturalDisasterType ],
+        [ rdfs:comment "hasImpact values must be Impact resources." ;
+          sh:path :hasImpact ;
+          sh:class :Impact ],
+        [ rdfs:comment "hasAffectedPopulation values must be AffectedPopulation resources." ;
+          sh:path :hasAffectedPopulation ;
+          sh:class :AffectedPopulation ],
+        [ rdfs:comment "hasAgricultureDamage values must be AgricultureDamage resources." ;
+          sh:path :hasAgricultureDamage ;
+          sh:class :AgricultureDamage ],
+        [ rdfs:comment "hasAirportDisruption values must be AirportDisruption resources." ;
+          sh:path :hasAirportDisruption ;
+          sh:class :AirportDisruption ],
+        [ rdfs:comment "hasCasualties values must be Casualties resources." ;
+          sh:path :hasCasualties ;
+          sh:class :Casualties ],
+        [ rdfs:comment "hasClassSuspension values must be ClassSuspension resources." ;
+          sh:path :hasClassSuspension ;
+          sh:class :ClassSuspension ],
+        [ rdfs:comment "hasCommunicationLineDisruption values must be CommunicationLineDisruption resources." ;
+          sh:path :hasCommunicationLineDisruption ;
+          sh:class :CommunicationLineDisruption ],
+        [ rdfs:comment "hasDamageGeneral values must be DamageGeneral resources." ;
+          sh:path :hasDamageGeneral ;
+          sh:class :DamageGeneral ],
+        [ rdfs:comment "hasHousingDamage values must be HousingDamage resources." ;
+          sh:path :hasHousingDamage ;
+          sh:class :HousingDamage ],
+        [ rdfs:comment "hasInfrastructureDamage values must be InfrastructureDamage resources." ;
+          sh:path :hasInfrastructureDamage ;
+          sh:class :InfrastructureDamage ],
+        [ rdfs:comment "hasPowerDisruption values must be PowerDisruption resources." ;
+          sh:path :hasPowerDisruption ;
+          sh:class :PowerDisruption ],
+        [ rdfs:comment "hasRoadAndBridgesDamage values must be RoadAndBridgesDamage resources." ;
+          sh:path :hasRoadAndBridgesDamage ;
+          sh:class :RoadAndBridgesDamage ],
+        [ rdfs:comment "hasSeaportDisruption values must be SeaportDisruption resources." ;
+          sh:path :hasSeaportDisruption ;
+          sh:class :SeaportDisruption ],
+        [ rdfs:comment "hasStrandedEvent values must be StrandedEvent resources." ;
+          sh:path :hasStrandedEvent ;
+          sh:class :StrandedEvent ],
+        [ rdfs:comment "hasWaterDisruption values must be WaterDisruption resources." ;
+          sh:path :hasWaterDisruption ;
+          sh:class :WaterDisruption ],
+        [ rdfs:comment "hasWorkSuspension values must be WorkSuspension resources." ;
+          sh:path :hasWorkSuspension ;
+          sh:class :WorkSuspension ],
+        [ rdfs:comment "hasPreparedness values must be Preparedness resources." ;
+          sh:path :hasPreparedness ;
+          sh:class :Preparedness ],
+        [ rdfs:comment "hasPreemptiveEvacuation values must be PreemptiveEvacuation resources." ;
+          sh:path :hasPreemptiveEvacuation ;
+          sh:class :PreemptiveEvacuation ],
+        [ rdfs:comment "hasWarning values must be Warning resources." ;
+          sh:path :hasWarning ;
+          sh:class :Warning ],
+        [ rdfs:comment "hasResponse values must be Response resources." ;
+          sh:path :hasResponse ;
+          sh:class :Response ],
+        [ rdfs:comment "hasAssistance values must be Assistance resources." ;
+          sh:path :hasAssistance ;
+          sh:class :Assistance ],
+        [ rdfs:comment "hasDeclarationOfCalamity values must be DeclarationOfCalamity resources." ;
+          sh:path :hasDeclarationOfCalamity ;
+          sh:class :DeclarationOfCalamity ],
+        [ rdfs:comment "hasRecovery values must be Recovery resources." ;
+          sh:path :hasRecovery ;
+          sh:class :Recovery ],
+        [ rdfs:comment "hasRelief values must be Relief resources." ;
+          sh:path :hasRelief ;
+          sh:class :Relief ],
+        [ rdfs:comment "hasRescue values must be Rescue resources." ;
+          sh:path :hasRescue ;
+          sh:class :Rescue ],
+        [ rdfs:comment "hasLocation values must be Location resources." ;
+          sh:path :hasLocation ;
+          sh:class :Location ],
+        [ rdfs:comment "hasRegion values must be Region resources." ;
+          sh:path :hasRegion ;
+          sh:class :Region ],
+        [ rdfs:comment "hasProvince values must be Province resources." ;
+          sh:path :hasProvince ;
+          sh:class :Province ],
+        [ rdfs:comment "hasMunicipality values must be Municipality resources." ;
+          sh:path :hasMunicipality ;
+          sh:class :Municipality ],
+        [ rdfs:comment "hasBarangay stores a barangay label according to the ontology data property range xsd:string." ;
+          sh:path :hasBarangay ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "hasClimateParameterMeasurement values must be beAWARE ClimateParameter resources." ;
+          sh:path baw:hasClimateParameterMeasurement ;
+          sh:class baw:ClimateParameter ],
+        [ rdfs:comment "beAWARE disaster start follows xsd:dateTime and is equivalent to startDate." ;
+          sh:path baw:hasDisasterStart ;
+          sh:datatype xsd:dateTime ;
+          sh:lessThanOrEquals baw:hasDisasterEnd ],
+        [ rdfs:comment "beAWARE disaster end follows xsd:dateTime and is equivalent to endDate." ;
+          sh:path baw:hasDisasterEnd ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "beAWARE disaster location values must be beAWARE Location resources." ;
+          sh:path baw:hasDisasterLocation ;
+          sh:class baw:Location ] .
+
+sgsh:IncidentShape a sh:NodeShape ;
+    rdfs:comment "Validates Incident-specific fields and its link to a parent MajorEvent." ;
+    sh:targetClass :Incident, baw:Incident ;
+    sh:property
+        [ rdfs:comment "incidentDescription follows the Incident data property range xsd:string." ;
+          sh:path :incidentDescription ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "incidentActionsTaken follows the Incident data property range xsd:string." ;
+          sh:path :incidentActionsTaken ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "isRelatedTo values must be MajorEvent resources." ;
+          sh:path :isRelatedTo ;
+          sh:class :MajorEvent ],
+        [ rdfs:comment "incidentDerivedFrom is a provenance link derived through the related major event chain." ;
+          sh:path :incidentDerivedFrom ;
+          sh:nodeKind sh:BlankNodeOrIRI ],
+        [ rdfs:comment "beAWARE incident climate parameter values must be ClimateParameter resources." ;
+          sh:path baw:hasIncidentClimateParameter ;
+          sh:class baw:ClimateParameter ],
+        [ rdfs:comment "beAWARE incident location values must be Location resources." ;
+          sh:path baw:hasIncidentLocation ;
+          sh:class baw:Location ] .
+
+sgsh:MajorEventShape a sh:NodeShape ;
+    rdfs:comment "Validates MajorEvent-specific links to related incidents." ;
+    sh:targetClass :MajorEvent ;
+    sh:property
+        [ rdfs:comment "hasRelatedIncident values must be Incident resources." ;
+          sh:path :hasRelatedIncident ;
+          sh:class :Incident ] .
+
+sgsh:DisasterTypeShape a sh:NodeShape ;
+    rdfs:comment "Validates DisasterType SKOS classification metadata used for EM-DAT-style hazard concepts." ;
+    sh:targetClass :DisasterType ;
+    sh:property
+        [ rdfs:comment "DisasterType broader links must point to another DisasterType concept." ;
+          sh:path skos:broader ;
+          sh:class :DisasterType ],
+        [ rdfs:comment "DisasterType concepts belong to the DisasterTypeScheme individual when skos:inScheme is present." ;
+          sh:path skos:inScheme ;
+          sh:hasValue :DisasterTypeScheme ],
+        [ rdfs:comment "DisasterType definitions are strings when present." ;
+          sh:path skos:definition ;
+          sh:datatype xsd:string ] .
+
+sgsh:DisasterTypeSchemeShape a sh:NodeShape ;
+    rdfs:comment "Targets the DisasterTypeScheme node so the scheme can be audited separately from DisasterType concepts." ;
+    sh:targetNode :DisasterTypeScheme .
+
+#################################################################
+# Location shapes
+#################################################################
+
+sgsh:LocationShape a sh:NodeShape ;
+    rdfs:comment "Validates shared Location fields, geographic hierarchy links, and coordinate or demographic attributes." ;
+    sh:targetClass :Location, baw:Location, :Country, :IslandGroup, :Region, :Province, :Municipality, :City, :SubMunicipality, :Barangay ;
+    sh:property
+        [ rdfs:comment "psgcCode follows the Location data property range xsd:string." ;
+          sh:path :psgcCode ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "geographicLevel follows the Location data property range xsd:string." ;
+          sh:path :geographicLevel ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "correspondenceCode follows the Location data property range xsd:string." ;
+          sh:path :correspondenceCode ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "cityClass follows the Location data property range xsd:string." ;
+          sh:path :cityClass ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "incomeClass follows the Location data property range xsd:string." ;
+          sh:path :incomeClass ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "urbanRural follows the Location data property range xsd:string." ;
+          sh:path :urbanRural ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "population2024 follows the Location data property range xsd:int or xsd:integer." ;
+          sh:path :population2024 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "populationNote follows the Location data property range xsd:string." ;
+          sh:path :populationNote ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "latitude follows the ontology range xsd:decimal." ;
+          sh:path :latitude ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "longitude follows the ontology range xsd:decimal." ;
+          sh:path :longitude ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "isPartOf values must be resources in the administrative location hierarchy." ;
+          sh:path :isPartOf ;
+          sh:or (
+              [ sh:class :Country ]
+              [ sh:class :IslandGroup ]
+              [ sh:class :Region ]
+              [ sh:class :Province ]
+              [ sh:class :Municipality ]
+          ) ],
+        [ rdfs:comment "beAWARE inverse disaster-location values must be NaturalDisaster resources." ;
+          sh:path baw:isLocationOfDisaster ;
+          sh:class baw:NaturalDisaster ],
+        [ rdfs:comment "beAWARE inverse incident-location values must be Incident resources." ;
+          sh:path baw:isLocationOfIncident ;
+          sh:class baw:Incident ],
+        [ rdfs:comment "beAWARE inverse measurement-location values must be ClimateParameter resources." ;
+          sh:path baw:isLocationOfMeasurement ;
+          sh:class baw:ClimateParameter ] .
+
+sgsh:IslandGroupShape a sh:NodeShape ;
+    rdfs:comment "Requires IslandGroup resources to point upward to a Country, matching the ontology restriction." ;
+    sh:targetClass :IslandGroup ;
+    sh:property
+        [ rdfs:comment "IslandGroup must have at least one isPartOf Country value." ;
+          sh:path :isPartOf ;
+          sh:minCount 1 ;
+          sh:class :Country ] .
+
+sgsh:RegionShape a sh:NodeShape ;
+    rdfs:comment "Requires Region resources to point upward to an IslandGroup, matching the ontology restriction." ;
+    sh:targetClass :Region ;
+    sh:property
+        [ rdfs:comment "Region must have at least one isPartOf IslandGroup value." ;
+          sh:path :isPartOf ;
+          sh:minCount 1 ;
+          sh:class :IslandGroup ] .
+
+sgsh:ProvinceShape a sh:NodeShape ;
+    rdfs:comment "Requires Province resources to point upward to a Region, matching the ontology restriction." ;
+    sh:targetClass :Province ;
+    sh:property
+        [ rdfs:comment "Province must have at least one isPartOf Region value." ;
+          sh:path :isPartOf ;
+          sh:minCount 1 ;
+          sh:class :Region ] .
+
+sgsh:MunicipalityShape a sh:NodeShape ;
+    rdfs:comment "Requires Municipality resources to point upward to a Province, matching the ontology restriction." ;
+    sh:targetClass :Municipality ;
+    sh:property
+        [ rdfs:comment "Municipality must have at least one isPartOf Province value." ;
+          sh:path :isPartOf ;
+          sh:minCount 1 ;
+          sh:class :Province ] .
+
+sgsh:BarangayShape a sh:NodeShape ;
+    rdfs:comment "Requires Barangay resources to point upward to a Municipality, matching the ontology restriction." ;
+    sh:targetClass :Barangay ;
+    sh:property
+        [ rdfs:comment "Barangay must have at least one isPartOf Municipality value." ;
+          sh:path :isPartOf ;
+          sh:minCount 1 ;
+          sh:class :Municipality ] .
+
+#################################################################
+# Impact shapes
+#################################################################
+
+sgsh:ImpactShape a sh:NodeShape ;
+    rdfs:comment "Validates shared Impact location and remarks properties for all impact subclasses without relying on inference." ;
+    sh:targetClass :Impact, baw:Impact, :AffectedPopulation, :AgricultureDamage, :AirportDisruption, :Casualties, :ClassSuspension, :CommunicationLineDisruption, :DamageGeneral, :FlightDisruption, :HousingDamage, :InfrastructureDamage, :PowerDisruption, :RoadAndBridgesDamage, :SeaportDisruption, :StrandedEvent, :WaterDisruption, :WorkSuspension ;
+    sh:property
+        [ rdfs:comment "Impact hasLocation values must be Location resources." ;
+          sh:path :hasLocation ;
+          sh:class :Location ],
+        [ rdfs:comment "Impact hasRegion values must be Region resources." ;
+          sh:path :hasRegion ;
+          sh:class :Region ],
+        [ rdfs:comment "Impact hasProvince values must be Province resources." ;
+          sh:path :hasProvince ;
+          sh:class :Province ],
+        [ rdfs:comment "Impact hasMunicipality values must be Municipality resources." ;
+          sh:path :hasMunicipality ;
+          sh:class :Municipality ],
+        [ rdfs:comment "Impact hasBarangay stores a barangay label according to xsd:string." ;
+          sh:path :hasBarangay ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "Impact remarks follow xsd:string." ;
+          sh:path :remarks ;
+          sh:datatype xsd:string ] .
+
+sgsh:AffectedPopulationShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates affected and displaced population counts declared on AffectedPopulation." ;
+    sh:targetClass :AffectedPopulation ;
+    sh:property
+        [ rdfs:comment "affectedBarangays is required by the ontology restriction and must be an integer literal." ;
+          sh:path :affectedBarangays ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "affectedFamilies is required by the ontology restriction and must be an integer literal." ;
+          sh:path :affectedFamilies ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "affectedPersons is required by the ontology restriction and must be an integer literal." ;
+          sh:path :affectedPersons ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "displacedFamilies is required by the ontology restriction and must be an integer literal." ;
+          sh:path :displacedFamilies ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "displacedPersons is required by the ontology restriction and must be an integer literal." ;
+          sh:path :displacedPersons ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:AgricultureDamageShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates agriculture damage quantities, classifications, affected farmer/fisherfolk counts, and QUDT monetary values." ;
+    sh:targetClass :AgricultureDamage ;
+    sh:property
+        [ rdfs:comment "agriDamageAmount is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :agriDamageAmount ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "agriDamageClassification is required by the ontology restriction and must be a string." ;
+          sh:path :agriDamageClassification ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "agriDamageQuantity is required by the ontology restriction and must be a decimal-compatible literal." ;
+          sh:path :agriDamageQuantity ;
+          sh:minCount 1 ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "agriDamageType is required by the ontology restriction and must be a string." ;
+          sh:path :agriDamageType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "agriDamageUnit is required by the ontology restriction and must be a string." ;
+          sh:path :agriDamageUnit ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "farmerFisherfolkAffected is required by the ontology restriction and must be an integer literal." ;
+          sh:path :farmerFisherfolkAffected ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "partiallyDamagedCropArea is required by the ontology restriction and must be a decimal-compatible literal." ;
+          sh:path :partiallyDamagedCropArea ;
+          sh:minCount 1 ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "partiallyDamagedInfrastructure is required by the ontology restriction and must be an integer literal." ;
+          sh:path :partiallyDamagedInfrastructure ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "productionLossCost is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :productionLossCost ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "productionLossVolume is required by the ontology restriction and must be a decimal-compatible literal." ;
+          sh:path :productionLossVolume ;
+          sh:minCount 1 ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "totallyDamagedCropArea is required by the ontology restriction and must be a decimal-compatible literal." ;
+          sh:path :totallyDamagedCropArea ;
+          sh:minCount 1 ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "totallyDamagedInfrastructure is required by the ontology restriction and must be an integer literal." ;
+          sh:path :totallyDamagedInfrastructure ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:AirportDisruptionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates airport disruption details including affected description, timestamps, port name/status, and stranded passengers." ;
+    sh:targetClass :AirportDisruption ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "cancellationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :cancellationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "portOrTerminalName is required by the ontology restriction and must be a string." ;
+          sh:path :portOrTerminalName ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "portStatus is required by the ontology restriction and must be a string." ;
+          sh:path :portStatus ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "resumptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :resumptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "strandedPassengers follows the shared airport/stranded event range xsd:int or xsd:integer." ;
+          sh:path :strandedPassengers ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:CasualtiesShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates casualty cause, count, data source, and casualty type." ;
+    sh:targetClass :Casualties ;
+    sh:property
+        [ rdfs:comment "casualtyCause is required by the ontology restriction and must be a string." ;
+          sh:path :casualtyCause ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "casualtyCount is required by the ontology restriction and must be an integer literal." ;
+          sh:path :casualtyCount ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "casualtyDataSource is required by the ontology restriction and must be a string." ;
+          sh:path :casualtyDataSource ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "isOfCasualtyType is required; the ontology declares it as a datatype property with CasualtyType range, so this allows known casualty individuals, typed casualty resources, or string labels." ;
+          sh:path :isOfCasualtyType ;
+          sh:minCount 1 ;
+          sh:or (
+              [ sh:in ( :Dead :Missing :Injured ) ]
+              [ sh:class :CasualtyType ]
+              [ sh:datatype xsd:string ]
+          ) ] .
+
+sgsh:CasualtyTypeShape a sh:NodeShape ;
+    rdfs:comment "Targets casualty type resources such as Dead, Missing, and Injured for auditability." ;
+    sh:targetClass :CasualtyType .
+
+sgsh:ClassSuspensionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates education suspension details declared on ClassSuspension." ;
+    sh:targetClass :ClassSuspension ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "cancellationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :cancellationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "fromClassLevel is required by the ontology restriction and must be a string." ;
+          sh:path :fromClassLevel ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "resumptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :resumptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "suspensionType is required by the ontology restriction and must be a string." ;
+          sh:path :suspensionType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "toClassLevel is required by the ontology restriction and must be a string." ;
+          sh:path :toClassLevel ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:CommunicationLineDisruptionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates communication line disruption details declared on CommunicationLineDisruption." ;
+    sh:targetClass :CommunicationLineDisruption ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "communicationStatus is required by the ontology restriction and must be a string." ;
+          sh:path :communicationStatus ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "interruptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :interruptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "restorationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :restorationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "telecompany is required by the ontology restriction and must be a string." ;
+          sh:path :telecompany ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:DamageGeneralShape a sh:NodeShape ;
+    rdfs:comment "Validates general damage amount, insured damage amount, and CPI fields declared on DamageGeneral." ;
+    sh:targetClass :DamageGeneral ;
+    sh:property
+        [ rdfs:comment "generalDamageAmount values must be QuantityValue resources." ;
+          sh:path :generalDamageAmount ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "insuredDamageAmount values must be QuantityValue resources." ;
+          sh:path :insuredDamageAmount ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "cpi follows the DamageGeneral data property range xsd:decimal." ;
+          sh:path :cpi ;
+          sh:node sgsh:DecimalLiteralShape ] .
+
+sgsh:FlightDisruptionShape a sh:NodeShape ;
+    rdfs:comment "Validates flight disruption details declared on FlightDisruption data properties." ;
+    sh:targetClass :FlightDisruption ;
+    sh:property
+        [ rdfs:comment "airline follows the FlightDisruption data property range xsd:string." ;
+          sh:path :airline ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "airportType follows the FlightDisruption data property range xsd:string." ;
+          sh:path :airportType ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "flightNo follows the FlightDisruption data property range xsd:string." ;
+          sh:path :flightNo ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "flightRoute follows the FlightDisruption data property range xsd:string." ;
+          sh:path :flightRoute ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "cancellationDateTime follows the shared disruption range xsd:dateTime." ;
+          sh:path :cancellationDateTime ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "resumptionDateTime follows the shared disruption range xsd:dateTime." ;
+          sh:path :resumptionDateTime ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "portOrTerminalName follows the shared port or terminal data property range xsd:string." ;
+          sh:path :portOrTerminalName ;
+          sh:datatype xsd:string ] .
+
+sgsh:HousingDamageShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates housing damage amount and house damage counts declared on HousingDamage." ;
+    sh:targetClass :HousingDamage ;
+    sh:property
+        [ rdfs:comment "housingDamageAmount is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :housingDamageAmount ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "partiallyDamagedHouses is required by the ontology restriction and must be an integer literal." ;
+          sh:path :partiallyDamagedHouses ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "totallyDamagedHouses is required by the ontology restriction and must be an integer literal." ;
+          sh:path :totallyDamagedHouses ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:InfrastructureDamageShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates infrastructure damage monetary values, descriptions, and damaged-unit counts." ;
+    sh:targetClass :InfrastructureDamage ;
+    sh:property
+        [ rdfs:comment "commercialDamageAmount is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :commercialDamageAmount ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "crossSectoralDamageAmount is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :crossSectoralDamageAmount ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "infraDamageAmount is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :infraDamageAmount ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "socialDamageAmount is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :socialDamageAmount ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "infraDamageClassification is required by the ontology restriction and must be a string." ;
+          sh:path :infraDamageClassification ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "infraDamageType is required by the ontology restriction and must be a string." ;
+          sh:path :infraDamageType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "infraName is required by the ontology restriction and must be a string." ;
+          sh:path :infraName ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "infraQtyDamaged is required by the ontology restriction and must be an integer literal." ;
+          sh:path :infraQtyDamaged ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "infraUnitDamaged is required by the ontology restriction and must be a string." ;
+          sh:path :infraUnitDamaged ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "numberInfraDamaged is required by the ontology restriction and must be an integer literal." ;
+          sh:path :numberInfraDamaged ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:PowerDisruptionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates power disruption details declared on PowerDisruption." ;
+    sh:targetClass :PowerDisruption ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "disruptionType is required by the ontology restriction and must be a string." ;
+          sh:path :disruptionType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "interruptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :interruptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "restorationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :restorationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "serviceProvider is required by the ontology restriction and must be a string." ;
+          sh:path :serviceProvider ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:RoadAndBridgesDamageShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates road and bridge disruption timestamps, names, status, type, and classification." ;
+    sh:targetClass :RoadAndBridgesDamage ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "notPassableDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :notPassableDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "passableDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :passableDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "roadBridgeClassification is required by the ontology restriction and must be a string." ;
+          sh:path :roadBridgeClassification ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "roadBridgeName is required by the ontology restriction and must be a string." ;
+          sh:path :roadBridgeName ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "roadBridgeStatus is required by the ontology restriction and must be a string." ;
+          sh:path :roadBridgeStatus ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "roadBridgeType is required by the ontology restriction and must be a string." ;
+          sh:path :roadBridgeType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:SeaportDisruptionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates seaport disruption details declared on SeaportDisruption." ;
+    sh:targetClass :SeaportDisruption ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "cancellationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :cancellationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "portOrTerminalName is required by the ontology restriction and must be a string." ;
+          sh:path :portOrTerminalName ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "portStatus is required by the ontology restriction and must be a string." ;
+          sh:path :portStatus ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "resumptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :resumptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ] .
+
+sgsh:StrandedEventShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates stranded transport location descriptors and stranded passenger/cargo/vessel counts." ;
+    sh:targetClass :StrandedEvent ;
+    sh:property
+        [ rdfs:comment "district is required by the ontology restriction and must be a string." ;
+          sh:path :district ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "portOrTerminalName is required by the ontology restriction and must be a string." ;
+          sh:path :portOrTerminalName ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "station is required by the ontology restriction and must be a string." ;
+          sh:path :station ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "substation is required by the ontology restriction and must be a string." ;
+          sh:path :substation ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "strandedMotorBancas is required by the ontology restriction and must be an integer literal." ;
+          sh:path :strandedMotorBancas ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "strandedPassengers is required by the ontology restriction and must be an integer literal." ;
+          sh:path :strandedPassengers ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "strandedRollingCargoes is required by the ontology restriction and must be an integer literal." ;
+          sh:path :strandedRollingCargoes ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "strandedVessels is required by the ontology restriction and must be an integer literal." ;
+          sh:path :strandedVessels ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:WaterDisruptionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates water disruption details declared on WaterDisruption." ;
+    sh:targetClass :WaterDisruption ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "disruptionType is required by the ontology restriction and must be a string." ;
+          sh:path :disruptionType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "interruptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :interruptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "restorationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :restorationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "serviceProvider is required by the ontology restriction and must be a string." ;
+          sh:path :serviceProvider ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:WorkSuspensionShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates work suspension details declared on WorkSuspension." ;
+    sh:targetClass :WorkSuspension ;
+    sh:property
+        [ rdfs:comment "affectedDescription is required by the ontology restriction and must be a string." ;
+          sh:path :affectedDescription ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "cancellationDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :cancellationDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "resumptionDateTime is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :resumptionDateTime ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "suspensionType is required by the ontology restriction and must be a string." ;
+          sh:path :suspensionType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+#################################################################
+# Preparedness and response shapes
+#################################################################
+
+sgsh:PreparednessShape a sh:NodeShape ;
+    rdfs:comment "Validates shared Preparedness location, agency/LGU, and remarks properties without relying on subclass inference." ;
+    sh:targetClass :Preparedness, :PreemptiveEvacuation, :Warning ;
+    sh:property
+        [ rdfs:comment "Preparedness hasLocation values must be Location resources." ;
+          sh:path :hasLocation ;
+          sh:class :Location ],
+        [ rdfs:comment "Preparedness hasRegion values must be Region resources." ;
+          sh:path :hasRegion ;
+          sh:class :Region ],
+        [ rdfs:comment "Preparedness hasProvince values must be Province resources." ;
+          sh:path :hasProvince ;
+          sh:class :Province ],
+        [ rdfs:comment "Preparedness hasMunicipality values must be Municipality resources." ;
+          sh:path :hasMunicipality ;
+          sh:class :Municipality ],
+        [ rdfs:comment "Preparedness hasBarangay stores a barangay label according to xsd:string." ;
+          sh:path :hasBarangay ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "agencyLGUsPresent follows the Preparedness or Assistance data property range xsd:string." ;
+          sh:path :agencyLGUsPresent ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "Preparedness remarks follow xsd:string." ;
+          sh:path :remarks ;
+          sh:datatype xsd:string ] .
+
+sgsh:PreemptiveEvacuationShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates evacuation-center, plan, family, sex-disaggregated, and total preemptive evacuation counts." ;
+    sh:targetClass :PreemptiveEvacuation ;
+    sh:property
+        [ rdfs:comment "evacuationCenters is required by the ontology restriction and must be an integer literal." ;
+          sh:path :evacuationCenters ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "evacuationPlan is required by the ontology restriction and must be a string." ;
+          sh:path :evacuationPlan ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "preemptFamilies is required by the ontology restriction and must be an integer literal." ;
+          sh:path :preemptFamilies ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "preemptFemales is required by the ontology restriction and must be an integer literal." ;
+          sh:path :preemptFemales ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "preemptMales is required by the ontology restriction and must be an integer literal." ;
+          sh:path :preemptMales ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "preemptPersons is required by the ontology restriction and must be an integer literal." ;
+          sh:path :preemptPersons ;
+          sh:minCount 1 ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:WarningShape a sh:NodeShape ;
+    rdfs:comment "Validates warning announcement text and timestamp fields." ;
+    sh:targetClass :Warning ;
+    sh:property
+        [ rdfs:comment "warningReleased follows the Warning data property range xsd:string." ;
+          sh:path :warningReleased ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "warningTimeStamp follows the Warning data property range xsd:dateTime." ;
+          sh:path :warningTimeStamp ;
+          sh:datatype xsd:dateTime ] .
+
+sgsh:ResponseShape a sh:NodeShape ;
+    rdfs:comment "Validates shared Response location and remarks properties without relying on subclass inference." ;
+    sh:targetClass :Response, :Assistance, :DeclarationOfCalamity, :Recovery, :Relief, :Rescue ;
+    sh:property
+        [ rdfs:comment "Response hasLocation values must be Location resources." ;
+          sh:path :hasLocation ;
+          sh:class :Location ],
+        [ rdfs:comment "Response hasRegion values must be Region resources." ;
+          sh:path :hasRegion ;
+          sh:class :Region ],
+        [ rdfs:comment "Response hasProvince values must be Province resources." ;
+          sh:path :hasProvince ;
+          sh:class :Province ],
+        [ rdfs:comment "Response hasMunicipality values must be Municipality resources." ;
+          sh:path :hasMunicipality ;
+          sh:class :Municipality ],
+        [ rdfs:comment "Response hasBarangay stores a barangay label according to xsd:string." ;
+          sh:path :hasBarangay ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "Response remarks follow xsd:string." ;
+          sh:path :remarks ;
+          sh:datatype xsd:string ] .
+
+sgsh:AssistanceShape a sh:NodeShape ;
+    rdfs:comment "Validates assistance organization, contribution, item, family-assistance, and agency presence fields." ;
+    sh:targetClass :Assistance ;
+    sh:property
+        [ rdfs:comment "contributingOrg values must be prov:Organization resources." ;
+          sh:path :contributingOrg ;
+          sh:class prov:Organization ],
+        [ rdfs:comment "contributionAmount values must be QuantityValue resources." ;
+          sh:path :contributionAmount ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "itemCost values must be QuantityValue resources." ;
+          sh:path :itemCost ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "itemCostPerUnit values must be QuantityValue resources." ;
+          sh:path :itemCostPerUnit ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "contributionType follows the Assistance data property range xsd:string." ;
+          sh:path :contributionType ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "agencyLGUsPresent follows the Assistance or Preparedness data property range xsd:string." ;
+          sh:path :agencyLGUsPresent ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "internationalOrgsPresent follows the Assistance data property range xsd:string." ;
+          sh:path :internationalOrgsPresent ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "itemQuantity follows the Assistance data property range xsd:decimal." ;
+          sh:path :itemQuantity ;
+          sh:node sgsh:DecimalLiteralShape ],
+        [ rdfs:comment "itemTypeOrNeeds follows the Assistance data property range xsd:string." ;
+          sh:path :itemTypeOrNeeds ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "itemUnit follows the Assistance data property range xsd:string." ;
+          sh:path :itemUnit ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "noFamiliesAssisted follows the Assistance data property range xsd:int or xsd:integer." ;
+          sh:path :noFamiliesAssisted ;
+          sh:node sgsh:IntegerLiteralShape ],
+        [ rdfs:comment "noFamiliesNeedingAssistance follows the Assistance data property range xsd:int or xsd:integer." ;
+          sh:path :noFamiliesNeedingAssistance ;
+          sh:node sgsh:IntegerLiteralShape ] .
+
+sgsh:DeclarationOfCalamityShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates declaration type, resolution date, and resolution number declared on DeclarationOfCalamity." ;
+    sh:targetClass :DeclarationOfCalamity ;
+    sh:property
+        [ rdfs:comment "declarationType is required by the ontology restriction and must be a string." ;
+          sh:path :declarationType ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "resolutionDate is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :resolutionDate ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "resolutionNo is required by the ontology restriction and must be a string." ;
+          sh:path :resolutionNo ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:RecoveryShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates policy, post-structure cost, training, and search/rescue/retrieval fields declared on Recovery." ;
+    sh:targetClass :Recovery ;
+    sh:property
+        [ rdfs:comment "policyChanges is required by the ontology restriction and must be a string." ;
+          sh:path :policyChanges ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "postStructureCost is required by the ontology restriction and must point to a QuantityValue resource." ;
+          sh:path :postStructureCost ;
+          sh:minCount 1 ;
+          sh:class qudt:QuantityValue ],
+        [ rdfs:comment "postTraining is required by the ontology restriction and must be a string." ;
+          sh:path :postTraining ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "srrDone is required by the ontology restriction; the declared property range is xsd:string." ;
+          sh:path :srrDone ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:ReliefShape a sh:NodeShape ;
+    rdfs:comment "Targets Relief resources so relief instances remain auditable even though the ontology currently has no Relief-specific properties." ;
+    sh:targetClass :Relief .
+
+sgsh:RescueShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates rescue equipment and rescue unit fields declared on Rescue." ;
+    sh:targetClass :Rescue ;
+    sh:property
+        [ rdfs:comment "rescueEquipment is required by the ontology restriction and must be a string." ;
+          sh:path :rescueEquipment ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "rescueUnit is required by the ontology restriction and must be a string." ;
+          sh:path :rescueUnit ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+#################################################################
+# Source, quantity, and climate-parameter shapes
+#################################################################
+
+sgsh:SourceShape a sh:NodeShape ;
+    rdfs:comment "Requires and validates source metadata fields declared on Source." ;
+    sh:targetClass :Source ;
+    sh:property
+        [ rdfs:comment "format is required by the ontology restriction and must be a string." ;
+          sh:path :format ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "lastUpdateDate is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :lastUpdateDate ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "obtainedDate is required by the ontology restriction and must be xsd:dateTime." ;
+          sh:path :obtainedDate ;
+          sh:minCount 1 ;
+          sh:datatype xsd:dateTime ],
+        [ rdfs:comment "reportLink is required by the ontology restriction and must be a string." ;
+          sh:path :reportLink ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "reportName is required by the ontology restriction and must be a string." ;
+          sh:path :reportName ;
+          sh:minCount 1 ;
+          sh:datatype xsd:string ] .
+
+sgsh:QuantityValueShape a sh:NodeShape ;
+    rdfs:comment "Targets QUDT QuantityValue resources used by monetary and amount object properties for auditability." ;
+    sh:targetClass qudt:QuantityValue .
+
+sgsh:CurrencyUnitShape a sh:NodeShape ;
+    rdfs:comment "Targets QUDT CurrencyUnit resources used by amount values for auditability." ;
+    sh:targetClass qudt:CurrencyUnit .
+
+sgsh:ClimateParameterShape a sh:NodeShape ;
+    rdfs:comment "Validates beAWARE ClimateParameter measurement values, units, type, location, and incident inverse links." ;
+    sh:targetClass baw:ClimateParameter ;
+    sh:property
+        [ rdfs:comment "hasValue follows the beAWARE ClimateParameter data property range xsd:float." ;
+          sh:path baw:hasValue ;
+          sh:datatype xsd:float ],
+        [ rdfs:comment "hasUnit follows the beAWARE ClimateParameter data property range xsd:string." ;
+          sh:path baw:hasUnit ;
+          sh:datatype xsd:string ],
+        [ rdfs:comment "isOfClimateParameterType values must be beAWARE ClimateParameterType resources." ;
+          sh:path baw:isOfClimateParameterType ;
+          sh:class baw:ClimateParameterType ],
+        [ rdfs:comment "hasMeasurementLocation values must be beAWARE Location resources." ;
+          sh:path baw:hasMeasurementLocation ;
+          sh:class baw:Location ],
+        [ rdfs:comment "isClimateParameterOfIncident values must be beAWARE Incident resources." ;
+          sh:path baw:isClimateParameterOfIncident ;
+          sh:class baw:Incident ] .
+
+sgsh:ClimateParameterTypeShape a sh:NodeShape ;
+    rdfs:comment "Targets beAWARE ClimateParameterType resources such as Temperature, Magnitude, WindSpeed, and FloodDepth." ;
+    sh:targetClass baw:ClimateParameterType .
+
+sgsh:GeoFeatureShape a sh:NodeShape ;
+    rdfs:comment "Targets GeoSPARQL Feature resources so geographic features can be audited alongside SakunaGraPH Location resources." ;
+    sh:targetClass geo:Feature .
