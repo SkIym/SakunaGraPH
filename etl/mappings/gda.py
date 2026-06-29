@@ -7,7 +7,7 @@ from semantic_processing.org_resolver import ORG_RESOLVER
 from .graph import ORG, PROV, QUDT, SKG, add_monetary
 from .iris import (
     comms_iri, doc_iri, housing_iri, incident_iri, infra_iri, pevac_iri, power_iri, prov_iri, assistance_iri, aff_pop_iri, casualties_iri,
-    damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, row_iri, seaport_iri, sub_iri, water_iri
+    damage_gen_iri, org_iri, recovery_iri, event_uri, rnb_iri, row_iri, seaport_iri, sub_iri, warning_iri, water_iri
 )
 
 
@@ -45,7 +45,7 @@ class Incident:
 class Preparedness:
     id: str
     agencyLGUsPresentPreparedness: str | None
-    announcementsReleased: str | None
+    warningReleased: str | None
     hasLocation: URIRef | None
 
 @dataclass
@@ -247,7 +247,7 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
 
     for r in rs:
         e_uri = event_uri("gda", r.id)
-        uri = sub_iri(e_uri, "preparedness")
+        uri = warning_iri(e_uri)
 
         g.add((uri, RDF.type, SKG.Warning))
         g.add((e_uri, SKG.hasWarning, uri))
@@ -259,8 +259,8 @@ def preparedness_mapping(rs: list[Preparedness], g: Graph) -> None:
             g.add((uri, SKG.agencyLGUsPresent, Literal(r.agencyLGUsPresentPreparedness)))
             for org in ORG_RESOLVER.split_and_resolve(str(r.agencyLGUsPresentPreparedness)):
                     g.add((uri, SKG.contributingOrg, org))
-        if r.announcementsReleased:
-            g.add((uri, SKG.warningReleased, Literal(r.announcementsReleased)))
+        if r.warningReleased:
+            g.add((uri, SKG.warningReleased, Literal(r.warningReleased)))
 
 
 # ---------------------------------------------------------------------------
@@ -327,7 +327,7 @@ def calamity_mapping(rs: list[DeclarationOfCalamity], g: Graph) -> None:
                 g.add((uri, SKG.declarationType, Literal(r.declarationOfCalamity)))
             else:
                 e_uri = event_uri("gda", r.id)
-                uri = sub_iri(e_uri, "preparedness")
+                uri = warning_iri(e_uri, "declaration")
                 _add_location(g, uri, r.hasLocation)
                 g.add((uri, RDF.type, SKG.Warning))
                 g.add((e_uri, SKG.hasWarning, uri))

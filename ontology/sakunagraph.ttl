@@ -46,6 +46,7 @@ qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
 :Depth rdf:type baw:ClimateParameterType .
 :Intensity rdf:type baw:ClimateParameterType .
 :FloodDepth rdf:type baw:ClimateParameterType .
+:WaveHeight rdf:type baw:ClimateParameterType .
 
 :Dead rdf:type :CasualtyType .
 :Missing rdf:type :CasualtyType .
@@ -178,7 +179,12 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://sakuna.ph/contributingOrg
 :contributingOrg rdf:type owl:ObjectProperty ;
-                 rdfs:domain :Assistance ;
+                 rdfs:domain [ rdf:type owl:Class ;
+                               owl:unionOf ( :Assistance
+                                             :Rescue
+                                             :Warning
+                                           )
+                             ] ;
                  rdfs:range prov:Organization ;
                  rdfs:label "contributing org" .
 

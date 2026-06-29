@@ -2,8 +2,8 @@ from dataclasses import dataclass, fields
 from datetime import datetime, date
 from polars import DataFrame
 from rdflib import RDF, RDFS, XSD, Literal, URIRef, Graph
-from .graph import ORG, PROV, SKG, SKOS, add_monetary
-from .iris import aff_pop_iri, assistance_iri, casualties_iri, damage_gen_iri, event_uri, org_iri, prov_iri, recovery_iri, row_iri
+from .graph import BAW, ORG, PROV, SKG, SKOS, add_monetary
+from .iris import aff_pop_iri, assistance_iri, casualties_iri, climate_param_iri, damage_gen_iri, event_uri, org_iri, prov_iri, recovery_iri, row_iri
 from typing import Type, TypeVar, Literal as TypingLiteral
 from semantic_processing.org_resolver import ORG_RESOLVER
 
@@ -108,6 +108,19 @@ def _is_incident(loc: URIRef, dtype: str) -> bool:
     return False
 
 
+def _add_magnitude_parameter(g: Graph, event_iri: URIRef, value: float | None, scale: str | None) -> None:
+    if value is None:
+        return
+
+    uri = climate_param_iri(event_iri, "magnitude")
+    g.add((uri, RDF.type, BAW.ClimateParameter))
+    g.add((event_iri, BAW.hasClimateParameterMeasurement, uri))
+    g.add((uri, BAW.isOfClimateParameterType, SKG.Magnitude))
+    g.add((uri, BAW.hasValue, Literal(float(value), datatype=XSD.float)))
+    if scale:
+        g.add((uri, BAW.hasUnit, Literal(str(scale))))
+
+
 def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
     for r in rs:
@@ -129,6 +142,7 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
         g.add((uri, PROV.wasDerivedFrom, row_uri)) # link source row
 
+        _add_magnitude_parameter(g, uri, r.hasMagnitude, r.hasMagnitudeScale)
 
         for f in fields(r):
 
@@ -161,14 +175,10 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
                 for s in subtypes:
                     s = s.strip()
                     g.add((uri, SKG.hasDisasterSubtype, URIRef(SKG[s])))
-            # elif f.name == "hasMagnitude":
-            #     g.add((uri, SKG.magnitude, Literal(float(value), datatype=XSD.decimal)))
-            # elif f.name == "hasMagnitudeScale":
-            #     g.add((uri, SKG.magnitudeScale, Literal(value)))
-            # elif f.name == "latitude":
-            #     g.add((uri, SKG.epicenterLatitude, Literal(float(value), datatype=XSD.decimal)))
-            # elif f.name == "longitude":
-            #     g.add((uri, SKG.epicenterLongitude, Literal(float(value), datatype=XSD.decimal)))
+            elif f.name in {"hasMagnitude", "hasMagnitudeScale"}:
+                continue
+            elif f.name in {"latitude", "longitude"}:
+                g.add((uri, getattr(SKG, f.name), Literal(float(value), datatype=XSD.decimal)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value))) 
         

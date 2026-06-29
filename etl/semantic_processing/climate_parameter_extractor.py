@@ -42,6 +42,7 @@ PARAMETER_ALIASES: dict[str, tuple[str, ...]] = {
     "Depth": ("depth", "km depth", "focal depth"),
     "Intensity": ("intensity", "signal", "tcws", "tropical cyclone wind signal"),
     "FloodDepth": ("flood depth", "floodwater", "flood water", "water level"),
+    "WaveHeight": ("wave height", "tsunami wave height"),
 }
 
 WARNING_PATTERNS: tuple[tuple[str, re.Pattern[str]], ...] = (

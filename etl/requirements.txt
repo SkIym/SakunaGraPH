@@ -13,3 +13,4 @@ fastexcel
 docx2pdf
 docling
 lxml
+pyshacl

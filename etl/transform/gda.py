@@ -83,18 +83,11 @@ COLUMN_MAPPING = {
 
 EXPORT_SPECS: dict[str, Any] = {
     "gda_prep.csv": {
-        "cols": ["id", "agencyLGUsPresentPreparedness", "declarationOfCalamity"],
+        "cols": ["id", "agencyLGUsPresentPreparedness", "warningReleased"],
         "dropna": {
-            "subset": ["agencyLGUsPresentPreparedness", "declarationOfCalamity"],
+            "subset": ["agencyLGUsPresentPreparedness", "warningReleased"],
             "how": "all",
         },
-        "contains": {
-            "column": "declarationOfCalamity",
-            "pattern": "Calamity",
-            "case": False,
-            "exclude": True,
-        },
-        "rename": {"declarationOfCalamity": "announcementsReleased"},
     },
     "gda_evac.csv": {
         "cols": ["id", "evacuationPlan", "evacuationCenters"],
@@ -540,6 +533,14 @@ def transform_gda(path: str) -> dict[type, list[Any]]:
     df["totallyDamagedHouses"] = df["totallyDamagedHouses"].astype(float).astype("Int64")
 
     df["id"] = df.apply(_event_id, axis=1)
+
+    is_calamity_declaration = (
+        df["declarationOfCalamity"]
+        .astype("string")
+        .str.contains("Calamity", case=False, na=False)
+    )
+    df["warningReleased"] = df["declarationOfCalamity"].where(~is_calamity_declaration, None)
+    df.loc[~is_calamity_declaration, "declarationOfCalamity"] = None
 
     # general damage amount values if no other were reported (exclude totals)
     cols = ["infraDamageAmount", "agricultureDamageAmount", "commercialDamageAmount", "socialDamageAmount", "crossSectoralDamageAmount"]
