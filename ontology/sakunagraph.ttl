@@ -36,23 +36,6 @@ qudt:conversionOffset rdf:type owl:AnnotationProperty .
 qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
 
 
-:Temperature rdf:type baw:ClimateParameterType .
-:Magnitude rdf:type baw:ClimateParameterType .
-:MagnitudeScale rdf:type baw:ClimateParameterType .
-:WindSpeed rdf:type baw:ClimateParameterType .
-:Precipitation rdf:type baw:ClimateParameterType .
-:Humidity rdf:type baw:ClimateParameterType .
-:AtmosphericPressure rdf:type baw:ClimateParameterType .
-:Depth rdf:type baw:ClimateParameterType .
-:Intensity rdf:type baw:ClimateParameterType .
-:FloodDepth rdf:type baw:ClimateParameterType .
-:WaveHeight rdf:type baw:ClimateParameterType .
-
-:Dead rdf:type :CasualtyType .
-:Missing rdf:type :CasualtyType .
-:Injured rdf:type :CasualtyType .
-
-
 #################################################################
 #    Object Properties
 #################################################################
@@ -426,14 +409,6 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                     rdfs:label "has related incident"@en .
 
 
-###  https://sakuna.ph/hasRelief
-:hasRelief rdf:type owl:ObjectProperty ;
-           rdfs:subPropertyOf :hasResponse ;
-           rdfs:domain :DisasterEvent ;
-           rdfs:range :Relief ;
-           rdfs:label "has relief" .
-
-
 ###  https://sakuna.ph/hasRescue
 :hasRescue rdf:type owl:ObjectProperty ;
            rdfs:subPropertyOf :hasResponse ;
@@ -524,6 +499,12 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
                      rdfs:domain :DamageGeneral ;
                      rdfs:range qudt:QuantityValue ;
                      rdfs:label "insured damage amount"@en .
+
+
+###  https://sakuna.ph/isOfCasualtyType
+:isOfCasualtyType rdf:type owl:ObjectProperty ;
+                  rdfs:domain :Casualties ;
+                  rdfs:range :CasualtyType .
 
 
 ###  https://sakuna.ph/isPartOf
@@ -757,13 +738,6 @@ baw:hasValue rdf:type owl:DatatypeProperty ;
                     rdfs:domain :Casualties ;
                     rdfs:range xsd:string ;
                     rdfs:label "source of casualty data" .
-
-
-###  https://sakuna.ph/isOfCasualtyType
-:isOfCasualtyType rdf:type owl:DatatypeProperty ;
-              rdfs:domain :Casualties ;
-              rdfs:range :CasualtyType ;
-              rdfs:label "is of casualty type" .
 
 
 ###  https://sakuna.ph/cityClass
@@ -1015,6 +989,10 @@ baw:hasValue rdf:type owl:DatatypeProperty ;
                                   ] ;
                       rdfs:range xsd:dateTime ;
                       rdfs:label "interruption datetime"@en .
+
+
+###  https://sakuna.ph/isOfCasualtyType
+:isOfCasualtyType rdf:type owl:DatatypeProperty .
 
 
 ###  https://sakuna.ph/itemQuantity
@@ -1705,6 +1683,10 @@ baw:NaturalDisaster rdf:type owl:Class ;
 :Casualties rdf:type owl:Class ;
             rdfs:subClassOf :Impact ,
                             [ rdf:type owl:Restriction ;
+                              owl:onProperty :isOfCasualtyType ;
+                              owl:someValuesFrom :CasualtyType
+                            ] ,
+                            [ rdf:type owl:Restriction ;
                               owl:onProperty :casualtyCause ;
                               owl:someValuesFrom xsd:string
                             ] ,
@@ -1715,18 +1697,16 @@ baw:NaturalDisaster rdf:type owl:Class ;
                             [ rdf:type owl:Restriction ;
                               owl:onProperty :casualtyDataSource ;
                               owl:someValuesFrom xsd:string
-                            ] ,
-                            [ rdf:type owl:Restriction ;
-                              owl:onProperty :isOfCasualtyType ;
-                              owl:someValuesFrom :CasualtyType
                             ] ;
             rdfs:label "Casualties"@en ;
             skos:definition "Represents the number of deaths, injured, and missing due to a disaster." .
 
+
+###  https://sakuna.ph/CasualtyType
 :CasualtyType rdf:type owl:Class ;
-                         rdfs:label "Casualty Type" ;
-                         skos:definition "Represents various types of casualties" ;
-                         skos:example "Dead, injured, missing" .
+              rdfs:label "Casualty Type" ;
+              skos:definition "Represents various types of casualties" ;
+              skos:example "Dead, injured, missing" .
 
 
 ###  https://sakuna.ph/City
@@ -2083,10 +2063,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
         skos:definition "Administrative Level 1" .
 
 
-###  https://sakuna.ph/Relief
-:Relief rdf:type owl:Class .
-
-
 ###  https://sakuna.ph/Rescue
 :Rescue rdf:type owl:Class ;
         rdfs:subClassOf :Response ,
@@ -2360,6 +2336,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
          skos:prefLabel "Ashfall"@en .
 
 
+###  https://sakuna.ph/AtmosphericPressure
+:AtmosphericPressure rdf:type owl:NamedIndividual ,
+                              baw:ClimateParameterType .
+
+
 ###  https://sakuna.ph/AvalancheDry
 :AvalancheDry rdf:type owl:NamedIndividual ,
                        skos:Concept ,
@@ -2483,6 +2464,16 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                        skos:definition "Accident involving the collapse of a building or structure. Can either involve industrial structures or domestic/non-industrial structures." ;
                        skos:note "Collapse of a building or structure. Can involve fallen debris, fallen tree/s, uprooted trees, toppled posts, and soil collapse. Can be due to typhoons, strong winds, tropical storms, tropical cyclones, tropical depressions." ;
                        skos:prefLabel "Collapse (Misc)"@en .
+
+
+###  https://sakuna.ph/Dead
+:Dead rdf:type owl:NamedIndividual ,
+               :CasualtyType .
+
+
+###  https://sakuna.ph/Depth
+:Depth rdf:type owl:NamedIndividual ,
+                baw:ClimateParameterType .
 
 
 ###  https://sakuna.ph/Derecho
@@ -2650,6 +2641,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
        skos:prefLabel "Flood"@en .
 
 
+###  https://sakuna.ph/FloodDepth
+:FloodDepth rdf:type owl:NamedIndividual ,
+                     baw:ClimateParameterType .
+
+
 ###  https://sakuna.ph/FloodGeneral
 :FloodGeneral rdf:type owl:NamedIndividual ,
                        skos:Concept ,
@@ -2774,6 +2770,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
           skos:prefLabel "Heat Wave"@en .
 
 
+###  https://sakuna.ph/Humidity
+:Humidity rdf:type owl:NamedIndividual ,
+                   baw:ClimateParameterType .
+
+
 ###  https://sakuna.ph/Hydrological
 :Hydrological rdf:type owl:NamedIndividual ,
                        skos:Concept ,
@@ -2864,6 +2865,16 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                     skos:prefLabel "Infestation (General)"@en .
 
 
+###  https://sakuna.ph/Injured
+:Injured rdf:type owl:NamedIndividual ,
+                  :CasualtyType .
+
+
+###  https://sakuna.ph/Intensity
+:Intensity rdf:type owl:NamedIndividual ,
+                    baw:ClimateParameterType .
+
+
 ###  https://sakuna.ph/Lahar
 :Lahar rdf:type owl:NamedIndividual ,
                 skos:Concept ,
@@ -2928,6 +2939,16 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                    skos:definition "Infestation of locusts (insects)." ;
                    skos:note "Infestation of locusts (insects)." ;
                    skos:prefLabel "Locust Infestation"@en .
+
+
+###  https://sakuna.ph/Magnitude
+:Magnitude rdf:type owl:NamedIndividual ,
+                    baw:ClimateParameterType .
+
+
+###  https://sakuna.ph/MagnitudeScale
+:MagnitudeScale rdf:type owl:NamedIndividual ,
+                         baw:ClimateParameterType .
 
 
 ###  https://sakuna.ph/MassMovementDry
@@ -2995,6 +3016,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                               skos:definition "Disaster type term used in EM-DAT to describe technological accidents of a non-industrial or transport nature (e.g., involving houses)." ;
                               skos:note "Miscellaneous accident (general): Can involve fireworks or firework-related incidents (injuries) or events about elections, celebrations (year-end, christmas), observance of holidays (such as the Lenten season, Undas, All Saints' Day and All Soul's Day). Can involve drowning incidents and food poisoning. Does not include transport or vehicular accidents." ;
                               skos:prefLabel "Miscellaneous Accident (General)"@en .
+
+
+###  https://sakuna.ph/Missing
+:Missing rdf:type owl:NamedIndividual ,
+                  :CasualtyType .
 
 
 ###  https://sakuna.ph/Mudslide
@@ -3066,6 +3092,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
            skos:definition "Poisoning of atmosphere or water courses due to industrial sources of contamination." ;
            skos:note "Poisoning of atmosphere or water courses due to industrial sources of contamination." ;
            skos:prefLabel "Poisoning"@en .
+
+
+###  https://sakuna.ph/Precipitation
+:Precipitation rdf:type owl:NamedIndividual ,
+                        baw:ClimateParameterType .
 
 
 ###  https://sakuna.ph/PrionDisease
@@ -3313,6 +3344,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                skos:prefLabel "Technological"@en .
 
 
+###  https://sakuna.ph/Temperature
+:Temperature rdf:type owl:NamedIndividual ,
+                      baw:ClimateParameterType .
+
+
 ###  https://sakuna.ph/Thunderstorms
 :Thunderstorms rdf:type owl:NamedIndividual ,
                         skos:Concept ,
@@ -3453,6 +3489,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                    skos:prefLabel "Wave Action (General)" .
 
 
+###  https://sakuna.ph/WaveHeight
+:WaveHeight rdf:type owl:NamedIndividual ,
+                     baw:ClimateParameterType .
+
+
 ###  https://sakuna.ph/Wildfire
 :Wildfire rdf:type owl:NamedIndividual ,
                    skos:Concept ,
@@ -3475,6 +3516,11 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
                  skos:definition "Any uncontrolled and non-prescribed combustion or burning of plants in a natural setting such as a forest, grassland, brush land or tundra, which consumes natural fuels and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions." ;
                  skos:note "Wildfire (general): Any type of fire  in a natural setting such as a grassland, mountain, brush land or tundra, which consumes natural fuels such as tress and spreads based on environmental conditions (e.g., wind, or topography). Wildfires can be triggered by lightning or human actions. Can affect animals, trees, and properties. Can be due to El Nino." ;
                  skos:prefLabel "Wildfire (General)"@en .
+
+
+###  https://sakuna.ph/WindSpeed
+:WindSpeed rdf:type owl:NamedIndividual ,
+                    baw:ClimateParameterType .
 
 
 ###  https://sakuna.ph/WormsInfestation
@@ -3519,6 +3565,9 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 
 :infraDamageAmount rdfs:label "infrastructure damage amount"@en ,
                               "infrastructure damage amount" .
+
+
+:isOfCasualtyType rdfs:label "is of casualty type" .
 
 
 :postStructureCost rdfs:comment "Cost of Structure Built post-disaster" ;
