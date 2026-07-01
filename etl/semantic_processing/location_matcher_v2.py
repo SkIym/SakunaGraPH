@@ -371,7 +371,7 @@ class LocationMatcher:
 
             # Ambiguous Region IV → both IV-A and IV-B
             if highest in {"4", "Region 4", "IV"}:
-                matched.extend([self.base + "0400000000-A", self.base + "1700000000"])
+                matched.extend([self.base + "0400000000", self.base + "1700000000"])
                 continue
 
             # Single-tier: try region → province → municipality in order
