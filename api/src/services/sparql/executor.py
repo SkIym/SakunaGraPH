@@ -4,7 +4,7 @@ from typing import Any
 import httpx
 
 from src.config import settings
-from src.services.gemini import get_gemini_client, get_gemini_model
+from src.services.llm import generate_text
 
 WRITE_PATTERNS = [
     re.compile(r"\bINSERT\b", re.IGNORECASE),
@@ -37,11 +37,7 @@ def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
         "Return ONLY the SPARQL query inside a ```sparql code block, no explanation.\n\n"
         f"Question: {nl_query}"
     )
-    response = get_gemini_client().models.generate_content(
-        model=get_gemini_model(),
-        contents=prompt,
-    )
-    return _extract_sparql(response.text)
+    return _extract_sparql(generate_text(prompt))
 
 
 async def execute_sparql(query: str) -> dict[Any, Any] | str:
@@ -89,10 +85,6 @@ async def sparql_with_correction(
                 f"Error:\n{result}\n\n"
                 "Fix the query and return ONLY the corrected SPARQL inside a ```sparql code block."
             )
-            response = get_gemini_client().models.generate_content(
-                model=get_gemini_model(),
-                contents=correction_prompt,
-            )
-            sparql = _extract_sparql(response.text)
+            sparql = _extract_sparql(generate_text(correction_prompt))
 
     return sparql, {}

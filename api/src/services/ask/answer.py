@@ -1,7 +1,7 @@
 import json
 from typing import Any
 
-from src.services.gemini import get_gemini_client, get_gemini_model
+from src.services.llm import generate_text_async
 
 
 def build_grounding_prompt(nl_query: str, sparql_results: dict[Any, Any]) -> str:
@@ -29,8 +29,4 @@ def build_grounding_prompt(nl_query: str, sparql_results: dict[Any, Any]) -> str
 
 async def ground_answer(nl_query: str, sparql_results: dict[Any, Any]) -> str:
     prompt = build_grounding_prompt(nl_query, sparql_results)
-    response = await get_gemini_client().aio.models.generate_content(
-        model=get_gemini_model(),
-        contents=prompt,
-    )
-    return response.text
+    return await generate_text_async(prompt)

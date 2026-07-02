@@ -1,18 +1,15 @@
 import asyncio
 import re
 import time
-from typing import Any, Literal
+from typing import Any
 
+from src.schemas.map import EventMode, EventScope, EventType
 from src.services.common import ServiceError
 from src.services.sparql import execute_sparql
 
 PAGE_SIZE = 10
 _CACHE_TTL = 300
 _PSGC_RE = re.compile(r"^\d{10}$")
-
-EventType = Literal["MajorEvent", "Incident"]
-EventMode = Literal["major", "incidents"]
-EventScope = Literal["region", "province"]
 
 
 class _TTLCache:
@@ -148,43 +145,3 @@ async def get_events(
     result = await _fetch_events(id, event_type, page, PAGE_SIZE)
     _cache.set(cache_key, result)
     return result
-
-
-async def get_region_events(
-    psgc: str,
-    event_type: EventType = "MajorEvent",
-    page: int = 1,
-    limit: int = 10,
-) -> dict[str, Any]:
-    cache_key = ("region", psgc, event_type, page, limit)
-    if (cached := _cache.get(cache_key)) is not None:
-        return cached
-
-    result = await _fetch_events(psgc, event_type, page, limit)
-    response = {
-        "events": result["events"],
-        "major_count": result["majorCount"],
-        "incident_count": result["incidentCount"],
-    }
-    _cache.set(cache_key, response)
-    return response
-
-
-async def get_province_events(
-    psgc: str,
-    event_type: EventType = "MajorEvent",
-    page: int = 1,
-    limit: int = 10,
-) -> dict[str, Any]:
-    cache_key = ("province", psgc, event_type, page, limit)
-    if (cached := _cache.get(cache_key)) is not None:
-        return cached
-
-    result = await _fetch_events(psgc, event_type, page, limit)
-    response = {
-        "events": result["events"],
-        "major_count": result["majorCount"],
-        "incident_count": result["incidentCount"],
-    }
-    _cache.set(cache_key, response)
-    return response

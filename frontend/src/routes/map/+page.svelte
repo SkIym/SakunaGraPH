@@ -4,7 +4,7 @@
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
 	import { apiUrl } from '$lib/api.js';
 	import {
-		regionPsgcFromCC1,
+		normalizePsgcCode,
 		formatProvName,
 		REGION_LABELS,
 		REGION_COLORS,
@@ -54,9 +54,9 @@
 
 			pathData = geojson.features.map((f) => ({
 				d: pathGen(f),
-				gid: f.properties.adm2_psgc,
+				gid: normalizePsgcCode(f.properties.adm2_psgc),
 				name: f.properties.adm2_en,
-				regionPsgc: f.properties.adm1_psgc,
+				regionPsgc: normalizePsgcCode(f.properties.adm1_psgc),
 				feature: f
 			}));
 
@@ -129,8 +129,6 @@
 
 			if (!res.ok) { queryError = data.detail ?? data.message ?? 'Query failed.'; return; }
 
-			// Wrap bindings back into the shape the template already expects:
-			// results.results.bindings — avoids touching any template code
 			results       = { results: { bindings: data.events } };
 			majorCount    = data.majorCount;
 			incidentCount = data.incidentCount;

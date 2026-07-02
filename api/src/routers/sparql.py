@@ -2,16 +2,12 @@ from typing import Any
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse
-from pydantic import BaseModel
 
+from src.schemas.sparql import SparqlRequest
 from src.services.common import ServiceError
 from src.services.sparql import run_sparql_query
 
 router = APIRouter(prefix="/sparql", tags=["sparql"])
-
-
-class SparqlRequest(BaseModel):
-    query: str
 
 
 @router.post("", response_model=None)
