@@ -19,6 +19,7 @@ DEFAULT_SHAPES_PATH = ROOT_DIR / "ontology" / "shapes" / "shapes.ttl"
 DEFAULT_ONTOLOGY_PATH = ROOT_DIR / "ontology" / "sakunagraph.ttl"
 DEFAULT_CONTEXT_GRAPH_PATHS = (
     ROOT_DIR / "data" / "rdf" / "psgc" / "psgc.ttl",
+    ROOT_DIR / "ontology" / "disaster_type_scheme.ttl",
     ROOT_DIR / "data" / "rdf" / "orgs" / "orgs.ttl",
     ROOT_DIR / "data" / "rdf" / "prov" / "prov.ttl",
 )
@@ -185,9 +186,9 @@ def validate_graph(
     Validate an RDF graph against the SakunaGraPH SHACL shapes.
 
     Reference graphs are copied into the validation graph so `sh:class`
-    constraints can see PSGC, organization, and provenance nodes. When callers
-    pass `focus_nodes`, those context nodes are not selected as validation
-    targets.
+    constraints can see PSGC, disaster-type, organization, and provenance
+    nodes. When callers pass `focus_nodes`, those context nodes are not
+    selected as validation targets.
     """
     uses_default_validator = (
         shapes_graph == DEFAULT_SHAPES_PATH
@@ -233,9 +234,18 @@ def validate_file(path: str | Path, **kwargs) -> ShaclValidationResult:
     return validate_graph(Path(path), label=kwargs.pop("label", str(path)), **kwargs)
 
 
-def validation_focus_nodes(graph: Graph) -> tuple[URIRef | BNode, ...]:
-    """Return typed subjects from the caller's graph for focused validation."""
-    return tuple(sorted(set(graph.subjects(RDF.type, None)), key=str))
+def validation_focus_nodes(graph: Graph) -> tuple[URIRef, ...]:
+    """Return typed URI subjects from the caller's graph for focused validation."""
+    return tuple(
+        sorted(
+            {
+                subject
+                for subject in graph.subjects(RDF.type, None)
+                if isinstance(subject, URIRef)
+            },
+            key=str,
+        )
+    )
 
 
 def existing_default_context_paths() -> tuple[Path, ...]:
@@ -311,7 +321,7 @@ def _main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument(
         "--no-default-context",
         action="store_true",
-        help="Do not include PSGC, organization, or provenance context graphs.",
+        help="Do not include PSGC, disaster-type, organization, or provenance context graphs.",
     )
     parser.add_argument(
         "--no-context",

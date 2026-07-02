@@ -66,6 +66,11 @@ Raw Data (PDF, XLSX)
    python -m pipeline.run_ndrrmc
    ```
 
+   To validate each output batch before serialization:
+   ```bash
+   python -m pipeline.run_ndrrmc --validate --batch-size 10
+   ```
+
 
 ### DROMIC
 

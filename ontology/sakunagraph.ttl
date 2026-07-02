@@ -1027,7 +1027,7 @@ baw:hasValue rdf:type owl:DatatypeProperty ;
                                             :Source
                                           )
                             ] ;
-                rdfs:range xsd:dateTime ;
+                rdfs:range xsd:date ;
                 rdfs:label "last update date"@en .
 
 
@@ -1079,7 +1079,7 @@ baw:hasValue rdf:type owl:DatatypeProperty ;
 :obtainedDate rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
               rdfs:domain :Source ;
-              rdfs:range xsd:dateTime ;
+              rdfs:range xsd:date ;
               rdfs:label "obtained date"@en .
 
 

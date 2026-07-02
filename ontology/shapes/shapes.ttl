@@ -1070,20 +1070,19 @@ sgsh:SourceFormatPropertyShape a sh:PropertyShape ;
     sh:datatype xsd:string .
 
 sgsh:SourceLastUpdateDatePropertyShape a sh:PropertyShape ;
-    rdfs:comment "lastUpdateDate is required by the ontology restriction and must be xsd:dateTime." ;
+    rdfs:comment "lastUpdateDate is required by the ontology restriction and must be xsd:date." ;
     sh:path :lastUpdateDate ;
-    sh:datatype xsd:dateTime .
+    sh:datatype xsd:date .
 
 sgsh:SourceObtainedDatePropertyShape a sh:PropertyShape ;
-    rdfs:comment "obtainedDate is required by the ontology restriction and must be xsd:dateTime." ;
+    rdfs:comment "obtainedDate is required by the ontology restriction and must be xsd:date." ;
     sh:path :obtainedDate ;
     sh:minCount 1 ;
-    sh:datatype xsd:dateTime .
+    sh:datatype xsd:date .
 
 sgsh:SourceReportLinkPropertyShape a sh:PropertyShape ;
     rdfs:comment "reportLink is required by the ontology restriction and must be a string." ;
     sh:path :reportLink ;
-    sh:minCount 1 ;
     sh:datatype xsd:string .
 
 sgsh:SourceReportNamePropertyShape a sh:PropertyShape ;

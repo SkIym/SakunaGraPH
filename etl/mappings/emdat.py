@@ -71,6 +71,18 @@ class Source:
     obtainedDate: date
     reportName: str
 
+
+def _as_date(value: date | datetime) -> date:
+    if isinstance(value, datetime):
+        return value.date()
+    return value
+
+
+def _as_datetime(value: date | datetime) -> datetime:
+    if isinstance(value, datetime):
+        return value
+    return datetime.combine(value, datetime.min.time())
+
 def source_mapping(g: Graph, s: Source) -> URIRef:
     """
     Called once per file
@@ -82,7 +94,7 @@ def source_mapping(g: Graph, s: Source) -> URIRef:
     g.add((uri, URIRef(SKG["format"]), Literal(s.format)))
     g.add((uri, SKG.reportLink, Literal("https://public.emdat.be/data")))
     g.add((uri, SKG.reportName, Literal(s.reportName)))
-    g.add((uri, SKG.obtainedDate, Literal(s.obtainedDate, datatype=XSD.dateTime)))
+    g.add((uri, SKG.obtainedDate, Literal(_as_date(s.obtainedDate), datatype=XSD.date)))
     g.add((uri, PROV.wasGeneratedBy, URIRef(SKG["em-dat_website_access"])))
     g.add((uri, PROV.wasAttributedTo, ORG.CRED))
 
@@ -91,7 +103,6 @@ def source_mapping(g: Graph, s: Source) -> URIRef:
 def _is_incident(loc: URIRef, dtype: str) -> bool:
 
     if not loc: return False
-    print(loc)
     if ("|" not in loc
         and all(
             l not in loc
@@ -160,13 +171,13 @@ def event_mapping(rs: list[Event], g: Graph, src_uri: URIRef):
 
                 
             elif f.name == "startDate":
-                g.add((uri, SKG.startDate, Literal(value, datatype=XSD.date)))
+                g.add((uri, SKG.startDate, Literal(_as_datetime(value), datatype=XSD.dateTime)))
             elif f.name == "endDate":
-                g.add((uri, SKG.endDate, Literal(value, datatype=XSD.date)))
+                g.add((uri, SKG.endDate, Literal(_as_datetime(value), datatype=XSD.dateTime)))
             elif f.name == "lastUpdateDate":
-                g.add((uri, SKG.lastUpdateDate, Literal(value, datatype=XSD.date)))
+                g.add((uri, SKG.lastUpdateDate, Literal(_as_datetime(value), datatype=XSD.dateTime)))
             elif f.name == "entryDate":
-                g.add((uri, SKG.entryDate, Literal(value, datatype=XSD.date)))
+                g.add((uri, SKG.entryDate, Literal(_as_datetime(value), datatype=XSD.dateTime)))
             elif f.name == "hasDisasterType":
                 g.add((uri, SKG.hasDisasterType, URIRef(SKG[value])))
             elif f.name == "hasDisasterSubtype":
