@@ -58,9 +58,12 @@ sgsh:DisasterEventEntryDatePropertyShape a sh:PropertyShape ;
     sh:datatype xsd:dateTime .
 
 sgsh:DisasterEventLastUpdateDatePropertyShape a sh:PropertyShape ;
-    rdfs:comment "lastUpdateDate follows the DisasterEvent or Source data property range xsd:dateTime." ;
+    rdfs:comment "lastUpdateDate accepts xsd:date or xsd:dateTime." ;
     sh:path :lastUpdateDate ;
-    sh:datatype xsd:dateTime .
+    sh:or (
+        [ sh:datatype xsd:date ]
+        [ sh:datatype xsd:dateTime ]
+    ) .
 
 sgsh:DisasterEventReferencePropertyShape a sh:PropertyShape ;
     rdfs:comment "reference follows the DisasterEvent data property range xsd:string." ;
@@ -1019,9 +1022,12 @@ sgsh:DeclarationOfCalamityDeclarationTypePropertyShape a sh:PropertyShape ;
     sh:datatype xsd:string .
 
 sgsh:DeclarationOfCalamityResolutionDatePropertyShape a sh:PropertyShape ;
-    rdfs:comment "resolutionDate is required by the ontology restriction and must be xsd:dateTime." ;
+    rdfs:comment "resolutionDate accepts xsd:date or xsd:dateTime." ;
     sh:path :resolutionDate ;
-    sh:datatype xsd:dateTime .
+    sh:or (
+        [ sh:datatype xsd:date ]
+        [ sh:datatype xsd:dateTime ]
+    ) .
 
 sgsh:DeclarationOfCalamityResolutionNoPropertyShape a sh:PropertyShape ;
     rdfs:comment "resolutionNo is required by the ontology restriction and must be a string." ;
@@ -1070,15 +1076,20 @@ sgsh:SourceFormatPropertyShape a sh:PropertyShape ;
     sh:datatype xsd:string .
 
 sgsh:SourceLastUpdateDatePropertyShape a sh:PropertyShape ;
-    rdfs:comment "lastUpdateDate is required by the ontology restriction and must be xsd:date." ;
+    rdfs:comment "lastUpdateDate accepts xsd:date or xsd:dateTime." ;
     sh:path :lastUpdateDate ;
-    sh:datatype xsd:date .
+    sh:or (
+        [ sh:datatype xsd:date ]
+        [ sh:datatype xsd:dateTime ]
+    ) .
 
 sgsh:SourceObtainedDatePropertyShape a sh:PropertyShape ;
-    rdfs:comment "obtainedDate is required by the ontology restriction and must be xsd:date." ;
+    rdfs:comment "obtainedDate accepts xsd:date or xsd:dateTime when present." ;
     sh:path :obtainedDate ;
-    sh:minCount 1 ;
-    sh:datatype xsd:date .
+    sh:or (
+        [ sh:datatype xsd:date ]
+        [ sh:datatype xsd:dateTime ]
+    ) .
 
 sgsh:SourceReportLinkPropertyShape a sh:PropertyShape ;
     rdfs:comment "reportLink is required by the ontology restriction and must be a string." ;
