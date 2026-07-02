@@ -11,3 +11,7 @@ class AskResponse(BaseModel):
     sparql: str
     answer: str
     bindings: list[dict[Any, Any]]
+
+
+class AskPreviewResponse(BaseModel):
+    sparql: str

@@ -1,43 +1,36 @@
-import json
-
-import google as genai
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from fastapi.responses import StreamingResponse
 
-from src.config import settings
-from src.schemas.ask import AskRequest, AskResponse
-from src.services.answer_service import build_grounding_prompt, ground_answer
-from src.services.ontology_context import load_ontology_context
-from src.services.sparql_service import sparql_with_correction
+from src.schemas.ask import AskPreviewResponse, AskRequest, AskResponse
+from src.services.common import ServiceError
+from src.services.ask import ask_question, preview_question, stream_answer_events
 
 router = APIRouter(tags=["ask"])
 
-_ontology_context = load_ontology_context()
+
+def _to_http_error(exc: ServiceError) -> HTTPException:
+    return HTTPException(status_code=exc.status_code, detail=exc.detail)
 
 
 @router.post("/ask", response_model=AskResponse)
 async def ask(request: AskRequest) -> AskResponse:
-    sparql, raw_results = await sparql_with_correction(request.query, _ontology_context)
-    bindings = raw_results.get("results", {}).get("bindings", [])
-    answer = await ground_answer(request.query, raw_results)
-    return AskResponse(sparql=sparql, answer=answer, bindings=bindings)
+    try:
+        return AskResponse(**await ask_question(request.query))
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
+
+
+@router.post("/ask/preview", response_model=AskPreviewResponse)
+async def ask_preview(request: AskRequest) -> AskPreviewResponse:
+    try:
+        return AskPreviewResponse(**await preview_question(request.query))
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
 
 
 @router.post("/ask/stream")
 async def ask_stream(request: AskRequest) -> StreamingResponse:
-    async def event_generator():
-        sparql, raw_results = await sparql_with_correction(request.query, _ontology_context)
-        bindings = raw_results.get("results", {}).get("bindings", [])
-
-        yield f"data: {json.dumps({'type': 'meta', 'sparql': sparql, 'bindings': bindings})}\n\n"
-
-        prompt = build_grounding_prompt(request.query, raw_results)
-        model = genai.GenerativeModel(settings.gemini_model) # type: ignore
-        response = await model.generate_content_async(prompt, stream=True)
-        async for chunk in response:
-            if chunk.text:
-                yield f"data: {json.dumps({'type': 'token', 'text': chunk.text})}\n\n"
-
-        yield f"data: {json.dumps({'type': 'done'})}\n\n"
-
-    return StreamingResponse(event_generator(), media_type="text/event-stream")
+    return StreamingResponse(
+        stream_answer_events(request.query),
+        media_type="text/event-stream",
+    )

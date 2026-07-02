@@ -3,6 +3,7 @@
 	import SparqlEditor from '$lib/components/SparqlEditor.svelte';
 	import ResultsModal from '$lib/components/ResultsModal.svelte';
 	import { COMPETENCY_QUESTIONS } from '$lib/competency_queries.js';
+	import { apiUrl } from '$lib/api.js';
 
 	const GraPH_color = '#305bb2' 
 
@@ -120,7 +121,7 @@ LIMIT 15`
 		}
 		loading = true;
 		try {
-			const res = await fetch('/api/sparql', {
+			const res = await fetch(apiUrl('/api/sparql'), {
 				method: 'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body: JSON.stringify({ query: trimmed })

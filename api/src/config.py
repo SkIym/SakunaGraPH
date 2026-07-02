@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     gemini_api_key: str = ""
     gemini_model: str = ""
 
-    graphdb_endpoint: str = ""
+    graphdb_endpoint: str = "http://localhost:7200/repositories/SakunaGraph"
 
 
 settings = Settings()

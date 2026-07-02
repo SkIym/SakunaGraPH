@@ -2,6 +2,7 @@
 	import { onMount } from 'svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
+	import { apiUrl } from '$lib/api.js';
 	import {
 		regionPsgcFromCC1,
 		formatProvName,
@@ -25,7 +26,7 @@
 
 	// ── UI state ─────────────────────────────────────────────────────────────
 	let view = $state('regions');  // 'regions' | 'provinces'
-	let selected = $state(null);   // {type, psgc, id, name, rawName?}
+	let selected = $state(null);   // {type, psgc, id, name}
 
 	// ── Results state ────────────────────────────────────────────────────────
 	const PAGE_SIZE = 10;
@@ -119,14 +120,14 @@
         expandedAlternates = new Set();
 
 		const scope = selected.type === 'region' ? 'region' : 'province';
-		const id    = selected.type === 'region' ? selected.psgc : selected.rawName;
+		const id    = selected.type === 'region' ? selected.psgc : selected.id;
 		const params = new URLSearchParams({ scope, id, mode: resultMode, page: String(page) });
 
 		try {
-			const res = await fetch(`/api/map/events?${params}`);
+			const res = await fetch(apiUrl(`/api/map/events?${params}`));
 			const data = await res.json();
 
-			if (!res.ok) { queryError = data.message ?? 'Query failed.'; return; }
+			if (!res.ok) { queryError = data.detail ?? data.message ?? 'Query failed.'; return; }
 
 			// Wrap bindings back into the shape the template already expects:
 			// results.results.bindings — avoids touching any template code
@@ -159,8 +160,7 @@
 				type: 'province',
 				psgc: null,
 				id: item.gid,
-				name: formatProvName(item.name),
-				rawName: item.name
+				name: formatProvName(item.name)
 			};
 		}
 	}

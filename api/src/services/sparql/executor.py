@@ -1,16 +1,26 @@
-import asyncio
-import json
 import re
 from typing import Any
-from google import genai
+
 import httpx
 
 from src.config import settings
-from src.services.ontology_context import load_ontology_context
+from src.services.gemini import get_gemini_client, get_gemini_model
 
-# genai.configure(api_key=settings.gemini_api_key)
-# _model = genai.GenerativeModel(settings.gemini_model)
-client = genai.Client(api_key=settings.gemini_api_key)
+WRITE_PATTERNS = [
+    re.compile(r"\bINSERT\b", re.IGNORECASE),
+    re.compile(r"\bDELETE\b", re.IGNORECASE),
+    re.compile(r"\bCLEAR\b", re.IGNORECASE),
+    re.compile(r"\bDROP\b", re.IGNORECASE),
+    re.compile(r"\bCREATE\s+GRAPH\b", re.IGNORECASE),
+    re.compile(r"\bLOAD\b", re.IGNORECASE),
+    re.compile(r"\bCOPY\s+GRAPH\b", re.IGNORECASE),
+    re.compile(r"\bMOVE\s+GRAPH\b", re.IGNORECASE),
+]
+
+
+def is_write_operation(query: str) -> bool:
+    return any(pattern.search(query) for pattern in WRITE_PATTERNS)
+
 
 def _extract_sparql(text: str) -> str:
     match = re.search(r"```(?:sparql)?\s*(.*?)```", text, re.DOTALL | re.IGNORECASE)
@@ -27,13 +37,19 @@ def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
         "Return ONLY the SPARQL query inside a ```sparql code block, no explanation.\n\n"
         f"Question: {nl_query}"
     )
-    response = client.models.generate_content(
-        model=settings.gemini_model,
-        contents=prompt)
+    response = get_gemini_client().models.generate_content(
+        model=get_gemini_model(),
+        contents=prompt,
+    )
     return _extract_sparql(response.text)
 
 
 async def execute_sparql(query: str) -> dict[Any, Any] | str:
+    if not query or not query.strip():
+        return "A non-empty SPARQL query is required."
+    if is_write_operation(query):
+        return "Write operations (INSERT, DELETE, CLEAR, DROP, LOAD, etc.) are not permitted."
+
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
             response = await client.post(
@@ -48,7 +64,7 @@ async def execute_sparql(query: str) -> dict[Any, Any] | str:
             return f"GraphDB returned {response.status_code}: {response.text[:500]}"
         return response.json()
     except httpx.ConnectError:
-        return f"Cannot connect to GraphDB"
+        return "Cannot connect to GraphDB"
     except Exception as exc:
         return str(exc)
 
@@ -73,23 +89,10 @@ async def sparql_with_correction(
                 f"Error:\n{result}\n\n"
                 "Fix the query and return ONLY the corrected SPARQL inside a ```sparql code block."
             )
-            response = client.models.generate_content(
-                model=settings.gemini_model,
-                contents=correction_prompt)
+            response = get_gemini_client().models.generate_content(
+                model=get_gemini_model(),
+                contents=correction_prompt,
+            )
             sparql = _extract_sparql(response.text)
 
     return sparql, {}
-
-
-if __name__ == "__main__":
-    async def _test() -> None:
-        ctx = load_ontology_context()
-        sparql, bindings = await sparql_with_correction(
-            "how many people were affected by floods in 2023", ctx
-        )
-        print("=== Generated SPARQL ===")
-        print(sparql)
-        print("\n=== Bindings ===")
-        print(json.dumps(bindings, indent=2))
-
-    asyncio.run(_test())
