@@ -84,6 +84,8 @@ def load_csv_df(
     # filter out ncr value in province column
     df = remove_values_from_column(df, "province", ["ncr"])
 
+    df = remove_barangay_count_values(df)
+
     if collapse_key:
         df = collapse(df, collapse_on, collapse_key)
 
@@ -584,3 +586,19 @@ def split_merged_cost_values(df: pl.DataFrame) -> pl.DataFrame:
 
     return result
 
+
+def remove_barangay_count_values(df: DataFrame):
+    if "hasBarangay" not in df.columns:
+        return df
+
+    return df.with_columns(
+        pl.when(
+            pl.col("hasBarangay")
+            .cast(pl.Utf8, strict=False)
+            .str.strip_chars()
+            .str.contains(r"^\d+$")
+        )
+        .then(None)
+        .otherwise(pl.col("hasBarangay"))
+        .alias("hasBarangay")
+    )
