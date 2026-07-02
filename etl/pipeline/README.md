@@ -57,27 +57,33 @@ Builds DROMIC event graphs per year from the parsed reports tree under
 subfolder, or iterates over all year subfolders when `--all` is passed.
 
 Steps:
-1. For a given year directory, walk every event subfolder (skipping any folder
-   listed in `_needs_rerun.txt` for that year).
-2. Per event folder, `load_event` reads `metadata.json` and `event_mapping`
-   mints the event IRI; `load_provenance` + `prov_mapping` attach the
-   provenance chain from `source.json`.
+1. For a given year directory, discover event subfolders, applying `--start`
+   and optional `--limit`, while skipping folders listed in `_needs_rerun.txt`
+   for that year.
+2. For each batch (default 100 event folders), transform and map those events
+   into a temporary batch graph. Per event, `load_event` reads `metadata.json`
+   and `event_mapping` mints the event IRI; `load_provenance` + `prov_mapping`
+   attach the provenance chain from `source.json`.
 3. `load_aff_pop` is called for affected-population and pre-emptive evacuation
    data; non-empty results are passed to `aff_pop_mapping` and `pevac_mapping`
-   respectively.
-4. `load_housing` populates housing damage via `housing_mapping` if present.
-5. `load_assistance` + `assistance_mapping` handle assistance data; failures
+   respectively. `load_housing` populates housing damage via `housing_mapping`
+   if present.
+4. `load_assistance` + `assistance_mapping` handle assistance data; failures
    are caught, logged, and the offending folder name is appended to
    `_needs_rerun.txt` for later inspection rather than aborting the run.
-6. All per-event subgraphs are merged into a single year graph and serialized
-   to `../data/rdf/events/{--out}-{year}.ttl`.
+5. Optionally run SHACL validation when `--validate` is set. Batches are
+   merged into the final year graph only after validation passes. Add
+   `--no-context` to validate without PSGC/disaster-type/org/provenance
+   context graphs.
+6. Serialize the year graph to
+   `../data/rdf/events/dromic/{--out}-{year}.ttl`.
 
 **`_needs_rerun.txt` mechanic** — each year directory may contain this file.
 Folders listed there are silently skipped during `run()`, and any folder whose
 `load_assistance` call raises an exception is automatically appended to it,
 making failed events easy to retry in isolation.
 
-CLI: `python run_dromic.py [--year 2026]`
+CLI: `python -m pipeline.run_dromic [--year 2026] [--batch-size 100] [--validate] [--no-context]`
 
 ## `run_gda.py`
 Builds `gda.ttl` from the cleaned Geographical Disaster Archive workbook at

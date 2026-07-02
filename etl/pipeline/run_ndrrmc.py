@@ -363,7 +363,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--batch-size",
         type=int,
-        default=None,
+        default=DEFAULT_BATCH_SIZE,
         help="Number of NDRRMC event folders per output and validation batch.",
     )
     parser.add_argument(

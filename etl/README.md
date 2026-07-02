@@ -84,6 +84,11 @@ Raw Data (PDF, XLSX)
    python -m pipeline.run_dromic
    ```
 
+   To validate each 100-event batch before merging into the year graph:
+   ```bash
+   python -m pipeline.run_dromic --validate --batch-size 100
+   ```
+
 
 ### GDA
 1. **Collect** Ensure the cleaned digitized archive file is in `data/raw/static`
