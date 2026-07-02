@@ -1,7 +1,7 @@
 <script>
 	import { tick } from 'svelte';
-	import { PUBLIC_API_URL } from '$env/static/public';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
+	import { apiUrl } from '$lib/api.js';
 
 	let messages = $state([]);
 	let input    = $state('');
@@ -39,7 +39,7 @@
 		await scrollBottom();
 
 		try {
-			const res  = await fetch(`${PUBLIC_API_URL}/ask`, {
+			const res  = await fetch(apiUrl('/api/ask'), {
 				method:  'POST',
 				headers: { 'Content-Type': 'application/json' },
 				body:    JSON.stringify({ query })

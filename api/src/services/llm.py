@@ -12,6 +12,17 @@ def _base_url() -> str:
     return settings.local_llm_base_url.rstrip("/")
 
 
+def _endpoint_url(path: str) -> str:
+    path = path.strip()
+    if path.startswith(("http://", "https://")):
+        return path
+    return f"{_base_url()}/{path.lstrip('/')}"
+
+
+def _chat_url() -> str:
+    return _endpoint_url(settings.local_llm_chat_path)
+
+
 def _model_name() -> str:
     model = settings.local_llm_model.strip()
     if not model:
@@ -26,9 +37,9 @@ def _timeout() -> httpx.Timeout:
 def _request_body(prompt: str, *, stream: bool) -> dict[str, Any]:
     return {
         "model": _model_name(),
-        "prompt": prompt,
+        "input": prompt,
         "stream": stream,
-        "keep_alive": settings.local_llm_keep_alive,
+        "store": settings.local_llm_store,
     }
 
 
@@ -61,16 +72,25 @@ async def _raise_for_stream_api_error(response: httpx.Response) -> None:
     raise ServiceError(502, f"Local LLM API returned {response.status_code}: {detail}")
 
 
+def _output_message_text(item: dict[str, Any]) -> str:
+    if item.get("type") != "message":
+        return ""
+    content = item.get("content")
+    return content if isinstance(content, str) else ""
+
+
 def _extract_text(payload: dict[str, Any]) -> str:
-    text = payload.get("response")
-    if isinstance(text, str):
-        return text
+    output = payload.get("output")
+    if isinstance(output, list):
+        text = "".join(
+            _output_message_text(item)
+            for item in output
+            if isinstance(item, dict)
+        )
+        if text:
+            return text
 
-    message = payload.get("message")
-    if isinstance(message, dict) and isinstance(message.get("content"), str):
-        return message["content"]
-
-    raise ServiceError(502, f"Local LLM response contained no text: {payload}")
+    raise ServiceError(502, f"Local LLM response contained no message output: {payload}")
 
 
 def _connection_error(exc: httpx.HTTPError) -> ServiceError:
@@ -88,7 +108,7 @@ def generate_text(prompt: str) -> str:
     try:
         with httpx.Client(timeout=_timeout()) as client:
             response = client.post(
-                f"{_base_url()}/api/generate",
+                _chat_url(),
                 json=_request_body(prompt, stream=False),
             )
     except httpx.HTTPError as exc:
@@ -102,7 +122,7 @@ async def generate_text_async(prompt: str) -> str:
     try:
         async with httpx.AsyncClient(timeout=_timeout()) as client:
             response = await client.post(
-                f"{_base_url()}/api/generate",
+                _chat_url(),
                 json=_request_body(prompt, stream=False),
             )
     except httpx.HTTPError as exc:
@@ -117,7 +137,7 @@ async def stream_text_async(prompt: str) -> AsyncIterator[str]:
         async with httpx.AsyncClient(timeout=None) as client:
             async with client.stream(
                 "POST",
-                f"{_base_url()}/api/generate",
+                _chat_url(),
                 json=_request_body(prompt, stream=True),
             ) as response:
                 await _raise_for_stream_api_error(response)
@@ -126,6 +146,10 @@ async def stream_text_async(prompt: str) -> AsyncIterator[str]:
                     line = line.strip()
                     if not line:
                         continue
+                    if line.startswith("data:"):
+                        line = line.removeprefix("data:").strip()
+                    if line == "[DONE]":
+                        break
 
                     try:
                         payload = json.loads(line)
@@ -135,11 +159,18 @@ async def stream_text_async(prompt: str) -> AsyncIterator[str]:
                     if error := payload.get("error"):
                         raise ServiceError(502, f"Local LLM stream error: {error}")
 
-                    text = payload.get("response")
-                    if isinstance(text, str) and text:
+                    output = payload.get("output")
+                    text = ""
+                    if isinstance(output, list):
+                        text = "".join(
+                            _output_message_text(item)
+                            for item in output
+                            if isinstance(item, dict)
+                        )
+                    if text:
                         yield text
 
-                    if payload.get("done"):
+                    if payload.get("done") or payload.get("type") == "done":
                         break
     except httpx.HTTPError as exc:
         raise _connection_error(exc) from exc
@@ -162,7 +193,8 @@ async def list_models_async() -> list[dict[str, Any]]:
 
 def active_model_info() -> dict[str, str]:
     return {
-        "provider": "ollama",
+        "provider": "local",
         "baseUrl": _base_url(),
+        "chatUrl": _chat_url(),
         "model": _model_name(),
     }

@@ -5,7 +5,7 @@
 		{ href: '/', label: 'Home' },
 		{ href: '/map', label: 'Map' },
 		{ href: '/ontology', label: 'Ontology' },
-		// { href: '/ask', label: 'Ask' }
+		{ href: '/ask', label: 'Ask' }
 	];
 </script>
 
