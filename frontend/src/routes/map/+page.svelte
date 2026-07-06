@@ -128,11 +128,10 @@
 
 			if (!res.ok) { queryError = data.detail ?? data.message ?? 'Query failed.'; return; }
 
-			const events = (data.events ?? []).map(normalizeMapEvent);
-			results       = events;
+			results       = data.events ?? [];
 			majorCount    = data.majorCount;
 			incidentCount = data.incidentCount;
-            groupedResults = groupByAlternates(events);
+            groupedResults = groupByAlternates(results);
 		} catch {
 			queryError = 'Could not reach server.';
 		} finally {
@@ -215,37 +214,10 @@
 		return pages;
 	});
 
-	// Result column display helpers
-	function termValue(value) {
-		if (value == null) return '';
-		if (typeof value === 'object' && 'value' in value) return value.value ?? '';
-		return value;
-	}
-
-	function valueList(value, separator = ',') {
-		const raw = termValue(value);
-		if (Array.isArray(raw)) return raw.map(termValue).filter(Boolean);
-		if (typeof raw !== 'string') return raw ? [String(raw)] : [];
-		return raw.split(separator).map(s => s.trim()).filter(Boolean);
-	}
-
-	function normalizeMapEvent(row) {
-		const startDate = String(termValue(row.startDate) ?? '');
-		return {
-			event: String(termValue(row.event) ?? ''),
-			eventName: String(termValue(row.eventName) || '(unnamed event)'),
-			startDate: startDate.split('T')[0],
-			locations: valueList(row.locations, '|'),
-			disasterTypes: valueList(row.disasterTypes ?? row.disasterType, ','),
-			alternates: valueList(row.alternates, ','),
-			source: termValue(row.source) || null
-		};
-	}
-
 	function colValue(row, col) {
 		const v = row[col];
 		if (Array.isArray(v)) return v.length ? v.join(', ') : '—';
-		return termValue(v) || '—';
+		return v || '—';
 	}
 
 	const DISPLAY_COLS = ['eventName', 'disasterTypes', 'startDate', 'locations'];
