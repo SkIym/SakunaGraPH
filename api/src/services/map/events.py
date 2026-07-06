@@ -3,7 +3,8 @@ import re
 import time
 from typing import Any
 
-from src.schemas.map import EventMode, EventScope, EventType
+from src.schemas.map import EventMode, EventScope, EventType, MapEvent, MapEventsResponse
+from src.services.ontology.utils import binding_value
 from src.services.common import ServiceError
 from src.services.sparql import execute_sparql
 
@@ -99,6 +100,35 @@ def _count_val(result: dict[Any, Any]) -> int:
     return int(value) if value else 0
 
 
+def _split_list(value: str, separator: str) -> list[str]:
+    return [part.strip() for part in value.split(separator) if part.strip()]
+
+
+def _event_item(binding: dict[Any, Any]) -> MapEvent | None:
+    event = binding_value(binding, "event", "")
+    if not event:
+        return None
+
+    start_date = binding_value(binding, "startDate", "")
+    return MapEvent(
+        event=event,
+        eventName=binding_value(binding, "eventName", "") or "(unnamed event)",
+        startDate=start_date.split("T", 1)[0] if start_date else "",
+        locations=_split_list(binding_value(binding, "locations", ""), "|"),
+        disasterTypes=_split_list(binding_value(binding, "disasterType", ""), ","),
+        alternates=_split_list(binding_value(binding, "alternates", ""), ","),
+        source=binding_value(binding, "source") or None,
+    )
+
+
+def _event_items(result: dict[Any, Any]) -> list[MapEvent]:
+    events: list[MapEvent] = []
+    for binding in result.get("results", {}).get("bindings", []):
+        if event := _event_item(binding):
+            events.append(event)
+    return events
+
+
 def _event_type_from_mode(mode: EventMode) -> EventType:
     return "MajorEvent" if mode == "major" else "Incident"
 
@@ -113,7 +143,7 @@ async def _fetch_events(
     event_type: EventType,
     page: int,
     limit: int,
-) -> dict[str, Any]:
+) -> MapEventsResponse:
     _validate_psgc(psgc)
     offset = (page - 1) * limit
     events_res, major_res, incident_res = await asyncio.gather(
@@ -124,11 +154,11 @@ async def _fetch_events(
     errors = [r for r in (events_res, major_res, incident_res) if isinstance(r, str)]
     if errors:
         raise ServiceError(502, errors[0])
-    return {
-        "events": events_res.get("results", {}).get("bindings", []),
-        "majorCount": _count_val(major_res),
-        "incidentCount": _count_val(incident_res),
-    }
+    return MapEventsResponse(
+        events=_event_items(events_res),
+        majorCount=_count_val(major_res),
+        incidentCount=_count_val(incident_res),
+    )
 
 
 async def get_events(
@@ -136,7 +166,7 @@ async def get_events(
     id: str,
     mode: EventMode = "major",
     page: int = 1,
-) -> dict[str, Any]:
+) -> MapEventsResponse:
     event_type = _event_type_from_mode(mode)
     cache_key = ("events", scope, id, mode, page)
     if (cached := _cache.get(cache_key)) is not None:

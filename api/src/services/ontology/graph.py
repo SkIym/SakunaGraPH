@@ -1,6 +1,7 @@
 import asyncio
 from typing import Any
 
+from src.schemas.ontology import OntologyGraphResponse
 from src.services.common import ServiceError
 from src.services.ontology.utils import binding_value
 from src.services.sparql import execute_sparql
@@ -128,7 +129,7 @@ def _build_graph(
     subclassof_bindings: list[dict[Any, Any]],
     objprop_bindings: list[dict[Any, Any]],
     dataprop_bindings: list[dict[Any, Any]],
-) -> dict[Any, Any]:
+) -> OntologyGraphResponse:
     data_props: dict[str, list[dict[Any, Any]]] = {}
     seen_dp: set[tuple[Any, Any, Any]] = set()
     for b in dataprop_bindings:
@@ -210,10 +211,10 @@ def _build_graph(
         if not any(link["source"] == src and link["target"] == tgt for link in links):
             links.append({"source": src, "target": tgt, "type": "objectProperty", "label": lbl})
 
-    return {"nodes": nodes, "links": links}
+    return OntologyGraphResponse(nodes=nodes, links=links)
 
 
-async def get_ontology_graph() -> dict[Any, Any]:
+async def get_ontology_graph() -> OntologyGraphResponse:
     class_res, subclassof_res, objprop_res, dataprop_res = await asyncio.gather(
         execute_sparql(_GRAPH_CLASSES_QUERY),
         execute_sparql(_GRAPH_SUBCLASSOF_QUERY),

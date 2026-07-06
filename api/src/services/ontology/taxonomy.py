@@ -1,5 +1,6 @@
 from typing import Any
 
+from src.schemas.ontology import TaxonomyNode
 from src.services.common import ServiceError
 from src.services.ontology.utils import binding_value
 from src.services.sparql import execute_sparql
@@ -32,7 +33,7 @@ _TAXONOMY_GROUP: dict[str, str] = {
 }
 
 
-def _build_taxonomy_tree(bindings: list[dict[Any, Any]]) -> dict[Any, Any]:
+def _build_taxonomy_tree(bindings: list[dict[Any, Any]]) -> TaxonomyNode:
     concepts: dict[str, dict[Any, Any]] = {}
     children_of: dict[str, list[str]] = {}
 
@@ -64,29 +65,30 @@ def _build_taxonomy_tree(bindings: list[dict[Any, Any]]) -> dict[Any, Any]:
     for iri in top_level:
         assign_group(iri, "natural")
 
-    def build_node(iri: str) -> dict[Any, Any]:
+    def build_node(iri: str) -> TaxonomyNode:
         concept = concepts[iri]
-        node = {
-            "id": concept["id"],
-            "label": concept["label"],
-            "group": concept.get("group", "natural"),
-            "definition": concept["definition"],
-        }
         kids = children_of.get(iri, [])
-        if kids:
-            node["children"] = [build_node(child) for child in kids]
-        return node
+        return TaxonomyNode(
+            id=concept["id"],
+            label=concept["label"],
+            group=concept.get("group", "natural"),
+            definition=concept["definition"],
+            children=[build_node(child) for child in kids] if kids else None,
+        )
 
-    return {
-        "id": "root",
-        "label": "Disaster Types",
-        "group": "root",
-        "definition": "SakunaGraPH Disaster Type Classification Scheme based on the Emergency Events Database (EM-DAT) classification.",
-        "children": [build_node(iri) for iri in top_level],
-    }
+    return TaxonomyNode(
+        id="root",
+        label="Disaster Types",
+        group="root",
+        definition=(
+            "SakunaGraPH Disaster Type Classification Scheme based on the "
+            "Emergency Events Database (EM-DAT) classification."
+        ),
+        children=[build_node(iri) for iri in top_level],
+    )
 
 
-async def get_disaster_taxonomy() -> dict[Any, Any]:
+async def get_disaster_taxonomy() -> TaxonomyNode:
     results = await execute_sparql(_TAXONOMY_QUERY)
     if isinstance(results, str):
         raise ServiceError(502, results)

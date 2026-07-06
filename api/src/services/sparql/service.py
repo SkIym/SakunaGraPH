@@ -1,17 +1,17 @@
 import re
-from typing import Any
 
+from src.schemas.sparql import SparqlQueryResponse
 from src.services.common import ServiceError
 from src.services.sparql.executor import execute_sparql
 
 
-async def run_sparql_query(query: str) -> dict[Any, Any]:
+async def run_sparql_query(query: str) -> SparqlQueryResponse:
     if not query or not query.strip():
         raise ServiceError(400, "A non-empty SPARQL query is required.")
 
     result = await execute_sparql(query)
     if isinstance(result, dict):
-        return result
+        return SparqlQueryResponse.model_validate(result)
 
     if result.startswith("Write operations"):
         raise ServiceError(403, result)

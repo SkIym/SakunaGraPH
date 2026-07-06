@@ -3,6 +3,15 @@ import re
 from typing import Any
 from urllib.parse import unquote, urlparse
 
+from src.schemas.disasters import (
+    DisasterOrganization,
+    DisasterOrganizationsResponse,
+    DisasterSource,
+    DisasterSourcesResponse,
+    EventImpactResponse,
+    ImpactClass,
+    ImpactItem,
+)
 from src.services.common import ServiceError
 from src.services.ontology.utils import binding_value
 from src.services.sparql import execute_sparql
@@ -75,7 +84,7 @@ async def _execute_or_raise(query: str) -> dict[Any, Any]:
     return result
 
 
-async def _resolve_impact_class(impact: str) -> dict[str, str]:
+async def _resolve_impact_class(impact: str) -> ImpactClass:
     requested = _decode_path_value(impact)
     requested_key = _key(requested)
     if not requested_key:
@@ -91,12 +100,12 @@ async def _resolve_impact_class(impact: str) -> dict[str, str]:
         label = binding_value(binding, "label", "")
         keys = {_key(class_iri), _key(label)}
         if requested_key in keys:
-            return {
-                "uri": class_iri,
-                "id": _local_name(class_iri),
-                "label": label or _local_name(class_iri),
-                "definition": binding_value(binding, "definition", ""),
-            }
+            return ImpactClass(
+                uri=class_iri,
+                id=_local_name(class_iri),
+                label=label or _local_name(class_iri),
+                definition=binding_value(binding, "definition", ""),
+            )
 
     raise ServiceError(404, f"Unknown impact class: {impact}")
 
@@ -229,13 +238,14 @@ ORDER BY ?label ?source ?sourceRecord
 """
 
 
-def _binding_term(binding: dict[Any, Any], key: str) -> dict[str, Any] | None:
+def _binding_display_value(binding: dict[Any, Any], key: str) -> dict[str, Any] | None:
     term = binding.get(key)
     if not term:
         return None
+    value = term.get("value", "")
     result: dict[str, Any] = {
-        "value": term.get("value"),
-        "type": term.get("type"),
+        "value": _local_name(value) if term.get("type") == "uri" else value,
+        "valueType": term.get("type"),
     }
     if datatype := term.get("datatype"):
         result["datatype"] = datatype
@@ -251,7 +261,7 @@ def _dedupe_append(items: list[dict[str, Any]], item: dict[str, Any], seen: set[
         items.append(item)
 
 
-def _build_impact_items(bindings: list[dict[Any, Any]]) -> list[dict[str, Any]]:
+def _build_impact_items(bindings: list[dict[Any, Any]]) -> list[ImpactItem]:
     grouped: dict[tuple[str, str, str], dict[str, Any]] = {}
 
     for binding in bindings:
@@ -295,25 +305,25 @@ def _build_impact_items(bindings: list[dict[Any, Any]]) -> list[dict[str, Any]]:
             )
 
         predicate = binding_value(binding, "predicate", "")
-        value = _binding_term(binding, "value")
+        value = _binding_display_value(binding, "value")
         if predicate and value:
             value_item = {
                 "predicate": predicate,
                 "label": binding_value(binding, "predicateLabel", _local_name(predicate)),
-                "value": value,
+                **value,
             }
             if unit := binding_value(binding, "unit", ""):
-                value_item["unit"] = unit
+                value_item["unit"] = _local_name(unit)
             _dedupe_append(item["values"], value_item, item["_seenValues"])
 
     items = list(grouped.values())
     for item in items:
         del item["_seenLocations"]
         del item["_seenValues"]
-    return items
+    return [ImpactItem.model_validate(item) for item in items]
 
 
-def _build_sources(bindings: list[dict[Any, Any]]) -> list[dict[str, Any]]:
+def _build_sources(bindings: list[dict[Any, Any]]) -> list[DisasterSource]:
     grouped: dict[str, dict[str, Any]] = {}
 
     for binding in bindings:
@@ -350,10 +360,10 @@ def _build_sources(bindings: list[dict[Any, Any]]) -> list[dict[str, Any]]:
     sources = list(grouped.values())
     for source in sources:
         del source["_seenRecords"]
-    return sources
+    return [DisasterSource.model_validate(source) for source in sources]
 
 
-def _build_organizations(bindings: list[dict[Any, Any]]) -> list[dict[str, Any]]:
+def _build_organizations(bindings: list[dict[Any, Any]]) -> list[DisasterOrganization]:
     grouped: dict[str, dict[str, Any]] = {}
 
     for binding in bindings:
@@ -394,42 +404,42 @@ def _build_organizations(bindings: list[dict[Any, Any]]) -> list[dict[str, Any]]
     organizations = list(grouped.values())
     for organization in organizations:
         del organization["_seenRoles"]
-    return organizations
+    return [
+        DisasterOrganization.model_validate(organization)
+        for organization in organizations
+    ]
 
 
-async def get_event_impact(uri: str, impact: str) -> dict[str, Any]:
+async def get_event_impact(uri: str, impact: str) -> EventImpactResponse:
     event_iri = _validate_iri(uri, "uri")
     impact_class = await _resolve_impact_class(impact)
-    result = await _execute_or_raise(_impact_query(event_iri, impact_class["uri"]))
+    result = await _execute_or_raise(_impact_query(event_iri, impact_class.uri))
     bindings = result.get("results", {}).get("bindings", [])
 
-    return {
-        "event": event_iri,
-        "impact": impact_class,
-        "items": _build_impact_items(bindings),
-        "bindings": bindings,
-    }
+    return EventImpactResponse(
+        event=event_iri,
+        impact=impact_class,
+        items=_build_impact_items(bindings),
+    )
 
 
-async def get_disaster_organizations(uri: str) -> dict[str, Any]:
+async def get_disaster_organizations(uri: str) -> DisasterOrganizationsResponse:
     event_iri = _validate_iri(uri, "uri")
     result = await _execute_or_raise(_organizations_query(event_iri))
     bindings = result.get("results", {}).get("bindings", [])
 
-    return {
-        "event": event_iri,
-        "organizations": _build_organizations(bindings),
-        "bindings": bindings,
-    }
+    return DisasterOrganizationsResponse(
+        event=event_iri,
+        organizations=_build_organizations(bindings),
+    )
 
 
-async def get_disaster_sources(uri: str) -> dict[str, Any]:
+async def get_disaster_sources(uri: str) -> DisasterSourcesResponse:
     event_iri = _validate_iri(uri, "uri")
     result = await _execute_or_raise(_sources_query(event_iri))
     bindings = result.get("results", {}).get("bindings", [])
 
-    return {
-        "event": event_iri,
-        "sources": _build_sources(bindings),
-        "bindings": bindings,
-    }
+    return DisasterSourcesResponse(
+        event=event_iri,
+        sources=_build_sources(bindings),
+    )

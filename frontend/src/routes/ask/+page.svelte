@@ -16,13 +16,6 @@
 		'What types of disasters occurred in Mindanao?'
 	];
 
-	function displayVal(b) {
-		if (!b) return '—';
-		const v = b.value ?? '';
-		if (b.type === 'uri') return v.split(/[/#]/).pop() || v;
-		return v;
-	}
-
 	async function scrollBottom() {
 		await tick();
 		bottomEl?.scrollIntoView({ behavior: 'smooth' });
@@ -49,7 +42,7 @@
 			messages = messages.map((m, i) =>
 				i !== idx ? m :
 				res.ok
-					? { role: 'assistant', text: json.answer, sparql: json.sparql, bindings: json.bindings ?? [] }
+					? { role: 'assistant', text: json.answer, sparql: json.sparql, rows: json.rows ?? [] }
 					: { role: 'assistant', error: json.detail ?? 'Request failed.' }
 			);
 		} catch {
@@ -149,12 +142,12 @@
 										{/if}
 
 										<!-- Results table -->
-										{#if msg.bindings?.length > 0}
-											{@const cols = Object.keys(msg.bindings[0])}
+										{#if msg.rows?.length > 0}
+											{@const cols = Object.keys(msg.rows[0])}
 											<details class="border-t border-slate-100">
 												<summary class="cursor-pointer select-none px-5 py-2.5 text-[11px] font-semibold uppercase tracking-widest text-slate-400 hover:text-slate-600 transition-colors list-none flex items-center gap-1.5">
 													<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="chevron"><path d="m9 18 6-6-6-6"/></svg>
-													Results · {msg.bindings.length} row{msg.bindings.length === 1 ? '' : 's'}
+													Results · {msg.rows.length} row{msg.rows.length === 1 ? '' : 's'}
 												</summary>
 												<div class="px-5 pb-4 overflow-x-auto">
 													<table class="w-full text-xs border-collapse">
@@ -166,11 +159,11 @@
 															</tr>
 														</thead>
 														<tbody>
-															{#each msg.bindings as row, i}
+															{#each msg.rows as row, i}
 																<tr class="{i % 2 === 1 ? 'bg-slate-50/60' : ''}">
 																	{#each cols as col}
-																		<td class="py-1.5 pr-4 text-slate-600 max-w-[200px] truncate" title={row[col]?.value ?? ''}>
-																			{displayVal(row[col])}
+																		<td class="py-1.5 pr-4 text-slate-600 max-w-[200px] truncate" title={row[col] ?? ''}>
+																			{row[col] ?? '—'}
 																		</td>
 																	{/each}
 																</tr>
@@ -179,7 +172,7 @@
 													</table>
 												</div>
 											</details>
-										{:else if msg.bindings}
+										{:else if msg.rows}
 											<div class="border-t border-slate-100 px-5 py-2.5 text-[11px] text-slate-400">No matching records in the knowledge graph.</div>
 										{/if}
 									{/if}

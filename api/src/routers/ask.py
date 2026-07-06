@@ -47,7 +47,7 @@ async def ask_models() -> dict[str, Any]:
 @router.post("/ask", response_model=AskResponse)
 async def ask(request: AskRequest) -> AskResponse:
     try:
-        return AskResponse(**await ask_question(request.query))
+        return await ask_question(request.query)
     except ServiceError as exc:
         raise _to_http_error(exc) from exc
 
@@ -55,7 +55,7 @@ async def ask(request: AskRequest) -> AskResponse:
 @router.post("/ask/preview", response_model=AskPreviewResponse)
 async def ask_preview(request: AskRequest) -> AskPreviewResponse:
     try:
-        return AskPreviewResponse(**await preview_question(request.query))
+        return await preview_question(request.query)
     except ServiceError as exc:
         raise _to_http_error(exc) from exc
 

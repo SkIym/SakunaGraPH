@@ -8,7 +8,6 @@
 		formatProvName,
 		REGION_LABELS,
 		REGION_COLORS,
-		bindingDisplay,
 		formatDisasterType
 	} from '$lib/mapData.js';
 
@@ -129,12 +128,11 @@
 
 			if (!res.ok) { queryError = data.detail ?? data.message ?? 'Query failed.'; return; }
 
-			results       = { results: { bindings: data.events } };
+			const events = (data.events ?? []).map(normalizeMapEvent);
+			results       = events;
 			majorCount    = data.majorCount;
 			incidentCount = data.incidentCount;
-            groupedResults = groupByAlternates(data.events);
-            console.log('sample alternates value:', data.events[0]?.alternates?.value);
-            console.log('sample event IRI:', data.events[0]?.event?.value);
+            groupedResults = groupByAlternates(events);
 		} catch {
 			queryError = 'Could not reach server.';
 		} finally {
@@ -218,18 +216,42 @@
 	});
 
 	// Result column display helpers
-	function colValue(row, col) {
-		const v = row[col];
-		if (!v) return '—';
-		if (col === 'disasterType') return formatDisasterType(bindingDisplay(v));
-		if (col === 'startDate') return v.value?.split('T')[0] ?? v.value ?? '—';
-		return bindingDisplay(v);
+	function termValue(value) {
+		if (value == null) return '';
+		if (typeof value === 'object' && 'value' in value) return value.value ?? '';
+		return value;
 	}
 
-	const DISPLAY_COLS = ['eventName', 'disasterType', 'startDate', 'locations'];
+	function valueList(value, separator = ',') {
+		const raw = termValue(value);
+		if (Array.isArray(raw)) return raw.map(termValue).filter(Boolean);
+		if (typeof raw !== 'string') return raw ? [String(raw)] : [];
+		return raw.split(separator).map(s => s.trim()).filter(Boolean);
+	}
+
+	function normalizeMapEvent(row) {
+		const startDate = String(termValue(row.startDate) ?? '');
+		return {
+			event: String(termValue(row.event) ?? ''),
+			eventName: String(termValue(row.eventName) || '(unnamed event)'),
+			startDate: startDate.split('T')[0],
+			locations: valueList(row.locations, '|'),
+			disasterTypes: valueList(row.disasterTypes ?? row.disasterType, ','),
+			alternates: valueList(row.alternates, ','),
+			source: termValue(row.source) || null
+		};
+	}
+
+	function colValue(row, col) {
+		const v = row[col];
+		if (Array.isArray(v)) return v.length ? v.join(', ') : '—';
+		return termValue(v) || '—';
+	}
+
+	const DISPLAY_COLS = ['eventName', 'disasterTypes', 'startDate', 'locations'];
 	const COL_LABELS = {
 		eventName: 'Event',
-		disasterType: 'Type',
+		disasterTypes: 'Type',
 		startDate: 'Date',
 		locations: 'Locations'
 	};
@@ -238,19 +260,18 @@
     let expandedAlternates = $state(new Set());
     let groupedResults = $state(null);
 
-    function groupByAlternates(bindings) {
+    function groupByAlternates(events) {
         const byIri = new Map();
-        for (const row of bindings) {
-            if (row.event?.value) byIri.set(row.event.value, row);
+        for (const row of events) {
+            if (row.event) byIri.set(row.event, row);
         }
 
         // Build adjacency: for each IRI, collect all known alts that exist on this page
         const adjAlts = new Map();
-        for (const row of bindings) {
-            const iri = row.event?.value;
+        for (const row of events) {
+            const iri = row.event;
             if (!iri) continue;
-            const alts = (row.alternates?.value ?? '')
-            .split(',').map(s => s.trim()).filter(s => s && byIri.has(s));
+            const alts = (row.alternates ?? []).filter(s => s && byIri.has(s));
             adjAlts.set(iri, alts);
         }
 
@@ -281,8 +302,8 @@
         // For each cluster, elect rep by earliest startDate, IRI tiebreak
         const output = [];
         const seen = new Set();
-        for (const row of bindings) {
-            const iri = row.event?.value;
+        for (const row of events) {
+            const iri = row.event;
             if (!iri || seen.has(iri)) continue;
 
             const root = find(iri);
@@ -298,11 +319,11 @@
 
             const members = clusterIris.map(m => byIri.get(m)).filter(Boolean);
             members.sort((a, b) => {
-            const da = a.startDate?.value ?? '';
-            const db = b.startDate?.value ?? '';
+            const da = a.startDate ?? '';
+            const db = b.startDate ?? '';
             if (da !== db) return da < db ? -1 : 1;
-            const ia = a.event?.value ?? '';
-            const ib = b.event?.value ?? '';
+            const ia = a.event ?? '';
+            const ib = b.event ?? '';
             return ia < ib ? -1 : ia > ib ? 1 : 0;
             });
 
@@ -563,7 +584,7 @@
 							</div>
 
 						{:else if results}
-							{@const rows = results.results?.bindings ?? []}
+							{@const rows = results ?? []}
 							{#if rows.length === 0}
 								<div class="py-10 text-center text-slate-400 text-sm">
 									No disaster events found for this area.
@@ -592,10 +613,9 @@
 												{/each}
 											{:else}
 												{#each groupedResults ?? [] as { row, subs }, i}
-                                                {@const rowKey = row.event?.value ?? String(i)}
-                                                {@const locs = (row.locations?.value ?? '').split('|').filter(Boolean)}
-                                                {@const dtypes = (row.disasterType?.value ?? row.disasterTypes?.value ?? '')
-                                                    .split(',').map(s => s.trim()).filter(Boolean)}
+                                                {@const rowKey = row.event ?? String(i)}
+                                                {@const locs = row.locations ?? []}
+                                                {@const dtypes = row.disasterTypes ?? []}
                                                 {@const expanded = expandedRows.has(rowKey)}
                                                 {@const expandable = locs.length > 1}
                                                 {@const hasAlts = subs.length > 0}
@@ -615,7 +635,7 @@
                                                     }}
                                                 >
                                                     <!-- Event name + alternates badge -->
-                                                    <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName?.value ?? ''}>
+                                                    <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName ?? ''}>
                                                     <div class="flex flex-col gap-1">
                                                         <span class="truncate">{colValue(row, 'eventName')}</span>
                                                         {#if hasAlts}
@@ -630,9 +650,9 @@
                                                                 {altsExpanded ? '▾' : '▸'} {subs.length} alternate{subs.length > 1 ? 's' : ''}
                                                             </button>
                                                             {/if}
-                                                            {#if row.source?.value}
+                                                            {#if row.source}
                                                             <span class="w-fit rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                                                                {row.source.value}
+                                                                {row.source}
                                                             </span>
                                                         {/if}
                                                     </div>
@@ -692,18 +712,17 @@
                                                 <!-- Alternate sub-rows -->
                                                 {#if altsExpanded}
                                                     {#each subs as sub, si}
-                                                    {@const subLocs = (sub.locations?.value ?? '').split('|').filter(Boolean)}
-                                                    {@const subTypes = (sub.disasterType?.value ?? sub.disasterTypes?.value ?? '')
-                                                        .split(',').map(s => s.trim()).filter(Boolean)}
-                                                    {@const subKey = sub.event?.value ?? `sub-${i}-${si}`}
+                                                    {@const subLocs = sub.locations ?? []}
+                                                    {@const subTypes = sub.disasterTypes ?? []}
+                                                    {@const subKey = sub.event ?? `sub-${i}-${si}`}
                                                     {@const subExpanded = expandedRows.has(subKey)}
                                                     <tr class="bg-violet-50/60 border-l-2 border-violet-300">
                                                         <td class="pl-6 pr-3 py-1.5 text-slate-500 max-w-[160px]">
                                                         <div class="flex flex-col gap-0.5">
-                                                            <span class="truncate text-xs">{sub.eventName?.value ? bindingDisplay(sub.eventName) : '—'}</span>
-                                                            {#if sub.source?.value}
+                                                            <span class="truncate text-xs">{sub.eventName || '—'}</span>
+                                                            {#if sub.source}
                                                             <span class="w-fit rounded-full bg-slate-200 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 uppercase tracking-wide">
-                                                                {sub.source.value}
+                                                                {sub.source}
                                                             </span>
                                                             {/if}
                                                         </div>
@@ -715,7 +734,7 @@
                                                         {/if}
                                                         </td>
                                                         <td class="px-3 py-1.5 text-slate-500 text-xs whitespace-nowrap">
-                                                        {sub.startDate?.value?.split('T')[0] ?? '—'}
+                                                        {sub.startDate || '—'}
                                                         </td>
                                                         <!-- svelte-ignore a11y_click_events_have_key_events -->
                                                         <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
