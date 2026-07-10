@@ -854,7 +854,7 @@ def doc_mapping(g: Graph, hs: List[DOC], event_iri: URIRef):
             elif f.name == "resolutionDate":
                 g.add((uri, SKG.resolutionDate, Literal(value, datatype=XSD.dateTime)))
             elif f.name == "resolutionNo":
-                g.add((uri, SKG.resolutionNo, Literal(value, datatype=XSD.string)))
+                g.add((uri, SKG.resolutionNo, Literal(str(value), datatype=XSD.string)))
             else:
                 g.add((uri, getattr(SKG, f.name), Literal(value)))
 
