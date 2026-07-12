@@ -20,6 +20,7 @@ AnalysisEventSortBy = Literal[
     "source",
 ]
 AnalysisSortDirection = Literal["asc", "desc"]
+AnalysisDisasterCountGroupBy = Literal["type", "taxonomy"]
 
 
 class AnalysisEventFacet(BaseModel):
@@ -63,3 +64,79 @@ class AnalysisEventsResponse(BaseModel):
     total: int
     sort_by: AnalysisEventSortBy
     sort_dir: AnalysisSortDirection
+
+
+class AnalysisSummaryResponse(BaseModel):
+    record_count: int = 0
+    dead: int = 0
+    injured: int = 0
+    missing: int = 0
+    affectedFamilies: int = 0
+    affectedPersons: int = 0
+    damage: list[AnalysisDamageAmount] = Field(default_factory=list)
+
+
+class AnalysisDisasterCount(BaseModel):
+    id: str
+    label: str
+    count: int
+
+
+class AnalysisDisasterCountsResponse(BaseModel):
+    group_by: AnalysisDisasterCountGroupBy
+    items: list[AnalysisDisasterCount] = Field(default_factory=list)
+
+
+class AnalysisVictimTrend(BaseModel):
+    year: int
+    dead: int = 0
+    injured: int = 0
+    missing: int = 0
+
+
+class AnalysisVictimTrendsResponse(BaseModel):
+    items: list[AnalysisVictimTrend] = Field(default_factory=list)
+
+
+class AnalysisRegionRanking(BaseModel):
+    id: str
+    label: str
+    count: int
+
+
+class AnalysisRegionRankingsResponse(BaseModel):
+    items: list[AnalysisRegionRanking] = Field(default_factory=list)
+
+
+class AnalysisDisasterRanking(BaseModel):
+    id: str
+    label: str
+    dead: int = 0
+
+
+class AnalysisDisasterRankingsResponse(BaseModel):
+    items: list[AnalysisDisasterRanking] = Field(default_factory=list)
+
+
+class AnalysisDamageHistogramBin(BaseModel):
+    unit: str
+    lowerBound: float
+    upperBound: float
+    count: int
+
+
+class AnalysisDamageHistogramResponse(BaseModel):
+    bins: list[AnalysisDamageHistogramBin] = Field(default_factory=list)
+
+
+class AnalysisDamageAffectedPoint(BaseModel):
+    event: str
+    eventName: str
+    unit: str
+    damage: float
+    affectedFamilies: int = 0
+    affectedPersons: int = 0
+
+
+class AnalysisDamageAffectedResponse(BaseModel):
+    items: list[AnalysisDamageAffectedPoint] = Field(default_factory=list)

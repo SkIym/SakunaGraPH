@@ -54,16 +54,16 @@
 		{/each}
 	</div>
 
-	<div class="flex flex-col gap-4 border-b border-slate-200 py-6 sm:flex-row sm:items-center sm:justify-between">
-		<div>
+	<div class="grid gap-4 border-b border-slate-200 py-6 lg:grid-cols-2">
+		<div class="rounded-lg border border-slate-200 p-4">
 			<p class="text-sm font-semibold text-slate-800">Event records</p>
-			<p class="mt-1 text-xs text-slate-500">Browse the filtered event table or export the complete result set as CSV.</p>
+			<p class="mt-1 text-xs leading-5 text-slate-500">Browse the filtered event table or export the complete result set as CSV.</p>
+			<a href="/analysis/events" class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-slate-800 px-3 text-[11px] font-semibold text-white transition hover:bg-slate-700">Open event table</a>
 		</div>
-		<a
-			href="/analysis/events"
-			class="inline-flex h-9 shrink-0 items-center justify-center rounded-md bg-slate-800 px-4 text-xs font-semibold text-white transition hover:bg-slate-700"
-		>
-			Open event table
-		</a>
+		<div class="rounded-lg border border-slate-200 p-4">
+			<p class="text-sm font-semibold text-slate-800">Metrics dashboard</p>
+			<p class="mt-1 text-xs leading-5 text-slate-500">Compare totals, distributions, regional rankings, and annual victim trends in the same filter scope.</p>
+			<a href="/analysis/metrics" class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-indigo-600 px-3 text-[11px] font-semibold text-white transition hover:bg-indigo-700">Open metrics dashboard</a>
+		</div>
 	</div>
 </section>

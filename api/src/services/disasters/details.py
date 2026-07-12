@@ -8,7 +8,13 @@ from src.schemas.disasters import (
     DisasterOrganizationsResponse,
     DisasterSource,
     DisasterSourcesResponse,
+    EventDetailDisasterType,
+    EventDetailLocation,
+    EventDetailRelatedEvent,
+    EventDetailsResponse,
+    EventDetailSource,
     EventImpactResponse,
+    IriLabel,
     ImpactClass,
     ImpactItem,
 )
@@ -238,6 +244,138 @@ ORDER BY ?label ?source ?sourceRecord
 """
 
 
+def _event_details_query(event_iri: str) -> str:
+    return _PREFIXES + f"""
+SELECT DISTINCT
+  ?kind ?resource ?id ?label ?eventClass ?startDate ?endDate
+  ?remarks
+  ?reportName ?reportLink ?obtainedDate ?lastUpdateDate ?format
+  ?attributedTo ?attributedToLabel
+WHERE {{
+  VALUES ?root {{ {_iri(event_iri)} }}
+  {{
+    ?root a ?eventClass .
+    VALUES ?eventClass {{ :MajorEvent :Incident }}
+    OPTIONAL {{ ?root :eventName ?eventName }}
+    OPTIONAL {{ ?root :incidentDescription ?incidentDescription }}
+    OPTIONAL {{ ?root :startDate ?startDate }}
+    OPTIONAL {{ ?root :endDate ?endDate }}
+    OPTIONAL {{ ?root :remarks ?remarks }}
+    BIND(COALESCE(?eventName, ?incidentDescription) AS ?label)
+    BIND(?root AS ?resource)
+    BIND("core" AS ?kind)
+  }}
+  UNION
+  {{
+    ?root :hasLocation ?resource .
+    OPTIONAL {{ ?resource :psgcCode ?id }}
+    OPTIONAL {{ ?resource rdfs:label ?label }}
+    BIND("location" AS ?kind)
+  }}
+  UNION
+  {{
+    ?root (:hasDisasterType|:hasDisasterSubtype) ?resource .
+    OPTIONAL {{ ?resource (skos:prefLabel|rdfs:label) ?label }}
+    BIND("disasterType" AS ?kind)
+  }}
+  UNION
+  {{
+    {{
+      {{ ?resource :hasRelatedIncident ?root }}
+      UNION
+      {{ ?root :isRelatedTo ?resource }}
+    }}
+    OPTIONAL {{ ?resource :eventName ?eventName }}
+    OPTIONAL {{ ?resource :incidentDescription ?incidentDescription }}
+    OPTIONAL {{ ?resource :startDate ?startDate }}
+    OPTIONAL {{ ?resource :endDate ?endDate }}
+    OPTIONAL {{
+      ?resource a ?eventClass .
+      VALUES ?eventClass {{ :MajorEvent :Incident }}
+    }}
+    BIND(COALESCE(?eventName, ?incidentDescription) AS ?label)
+    BIND("majorEvent" AS ?kind)
+  }}
+  UNION
+  {{
+    {{
+      {{ ?root :hasRelatedIncident ?resource }}
+      UNION
+      {{ ?resource :isRelatedTo ?root }}
+    }}
+    OPTIONAL {{ ?resource :eventName ?eventName }}
+    OPTIONAL {{ ?resource :incidentDescription ?incidentDescription }}
+    OPTIONAL {{ ?resource :startDate ?startDate }}
+    OPTIONAL {{ ?resource :endDate ?endDate }}
+    OPTIONAL {{
+      ?resource a ?eventClass .
+      VALUES ?eventClass {{ :MajorEvent :Incident }}
+    }}
+    BIND(COALESCE(?eventName, ?incidentDescription) AS ?label)
+    BIND("incident" AS ?kind)
+  }}
+  UNION
+  {{
+    {{
+      {{ ?root prov:alternateOf ?resource }}
+      UNION
+      {{ ?resource prov:alternateOf ?root }}
+      UNION
+      {{ ?root owl:sameAs ?resource }}
+      UNION
+      {{ ?resource owl:sameAs ?root }}
+      UNION
+      {{
+        ?alignment rdf:subject ?root ;
+                   rdf:predicate owl:sameAs ;
+                   rdf:object ?resource .
+      }}
+      UNION
+      {{
+        ?alignment rdf:object ?root ;
+                   rdf:predicate owl:sameAs ;
+                   rdf:subject ?resource .
+      }}
+    }}
+    FILTER(?resource != ?root)
+    OPTIONAL {{ ?resource :eventName ?eventName }}
+    OPTIONAL {{ ?resource :incidentDescription ?incidentDescription }}
+    OPTIONAL {{ ?resource :startDate ?startDate }}
+    OPTIONAL {{ ?resource :endDate ?endDate }}
+    OPTIONAL {{
+      ?resource a ?eventClass .
+      VALUES ?eventClass {{ :MajorEvent :Incident }}
+    }}
+    BIND(COALESCE(?eventName, ?incidentDescription) AS ?label)
+    BIND("alternate" AS ?kind)
+  }}
+  UNION
+  {{
+    {{
+      {{ ?root prov:wasDerivedFrom+ ?resource . }}
+      UNION
+      {{
+        ?majorEvent :hasRelatedIncident ?root .
+        ?majorEvent prov:wasDerivedFrom+ ?resource .
+      }}
+    }}
+    ?resource a :Source .
+    OPTIONAL {{ ?resource :reportName ?reportName }}
+    OPTIONAL {{ ?resource :reportLink ?reportLink }}
+    OPTIONAL {{ ?resource :obtainedDate ?obtainedDate }}
+    OPTIONAL {{ ?resource :lastUpdateDate ?lastUpdateDate }}
+    OPTIONAL {{ ?resource :format ?format }}
+    OPTIONAL {{
+      ?resource prov:wasAttributedTo ?attributedTo .
+      OPTIONAL {{ ?attributedTo (skos:prefLabel|rdfs:label) ?attributedToLabel }}
+    }}
+    BIND("source" AS ?kind)
+  }}
+}}
+ORDER BY ?kind ?label ?resource
+"""
+
+
 def _binding_display_value(binding: dict[Any, Any], key: str) -> dict[str, Any] | None:
     term = binding.get(key)
     if not term:
@@ -410,6 +548,125 @@ def _build_organizations(bindings: list[dict[Any, Any]]) -> list[DisasterOrganiz
     ]
 
 
+def _date_only(value: str | None) -> str | None:
+    if not value:
+        return None
+    return value.split("T", 1)[0]
+
+
+def _related_event(binding: dict[Any, Any]) -> EventDetailRelatedEvent:
+    event_class = _local_name(binding_value(binding, "eventClass", "")) or None
+    return EventDetailRelatedEvent(
+        uri=binding_value(binding, "resource", ""),
+        name=binding_value(binding, "label", "") or "(unnamed event)",
+        eventType=event_class,
+        startDate=_date_only(binding_value(binding, "startDate")),
+        endDate=_date_only(binding_value(binding, "endDate")),
+    )
+
+
+def _build_event_details(
+    event_iri: str,
+    bindings: list[dict[Any, Any]],
+) -> EventDetailsResponse:
+    core: dict[str, Any] | None = None
+    locations: dict[str, EventDetailLocation] = {}
+    disaster_types: dict[str, EventDetailDisasterType] = {}
+    major_events: dict[str, EventDetailRelatedEvent] = {}
+    incidents: dict[str, EventDetailRelatedEvent] = {}
+    alternates: dict[str, EventDetailRelatedEvent] = {}
+    sources: dict[str, dict[str, Any]] = {}
+    remarks: list[str] = []
+    seen_remarks: set[str] = set()
+
+    for binding in bindings:
+        kind = binding_value(binding, "kind", "")
+        resource = binding_value(binding, "resource", "")
+
+        if kind == "core":
+            event_class = _local_name(binding_value(binding, "eventClass", ""))
+            if event_class not in {"MajorEvent", "Incident"}:
+                continue
+            core = {
+                "event": event_iri,
+                "name": binding_value(binding, "label", "") or "(unnamed event)",
+                "eventType": event_class,
+                "startDate": _date_only(binding_value(binding, "startDate")),
+                "endDate": _date_only(binding_value(binding, "endDate")),
+            }
+            if remark := binding_value(binding, "remarks", ""):
+                if remark not in seen_remarks:
+                    seen_remarks.add(remark)
+                    remarks.append(remark)
+        elif kind == "location" and resource:
+            location_id = binding_value(binding, "id", "") or _local_name(resource)
+            locations[resource] = EventDetailLocation(
+                uri=resource,
+                id=location_id,
+                label=binding_value(binding, "label", "") or location_id,
+            )
+        elif kind == "disasterType" and resource:
+            disaster_type_id = _local_name(resource)
+            disaster_types[resource] = EventDetailDisasterType(
+                uri=resource,
+                id=disaster_type_id,
+                label=binding_value(binding, "label", "") or disaster_type_id,
+            )
+        elif kind in {"majorEvent", "incident", "alternate"} and resource:
+            target = {
+                "majorEvent": major_events,
+                "incident": incidents,
+                "alternate": alternates,
+            }[kind]
+            target[resource] = _related_event(binding)
+        elif kind == "source" and resource:
+            source = sources.setdefault(
+                resource,
+                {
+                    "uri": resource,
+                    "reportName": binding_value(binding, "reportName", "")
+                    or _local_name(resource),
+                    "reportLink": binding_value(binding, "reportLink") or None,
+                    "obtainedDate": binding_value(binding, "obtainedDate") or None,
+                    "lastUpdateDate": binding_value(binding, "lastUpdateDate") or None,
+                    "format": binding_value(binding, "format") or None,
+                    "attributedTo": {},
+                },
+            )
+            attributed_to = binding_value(binding, "attributedTo", "")
+            if attributed_to:
+                source["attributedTo"][attributed_to] = IriLabel(
+                    uri=attributed_to,
+                    label=binding_value(binding, "attributedToLabel", "")
+                    or _local_name(attributed_to),
+                )
+
+    if core is None:
+        raise ServiceError(404, "Event not found")
+
+    source_items = []
+    for source in sources.values():
+        source["attributedTo"] = sorted(
+            source["attributedTo"].values(),
+            key=lambda item: item.label.casefold(),
+        )
+        source_items.append(EventDetailSource.model_validate(source))
+
+    return EventDetailsResponse(
+        **core,
+        remarks=remarks,
+        locations=sorted(locations.values(), key=lambda item: item.label.casefold()),
+        disasterTypes=sorted(
+            disaster_types.values(),
+            key=lambda item: item.label.casefold(),
+        ),
+        majorEvents=sorted(major_events.values(), key=lambda item: item.startDate or ""),
+        incidents=sorted(incidents.values(), key=lambda item: item.startDate or ""),
+        alternates=sorted(alternates.values(), key=lambda item: item.startDate or ""),
+        sources=sorted(source_items, key=lambda item: item.reportName.casefold()),
+    )
+
+
 async def get_event_impact(uri: str, impact: str) -> EventImpactResponse:
     event_iri = _validate_iri(uri, "uri")
     impact_class = await _resolve_impact_class(impact)
@@ -421,6 +678,13 @@ async def get_event_impact(uri: str, impact: str) -> EventImpactResponse:
         impact=impact_class,
         items=_build_impact_items(bindings),
     )
+
+
+async def get_event_details(uri: str) -> EventDetailsResponse:
+    event_iri = _validate_iri(uri, "uri")
+    result = await _execute_or_raise(_event_details_query(event_iri))
+    bindings = result.get("results", {}).get("bindings", [])
+    return _build_event_details(event_iri, bindings)
 
 
 async def get_disaster_organizations(uri: str) -> DisasterOrganizationsResponse:

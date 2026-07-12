@@ -6,7 +6,8 @@
 		visibleColumns = new Set(),
 		sortBy = 'startDate',
 		sortDir = 'desc',
-		onSort = () => {}
+		onSort = () => {},
+		onSelect = () => {}
 	} = $props();
 
 	const visible = $derived(columns.filter((column) => visibleColumns.has(column.id)));
@@ -102,7 +103,19 @@
 				{/each}
 			{:else}
 				{#each items as item, row (item.event)}
-					<tr class="align-top transition hover:bg-indigo-50/30 {row % 2 ? 'bg-slate-50/20' : ''}">
+					<tr
+						role="button"
+						tabindex="0"
+						aria-label="View details for {item.eventName || 'unnamed event'}"
+						onclick={() => onSelect(item)}
+						onkeydown={(keyboardEvent) => {
+							if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+								keyboardEvent.preventDefault();
+								onSelect(item);
+							}
+						}}
+						class="cursor-pointer align-top transition hover:bg-indigo-50/50 focus:bg-indigo-50/50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-300 {row % 2 ? 'bg-slate-50/20' : ''}"
+					>
 						{#each visible as column (column.id)}
 							<td class="px-3 py-3.5 text-slate-600 first:pl-5 last:pr-5">
 								{#if column.id === 'eventName'}

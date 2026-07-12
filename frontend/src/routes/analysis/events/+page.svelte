@@ -1,6 +1,7 @@
 <script>
 	import { analysisFilters, toAnalysisParams } from '$lib/analysis/filters.svelte.js';
 	import { apiJson, withQuery } from '$lib/api.js';
+	import EventDetails from '$lib/components/EventDetails.svelte';
 	import EmptyState from '$lib/components/analysis/EmptyState.svelte';
 	import EventTable from '$lib/components/analysis/EventTable.svelte';
 	import EventTableToolbar from '$lib/components/analysis/EventTableToolbar.svelte';
@@ -26,6 +27,7 @@
 	let error = $state('');
 	let retryToken = $state(0);
 	let previousFilterQuery = null;
+	let selectedEvent = $state('');
 
 	const filterQuery = $derived(toAnalysisParams().toString());
 	const requestParams = $derived(
@@ -181,6 +183,7 @@
 				{sortBy}
 				{sortDir}
 				onSort={sort}
+				onSelect={(item) => (selectedEvent = item.event)}
 			/>
 		{/if}
 
@@ -226,3 +229,7 @@
 		{/if}
 	</div>
 </section>
+
+{#if selectedEvent}
+	<EventDetails event={selectedEvent} onclose={() => (selectedEvent = '')} />
+{/if}

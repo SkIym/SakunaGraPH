@@ -83,6 +83,7 @@ class _TTLCache:
 
 
 _cache = _TTLCache()
+_all_events_inflight: dict[tuple[Any, ...], asyncio.Task[list[AnalysisEvent]]] = {}
 
 
 def _events_query(
@@ -427,6 +428,43 @@ async def get_analysis_events(
     )
     _cache.set(cache_key, response)
     return response
+
+
+async def _load_all_analysis_events(
+    filters: AnalysisFilters,
+    cache_key: tuple[Any, ...],
+) -> list[AnalysisEvent]:
+    result = await _execute_or_raise(
+        _events_query(
+            filters,
+            "startDate",
+            "desc",
+            limit=None,
+        )
+    )
+    items = await _enrich_events(_base_events(result))
+    _cache.set(cache_key, items)
+    return items
+
+
+async def get_all_analysis_events(filters: AnalysisFilters) -> list[AnalysisEvent]:
+    """Return the complete deduplicated result set for a filtered metric."""
+    cache_key = ("all-events", filters)
+    if (cached := _cache.get(cache_key)) is not None:
+        return cached
+
+    task = _all_events_inflight.get(cache_key)
+    if task is None:
+        task = asyncio.create_task(_load_all_analysis_events(filters, cache_key))
+        _all_events_inflight[cache_key] = task
+
+        def clear_inflight(completed: asyncio.Task[list[AnalysisEvent]]) -> None:
+            if _all_events_inflight.get(cache_key) is completed:
+                del _all_events_inflight[cache_key]
+
+        task.add_done_callback(clear_inflight)
+
+    return await asyncio.shield(task)
 
 
 async def get_analysis_events_export(

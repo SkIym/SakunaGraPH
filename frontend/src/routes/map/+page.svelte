@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import EventDetails from '$lib/components/EventDetails.svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
 	import { apiUrl } from '$lib/api.js';
@@ -26,6 +27,7 @@
 	// ── UI state ─────────────────────────────────────────────────────────────
 	let view = $state('regions');  // 'regions' | 'provinces'
 	let selected = $state(null);   // {type, psgc, id, name}
+	let selectedEvent = $state('');
 
 	// ── Results state ────────────────────────────────────────────────────────
 	const PAGE_SIZE = 10;
@@ -220,6 +222,17 @@
 		return v || '—';
 	}
 
+	function showEventDetails(row) {
+		if (row?.event) selectedEvent = row.event;
+	}
+
+	function handleEventRowKeydown(keyboardEvent, row) {
+		if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+			keyboardEvent.preventDefault();
+			showEventDetails(row);
+		}
+	}
+
 	const DISPLAY_COLS = ['eventName', 'disasterTypes', 'startDate', 'locations'];
 	const COL_LABELS = {
 		eventName: 'Event',
@@ -312,6 +325,10 @@
 </svelte:head>
 
 <NodeCanvas />
+
+{#if selectedEvent}
+	<EventDetails event={selectedEvent} onclose={() => (selectedEvent = '')} />
+{/if}
 
 <!-- ── Cursor-following hover tooltip ────────────────────────────────────── -->
 {#if tooltipItem}
@@ -588,30 +605,26 @@
                                                 {@const rowKey = row.event ?? String(i)}
                                                 {@const locs = row.locations ?? []}
                                                 {@const dtypes = row.disasterTypes ?? []}
-                                                {@const expanded = expandedRows.has(rowKey)}
-                                                {@const expandable = locs.length > 1}
+	                                                {@const expandable = locs.length > 1}
                                                 {@const hasAlts = subs.length > 0}
                                                 {@const altsExpanded = expandedAlternates.has(rowKey)}
 
                                                 <!-- Representative row -->
-                                                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                                                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                                                <tr
-                                                    class="transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}
-                                                    {expandable || hasAlts ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-blue-50/40'}"
-                                                    onclick={() => {
-                                                    if (expandable) {
-                                                        if (expanded) expandedRows = new Set([...expandedRows].filter(k => k !== rowKey));
-                                                        else expandedRows = new Set([...expandedRows, rowKey]);
-                                                    }
-                                                    }}
-                                                >
+	                                                <tr
+	                                                    role="button"
+	                                                    tabindex="0"
+	                                                    aria-label="View details for {row.eventName || 'unnamed event'}"
+	                                                    class="cursor-pointer transition-colors hover:bg-blue-50/60 focus:bg-blue-50/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-300 {i % 2 === 0 ? '' : 'bg-slate-50/40'}"
+	                                                    onclick={() => showEventDetails(row)}
+	                                                    onkeydown={(keyboardEvent) => handleEventRowKeydown(keyboardEvent, row)}
+	                                                >
                                                     <!-- Event name + alternates badge -->
                                                     <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName ?? ''}>
                                                     <div class="flex flex-col gap-1">
                                                         <span class="truncate">{colValue(row, 'eventName')}</span>
                                                         {#if hasAlts}
-                                                            <button
+	                                                            <button
+	                                                                type="button"
                                                                 class="w-fit rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-600 hover:bg-violet-200 transition-colors"
                                                                 onclick={(e) => {
                                                                 e.stopPropagation();
@@ -638,7 +651,8 @@
                                                         <div class="flex flex-col gap-0.5">
                                                         <span>{formatDisasterType(dtypes[0])}</span>
                                                         {#if dtypes.length > 1}
-                                                            <button
+	                                                            <button
+	                                                            type="button"
                                                             class="w-fit text-blue-400 text-[10px] font-medium"
                                                             onclick={(e) => {
                                                                 e.stopPropagation();
@@ -666,12 +680,8 @@
                                                     <td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
                                                     {#if locs.length === 0}
                                                         <span class="text-slate-300">—</span>
-                                                    {:else if expanded}
-                                                        <div class="flex flex-col gap-0.5 text-xs leading-snug">
-                                                        {#each locs as loc}<span>{loc}</span>{/each}
-                                                        </div>
-                                                    {:else}
-                                                        <div class="text-xs leading-snug">
+	                                                    {:else}
+	                                                        <div class="text-xs leading-snug">
                                                         <span>{locs[0]}</span>
                                                         {#if expandable}
                                                             <span class="ml-1 text-blue-400 text-[10px] font-medium whitespace-nowrap">+{locs.length - 1} more</span>
@@ -683,12 +693,17 @@
 
                                                 <!-- Alternate sub-rows -->
                                                 {#if altsExpanded}
-                                                    {#each subs as sub, si}
-                                                    {@const subLocs = sub.locations ?? []}
-                                                    {@const subTypes = sub.disasterTypes ?? []}
-                                                    {@const subKey = sub.event ?? `sub-${i}-${si}`}
-                                                    {@const subExpanded = expandedRows.has(subKey)}
-                                                    <tr class="bg-violet-50/60 border-l-2 border-violet-300">
+	                                                    {#each subs as sub (sub.event)}
+	                                                    {@const subLocs = sub.locations ?? []}
+	                                                    {@const subTypes = sub.disasterTypes ?? []}
+	                                                    <tr
+	                                                        role="button"
+	                                                        tabindex="0"
+	                                                        aria-label="View details for {sub.eventName || 'unnamed event'}"
+	                                                        class="cursor-pointer border-l-2 border-violet-300 bg-violet-50/60 transition hover:bg-violet-100/70 focus:bg-violet-100/70 focus:outline-none"
+	                                                        onclick={() => showEventDetails(sub)}
+	                                                        onkeydown={(keyboardEvent) => handleEventRowKeydown(keyboardEvent, sub)}
+	                                                    >
                                                         <td class="pl-6 pr-3 py-1.5 text-slate-500 max-w-[160px]">
                                                         <div class="flex flex-col gap-0.5">
                                                             <span class="truncate text-xs">{sub.eventName || '—'}</span>
@@ -708,22 +723,13 @@
                                                         <td class="px-3 py-1.5 text-slate-500 text-xs whitespace-nowrap">
                                                         {sub.startDate || '—'}
                                                         </td>
-                                                        <!-- svelte-ignore a11y_click_events_have_key_events -->
-                                                        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                                                        <td
-                                                        class="px-3 py-1.5 text-slate-500 align-top text-xs {subLocs.length > 1 ? 'cursor-pointer' : ''}"
-                                                        style="max-width:180px;"
-                                                        onclick={() => {
-                                                            if (subLocs.length <= 1) return;
-                                                            if (subExpanded) expandedRows = new Set([...expandedRows].filter(k => k !== subKey));
-                                                            else expandedRows = new Set([...expandedRows, subKey]);
-                                                        }}
-                                                        >
-                                                        {#if subLocs.length === 0}
-                                                            <span class="text-slate-300">—</span>
-                                                        {:else if subExpanded}
-                                                            <div class="flex flex-col gap-0.5">{#each subLocs as l}<span>{l}</span>{/each}</div>
-                                                        {:else}
+	                                                        <td
+	                                                        class="px-3 py-1.5 text-slate-500 align-top text-xs"
+	                                                        style="max-width:180px;"
+	                                                        >
+	                                                        {#if subLocs.length === 0}
+	                                                            <span class="text-slate-300">—</span>
+	                                                        {:else}
                                                             {subLocs[0]}{#if subLocs.length > 1}<span class="ml-1 text-blue-400 text-[10px]">+{subLocs.length - 1}</span>{/if}
                                                         {/if}
                                                         </td>

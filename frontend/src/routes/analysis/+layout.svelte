@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from 'svelte';
+	import { page } from '$app/stores';
 	import { analysisFilters } from '$lib/analysis/filters.svelte.js';
 	import { apiUrl } from '$lib/api.js';
 	import FilterPanel from '$lib/components/analysis/FilterPanel.svelte';
@@ -11,6 +12,10 @@
 	let loading = $state(true);
 	let error = $state('');
 	let mobileFiltersOpen = $state(false);
+	const ANALYSIS_VIEWS = [
+		{ href: '/analysis/events', label: 'Events' },
+		{ href: '/analysis/metrics', label: 'Metrics' }
+	];
 
 	async function loadFilterOptions(signal) {
 		loading = true;
@@ -102,6 +107,21 @@
 				</div>
 
 				<div class="hidden h-8 w-px shrink-0 bg-slate-200 lg:block"></div>
+				<nav
+					aria-label="Analysis views"
+					class="flex shrink-0 items-center gap-0.5 rounded-full border border-slate-200 bg-slate-50 p-0.5"
+				>
+					{#each ANALYSIS_VIEWS as view}
+						{@const active = $page.url.pathname === view.href}
+						<a
+							href={view.href}
+							aria-current={active ? 'page' : undefined}
+							class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition {active ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:bg-white hover:text-slate-700'}"
+						>
+							{view.label}
+						</a>
+					{/each}
+				</nav>
 				<div class="min-w-0 flex-1">
 					{#if analysisFilters.hasActiveFilters}
 						<SelectedFilterChips locations={options?.locations} taxonomy={options?.disasterTypes} />

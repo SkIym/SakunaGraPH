@@ -1,3 +1,5 @@
+from typing import Literal
+
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -9,6 +11,51 @@ class IriLabel(BaseModel):
 class EventReference(BaseModel):
     uri: str
     name: str
+
+
+class EventDetailLocation(BaseModel):
+    uri: str
+    id: str
+    label: str
+
+
+class EventDetailDisasterType(BaseModel):
+    uri: str
+    id: str
+    label: str
+
+
+class EventDetailRelatedEvent(BaseModel):
+    uri: str
+    name: str
+    eventType: Literal["MajorEvent", "Incident"] | None = None
+    startDate: str | None = None
+    endDate: str | None = None
+
+
+class EventDetailSource(BaseModel):
+    uri: str
+    reportName: str
+    reportLink: str | None = None
+    obtainedDate: str | None = None
+    lastUpdateDate: str | None = None
+    format: str | None = None
+    attributedTo: list[IriLabel] = Field(default_factory=list)
+
+
+class EventDetailsResponse(BaseModel):
+    event: str
+    name: str
+    eventType: Literal["MajorEvent", "Incident"]
+    startDate: str | None = None
+    endDate: str | None = None
+    remarks: list[str] = Field(default_factory=list)
+    locations: list[EventDetailLocation] = Field(default_factory=list)
+    disasterTypes: list[EventDetailDisasterType] = Field(default_factory=list)
+    majorEvents: list[EventDetailRelatedEvent] = Field(default_factory=list)
+    incidents: list[EventDetailRelatedEvent] = Field(default_factory=list)
+    alternates: list[EventDetailRelatedEvent] = Field(default_factory=list)
+    sources: list[EventDetailSource] = Field(default_factory=list)
 
 
 class ImpactClass(BaseModel):
