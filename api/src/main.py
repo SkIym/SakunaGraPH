@@ -26,6 +26,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+from src.routers import analysis as analysis_router
 from src.routers import ask as ask_router
 from src.routers import disasters as disasters_router
 from src.routers import ontology as ontology_router
@@ -36,6 +37,7 @@ from src.routers import sparql as sparql_router
 # app.include_router(ontology_router.router)
 # app.include_router(map_router.router)
 # app.include_router(sparql_router.router)
+app.include_router(analysis_router.router, prefix="/api")
 app.include_router(ask_router.router, prefix="/api")
 app.include_router(disasters_router.router, prefix="/api")
 app.include_router(ontology_router.router, prefix="/api")
