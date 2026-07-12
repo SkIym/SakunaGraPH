@@ -3,6 +3,7 @@
 
 	let { root = null, loading = false } = $props();
 
+	let sectionOpen = $state(true);
 	let search = $state('');
 	let expanded = $state(new Set());
 
@@ -69,26 +70,37 @@
 	}
 </script>
 
-<section aria-labelledby="analysis-disaster-heading" class="px-4 py-4">
-	<div class="flex items-center justify-between gap-3">
-		<h2 id="analysis-disaster-heading" class="text-xs font-semibold text-slate-700">Disaster type</h2>
-		{#if analysisFilters.disasterTypes.length > 0}
-			<span class="text-[10px] font-semibold tabular-nums text-indigo-600">
-				{analysisFilters.disasterTypes.length} selected
-			</span>
-		{/if}
-	</div>
+<section aria-labelledby="analysis-disaster-heading">
+	<button
+		type="button"
+		onclick={() => (sectionOpen = !sectionOpen)}
+		aria-expanded={sectionOpen}
+		aria-controls="analysis-disaster-content"
+		class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition hover:bg-slate-50/70"
+	>
+		<span id="analysis-disaster-heading" class="text-xs font-semibold text-slate-700">Disaster type</span>
+		<span class="flex items-center gap-2">
+			{#if analysisFilters.disasterTypes.length > 0}
+				<span class="text-[10px] font-semibold tabular-nums text-indigo-600">
+					{analysisFilters.disasterTypes.length} selected
+				</span>
+			{/if}
+			<span class="flex h-5 w-5 items-center justify-center text-sm text-slate-400 transition-transform {sectionOpen ? 'rotate-90' : ''}" aria-hidden="true">&rsaquo;</span>
+		</span>
+	</button>
 
-	<label class="sr-only" for="analysis-disaster-search">Search disaster types</label>
-	<input
-		id="analysis-disaster-search"
-		type="search"
-		bind:value={search}
-		placeholder="Search disaster types"
-		class="mt-3 block h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-	/>
+	{#if sectionOpen}
+		<div id="analysis-disaster-content" class="px-4 pb-4">
+			<label class="sr-only" for="analysis-disaster-search">Search disaster types</label>
+			<input
+				id="analysis-disaster-search"
+				type="search"
+				bind:value={search}
+				placeholder="Search disaster types"
+				class="block h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+			/>
 
-	<div class="mt-3 space-y-0.5">
+			<div class="mt-3 space-y-0.5">
 		{#if loading}
 			{#each [1, 2, 3, 4] as row}
 				<div class="flex h-8 items-center gap-2 px-1" aria-hidden="true">
@@ -141,5 +153,7 @@
 				<p class="py-3 text-xs text-slate-400">No matching disaster types.</p>
 			{/if}
 		{/if}
-	</div>
+			</div>
+		</div>
+	{/if}
 </section>

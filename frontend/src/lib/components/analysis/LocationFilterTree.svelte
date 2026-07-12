@@ -3,6 +3,7 @@
 
 	let { locations = null, loading = false } = $props();
 
+	let sectionOpen = $state(true);
 	let search = $state('');
 	let expanded = $state(new Set());
 
@@ -82,26 +83,37 @@
 	}
 </script>
 
-<section aria-labelledby="analysis-location-heading" class="border-b border-slate-200 px-4 py-4">
-	<div class="flex items-center justify-between gap-3">
-		<h2 id="analysis-location-heading" class="text-xs font-semibold text-slate-700">Location</h2>
-		{#if analysisFilters.locationIds.length > 0}
-			<span class="text-[10px] font-semibold tabular-nums text-indigo-600">
-				{analysisFilters.locationIds.length} selected
-			</span>
-		{/if}
-	</div>
+<section aria-labelledby="analysis-location-heading" class="border-b border-slate-200">
+	<button
+		type="button"
+		onclick={() => (sectionOpen = !sectionOpen)}
+		aria-expanded={sectionOpen}
+		aria-controls="analysis-location-content"
+		class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition hover:bg-slate-50/70"
+	>
+		<span id="analysis-location-heading" class="text-xs font-semibold text-slate-700">Location</span>
+		<span class="flex items-center gap-2">
+			{#if analysisFilters.locationIds.length > 0}
+				<span class="text-[10px] font-semibold tabular-nums text-indigo-600">
+					{analysisFilters.locationIds.length} selected
+				</span>
+			{/if}
+			<span class="flex h-5 w-5 items-center justify-center text-sm text-slate-400 transition-transform {sectionOpen ? 'rotate-90' : ''}" aria-hidden="true">&rsaquo;</span>
+		</span>
+	</button>
 
-	<label class="sr-only" for="analysis-location-search">Search locations</label>
-	<input
-		id="analysis-location-search"
-		type="search"
-		bind:value={search}
-		placeholder="Search locations"
-		class="mt-3 block h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
-	/>
+	{#if sectionOpen}
+		<div id="analysis-location-content" class="px-4 pb-4">
+			<label class="sr-only" for="analysis-location-search">Search locations</label>
+			<input
+				id="analysis-location-search"
+				type="search"
+				bind:value={search}
+				placeholder="Search locations"
+				class="block h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+			/>
 
-	<div class="mt-3 space-y-0.5">
+			<div class="mt-3 space-y-0.5">
 		{#if loading}
 			{#each [1, 2, 3, 4] as row}
 				<div class="flex h-8 items-center gap-2 px-1" aria-hidden="true">
@@ -220,5 +232,7 @@
 				<p class="py-3 text-xs text-slate-400">No matching locations.</p>
 			{/if}
 		{/if}
-	</div>
+			</div>
+		</div>
+	{/if}
 </section>
