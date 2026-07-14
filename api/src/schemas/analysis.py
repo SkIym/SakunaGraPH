@@ -21,6 +21,7 @@ AnalysisEventSortBy = Literal[
 ]
 AnalysisSortDirection = Literal["asc", "desc"]
 AnalysisDisasterCountGroupBy = Literal["type", "taxonomy"]
+AnalysisTimelineBucket = Literal["month_year", "month_of_year"]
 
 
 class AnalysisEventFacet(BaseModel):
@@ -140,3 +141,30 @@ class AnalysisDamageAffectedPoint(BaseModel):
 
 class AnalysisDamageAffectedResponse(BaseModel):
     items: list[AnalysisDamageAffectedPoint] = Field(default_factory=list)
+
+
+class AnalysisCalendarItem(BaseModel):
+    period: str
+    count: int
+    dead: int | None = None
+    injured: int | None = None
+    missing: int | None = None
+
+
+class AnalysisCalendarResponse(BaseModel):
+    items: list[AnalysisCalendarItem] = Field(default_factory=list)
+
+
+class AnalysisTimelineCategoryStack(BaseModel):
+    period: str
+    categories: list[AnalysisDisasterCount] = Field(default_factory=list)
+
+
+class AnalysisTimelineCategoryStacksResponse(BaseModel):
+    bucket: AnalysisTimelineBucket
+    items: list[AnalysisTimelineCategoryStack] = Field(default_factory=list)
+
+
+class AnalysisTimelineDateEventsResponse(BaseModel):
+    date_prefix: str
+    items: list[AnalysisEvent] = Field(default_factory=list)

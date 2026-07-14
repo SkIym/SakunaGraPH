@@ -134,7 +134,7 @@
 			<nav class="mb-2 flex items-center gap-1.5 text-[10px] text-slate-400" aria-label="Breadcrumb">
 				<a href="/analysis" class="transition hover:text-slate-600">Analysis</a>
 				<span aria-hidden="true">/</span>
-				<span class="text-slate-600">Events</span>
+				<span class="text-slate-600">Table</span>
 			</nav>
 			<h1 class="text-xl font-semibold text-slate-800">Disaster event records</h1>
 			<p class="mt-1 text-xs leading-5 text-slate-500">Filter, compare, and export deduplicated records from every integrated source.</p>

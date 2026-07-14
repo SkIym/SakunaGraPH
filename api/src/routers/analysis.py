@@ -3,6 +3,7 @@ from datetime import date
 from fastapi import APIRouter, HTTPException, Query, Response
 
 from src.schemas.analysis import (
+    AnalysisCalendarResponse,
     AnalysisDamageAffectedResponse,
     AnalysisDamageHistogramResponse,
     AnalysisDisasterCountGroupBy,
@@ -15,13 +16,21 @@ from src.schemas.analysis import (
     AnalysisRegionRankingsResponse,
     AnalysisSortDirection,
     AnalysisSummaryResponse,
+    AnalysisTimelineBucket,
+    AnalysisTimelineCategoryStacksResponse,
+    AnalysisTimelineDateEventsResponse,
     AnalysisVictimTrendsResponse,
 )
 from src.services.analysis import (
+    get_calendar_days,
+    get_calendar_months,
+    get_calendar_years,
+    get_category_stacks,
     get_damage_histogram,
     get_damage_vs_affected,
     get_disaster_counts,
     get_disaster_rankings,
+    get_date_events,
     get_analysis_events,
     get_analysis_events_export,
     get_filter_options as get_filter_options_service,
@@ -323,6 +332,145 @@ async def damage_vs_affected(
                 disaster_types=disaster_types,
                 q=q,
             )
+        )
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
+
+
+@router.get("/calendar/years", response_model=AnalysisCalendarResponse)
+async def calendar_years(
+    event_type: AnalysisEventType = Query("all"),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    location_ids: list[str] = Query(default_factory=list),
+    disaster_types: list[str] = Query(default_factory=list),
+    q: str | None = Query(None, max_length=200),
+    include_impacts: bool = Query(False),
+) -> AnalysisCalendarResponse:
+    try:
+        return await get_calendar_years(
+            _make_filters(
+                event_type=event_type,
+                start_date=start_date,
+                end_date=end_date,
+                location_ids=location_ids,
+                disaster_types=disaster_types,
+                q=q,
+            ),
+            include_impacts=include_impacts,
+        )
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
+
+
+@router.get("/calendar/months", response_model=AnalysisCalendarResponse)
+async def calendar_months(
+    year: int = Query(..., ge=1900, le=2200),
+    event_type: AnalysisEventType = Query("all"),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    location_ids: list[str] = Query(default_factory=list),
+    disaster_types: list[str] = Query(default_factory=list),
+    q: str | None = Query(None, max_length=200),
+    include_impacts: bool = Query(False),
+) -> AnalysisCalendarResponse:
+    try:
+        return await get_calendar_months(
+            _make_filters(
+                event_type=event_type,
+                start_date=start_date,
+                end_date=end_date,
+                location_ids=location_ids,
+                disaster_types=disaster_types,
+                q=q,
+            ),
+            year=year,
+            include_impacts=include_impacts,
+        )
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
+
+
+@router.get("/calendar/days", response_model=AnalysisCalendarResponse)
+async def calendar_days(
+    year: int = Query(..., ge=1900, le=2200),
+    month: int = Query(..., ge=1, le=12),
+    event_type: AnalysisEventType = Query("all"),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    location_ids: list[str] = Query(default_factory=list),
+    disaster_types: list[str] = Query(default_factory=list),
+    q: str | None = Query(None, max_length=200),
+    include_impacts: bool = Query(False),
+) -> AnalysisCalendarResponse:
+    try:
+        return await get_calendar_days(
+            _make_filters(
+                event_type=event_type,
+                start_date=start_date,
+                end_date=end_date,
+                location_ids=location_ids,
+                disaster_types=disaster_types,
+                q=q,
+            ),
+            year=year,
+            month=month,
+            include_impacts=include_impacts,
+        )
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
+
+
+@router.get(
+    "/timeline/category-stacks",
+    response_model=AnalysisTimelineCategoryStacksResponse,
+)
+async def category_stacks(
+    bucket: AnalysisTimelineBucket = Query("month_year"),
+    event_type: AnalysisEventType = Query("all"),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    location_ids: list[str] = Query(default_factory=list),
+    disaster_types: list[str] = Query(default_factory=list),
+    q: str | None = Query(None, max_length=200),
+) -> AnalysisTimelineCategoryStacksResponse:
+    try:
+        return await get_category_stacks(
+            _make_filters(
+                event_type=event_type,
+                start_date=start_date,
+                end_date=end_date,
+                location_ids=location_ids,
+                disaster_types=disaster_types,
+                q=q,
+            ),
+            bucket=bucket,
+        )
+    except ServiceError as exc:
+        raise _to_http_error(exc) from exc
+
+
+@router.get("/timeline/date-events", response_model=AnalysisTimelineDateEventsResponse)
+async def date_events(
+    date_prefix: str = Query(..., min_length=4, max_length=10),
+    event_type: AnalysisEventType = Query("all"),
+    start_date: date | None = Query(None),
+    end_date: date | None = Query(None),
+    location_ids: list[str] = Query(default_factory=list),
+    disaster_types: list[str] = Query(default_factory=list),
+    q: str | None = Query(None, max_length=200),
+) -> AnalysisTimelineDateEventsResponse:
+    try:
+        return await get_date_events(
+            _make_filters(
+                event_type=event_type,
+                start_date=start_date,
+                end_date=end_date,
+                location_ids=location_ids,
+                disaster_types=disaster_types,
+                q=q,
+            ),
+            date_prefix=date_prefix,
         )
     except ServiceError as exc:
         raise _to_http_error(exc) from exc

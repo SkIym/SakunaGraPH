@@ -13,7 +13,7 @@
 
 	const scopeItems = $derived([
 		{
-			label: 'Event records',
+			label: 'Tabular view',
 			value: eventTypeLabels.get(analysisFilters.eventType),
 			color: '#6366f1'
 		},
@@ -54,16 +54,21 @@
 		{/each}
 	</div>
 
-	<div class="grid gap-4 border-b border-slate-200 py-6 lg:grid-cols-2">
+	<div class="grid gap-4 border-b border-slate-200 py-6 lg:grid-cols-2 xl:grid-cols-3">
 		<div class="rounded-lg border border-slate-200 p-4">
-			<p class="text-sm font-semibold text-slate-800">Event records</p>
+			<p class="text-sm font-semibold text-slate-800">Tabular view</p>
 			<p class="mt-1 text-xs leading-5 text-slate-500">Browse the filtered event table or export the complete result set as CSV.</p>
-			<a href="/analysis/events" class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-slate-800 px-3 text-[11px] font-semibold text-white transition hover:bg-slate-700">Open event table</a>
+			<a href="/analysis/events" class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-slate-800 px-3 text-[11px] font-semibold text-white transition hover:bg-slate-700">Open tabular view</a>
 		</div>
 		<div class="rounded-lg border border-slate-200 p-4">
 			<p class="text-sm font-semibold text-slate-800">Metrics dashboard</p>
 			<p class="mt-1 text-xs leading-5 text-slate-500">Compare totals, distributions, regional rankings, and annual victim trends in the same filter scope.</p>
 			<a href="/analysis/metrics" class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-indigo-600 px-3 text-[11px] font-semibold text-white transition hover:bg-indigo-700">Open metrics dashboard</a>
+		</div>
+		<div class="rounded-lg border border-slate-200 p-4">
+			<p class="text-sm font-semibold text-slate-800">Timeline analysis</p>
+			<p class="mt-1 text-xs leading-5 text-slate-500">Drill from years to days, compare disaster-type patterns, and inspect the matching event records.</p>
+			<a href="/analysis/timeline" class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-teal-600 px-3 text-[11px] font-semibold text-white transition hover:bg-teal-700">Open timeline analysis</a>
 		</div>
 	</div>
 </section>

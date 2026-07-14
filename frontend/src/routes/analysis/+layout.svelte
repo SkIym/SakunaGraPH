@@ -13,8 +13,9 @@
 	let error = $state('');
 	let mobileFiltersOpen = $state(false);
 	const ANALYSIS_VIEWS = [
-		{ href: '/analysis/events', label: 'Events' },
-		{ href: '/analysis/metrics', label: 'Metrics' }
+		{ href: '/analysis/events', label: 'Table' },
+		{ href: '/analysis/metrics', label: 'Metrics' },
+		{ href: '/analysis/timeline', label: 'Timeline' }
 	];
 
 	async function loadFilterOptions(signal) {
