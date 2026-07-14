@@ -32,7 +32,7 @@ from validate.validate import (
 log = logging.getLogger(__name__)
 
 DATA_DIR = "../data/raw/emdat"
-OUT_DIR = "../data/rdf/events/"
+OUT_DIR = "../data/rdf/events/emdat"
 DEFAULT_BATCH_SIZE = 100
 
 

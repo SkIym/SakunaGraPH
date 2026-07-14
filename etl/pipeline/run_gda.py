@@ -56,7 +56,7 @@ from transform.gda import transform_gda
 log = logging.getLogger(__name__)
 
 DATA_DIR = "../data/raw/static/"
-OUT_DIR = "../data/rdf/events/"
+OUT_DIR = "../data/rdf/events/gda"
 DEFAULT_BATCH_SIZE = 100
 
 

@@ -157,5 +157,46 @@ python -m pipeline.run_ndrrmc
 python build_alignment.py
 ```
 
-After the alignment stage, `load_graphdb.py` (not covered here) loads the
-resulting graphs into the triple store.
+## `load_graphdb.py`
+
+Loads Turtle files through GraphDB's RDF4J statements API into named context
+graphs. The default selection is every top-level Turtle file in `ontology/`
+(`sakunagraph.ttl` and `disaster_type_scheme.ttl`) plus every Turtle file under
+`data/rdf/`; it does not use GraphDB's default graph. Files in the ontology's
+`imports/`, `shapes/`, and `validation/` subdirectories are not loaded.
+
+The graph IRI follows the RDF folder structure. For example,
+`data/rdf/events/dromic/dromic-2025.ttl` is loaded into
+`https://sakuna.ph/events/dromic`; all DROMIC yearly files therefore share
+that source graph. A file directly in `data/rdf/events/` has its filename stem
+as its source graph, so `data/rdf/events/emdat.ttl` maps to
+`https://sakuna.ph/events/emdat`.
+
+Run it from `etl/`:
+
+```
+# All data RDF plus the top-level ontology Turtle files
+python -m pipeline.load_graphdb
+
+# Select logical subgraphs (may be repeated)
+python -m pipeline.load_graphdb --scope ontology --scope events
+python -m pipeline.load_graphdb --scope psgc
+
+# Select individual files; paths may be relative to data/rdf or the repository
+python -m pipeline.load_graphdb --file events/dromic/dromic-2025.ttl
+python -m pipeline.load_graphdb --file ../ontology/sakunagraph.ttl
+
+# Preview the file-to-context mapping without contacting GraphDB
+python -m pipeline.load_graphdb --scope events --dry-run
+
+# Make selected graphs match the selected files, or explicitly clear all data
+python -m pipeline.load_graphdb --scope events --replace
+python -m pipeline.load_graphdb --clear-repository
+```
+
+`--replace` clears only the selected named graphs before loading. When loading
+one DROMIC year, it clears the shared DROMIC graph first, so use it only when
+the selection contains every file that should remain in that source graph.
+`--clear-repository` (with legacy alias `--clear`) deletes every graph in the
+repository. Use `--username`/`--password`, or `GRAPHDB_USERNAME` and
+`GRAPHDB_PASSWORD`, when GraphDB requires HTTP basic authentication.

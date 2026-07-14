@@ -1,143 +1,333 @@
-"""Bulk-load RDF files from a directory into a GraphDB repository via REST API."""
+"""Load SakunaGraPH Turtle files into GraphDB named graphs.
+
+Run from ``etl/``:
+
+    python -m pipeline.load_graphdb --scope ontology --scope events
+
+The context IRI is derived from the file's path beneath ``data/rdf``.  Every
+top-level Turtle file in ``ontology/`` is loaded into the ontology graph;
+ontology subdirectories are excluded. Files in a source subdirectory share
+that source graph, so
+``data/rdf/events/dromic/dromic-2025.ttl`` is loaded into
+``https://sakuna.ph/events/dromic``.  A Turtle file directly below
+``data/rdf/events`` uses its filename stem as the source graph, e.g.
+``events/emdat.ttl`` is loaded into ``https://sakuna.ph/events/emdat``.
+"""
+
+from __future__ import annotations
 
 import argparse
 import os
 import sys
+from collections.abc import Iterable
+from pathlib import Path
+from typing import NamedTuple
+from urllib.parse import quote
+
 import requests
 
-MIME_TYPES = {
-    ".ttl": "text/turtle",
-    ".nt": "application/n-triples",
-    ".rdf": "application/rdf+xml",
-    ".owl": "application/rdf+xml",
-    ".jsonld": "application/ld+json",
-}
+
+REPOSITORY_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_RDF_ROOT = REPOSITORY_ROOT / "data" / "rdf"
+DEFAULT_ONTOLOGY_DIR = REPOSITORY_ROOT / "ontology"
+GRAPH_BASE_IRI = "https://sakuna.ph"
+SCOPES = ("ontology", "events", "orgs", "prov", "psgc", "resolution")
 
 
-def validate_repo(host, repo):
-    """Check that the repository exists on the GraphDB server."""
-    url = f"{host}/repositories"
+class LoadTarget(NamedTuple):
+    """A local Turtle file and the named graph to which it belongs."""
+
+    path: Path
+    context: str
+
+
+class LoaderError(RuntimeError):
+    """An expected GraphDB configuration or request error."""
+
+
+def is_relative_to(path: Path, parent: Path) -> bool:
+    """Return whether *path* is inside *parent* (also on Python < 3.9)."""
     try:
-        resp = requests.get(url, headers={"Accept": "application/json"}, timeout=10)
-        resp.raise_for_status()
-    except requests.ConnectionError:
-        print(f"ERROR: Cannot connect to GraphDB at {host}")
-        sys.exit(1)
-    except requests.HTTPError as e:
-        print(f"ERROR: Failed to list repositories: {e}")
-        sys.exit(1)
-
-    repos = [r.get("id", "") for r in resp.json().get("results", {}).get("bindings", [])]
-    # GraphDB may return repos in SPARQL-result format or plain JSON depending on version
-    if not repos:
-        # Try plain list format
-        repos = [r.get("id", "") for r in resp.json()] if isinstance(resp.json(), list) else []
-
-    if repo not in repos:
-        print(f"WARNING: Repository '{repo}' not found in {repos}. Proceeding anyway (it may still accept data).")
+        path.relative_to(parent)
+    except ValueError:
+        return False
+    return True
 
 
-def clear_repo(host, repo):
-    """Delete all statements from the repository."""
-    url = f"{host}/repositories/{repo}/statements"
-    print(f"Clearing repository '{repo}'...")
-    resp = requests.delete(url, timeout=60)
-    if resp.ok:
-        print(f"Repository '{repo}' cleared.")
+def graph_iri_for(path: Path, rdf_root: Path, ontology_dir: Path) -> str:
+    """Derive the context IRI for a supported SakunaGraPH Turtle file."""
+    if path.parent == ontology_dir:
+        return f"{GRAPH_BASE_IRI}/ontology"
+
+    relative = path.relative_to(rdf_root)
+    parent_parts = relative.parent.parts
+
+    # Source files directly in data/rdf/events have no source directory.
+    # Keep them separate rather than merging unrelated sources into /events.
+    if parent_parts == ("events",):
+        graph_parts = (*parent_parts, relative.stem)
+    elif parent_parts:
+        graph_parts = parent_parts
     else:
-        print(f"ERROR clearing repository: {resp.status_code} {resp.text}")
-        sys.exit(1)
+        # A file placed immediately under data/rdf is its own context graph.
+        graph_parts = (relative.stem,)
+
+    encoded_parts = (quote(part, safe="-._~") for part in graph_parts)
+    return f"{GRAPH_BASE_IRI}/{'/'.join(encoded_parts)}"
 
 
-def load_file(host, repo, filepath):
-    """Load a single RDF file into the repository."""
-    ext = os.path.splitext(filepath)[1].lower()
-    content_type = MIME_TYPES.get(ext)
-    if not content_type:
-        print(f"  SKIP {filepath} (unsupported extension '{ext}')")
-        return False
+def discover_scope(scope: str, rdf_root: Path, ontology_dir: Path) -> list[Path]:
+    """Return Turtle files selected by one logical SakunaGraPH scope."""
+    if scope == "ontology":
+        return sorted(path for path in ontology_dir.glob("*.ttl") if path.is_file())
 
-    url = f"{host}/repositories/{repo}/statements"
-    filename = os.path.basename(filepath)
+    directory = rdf_root / scope
+    if not directory.is_dir():
+        return []
+    return sorted(path for path in directory.rglob("*.ttl") if path.is_file())
 
-    with open(filepath, "r", encoding="utf-8") as f:
-        data = f.read()
 
-    if not data.strip():
-        print(f"  SKIP {filename} (empty file)")
-        return False
-
-    resp = requests.post(
-        url,
-        data=data.encode("utf-8"),
-        headers={"Content-Type": content_type},
-        timeout=300,
+def resolve_file_argument(value: str, rdf_root: Path, ontology_dir: Path) -> Path:
+    """Resolve an explicit --file value and keep it within loader-owned data."""
+    supplied = Path(value).expanduser()
+    candidates = (
+        supplied,
+        rdf_root / supplied,
+        REPOSITORY_ROOT / supplied,
     )
+    for candidate in candidates:
+        path = candidate.resolve()
+        if not path.is_file():
+            continue
+        if path.suffix.lower() != ".ttl":
+            raise LoaderError(f"Only Turtle files are supported: {path}")
+        if path.parent == ontology_dir or is_relative_to(path, rdf_root):
+            return path
+        raise LoaderError(
+            f"--file must be below {rdf_root} or directly below {ontology_dir}: {path}"
+        )
+    raise LoaderError(f"Turtle file not found: {value}")
 
-    if resp.ok:
-        print(f"  OK   {filename}")
-        return True
+
+def collect_targets(
+    scopes: Iterable[str], files: Iterable[str], rdf_root: Path, ontology_dir: Path
+) -> list[LoadTarget]:
+    """Discover selected files and return deterministic, de-duplicated targets."""
+    paths: set[Path] = set()
+    for scope in scopes:
+        if scope == "all":
+            if rdf_root.is_dir():
+                paths.update(path for path in rdf_root.rglob("*.ttl") if path.is_file())
+            paths.update(discover_scope("ontology", rdf_root, ontology_dir))
+        else:
+            paths.update(discover_scope(scope, rdf_root, ontology_dir))
+
+    for value in files:
+        paths.add(resolve_file_argument(value, rdf_root, ontology_dir))
+
+    return [
+        LoadTarget(path, graph_iri_for(path, rdf_root, ontology_dir))
+        for path in sorted(paths)
+    ]
+
+
+def graphdb_url(host: str, repo: str) -> str:
+    return f"{host.rstrip('/')}/repositories/{quote(repo, safe='-._~')}/statements"
+
+
+def display_path(path: Path) -> Path:
+    """Show repository-relative paths when possible, otherwise the full path."""
+    try:
+        return path.relative_to(REPOSITORY_ROOT)
+    except ValueError:
+        return path
+
+
+def validate_repository(session: requests.Session, host: str, repo: str) -> None:
+    """Confirm the configured repository exists before mutating it."""
+    url = f"{host.rstrip('/')}/repositories"
+    try:
+        response = session.get(url, headers={"Accept": "application/json"}, timeout=10)
+        response.raise_for_status()
+    except requests.RequestException as error:
+        raise LoaderError(f"Cannot query GraphDB repositories at {url}: {error}") from error
+
+    try:
+        payload = response.json()
+    except ValueError as error:
+        raise LoaderError(f"GraphDB returned invalid repository metadata from {url}") from error
+
+    if isinstance(payload, list):
+        repositories = {item.get("id") for item in payload if isinstance(item, dict)}
     else:
-        print(f"  FAIL {filename} — {resp.status_code}: {resp.text[:200]}")
-        return False
+        bindings = payload.get("results", {}).get("bindings", [])
+        repositories = {
+            item.get("id", {}).get("value", item.get("id"))
+            for item in bindings
+            if isinstance(item, dict)
+        }
+
+    if repo not in repositories:
+        available = ", ".join(sorted(name for name in repositories if name)) or "none"
+        raise LoaderError(f"Repository '{repo}' was not found (available: {available}).")
 
 
-def collect_files(directory):
-    """Collect all supported RDF files from a directory (non-recursive)."""
-    files = []
-    for name in sorted(os.listdir(directory)):
-        ext = os.path.splitext(name)[1].lower()
-        if ext in MIME_TYPES:
-            files.append(os.path.join(directory, name))
-    return files
+def clear_repository(session: requests.Session, endpoint: str) -> None:
+    """Clear every statement from a repository, including every named graph."""
+    try:
+        response = session.delete(endpoint, timeout=300)
+        response.raise_for_status()
+    except requests.RequestException as error:
+        raise LoaderError(f"Could not clear repository: {error}") from error
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Load RDF files into GraphDB")
-    parser.add_argument("--dir", default="../data/rdf/",
-                        help="Directory containing RDF files (default: ../data/rdf/)")
-    parser.add_argument("--repo", default="sakunagraph",
-                        help="GraphDB repository name (default: sakunagraph)")
-    parser.add_argument("--host", default="http://localhost:7200",
-                        help="GraphDB server URL (default: http://localhost:7200)")
-    parser.add_argument("--clear", action="store_true",
-                        help="Clear the repository before loading")
-    parser.add_argument("--include-ontology", action="store_true",
-                        help="Also load ontology files from ontology/ directory")
+def clear_context(session: requests.Session, endpoint: str, context: str) -> None:
+    """Clear one named graph using the RDF4J/GraphDB statements API."""
+    try:
+        response = session.delete(endpoint, params={"context": f"<{context}>"}, timeout=300)
+        response.raise_for_status()
+    except requests.RequestException as error:
+        raise LoaderError(f"Could not clear context <{context}>: {error}") from error
+
+
+def load_target(session: requests.Session, endpoint: str, target: LoadTarget, timeout: int) -> None:
+    """Upload one Turtle document into its derived GraphDB context graph."""
+    if target.path.stat().st_size == 0:
+        raise LoaderError(f"Refusing to load empty file: {target.path}")
+
+    try:
+        with target.path.open("rb") as source:
+            response = session.post(
+                endpoint,
+                params={"context": f"<{target.context}>"},
+                data=source,
+                headers={"Content-Type": "text/turtle"},
+                timeout=timeout,
+            )
+        response.raise_for_status()
+    except requests.RequestException as error:
+        detail = error.response.text[:500] if error.response is not None else str(error)
+        raise LoaderError(f"{target.path}: {detail}") from error
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Load SakunaGraPH Turtle files into GraphDB named graphs."
+    )
+    parser.add_argument("--repo", default="sakunagraph", help="GraphDB repository ID")
+    parser.add_argument("--host", default="http://localhost:7200", help="GraphDB server URL")
+    parser.add_argument(
+        "--rdf-root",
+        type=Path,
+        default=DEFAULT_RDF_ROOT,
+        help="Root containing RDF subgraphs (default: repository data/rdf)",
+    )
+    parser.add_argument(
+        "--scope",
+        action="append",
+        choices=("all", *SCOPES),
+        help="Load a logical subgraph; repeat to combine scopes (default: all)",
+    )
+    parser.add_argument(
+        "--file",
+        action="append",
+        default=[],
+        metavar="TTL",
+        help="Load one specific Turtle file; repeat as needed",
+    )
+    parser.add_argument(
+        "--replace",
+        action="store_true",
+        help="Clear each selected named graph before loading it",
+    )
+    parser.add_argument(
+        "--clear-repository",
+        "--clear",
+        dest="clear_repository",
+        action="store_true",
+        help="Clear the whole repository before loading (not limited to selected graphs)",
+    )
+    parser.add_argument("--dry-run", action="store_true", help="List files and contexts without calling GraphDB")
+    parser.add_argument("--timeout", type=int, default=300, help="Per-file upload timeout in seconds")
+    parser.add_argument("--username", default=os.getenv("GRAPHDB_USERNAME"), help="GraphDB username (or GRAPHDB_USERNAME)")
+    parser.add_argument("--password", default=os.getenv("GRAPHDB_PASSWORD"), help="GraphDB password (or GRAPHDB_PASSWORD)")
     args = parser.parse_args()
+    if args.timeout <= 0:
+        parser.error("--timeout must be positive")
+    if args.replace and args.clear_repository:
+        parser.error("--replace and --clear-repository cannot be used together")
+    return args
 
-    validate_repo(args.host, args.repo)
 
-    if args.clear:
-        clear_repo(args.host, args.repo)
+def main() -> int:
+    args = parse_args()
+    rdf_root = args.rdf_root.resolve()
+    ontology_dir = DEFAULT_ONTOLOGY_DIR.resolve()
+    # An explicit file selection is intentionally narrow.  Scopes and files
+    # can still be combined when the caller wants their union.
+    scopes = args.scope if args.scope is not None else ([] if args.file else ["all"])
 
-    files = collect_files(args.dir)
+    try:
+        targets = collect_targets(scopes, args.file, rdf_root, ontology_dir)
+    except (LoaderError, ValueError) as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 2
 
-    if args.include_ontology:
-        ontology_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(__file__))), "ontology")
-        if os.path.isdir(ontology_dir):
-            ontology_files = collect_files(ontology_dir)
-            print(f"\nLoading {len(ontology_files)} ontology file(s) from {ontology_dir}")
-            files = ontology_files + files
-        else:
-            print(f"WARNING: Ontology directory not found at {ontology_dir}")
+    if not targets:
+        print("No Turtle files matched the requested scope or file selection.")
+        return 0
 
-    if not files:
-        print(f"No RDF files found in {args.dir}")
-        sys.exit(0)
+    print(f"Selected {len(targets)} Turtle file(s):")
+    for target in targets:
+        print(f"  {display_path(target.path)} -> <{target.context}>")
 
-    print(f"\nLoading {len(files)} file(s) into {args.host}/repositories/{args.repo}\n")
+    if args.dry_run:
+        return 0
 
-    success = 0
-    failed = 0
-    for filepath in files:
-        if load_file(args.host, args.repo, filepath):
-            success += 1
-        else:
-            failed += 1
+    session = requests.Session()
+    if args.username:
+        session.auth = (args.username, args.password or "")
+    endpoint = graphdb_url(args.host, args.repo)
 
-    print(f"\nDone: {success} loaded, {failed} failed/skipped out of {len(files)} files.")
+    try:
+        validate_repository(session, args.host, args.repo)
+        if args.clear_repository:
+            print(f"Clearing repository '{args.repo}'...")
+            clear_repository(session, endpoint)
+        elif args.replace:
+            contexts = sorted({target.context for target in targets})
+            print(f"Clearing {len(contexts)} selected named graph(s)...")
+            for context in contexts:
+                clear_context(session, endpoint, context)
+
+        loaded = 0
+        failures: list[str] = []
+        for target in targets:
+            try:
+                load_target(session, endpoint, target, args.timeout)
+            except LoaderError as error:
+                failures.append(str(error))
+                print(f"  FAIL  {error}", file=sys.stderr)
+            else:
+                loaded += 1
+                print(f"  OK  {target.path.name} -> <{target.context}>")
+    except LoaderError as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 1
+    finally:
+        session.close()
+
+    if failures:
+        print(
+            f"Loaded {loaded} Turtle file(s); {len(failures)} failed. "
+            f"Repository: '{args.repo}'.",
+            file=sys.stderr,
+        )
+        return 1
+
+    print(f"Loaded {loaded} Turtle file(s) into repository '{args.repo}'.")
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
