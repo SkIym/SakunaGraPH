@@ -32,6 +32,27 @@ sgsh:DecimalLiteralShape a sh:NodeShape ;
         [ sh:datatype xsd:integer ]
     ) .
 
+sgsh:RequiresDetailBeyondLocationConstraint a sh:SPARQLConstraint ;
+    rdfs:comment "Prevents incomplete impact, preparedness, and response resources that assert only geographic context." ;
+    sh:message "Resources with :hasLocation must also assert at least one substantive non-geographic detail." ;
+    sh:select """
+        SELECT $this
+        WHERE {
+            $this <https://sakuna.ph/hasLocation> ?location .
+            FILTER NOT EXISTS {
+                $this ?property ?value .
+                FILTER (
+                    ?property != <http://www.w3.org/1999/02/22-rdf-syntax-ns#type>
+                    && ?property != <https://sakuna.ph/hasLocation>
+                    && ?property != <https://sakuna.ph/hasRegion>
+                    && ?property != <https://sakuna.ph/hasProvince>
+                    && ?property != <https://sakuna.ph/hasMunicipality>
+                    && ?property != <https://sakuna.ph/hasBarangay>
+                )
+            }
+        }
+    """ .
+
 #################################################################
 # Property shapes
 #################################################################
@@ -1213,8 +1234,9 @@ sgsh:DisasterTypeSchemeShape a sh:NodeShape ;
 #################################################################
 
 sgsh:ImpactShape a sh:NodeShape ;
-    rdfs:comment "Validates shared Impact location and remarks properties for all impact subclasses without relying on inference." ;
+    rdfs:comment "Validates shared Impact properties for all impact subclasses and rejects resources that contain only :hasLocation." ;
     sh:targetClass :Impact, baw:Impact, :AffectedPopulation, :AgricultureDamage, :AirportDisruption, :Casualties, :ClassSuspension, :CommunicationLineDisruption, :DamageGeneral, :FlightDisruption, :HousingDamage, :InfrastructureDamage, :PowerDisruption, :RoadAndBridgesDamage, :SeaportDisruption, :StrandedEvent, :WaterDisruption, :WorkSuspension ;
+    sh:sparql sgsh:RequiresDetailBeyondLocationConstraint ;
     sh:property
         sgsh:ImpactHasLocationPropertyShape,
         sgsh:ImpactHasRegionPropertyShape,
@@ -1407,8 +1429,9 @@ sgsh:WorkSuspensionShape a sh:NodeShape ;
 #################################################################
 
 sgsh:PreparednessShape a sh:NodeShape ;
-    rdfs:comment "Validates shared Preparedness location, agency/LGU, and remarks properties without relying on subclass inference." ;
+    rdfs:comment "Validates shared Preparedness properties and rejects resources that contain only :hasLocation without relying on subclass inference." ;
     sh:targetClass :Preparedness, :PreemptiveEvacuation, :Warning ;
+    sh:sparql sgsh:RequiresDetailBeyondLocationConstraint ;
     sh:property
         sgsh:PreparednessHasLocationPropertyShape,
         sgsh:PreparednessHasRegionPropertyShape,
@@ -1437,8 +1460,9 @@ sgsh:WarningShape a sh:NodeShape ;
         sgsh:WarningContributingOrgPropertyShape .
 
 sgsh:ResponseShape a sh:NodeShape ;
-    rdfs:comment "Validates shared Response location and remarks properties without relying on subclass inference." ;
+    rdfs:comment "Validates shared Response properties and rejects resources that contain only :hasLocation without relying on subclass inference." ;
     sh:targetClass :Response, :Assistance, :DeclarationOfCalamity, :Recovery, :Rescue ;
+    sh:sparql sgsh:RequiresDetailBeyondLocationConstraint ;
     sh:property
         sgsh:ResponseHasLocationPropertyShape,
         sgsh:ResponseHasRegionPropertyShape,

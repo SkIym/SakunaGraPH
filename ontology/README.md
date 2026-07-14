@@ -1,17 +1,24 @@
 # SakunaGraPH Ontology
 
-SakunaGraPH is an OWL ontology for modeling Philippine disaster knowledge. It captures disaster events, incidents, impacts, responses, preparedness actions, geographic hierarchy, and source provenance. The model extends the [beAWARE ontology](https://github.com/beAWARE-project/ontology) and is used by the ETL pipeline to populate the knowledge graph.
+SakunaGraPH is an OWL ontology for modeling Philippine disaster knowledge. It
+captures disaster events, incidents, impacts, responses, preparedness actions,
+geographic hierarchy, and source provenance. The model extends the
+[beAWARE ontology](https://github.com/beAWARE-project/ontology) and is used by
+the ETL pipeline to populate the knowledge graph.
 
-## What is in this folder
+## Folder layout
 
-| File | Purpose |
+| Path | Purpose |
 |------|---------|
-| `sakunagraph.ttl` | Main ontology in Turtle format |
-| `competency_questions.md` | SPARQL competency questions used to validate the graph |
-| `run_cqs.py` | Helper script that runs the competency questions against a local GraphDB repository |
-| `catalog-v001.xml` | Ontology catalog used by RDF/OWL tooling |
-| `pitfall-scanner-results*.xml` | OOPS! validation output |
-| `neontometrics-2.csv` | Ontology metrics export |
+| `sakunagraph.ttl` | Main SakunaGraPH OWL ontology in Turtle format. |
+| `disaster_type_scheme.ttl` | SKOS disaster-type classification aligned with EM-DAT. |
+| `imports/beAWARE_ontology.owl` | Local copy of the imported beAWARE ontology. |
+| `imports/catalog-v001.xml` | XML catalog that resolves local ontology imports. |
+| `shapes/shapes.ttl` | SHACL shapes for SakunaGraPH event and impact RDF. |
+| `shapes/psgc/shapes.ttl` | SHACL shapes for Philippine Standard Geographic Code (PSGC) RDF. |
+| `validation/competency_questions.md` | SPARQL competency questions for evaluating the graph. |
+| `validation/neontometrics-2.csv` | Ontology metrics export. |
+| `validation/pitfall-scanner-results-2.xml` | OOPS! Pitfall Scanner validation output. |
 
 ## Scope
 
@@ -30,7 +37,7 @@ The ontology models:
 Base IRI: https://sakuna.ph/
 ```
 
-## Imported Vocabularies
+## Imported vocabularies
 
 - `geo:` GeoSPARQL 1.1 for spatial features
 - `prov:` PROV-O for source and provenance modeling
@@ -38,7 +45,7 @@ Base IRI: https://sakuna.ph/
 - `qudt:` QUDT for numeric quantities and currency values
 - `baw:` beAWARE classes and properties reused by SakunaGraPH
 
-## Core Model
+## Core model
 
 ### Events
 
@@ -55,7 +62,7 @@ Base IRI: https://sakuna.ph/
 - `:RoadAndBridgesDamage`, `:SeaportDisruption`, `:AirportDisruption`
 - `:ClassSuspension`, `:WorkSuspension`, `:FlightDisruption`, `:StrandedEvent`
 
-### Preparedness and Response
+### Preparedness and response
 
 - `:PreemptiveEvacuation`
 - `:Rescue`
@@ -67,40 +74,30 @@ Base IRI: https://sakuna.ph/
 ### Geography
 
 - `:Country`, `:IslandGroup`, `:Region`, `:Province`, `:City`, `:Municipality`, `:Barangay`, `:SubMunicipality`
-- Geographic membership is modeled through `:isPartOf` chains rather than a separate region property
+- Geographic membership is modeled through `:isPartOf` chains rather than a separate region property.
 
 ### Provenance
 
-- `:Source` stores report metadata such as report name, URL, format, and acquisition dates
-- `prov:wasDerivedFrom` and related provenance links connect events to their source materials
+- `:Source` stores report metadata such as report name, URL, format, and acquisition dates.
+- `prov:wasDerivedFrom` and related provenance links connect events to their source materials.
 
-## Disaster Type Scheme
+## Disaster type scheme
 
-The ontology includes a SKOS concept scheme for disaster classification based on EM-DAT.
+`disaster_type_scheme.ttl` defines the SKOS concept scheme used by the ETL
+classifier. Its top-level branches are `:Natural` and `:Technological`.
+`skos:note` annotations on leaf concepts provide matching context for the
+semantic classifier.
 
-Top-level branches:
+## Validation
 
-- `:Natural`
-- `:Technological`
+Use `shapes/shapes.ttl` to validate event and impact data, and
+`shapes/psgc/shapes.ttl` to validate PSGC data. The pipeline defaults are
+defined in `etl/validate/validate.py` and `etl/pipeline/run_psgc.py`.
 
-Examples of major branches and leaves:
-
-- Natural: `:Biological`, `:Climatological`, `:Geophysical`, `:Hydrological`, `:Meteorological`
-- Technological: `:ArmedConflict`, `:IndustrialAccident`, `:MiscellaneousAccident`, `:Transport`
-
-Leaf concepts include `skos:note` annotations that support fuzzy matching in the ETL semantic classifier.
-
-## Validation And Queries
-
-The ontology has been checked with [OOPS! Pitfall Scanner](https://oops.linkeddata.es/). The reported XML files in this folder contain the validation results.
-
-Twenty competency questions are documented in [`competency_questions.md`](competency_questions.md). The questions are also runnable against a local GraphDB repository through [`run_cqs.py`](run_cqs.py):
-
-```bash
-python run_cqs.py
-```
-
-The script expects GraphDB to be available at `http://localhost:7200/repositories/SakunaGraph` and writes an HTML results file next to the script.
+The documented competency questions are in
+[`validation/competency_questions.md`](validation/competency_questions.md).
+OOPS! results and ontology metrics are retained in `validation/` as reference
+artifacts.
 
 ## Notes
 
