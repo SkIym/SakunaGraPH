@@ -79,6 +79,8 @@ def seaport_iri     (e: URIRef, r: str | None = None): return sub_iri(e, "seapor
 def airport_iri     (e: URIRef, r: str | None = None): return sub_iri(e, "airport_disruption", r)
 def flight_iri      (e: URIRef, r: str | None = None): return sub_iri(e, "flight_disruption", r)
 def damage_gen_iri  (e: URIRef, r: str | None = None): return sub_iri(e, "damage_general", r)
+def climate_param_iri(e: URIRef, r: str | None = None): return sub_iri(e, "climate_parameter", r)
+def warning_iri     (e: URIRef, r: str | None = None): return sub_iri(e, "warning", r)
 
 def org_iri(slug: str) -> URIRef:
     return URIRef(SKG[f"org/{slug}"])

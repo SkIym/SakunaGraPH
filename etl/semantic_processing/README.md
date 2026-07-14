@@ -69,7 +69,7 @@ pipeline: a fast keyword rule layer narrows the candidate set, then a
 SentenceTransformer resolves the final label via cosine similarity.
 
 - Loads leaf `skos:Concept`s in `skg:DisasterTypeScheme` (concepts with no
-  narrower children) plus their `skos:definition` from `sakunagraph.ttl`.
+  narrower children) plus their `skos:note` text from `disaster_type_scheme.ttl`.
 - Encodes each definition with a SentenceTransformer model (default
   `all-mpnet-base-v2`) at init time; incoming texts are scored via cosine
   similarity against this embedding matrix.

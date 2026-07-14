@@ -66,6 +66,11 @@ Raw Data (PDF, XLSX)
    python -m pipeline.run_ndrrmc
    ```
 
+   To validate each output batch before serialization:
+   ```bash
+   python -m pipeline.run_ndrrmc --validate --batch-size 10
+   ```
+
 
 ### DROMIC
 
@@ -77,6 +82,11 @@ Raw Data (PDF, XLSX)
 2. **Run** the full transform + mapping pipeline:
    ```bash
    python -m pipeline.run_dromic
+   ```
+
+   To validate each 100-event batch before merging into the year graph:
+   ```bash
+   python -m pipeline.run_dromic --validate --batch-size 100
    ```
 
 

@@ -19,9 +19,13 @@ Steps:
 4. `transform_emdat` parses the file into typed entity buckets, which are
    handed to the per-class mappers in order: `Event`, `Assistance`,
    `Recovery`, `DamageGeneral`, `Casualties`, `AffectedPopulation`.
-5. Serialize to `../data/rdf/events/{--out}` (default `emdat.ttl`).
+5. Optionally run SHACL validation when `--validate` is set. EM-DAT validates
+   the full output graph by default; add `--batch` to validate by event-id
+   batches instead. Add `--no-context` to validate without
+   PSGC/disaster-type/org/provenance context graphs.
+6. Serialize to `../data/rdf/events/{--out}` (default `emdat.ttl`).
 
-CLI: `python run_emdat.py [--out emdat.ttl]`
+CLI: `python -m pipeline.run_emdat [--out emdat.ttl] [--validate] [--batch] [--batch-size 100] [--no-context]`
 
 ## `run_ndrrmc.py`
 Builds NDRRMC event graphs from the parsed sitrep tree under
@@ -29,17 +33,22 @@ Builds NDRRMC event graphs from the parsed sitrep tree under
 subgraph per event and writes them out in batches.
 
 Steps:
-1. `load_events(DATA_DIR)` discovers all events in the index.
-2. For each batch (default 10 events), spin up a `ProcessPoolExecutor`; each
-   worker calls `process_event`, which mints the event IRI, loads provenance,
-   then runs the full set of loaders/mappers (incidents, aff_pop, casualties,
-   relief, infra, housing, agri, pevac, rnb, power, comms, doc_calamity,
-   class_suspension, work_suspension, stranded, water, seaport, airport,
-   flight).
-3. Subgraphs are merged into a per-batch main graph and serialized to
-   `../data/rdf/events/{--out}-{index}.ttl`.
+1. Discover event folders under `DATA_DIR`, applying `--start` and optional
+   `--limit`.
+2. For each batch (default 10 event folders), transform that batch with
+   `load_events(DATA_DIR, batch_folders)`.
+3. Map the transformed events into a temporary batch graph. Each event mints
+   the event IRI, loads provenance, then runs the full set of loaders/mappers
+   (incidents, aff_pop, casualties, relief, infra, housing, agri, pevac, rnb,
+   power, comms, doc_calamity, class_suspension, work_suspension, stranded,
+   water, seaport, airport, flight).
+4. Optionally run SHACL validation when `--validate` is set. Batches are
+   serialized only after validation passes. Add `--no-context` to validate
+   without PSGC/disaster-type/org/provenance context graphs.
+5. Serialize each valid batch graph to
+   `../data/rdf/events/ndrrmc/{--out}-{index}.ttl`.
 
-CLI: `python run_ndrrmc.py [--out ndrrmc] [--start 0] [--count 10]`
+CLI: `python -m pipeline.run_ndrrmc [--out ndrrmc] [--start 0] [--batch-size 10] [--validate] [--no-context]`
 
 ## `run_dromic.py`
 
@@ -48,27 +57,33 @@ Builds DROMIC event graphs per year from the parsed reports tree under
 subfolder, or iterates over all year subfolders when `--all` is passed.
 
 Steps:
-1. For a given year directory, walk every event subfolder (skipping any folder
-   listed in `_needs_rerun.txt` for that year).
-2. Per event folder, `load_event` reads `metadata.json` and `event_mapping`
-   mints the event IRI; `load_provenance` + `prov_mapping` attach the
-   provenance chain from `source.json`.
+1. For a given year directory, discover event subfolders, applying `--start`
+   and optional `--limit`, while skipping folders listed in `_needs_rerun.txt`
+   for that year.
+2. For each batch (default 100 event folders), transform and map those events
+   into a temporary batch graph. Per event, `load_event` reads `metadata.json`
+   and `event_mapping` mints the event IRI; `load_provenance` + `prov_mapping`
+   attach the provenance chain from `source.json`.
 3. `load_aff_pop` is called for affected-population and pre-emptive evacuation
    data; non-empty results are passed to `aff_pop_mapping` and `pevac_mapping`
-   respectively.
-4. `load_housing` populates housing damage via `housing_mapping` if present.
-5. `load_assistance` + `assistance_mapping` handle assistance data; failures
+   respectively. `load_housing` populates housing damage via `housing_mapping`
+   if present.
+4. `load_assistance` + `assistance_mapping` handle assistance data; failures
    are caught, logged, and the offending folder name is appended to
    `_needs_rerun.txt` for later inspection rather than aborting the run.
-6. All per-event subgraphs are merged into a single year graph and serialized
-   to `../data/rdf/events/{--out}-{year}.ttl`.
+5. Optionally run SHACL validation when `--validate` is set. Batches are
+   merged into the final year graph only after validation passes. Add
+   `--no-context` to validate without PSGC/disaster-type/org/provenance
+   context graphs.
+6. Serialize the year graph to
+   `../data/rdf/events/dromic/{--out}-{year}.ttl`.
 
 **`_needs_rerun.txt` mechanic** — each year directory may contain this file.
 Folders listed there are silently skipped during `run()`, and any folder whose
 `load_assistance` call raises an exception is automatically appended to it,
 making failed events easy to retry in isolation.
 
-CLI: `python run_dromic.py [--year 2026]`
+CLI: `python -m pipeline.run_dromic [--year 2026] [--batch-size 100] [--validate] [--no-context]`
 
 ## `run_gda.py`
 Builds `gda.ttl` from the cleaned Geographical Disaster Archive workbook at
@@ -82,9 +97,26 @@ Steps:
    `Casualties`, `HousingDamage`, `InfrastructureDamage`, `DamageGeneral`,
    `PowerDisruption`, `CommunicationLineDisruption`, `RoadAndBridgesDamage`,
    `SeaportDisruption`, `WaterDisruption`, `Assistance`, `Relief`, `Recovery`.
-4. Serialize to `../data/rdf/events/{--out}` (default `gda.ttl`).
+4. Optionally run SHACL validation when `--validate` is set. In that mode,
+   the transform still runs once, then GDA entities are grouped by event id,
+   mapped into temporary batch graphs, validated, and merged into the final
+   output graph only after the batch conforms. Add `--no-context` to validate
+   those batches without PSGC/disaster-type/org/provenance context graphs.
+5. Serialize to `../data/rdf/events/{--out}` (default `gda.ttl`).
 
-CLI: `python run_gda.py [--out gda.ttl]`
+CLI: `python run_gda.py [--out gda.ttl] [--validate] [--batch-size 100] [--no-context]`
+
+## `validate.py`
+Reusable SHACL validation helper for in-pipeline checks and standalone RDF
+validation. Create one `ShaclValidator.from_paths()` per pipeline run to load
+`ontology/shapes/shapes.ttl`, `ontology/sakunagraph.ttl`, and existing
+PSGC/disaster-type/org/provenance RDF context once, then reuse it for batch calls. The
+convenience `validate_graph(graph, focus_nodes=None, label=None)` still
+validates an in-memory `rdflib.Graph` against the same defaults. Pass
+`include_context_graphs=False` or CLI `--no-context` to validate without
+merging PSGC/disaster-type/org/provenance context.
+
+CLI: `python -m validate.validate [--no-context] [path/to/file.ttl ...]`
 
 ## `build_alignment.py`
 End-to-end entity-resolution pipeline that consumes every TTL under
@@ -119,9 +151,9 @@ python build_alignment.py [--sources DIR]
 ## Typical run order
 
 ```
-python run_emdat.py
+python -m pipeline.run_emdat
 python run_gda.py
-python run_ndrrmc.py
+python -m pipeline.run_ndrrmc
 python build_alignment.py
 ```
 

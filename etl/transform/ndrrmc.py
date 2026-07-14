@@ -9,14 +9,14 @@ import polars as pl
 from mappings.iris import NDRRMC_EVENT_NS
 from semantic_processing.location_matcher_v2 import LOCATION_MATCHER
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
-# from semantic_processing.disaster_params_extractor import PARAMS_EXTRACTOR
+from semantic_processing.climate_parameter_extractor import PARAMS_EXTRACTOR
 
 from mappings.ndrrmc import (
     AFF_POP_COL_MAP, AGRI_MAPPING, AIRPORT_MAPPING, ASSISTANCE_PROVIDED_MAPPING, CASUALTY_MAPPING, CLASS_MAPPING, COMMS_MAPPING, DOC, DOC_MAPPING,
     HOUSES_MAPPING, INCIDENT_COLUMN_MAPPINGS, INFRA_MAPPING, PEVAC_MAPPING,
     POWER_MAPPING, RNB_MAPPING, SEAPORT_MAPPING, STRANDED_MAPPING, WATER_DIS_MAPPING, WORK_MAPPING,
-    AffectedPopulation, Agriculture, Airport, Casualties, ClassDisruption, CommunicationLines, Event, Flight,
-    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, WorkDisruption, WaterDisruption
+    AffectedPopulation, Agriculture, Airport, Casualties, ClassDisruption, ClimateParameterMeasurement, CommunicationLines, Event, Flight,
+    Housing, Infrastructure, PEvacuation, Power, Provenance, Incident, Assistance, RNB, Seaport, Stranded, Warning, WorkDisruption, WaterDisruption
 )
 
 from transform.helpers import (
@@ -32,50 +32,90 @@ def _event_id(event_name: str, start_date: str | None) -> str:
     return uuid.uuid5(NDRRMC_EVENT_NS, key).hex
 
 
-def load_events(folder_path: str) -> list[Event]:
+def _load_climate_parameters(remarks_text: str) -> list[ClimateParameterMeasurement]:
+    extracted = PARAMS_EXTRACTOR.extract(remarks_text)
+    measurements: list[ClimateParameterMeasurement] = []
+
+    for idx, item in enumerate(extracted, 1):
+        # matched_location = None
+        # if item.location:
+        #     try:
+        #         matched = LOCATION_MATCHER.match([item.location])
+        #         matched_location = matched[0] if matched else None
+        #     except Exception:
+        #         matched_location = None
+
+        measurements.append(
+            ClimateParameterMeasurement(
+                id=str(idx),
+                parameter=item.parameter,
+                parameterText=item.parameterText,
+                value=item.value,
+                unit=item.unit,
+                location=item.location,
+                # hasLocation=matched_location,
+            )
+        )
+
+    return measurements
+
+
+def _load_warnings(remarks_text: str) -> list[Warning]:
+    extracted = PARAMS_EXTRACTOR.extract_warnings(remarks_text)
+    return [
+        Warning(
+            id=str(idx),
+            warningReleased=item.warningReleased,
+            warningTimeStamp=item.warningTimeStamp,
+        )
+        for idx, item in enumerate(extracted, 1)
+    ]
+
+
+def load_event(folder_path: str, folder: str) -> Event | None:
+    meta_path = os.path.join(folder_path, folder, "metadata.json")
+    src_path = os.path.join(folder_path, folder, "source.json")
+
+    if not os.path.exists(meta_path):
+        return None
+
+    with open(meta_path, "r", encoding="utf-8") as f:
+        meta: dict[str, str] = json.load(f)
+
+    with open(src_path, "r", encoding="utf-8") as f:
+        src: dict[str, str] = json.load(f)
+
+    event_name = event_name_expander(meta.get("eventName", folder))
+    # text = (meta.get("remarks") or "").split(". ")[0]
+    pred, _ = DISASTER_CLASSIFIER.classify(
+        [event_name + src.get("reportName", "")]
+    )[0]
+
+    # Extract disaster-specific params from narrative text
+    remarks_text = meta.get("remarks") or ""
+    params = _load_climate_parameters(remarks_text)
+    warnings = _load_warnings(remarks_text)
+
+    return Event(
+        id=_event_id(meta.get("eventName", folder), meta.get("startDate")),
+        eventName=meta.get("eventName", folder),
+        startDate=datetime.fromisoformat(meta["startDate"]) if meta.get("startDate") else None,
+        endDate=datetime.fromisoformat(meta["endDate"]) if meta.get("endDate") else None,
+        remarks=remarks_text or None,
+        hasDisasterType=pred,
+        climateParameters=params,
+        warnings=warnings,
+    )
+
+
+def load_events(folder_path: str, folders: Iterable[str] | None = None) -> list[Event]:
     events: list[Event] = []
+    folder_names = list(folders) if folders is not None else next(os.walk(folder_path))[1]
 
-    for folder in next(os.walk(folder_path))[1]:
-        meta_path = os.path.join(folder_path, folder, "metadata.json")
-        src_path = os.path.join(folder_path, folder, "source.json")
-
-        if not os.path.exists(meta_path):
-            continue
-
-        with open(meta_path, "r", encoding="utf-8") as f:
-            meta: dict[str, str] = json.load(f)
-
-        with open(src_path, "r", encoding="utf-8") as f:
-            src: dict[str, str] = json.load(f)
-
-        event_name = event_name_expander(meta.get("eventName", folder))
-        # text = (meta.get("remarks") or "").split(". ")[0]
-        pred, _ = DISASTER_CLASSIFIER.classify(
-            [event_name + src.get("reportName", "")]
-        )[0]
-
-        # Extract disaster-specific params from narrative text
-        remarks_text = meta.get("remarks") or ""
-        # params = PARAMS_EXTRACTOR.extract(remarks_text)
-
-        events.append(Event(
-            id=_event_id(meta.get("eventName", folder), meta.get("startDate")),
-            eventName=meta.get("eventName", folder),
-            startDate=datetime.fromisoformat(meta["startDate"]) if meta.get("startDate") else None,
-            endDate=datetime.fromisoformat(meta["endDate"]) if meta.get("endDate") else None,
-            remarks=remarks_text or None,
-            hasDisasterType=pred,
-            # windSpeed=params.windSpeed,
-            # gustSpeed=params.gustSpeed,
-            # centralPressure=params.centralPressure,
-            # signalNumber=params.signalNumber,
-            # stormCategory=params.stormCategory,
-            # internationalName=params.internationalName,
-            # magnitude=params.magnitude,
-            # earthquakeDepth=params.earthquakeDepth,
-            # epicenterLatitude=params.epicenterLatitude,
-            # epicenterLongitude=params.epicenterLongitude,
-        ))
+    for folder in folder_names:
+        event = load_event(folder_path, folder)
+        if event is not None:
+            events.append(event)
 
     return events
 

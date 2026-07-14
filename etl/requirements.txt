@@ -2,12 +2,15 @@ requests
 selenium
 pdfplumber
 pandas
+python-dateutil
 rdflib
 openpyxl
 thefuzz
 polars
 sentence_transformers
+gliner2[local]
 fastexcel
 docx2pdf
 docling
 lxml
+pyshacl

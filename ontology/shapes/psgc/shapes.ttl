@@ -1,0 +1,324 @@
+@prefix : <https://sakuna.ph/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix sgsh: <https://sakuna.ph/shapes/psgc/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+sgsh:PSGCShapeGraph a owl:Ontology ;
+    rdfs:comment "SHACL validation shapes for PSGC administrative geography RDF exported by etl/transform/psgc_datafile.py." .
+
+#################################################################
+# Shared property shapes
+#################################################################
+
+sgsh:RequiredLabelShape a sh:PropertyShape ;
+    rdfs:comment "Every PSGC location resource should have a human-readable label." ;
+    sh:path rdfs:label ;
+    sh:minCount 1 ;
+    sh:nodeKind sh:Literal .
+
+sgsh:RDFTypeShape a sh:PropertyShape ;
+    rdfs:comment "PSGC resources should have at least one rdf:type." ;
+    sh:path rdf:type ;
+    sh:minCount 1 .
+
+sgsh:GeographicLevelShape a sh:PropertyShape ;
+    rdfs:comment "Geographic level is emitted from the PSGC source level." ;
+    sh:path :geographicLevel ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:CorrespondenceCodeShape a sh:PropertyShape ;
+    rdfs:comment "Correspondence code is emitted as a string when present." ;
+    sh:path :correspondenceCode ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:CityClassShape a sh:PropertyShape ;
+    rdfs:comment "City class is emitted as a string when present." ;
+    sh:path :cityClass ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:IncomeClassificationShape a sh:PropertyShape ;
+    rdfs:comment "Current PSGC ETL emits income classification with this property." ;
+    sh:path :incomeClassification ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:IncomeClassShape a sh:PropertyShape ;
+    rdfs:comment "Ontology-level income class property, retained for compatibility with future exports." ;
+    sh:path :incomeClass ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:UrbanRuralShape a sh:PropertyShape ;
+    rdfs:comment "Urban or rural classification is emitted as a string when present." ;
+    sh:path :urbanRural ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:Population2024Shape a sh:PropertyShape ;
+    rdfs:comment "2024 population is emitted as an integer when present." ;
+    sh:path :population2024 ;
+    sh:maxCount 1 ;
+    sh:or (
+        [ sh:datatype xsd:int ]
+        [ sh:datatype xsd:integer ]
+    ) .
+
+sgsh:PopulationNoteShape a sh:PropertyShape ;
+    rdfs:comment "Population note is emitted as a string when present." ;
+    sh:path :populationNote ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:StatusShape a sh:PropertyShape ;
+    rdfs:comment "Status captures source flags such as capital or poblacion markers." ;
+    sh:path :status ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string .
+
+sgsh:AlternateLabelShape a sh:PropertyShape ;
+    rdfs:comment "Old PSGC names are stored as SKOS alternate labels." ;
+    sh:path skos:altLabel ;
+    sh:nodeKind sh:Literal .
+
+sgsh:PSGCCodeShape a sh:PropertyShape ;
+    rdfs:comment "Coded administrative units must have exactly one 10-digit PSGC code." ;
+    sh:path :psgcCode ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:datatype xsd:string ;
+    sh:pattern "^[0-9]{10}$" .
+
+sgsh:AdministrativeGeographicLevelShape a sh:PropertyShape ;
+    rdfs:comment "Administrative units must use one of the PSGC source level abbreviations." ;
+    sh:path :geographicLevel ;
+    sh:in (
+        "Reg"^^xsd:string
+        "Prov"^^xsd:string
+        "City"^^xsd:string
+        "Mun"^^xsd:string
+        "SubMun"^^xsd:string
+        "Bgy"^^xsd:string
+    ) .
+
+#################################################################
+# Hierarchy property shapes
+#################################################################
+
+sgsh:CountryGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:in ( "Country" "Country"^^xsd:string ) .
+
+sgsh:IslandGroupGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:in ( "Island Group" "Island Group"^^xsd:string ) .
+
+sgsh:IslandGroupParentShape a sh:PropertyShape ;
+    rdfs:comment "Island groups are part of the Philippines country node." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class :Country .
+
+sgsh:RegionGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:hasValue "Reg"^^xsd:string .
+
+sgsh:RegionPSGCCodeShape a sh:PropertyShape ;
+    sh:path :psgcCode ;
+    sh:pattern "^[0-9]{2}00000000$" .
+
+sgsh:RegionParentShape a sh:PropertyShape ;
+    rdfs:comment "Regions should point to an island group in current PSGC exports." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class :IslandGroup .
+
+sgsh:ProvinceGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:hasValue "Prov"^^xsd:string .
+
+sgsh:ProvincePSGCCodeShape a sh:PropertyShape ;
+    sh:path :psgcCode ;
+    sh:pattern "^[0-9]{5}00000$" .
+
+sgsh:ProvinceParentShape a sh:PropertyShape ;
+    rdfs:comment "Provinces should point to their parent region." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:class :Region .
+
+sgsh:MunicipalityGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:hasValue "Mun"^^xsd:string .
+
+sgsh:MunicipalityPSGCCodeShape a sh:PropertyShape ;
+    sh:path :psgcCode ;
+    sh:pattern "^[0-9]{7}000$" .
+
+sgsh:MunicipalityParentShape a sh:PropertyShape ;
+    rdfs:comment "Municipalities normally point to a province; PSGC special cases may point directly to a region." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:or (
+        [ sh:class :Province ]
+        [ sh:class :Region ]
+    ) .
+
+sgsh:CityGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:hasValue "City"^^xsd:string .
+
+sgsh:CityPSGCCodeShape a sh:PropertyShape ;
+    sh:path :psgcCode ;
+    sh:pattern "^[0-9]{7}000$" .
+
+sgsh:CityParentShape a sh:PropertyShape ;
+    rdfs:comment "Cities normally point to a province; highly urbanized cities and NCR cities may point directly to a region." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:or (
+        [ sh:class :Province ]
+        [ sh:class :Region ]
+    ) .
+
+sgsh:SubMunicipalityGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:hasValue "SubMun"^^xsd:string .
+
+sgsh:SubMunicipalityPSGCCodeShape a sh:PropertyShape ;
+    sh:path :psgcCode ;
+    sh:pattern "^[0-9]{7}000$" .
+
+sgsh:SubMunicipalityParentShape a sh:PropertyShape ;
+    rdfs:comment "Sub-municipalities should point to their parent city or municipality." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:or (
+        [ sh:class :City ]
+        [ sh:class :Municipality ]
+    ) .
+
+sgsh:BarangayGeographicLevelShape a sh:PropertyShape ;
+    sh:path :geographicLevel ;
+    sh:hasValue "Bgy"^^xsd:string .
+
+sgsh:BarangayPSGCCodeShape a sh:PropertyShape ;
+    sh:path :psgcCode ;
+    sh:pattern "^[0-9]{10}$" .
+
+sgsh:BarangayParentShape a sh:PropertyShape ;
+    rdfs:comment "Barangays should point to a municipality, city, or sub-municipality parent." ;
+    sh:path :isPartOf ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:or (
+        [ sh:class :Municipality ]
+        [ sh:class :City ]
+        [ sh:class :SubMunicipality ]
+    ) .
+
+#################################################################
+# Shared PSGC location metadata
+#################################################################
+
+sgsh:PSGCLocationShape a sh:NodeShape ;
+    rdfs:comment "Validates common PSGC location metadata and administrative hierarchy links." ;
+    sh:nodeKind sh:IRI ;
+    sh:targetClass :Country, :IslandGroup, :Region, :Province, :Municipality, :City, :SubMunicipality, :Barangay ;
+    sh:property
+        sgsh:RequiredLabelShape,
+        sgsh:RDFTypeShape,
+        sgsh:GeographicLevelShape,
+        sgsh:CorrespondenceCodeShape,
+        sgsh:CityClassShape,
+        sgsh:IncomeClassificationShape,
+        sgsh:IncomeClassShape,
+        sgsh:UrbanRuralShape,
+        sgsh:Population2024Shape,
+        sgsh:PopulationNoteShape,
+        sgsh:StatusShape,
+        sgsh:AlternateLabelShape .
+
+sgsh:PSGCAdministrativeLocationShape a sh:NodeShape ;
+    rdfs:comment "Validates metadata common to coded PSGC administrative units." ;
+    sh:targetClass :Region, :Province, :Municipality, :City, :SubMunicipality, :Barangay ;
+    sh:property
+        sgsh:PSGCCodeShape,
+        sgsh:AdministrativeGeographicLevelShape .
+
+#################################################################
+# Administrative hierarchy shapes
+#################################################################
+
+sgsh:CountryShape a sh:NodeShape ;
+    rdfs:comment "Validates the root country node added for PSGC hierarchy traversal." ;
+    sh:targetClass :Country ;
+    sh:property sgsh:CountryGeographicLevelShape .
+
+sgsh:IslandGroupShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC island group nodes." ;
+    sh:targetClass :IslandGroup ;
+    sh:property
+        sgsh:IslandGroupGeographicLevelShape,
+        sgsh:IslandGroupParentShape .
+
+sgsh:RegionShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC region resources." ;
+    sh:targetClass :Region ;
+    sh:property
+        sgsh:RegionGeographicLevelShape,
+        sgsh:RegionPSGCCodeShape,
+        sgsh:RegionParentShape .
+
+sgsh:ProvinceShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC province resources." ;
+    sh:targetClass :Province ;
+    sh:property
+        sgsh:ProvinceGeographicLevelShape,
+        sgsh:ProvincePSGCCodeShape,
+        sgsh:ProvinceParentShape .
+
+sgsh:MunicipalityShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC municipality resources." ;
+    sh:targetClass :Municipality ;
+    sh:property
+        sgsh:MunicipalityGeographicLevelShape,
+        sgsh:MunicipalityPSGCCodeShape,
+        sgsh:MunicipalityParentShape .
+
+sgsh:CityShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC city resources." ;
+    sh:targetClass :City ;
+    sh:property
+        sgsh:CityGeographicLevelShape,
+        sgsh:CityPSGCCodeShape,
+        sgsh:CityParentShape .
+
+sgsh:SubMunicipalityShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC sub-municipality resources, including Manila districts." ;
+    sh:targetClass :SubMunicipality ;
+    sh:property
+        sgsh:SubMunicipalityGeographicLevelShape,
+        sgsh:SubMunicipalityPSGCCodeShape,
+        sgsh:SubMunicipalityParentShape .
+
+sgsh:BarangayShape a sh:NodeShape ;
+    rdfs:comment "Validates PSGC barangay resources when barangay-level RDF is exported." ;
+    sh:targetClass :Barangay ;
+    sh:property
+        sgsh:BarangayGeographicLevelShape,
+        sgsh:BarangayPSGCCodeShape,
+        sgsh:BarangayParentShape .

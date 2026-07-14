@@ -1,5 +1,6 @@
 from sentence_transformers import SentenceTransformer, util
 from typing import List, Tuple
+from pathlib import Path
 from rdflib import Graph, RDF, Namespace, URIRef, RDFS, SKOS
 from rdflib.namespace import DefinedNamespace
 
@@ -12,6 +13,7 @@ from .classification_rules import (
 )
 
 SKG = Namespace("https://sakuna.ph/")
+ROOT_DIR = Path(__file__).resolve().parents[2]
 
 LEAF_CLASS_QUERY = """
 SELECT DISTINCT ?c ?defi WHERE {
@@ -23,7 +25,7 @@ SELECT DISTINCT ?c ?defi WHERE {
 }
 """
 
-ONTOLOGY_PATH = "../ontology/sakunagraph.ttl"
+ONTOLOGY_PATH = ROOT_DIR / "ontology" / "disaster_type_scheme.ttl"
 INIT_NS: dict[str, Namespace | type[DefinedNamespace]] = {"rdfs": RDFS, "skg": SKG, "skos": SKOS}
 
 
@@ -44,16 +46,23 @@ class DisasterClassifier:
     def __init__(
         self,
         model_name: str,
-        ontology_path: str = ONTOLOGY_PATH,
+        ontology_path: str | Path = ONTOLOGY_PATH,
         rules: list[ClassificationRule] | None = None,
     ):
         self.model = SentenceTransformer(model_name)
         self.rules = rules if rules is not None else CLASSIFICATION_RULES
+        ontology_path = Path(ontology_path)
 
         g = Graph()
-        g.parse(ontology_path)
+        g.parse(str(ontology_path))
 
         self.classes = _load_classes(g)
+        if not self.classes:
+            raise ValueError(
+                "No disaster type labels were loaded from "
+                f"{Path(ontology_path).resolve()}. Check the skos:inScheme/skos:note query."
+            )
+
         self.class_keys = list(self.classes.keys())
         self.class_labels = list(self.classes.values())
         self.embeddings = self.model.encode(self.class_keys, convert_to_tensor=True)
@@ -110,6 +119,9 @@ class DisasterClassifier:
                 indices = list(range(len(self.class_labels)))
         else:
             indices = list(range(len(self.class_labels)))
+
+        if not indices:
+            raise ValueError("Disaster classifier has no ontology labels to score.")
 
         candidate_embeddings = self.embeddings[indices]
         text_embedding = self.model.encode([text], convert_to_tensor=True)

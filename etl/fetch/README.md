@@ -26,9 +26,6 @@ python -m fetch.dromic --year 2024
 - `--year` required. Year of the situation-report archive to scrape.
 - `--page` optional. Start from a specific listing page instead of page 1.
 - `--last-scrape-date` optional, `YYYY-MM-DD`. Overrides the stored cutoff date.
-- `--state-file` optional. Path to the persistent scrape-state file. The current
-  implementation uses the year-specific state file written under the output
-  directory.
 - `--max-pages` optional, default `100`. Maximum number of listing pages to visit.
 
 ### Inputs
@@ -48,29 +45,25 @@ It then opens each report post and looks for the first downloadable attachment:
 For each year, the scraper writes to:
 
 - `../data/raw/dromic-new/{year}/` for downloaded files
-- `../data/raw/dromic-new/{year}/manifest.json` for per-file provenance metadata
-- `../data/raw/dromic-new/{year}/scrape_state.json` for resume state
+- `../data/raw/dromic-new/{year}/manifest.json` for per-file provenance metadata and resume state
 - `../logs/dromic/{year}_scraper_{timestamp}.log` for runtime logs
 
-The manifest stores one entry per successful download with:
+The manifest stores the latest scrape timestamp plus one entry per successful
+download:
 
+- `last_scrape_date`
 - `filename`
 - `download_url`
 - `downloaded_at`
 - `post_url`
 - `page`
 
-The state file stores:
-
-- `last_scrape_date`
-- `scraped_urls`
-
 ### Behavior
 
 - Walks paginated archive pages and opens each post via its `Read More` link
 - Stops early when it encounters a post older than the last stored scrape date
-- Skips posts already listed in the persistent state
-- Saves the manifest and state after each successful download, so interrupted runs can resume cleanly
+- Skips posts already listed in the manifest
+- Saves the manifest after each successful download, so interrupted runs can resume cleanly
 - Returns to the listing page after each post before continuing
 
 ### Notes
