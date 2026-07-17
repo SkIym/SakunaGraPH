@@ -1,5 +1,6 @@
 import argparse
 import logging
+import os
 from typing import Any, Iterable
 
 from rdflib import URIRef
@@ -245,9 +246,11 @@ def run(
         process_event(input_path, g, src_uri)
 
     log.info("Graph now contains %d triples", len(g))
-    log.info("Step 3/3: Serializing graph to %s", OUT_DIR + out_file)
-    g.serialize(destination=OUT_DIR + out_file, format="turtle")
-    log.info("=== GDA pipeline complete: %s ===", OUT_DIR + out_file)
+    os.makedirs(OUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUT_DIR, out_file)
+    log.info("Step 3/3: Serializing graph to %s", out_path)
+    g.serialize(destination=out_path, format="turtle")
+    log.info("=== GDA pipeline complete: %s ===", out_path)
 
 
 if __name__ == "__main__":

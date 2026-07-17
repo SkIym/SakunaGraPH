@@ -32,7 +32,7 @@ from validate.validate import (
 log = logging.getLogger(__name__)
 
 DATA_DIR = "../data/raw/emdat"
-OUT_DIR = "../data/rdf/events/emdat/"
+OUT_DIR = "../data/rdf/events/emdat"
 DEFAULT_BATCH_SIZE = 100
 
 
@@ -264,9 +264,11 @@ def run(
 
     log.info("Graph now contains %d triples", len(g))
 
-    log.info("Step 5/5: Serializing graph to %s", OUT_DIR + out_file)
-    g.serialize(destination=OUT_DIR + out_file, format="turtle")
-    log.info("=== EM-DAT pipeline complete: %s ===", OUT_DIR + out_file)
+    os.makedirs(OUT_DIR, exist_ok=True)
+    out_path = os.path.join(OUT_DIR, out_file)
+    log.info("Step 5/5: Serializing graph to %s", out_path)
+    g.serialize(destination=out_path, format="turtle")
+    log.info("=== EM-DAT pipeline complete: %s ===", out_path)
 
 
 if __name__ == "__main__":

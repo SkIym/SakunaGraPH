@@ -32,7 +32,7 @@ from validate.validate import (
 log = logging.getLogger(__name__)
 
 DATA_DIR = "../data/parsed/dromic"
-OUT_DIR = "../data/rdf/events/dromic/"
+OUT_DIR = "../data/rdf/events/dromic"
 DEFAULT_BATCH_SIZE = 100
 
 
