@@ -12,6 +12,10 @@ that source graph, so
 ``https://sakuna.ph/events/dromic``.  A Turtle file directly below
 ``data/rdf/events`` uses its filename stem as the source graph, e.g.
 ``events/emdat.ttl`` is loaded into ``https://sakuna.ph/events/emdat``.
+
+``--replace`` groups files by context and replaces each named graph in one
+RDF4J transaction.  This keeps a context unchanged if any input fails and lets
+GraphDB optimize replacement without a separate, inference-heavy clear.
 """
 
 from __future__ import annotations
@@ -22,7 +26,7 @@ import sys
 from collections.abc import Iterable
 from pathlib import Path
 from typing import NamedTuple
-from urllib.parse import quote
+from urllib.parse import quote, urljoin
 
 import requests
 
@@ -32,6 +36,8 @@ DEFAULT_RDF_ROOT = REPOSITORY_ROOT / "data" / "rdf"
 DEFAULT_ONTOLOGY_DIR = REPOSITORY_ROOT / "ontology"
 GRAPH_BASE_IRI = "https://sakuna.ph"
 SCOPES = ("ontology", "events", "orgs", "prov", "psgc", "resolution")
+REPLACE_GRAPH_PREDICATE = "http://www.ontotext.com/replaceGraph"
+REPLACE_GRAPH_MARKER = "urn:sakunagraph:loader"
 
 
 class LoadTarget(NamedTuple):
@@ -132,7 +138,15 @@ def collect_targets(
 
 
 def graphdb_url(host: str, repo: str) -> str:
-    return f"{host.rstrip('/')}/repositories/{quote(repo, safe='-._~')}/statements"
+    return f"{repository_url(host, repo)}/statements"
+
+
+def repository_url(host: str, repo: str) -> str:
+    return f"{host.rstrip('/')}/repositories/{quote(repo, safe='-._~')}"
+
+
+def transactions_url(host: str, repo: str) -> str:
+    return f"{repository_url(host, repo)}/transactions"
 
 
 def display_path(path: Path) -> Path:
@@ -172,22 +186,147 @@ def validate_repository(session: requests.Session, host: str, repo: str) -> None
         raise LoaderError(f"Repository '{repo}' was not found (available: {available}).")
 
 
-def clear_repository(session: requests.Session, endpoint: str) -> None:
+def clear_repository(session: requests.Session, endpoint: str, timeout: int) -> None:
     """Clear every statement from a repository, including every named graph."""
     try:
-        response = session.delete(endpoint, timeout=300)
+        response = session.delete(endpoint, timeout=timeout)
         response.raise_for_status()
     except requests.RequestException as error:
         raise LoaderError(f"Could not clear repository: {error}") from error
 
 
-def clear_context(session: requests.Session, endpoint: str, context: str) -> None:
+def clear_context(
+    session: requests.Session, endpoint: str, context: str, timeout: int
+) -> None:
     """Clear one named graph using the RDF4J/GraphDB statements API."""
     try:
-        response = session.delete(endpoint, params={"context": f"<{context}>"}, timeout=300)
+        response = session.delete(
+            endpoint,
+            params={"context": f"<{context}>"},
+            timeout=timeout,
+        )
         response.raise_for_status()
     except requests.RequestException as error:
         raise LoaderError(f"Could not clear context <{context}>: {error}") from error
+
+
+def group_targets_by_context(
+    targets: Iterable[LoadTarget],
+) -> list[tuple[str, list[LoadTarget]]]:
+    """Group targets deterministically for one transaction per named graph."""
+    grouped: dict[str, list[LoadTarget]] = {}
+    for target in targets:
+        grouped.setdefault(target.context, []).append(target)
+    return [(context, grouped[context]) for context in sorted(grouped)]
+
+
+def _request_error_detail(error: requests.RequestException) -> str:
+    if error.response is not None:
+        return error.response.text[:500]
+    return str(error)
+
+
+def _rollback_transaction(
+    session: requests.Session,
+    transaction_endpoint: str,
+    timeout: int,
+) -> None:
+    """Best-effort rollback that never masks the original load failure."""
+    try:
+        session.delete(transaction_endpoint, timeout=timeout)
+    except requests.RequestException:
+        pass
+
+
+def replace_context(
+    session: requests.Session,
+    transaction_collection: str,
+    context: str,
+    targets: Iterable[LoadTarget],
+    timeout: int,
+) -> None:
+    """Atomically replace one named graph with all of its selected files."""
+    context_targets = list(targets)
+    if not context_targets:
+        raise LoaderError(f"No Turtle files selected for context <{context}>")
+
+    for target in context_targets:
+        try:
+            if target.path.stat().st_size == 0:
+                raise LoaderError(f"Refusing to load empty file: {target.path}")
+        except OSError as error:
+            raise LoaderError(f"Could not inspect {target.path}: {error}") from error
+
+    transaction_endpoint: str | None = None
+    try:
+        response = session.post(transaction_collection, timeout=timeout)
+        response.raise_for_status()
+        location = response.headers.get("Location")
+        if not location:
+            raise LoaderError(
+                "GraphDB started a transaction without returning its endpoint"
+            )
+        transaction_endpoint = urljoin(
+            f"{transaction_collection.rstrip('/')}/",
+            location,
+        )
+
+        # GraphDB consumes this marker as transaction metadata; it is not
+        # inserted as data.  Subsequent ADD actions describe the replacement
+        # graph, allowing GraphDB to preserve overlapping inferred statements.
+        marker_update = (
+            "INSERT DATA { "
+            f"<{REPLACE_GRAPH_MARKER}> "
+            f"<{REPLACE_GRAPH_PREDICATE}> "
+            f"<{context}> "
+            "}"
+        )
+        response = session.put(
+            transaction_endpoint,
+            params={"action": "UPDATE"},
+            data=marker_update.encode("utf-8"),
+            headers={"Content-Type": "application/sparql-update"},
+            timeout=timeout,
+        )
+        response.raise_for_status()
+
+        for target in context_targets:
+            with target.path.open("rb") as source:
+                response = session.put(
+                    transaction_endpoint,
+                    params={"action": "ADD", "context": f"<{context}>"},
+                    data=source,
+                    headers={"Content-Type": "text/turtle"},
+                    timeout=timeout,
+                )
+            try:
+                response.raise_for_status()
+            except requests.RequestException as error:
+                detail = _request_error_detail(error)
+                raise LoaderError(
+                    f"Could not add {target.path} to <{context}>: {detail}"
+                ) from error
+
+        response = session.put(
+            transaction_endpoint,
+            params={"action": "COMMIT"},
+            timeout=timeout,
+        )
+        response.raise_for_status()
+        transaction_endpoint = None
+    except LoaderError:
+        if transaction_endpoint is not None:
+            _rollback_transaction(session, transaction_endpoint, timeout)
+        raise
+    except requests.RequestException as error:
+        if transaction_endpoint is not None:
+            _rollback_transaction(session, transaction_endpoint, timeout)
+        detail = _request_error_detail(error)
+        raise LoaderError(f"Could not replace context <{context}>: {detail}") from error
+    except OSError as error:
+        if transaction_endpoint is not None:
+            _rollback_transaction(session, transaction_endpoint, timeout)
+        raise LoaderError(f"Could not read input for context <{context}>: {error}") from error
 
 
 def load_target(session: requests.Session, endpoint: str, target: LoadTarget, timeout: int) -> None:
@@ -206,7 +345,7 @@ def load_target(session: requests.Session, endpoint: str, target: LoadTarget, ti
             )
         response.raise_for_status()
     except requests.RequestException as error:
-        detail = error.response.text[:500] if error.response is not None else str(error)
+        detail = _request_error_detail(error)
         raise LoaderError(f"{target.path}: {detail}") from error
 
 
@@ -238,7 +377,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--replace",
         action="store_true",
-        help="Clear each selected named graph before loading it",
+        help="Atomically replace each selected named graph",
     )
     parser.add_argument(
         "--clear-repository",
@@ -248,7 +387,12 @@ def parse_args() -> argparse.Namespace:
         help="Clear the whole repository before loading (not limited to selected graphs)",
     )
     parser.add_argument("--dry-run", action="store_true", help="List files and contexts without calling GraphDB")
-    parser.add_argument("--timeout", type=int, default=300, help="Per-file upload timeout in seconds")
+    parser.add_argument(
+        "--timeout",
+        type=int,
+        default=300,
+        help="Per-request clear, replacement, and upload timeout in seconds",
+    )
     parser.add_argument("--username", default=os.getenv("GRAPHDB_USERNAME"), help="GraphDB username (or GRAPHDB_USERNAME)")
     parser.add_argument("--password", default=os.getenv("GRAPHDB_PASSWORD"), help="GraphDB password (or GRAPHDB_PASSWORD)")
     args = parser.parse_args()
@@ -288,29 +432,46 @@ def main() -> int:
     if args.username:
         session.auth = (args.username, args.password or "")
     endpoint = graphdb_url(args.host, args.repo)
+    transaction_collection = transactions_url(args.host, args.repo)
 
     try:
         validate_repository(session, args.host, args.repo)
         if args.clear_repository:
             print(f"Clearing repository '{args.repo}'...")
-            clear_repository(session, endpoint)
-        elif args.replace:
-            contexts = sorted({target.context for target in targets})
-            print(f"Clearing {len(contexts)} selected named graph(s)...")
-            for context in contexts:
-                clear_context(session, endpoint, context)
+            clear_repository(session, endpoint, args.timeout)
 
         loaded = 0
         failures: list[str] = []
-        for target in targets:
-            try:
-                load_target(session, endpoint, target, args.timeout)
-            except LoaderError as error:
-                failures.append(str(error))
-                print(f"  FAIL  {error}", file=sys.stderr)
-            else:
-                loaded += 1
-                print(f"  OK  {target.path.name} -> <{target.context}>")
+        if args.replace:
+            context_groups = group_targets_by_context(targets)
+            print(f"Replacing {len(context_groups)} selected named graph(s) atomically...")
+            for context, context_targets in context_groups:
+                try:
+                    replace_context(
+                        session,
+                        transaction_collection,
+                        context,
+                        context_targets,
+                        args.timeout,
+                    )
+                except LoaderError as error:
+                    failures.append(str(error))
+                    print(f"  FAIL  {error}", file=sys.stderr)
+                else:
+                    loaded += len(context_targets)
+                    print(
+                        f"  OK  {len(context_targets)} file(s) -> <{context}>"
+                    )
+        else:
+            for target in targets:
+                try:
+                    load_target(session, endpoint, target, args.timeout)
+                except LoaderError as error:
+                    failures.append(str(error))
+                    print(f"  FAIL  {error}", file=sys.stderr)
+                else:
+                    loaded += 1
+                    print(f"  OK  {target.path.name} -> <{target.context}>")
     except LoaderError as error:
         print(f"ERROR: {error}", file=sys.stderr)
         return 1
