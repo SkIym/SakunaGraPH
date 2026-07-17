@@ -64,8 +64,21 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
         with open(manifest_path, encoding="utf-8", errors="replace") as f:
             raw = json.load(f)
 
+        # Archive manifests are now stored as {"entries": [...]}, while older
+        # runs used the list directly.  Normalise both shapes before looking up
+        # the source record; ignore malformed non-object entries safely.
+        if isinstance(raw, dict):
+            raw = raw.get("entries", [])
+        if not isinstance(raw, list):
+            raw = []
+
         manifest_entry = next(
-            (e for e in raw if Path(e.get("filename")).stem == pdf_path.stem), None
+            (
+                e for e in raw
+                if isinstance(e, dict)
+                and Path(str(e.get("filename", ""))).stem == pdf_path.stem
+            ),
+            None,
         )
 
     event_name = ""

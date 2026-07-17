@@ -13,8 +13,40 @@ import json
 from semantic_processing.disaster_classifier import DISASTER_CLASSIFIER
 import uuid
 from datetime import datetime
+from dataclasses import fields
 import re
 import polars as pl
+
+
+def _impact_entities(df: pl.DataFrame, cls):
+    """Build impact entities that contain data beyond their location."""
+    if "hasLocation" in df.columns:
+        df = df.with_columns(
+            pl.when(
+                pl.col("hasLocation")
+                .cast(pl.Utf8, strict=False)
+                .str.strip_chars()
+                .is_in(["", "none"])
+            )
+            .then(None)
+            .otherwise(pl.col("hasLocation"))
+            .alias("hasLocation")
+        )
+
+    entities = df_to_entities(df, cls)
+    impact_fields = [
+        field.name for field in fields(cls)
+        if field.name not in {"id", "hasLocation"}
+    ]
+
+    return [
+        entity for entity in entities
+        if any(
+            (value := getattr(entity, field_name)) is not None
+            and (not isinstance(value, str) or bool(value.strip()))
+            for field_name in impact_fields
+        )
+    ]
 
 def _fix_docling_numeric(val: str) -> str:
     """
@@ -227,7 +259,10 @@ def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, Lis
     # combined.write_csv(f"./dump/{Path(folder_path).stem}_aff_pop.csv")
 
 
-    return df_to_entities(combined, AffectedPopulation), df_to_entities(combined, PEvac)
+    return (
+        _impact_entities(combined, AffectedPopulation),
+        _impact_entities(combined, PEvac),
+    )
 
 def load_housing(folder_path: str) -> List[Housing] | None:
 
@@ -259,7 +294,7 @@ def load_housing(folder_path: str) -> List[Housing] | None:
     if len(df) > 1:
         df = df.with_row_index("id", 1)
 
-    return df_to_entities(df, Housing)
+    return _impact_entities(df, Housing)
 
 
 def load_assistance(folder_path: str) -> List[Assistance] | None:
@@ -323,7 +358,7 @@ def load_assistance(folder_path: str) -> List[Assistance] | None:
         df = df.with_row_index("id", 1)
 
 
-    return df_to_entities(df, Assistance)
+    return _impact_entities(df, Assistance)
 
 if __name__ == "__main__":
     load_assistance("../data/parsed/dromic/2025/Combined Effects of Southwest Monsoon and TCs Mirasol Nando and Opong 20260312")
