@@ -1,6 +1,7 @@
 <script>
 	import { onMount, tick } from 'svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
+	import { apiUrl } from '$lib/api.js';
 
 	// ── Tab state ─────────────────────────────────────────────────────────────
 	let activeTab = $state('graph');
@@ -60,7 +61,7 @@
 			import('d3-selection')
 		]);
 
-		const res = await fetch(`api/ontology/graph`);
+		const res = await fetch(apiUrl('/api/ontology/graph'));
 		const graphData = await res.json();
 		const nodes = graphData.nodes.map(n => ({ ...n }));
 		const links = graphData.links.map(l => ({ ...l }));
@@ -371,7 +372,7 @@
 			document.head.appendChild(st);
 		}
 
-		const res = await fetch(`api/ontology/taxonomy`);
+		const res = await fetch(apiUrl('/api/ontology/taxonomy'));
 		const treeData = await res.json();
 		taxLoading = false;
 
@@ -582,7 +583,7 @@
 			import('d3-selection')
 		]);
 
-		const res = await fetch(`api/ontology/psgc`);
+		const res = await fetch(apiUrl('/api/ontology/psgc'));
 		const data = await res.json();
 		psgcLoading = false;
 

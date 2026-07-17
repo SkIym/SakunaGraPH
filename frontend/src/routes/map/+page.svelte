@@ -1,13 +1,14 @@
 <script>
 	import { onMount } from 'svelte';
+	import EventDetails from '$lib/components/EventDetails.svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
+	import { apiUrl } from '$lib/api.js';
 	import {
-		regionPsgcFromCC1,
+		normalizePsgcCode,
 		formatProvName,
 		REGION_LABELS,
 		REGION_COLORS,
-		bindingDisplay,
 		formatDisasterType
 	} from '$lib/mapData.js';
 
@@ -25,7 +26,8 @@
 
 	// ── UI state ─────────────────────────────────────────────────────────────
 	let view = $state('regions');  // 'regions' | 'provinces'
-	let selected = $state(null);   // {type, psgc, id, name, rawName?}
+	let selected = $state(null);   // {type, psgc, id, name}
+	let selectedEvent = $state('');
 
 	// ── Results state ────────────────────────────────────────────────────────
 	const PAGE_SIZE = 10;
@@ -53,9 +55,9 @@
 
 			pathData = geojson.features.map((f) => ({
 				d: pathGen(f),
-				gid: f.properties.adm2_psgc,
+				gid: normalizePsgcCode(f.properties.adm2_psgc),
 				name: f.properties.adm2_en,
-				regionPsgc: f.properties.adm1_psgc,
+				regionPsgc: normalizePsgcCode(f.properties.adm1_psgc),
 				feature: f
 			}));
 
@@ -119,23 +121,19 @@
         expandedAlternates = new Set();
 
 		const scope = selected.type === 'region' ? 'region' : 'province';
-		const id    = selected.type === 'region' ? selected.psgc : selected.rawName;
+		const id    = selected.type === 'region' ? selected.psgc : selected.id;
 		const params = new URLSearchParams({ scope, id, mode: resultMode, page: String(page) });
 
 		try {
-			const res = await fetch(`/api/map/events?${params}`);
+			const res = await fetch(apiUrl(`/api/map/events?${params}`));
 			const data = await res.json();
 
-			if (!res.ok) { queryError = data.message ?? 'Query failed.'; return; }
+			if (!res.ok) { queryError = data.detail ?? data.message ?? 'Query failed.'; return; }
 
-			// Wrap bindings back into the shape the template already expects:
-			// results.results.bindings — avoids touching any template code
-			results       = { results: { bindings: data.events } };
+			results       = data.events ?? [];
 			majorCount    = data.majorCount;
 			incidentCount = data.incidentCount;
-            groupedResults = groupByAlternates(data.events);
-            console.log('sample alternates value:', data.events[0]?.alternates?.value);
-            console.log('sample event IRI:', data.events[0]?.event?.value);
+            groupedResults = groupByAlternates(results);
 		} catch {
 			queryError = 'Could not reach server.';
 		} finally {
@@ -159,8 +157,7 @@
 				type: 'province',
 				psgc: null,
 				id: item.gid,
-				name: formatProvName(item.name),
-				rawName: item.name
+				name: formatProvName(item.name)
 			};
 		}
 	}
@@ -219,19 +216,27 @@
 		return pages;
 	});
 
-	// Result column display helpers
 	function colValue(row, col) {
 		const v = row[col];
-		if (!v) return '—';
-		if (col === 'disasterType') return formatDisasterType(bindingDisplay(v));
-		if (col === 'startDate') return v.value?.split('T')[0] ?? v.value ?? '—';
-		return bindingDisplay(v);
+		if (Array.isArray(v)) return v.length ? v.join(', ') : '—';
+		return v || '—';
 	}
 
-	const DISPLAY_COLS = ['eventName', 'disasterType', 'startDate', 'locations'];
+	function showEventDetails(row) {
+		if (row?.event) selectedEvent = row.event;
+	}
+
+	function handleEventRowKeydown(keyboardEvent, row) {
+		if (keyboardEvent.key === 'Enter' || keyboardEvent.key === ' ') {
+			keyboardEvent.preventDefault();
+			showEventDetails(row);
+		}
+	}
+
+	const DISPLAY_COLS = ['eventName', 'disasterTypes', 'startDate', 'locations'];
 	const COL_LABELS = {
 		eventName: 'Event',
-		disasterType: 'Type',
+		disasterTypes: 'Type',
 		startDate: 'Date',
 		locations: 'Locations'
 	};
@@ -240,19 +245,18 @@
     let expandedAlternates = $state(new Set());
     let groupedResults = $state(null);
 
-    function groupByAlternates(bindings) {
+    function groupByAlternates(events) {
         const byIri = new Map();
-        for (const row of bindings) {
-            if (row.event?.value) byIri.set(row.event.value, row);
+        for (const row of events) {
+            if (row.event) byIri.set(row.event, row);
         }
 
         // Build adjacency: for each IRI, collect all known alts that exist on this page
         const adjAlts = new Map();
-        for (const row of bindings) {
-            const iri = row.event?.value;
+        for (const row of events) {
+            const iri = row.event;
             if (!iri) continue;
-            const alts = (row.alternates?.value ?? '')
-            .split(',').map(s => s.trim()).filter(s => s && byIri.has(s));
+            const alts = (row.alternates ?? []).filter(s => s && byIri.has(s));
             adjAlts.set(iri, alts);
         }
 
@@ -283,8 +287,8 @@
         // For each cluster, elect rep by earliest startDate, IRI tiebreak
         const output = [];
         const seen = new Set();
-        for (const row of bindings) {
-            const iri = row.event?.value;
+        for (const row of events) {
+            const iri = row.event;
             if (!iri || seen.has(iri)) continue;
 
             const root = find(iri);
@@ -300,11 +304,11 @@
 
             const members = clusterIris.map(m => byIri.get(m)).filter(Boolean);
             members.sort((a, b) => {
-            const da = a.startDate?.value ?? '';
-            const db = b.startDate?.value ?? '';
+            const da = a.startDate ?? '';
+            const db = b.startDate ?? '';
             if (da !== db) return da < db ? -1 : 1;
-            const ia = a.event?.value ?? '';
-            const ib = b.event?.value ?? '';
+            const ia = a.event ?? '';
+            const ib = b.event ?? '';
             return ia < ib ? -1 : ia > ib ? 1 : 0;
             });
 
@@ -321,6 +325,10 @@
 </svelte:head>
 
 <NodeCanvas />
+
+{#if selectedEvent}
+	<EventDetails event={selectedEvent} onclose={() => (selectedEvent = '')} />
+{/if}
 
 <!-- ── Cursor-following hover tooltip ────────────────────────────────────── -->
 {#if tooltipItem}
@@ -565,7 +573,7 @@
 							</div>
 
 						{:else if results}
-							{@const rows = results.results?.bindings ?? []}
+							{@const rows = results ?? []}
 							{#if rows.length === 0}
 								<div class="py-10 text-center text-slate-400 text-sm">
 									No disaster events found for this area.
@@ -594,34 +602,29 @@
 												{/each}
 											{:else}
 												{#each groupedResults ?? [] as { row, subs }, i}
-                                                {@const rowKey = row.event?.value ?? String(i)}
-                                                {@const locs = (row.locations?.value ?? '').split('|').filter(Boolean)}
-                                                {@const dtypes = (row.disasterType?.value ?? row.disasterTypes?.value ?? '')
-                                                    .split(',').map(s => s.trim()).filter(Boolean)}
-                                                {@const expanded = expandedRows.has(rowKey)}
-                                                {@const expandable = locs.length > 1}
+                                                {@const rowKey = row.event ?? String(i)}
+                                                {@const locs = row.locations ?? []}
+                                                {@const dtypes = row.disasterTypes ?? []}
+	                                                {@const expandable = locs.length > 1}
                                                 {@const hasAlts = subs.length > 0}
                                                 {@const altsExpanded = expandedAlternates.has(rowKey)}
 
                                                 <!-- Representative row -->
-                                                <!-- svelte-ignore a11y_click_events_have_key_events -->
-                                                <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                                                <tr
-                                                    class="transition-colors {i % 2 === 0 ? '' : 'bg-slate-50/40'}
-                                                    {expandable || hasAlts ? 'cursor-pointer hover:bg-blue-50/60' : 'hover:bg-blue-50/40'}"
-                                                    onclick={() => {
-                                                    if (expandable) {
-                                                        if (expanded) expandedRows = new Set([...expandedRows].filter(k => k !== rowKey));
-                                                        else expandedRows = new Set([...expandedRows, rowKey]);
-                                                    }
-                                                    }}
-                                                >
+	                                                <tr
+	                                                    role="button"
+	                                                    tabindex="0"
+	                                                    aria-label="View details for {row.eventName || 'unnamed event'}"
+	                                                    class="cursor-pointer transition-colors hover:bg-blue-50/60 focus:bg-blue-50/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-300 {i % 2 === 0 ? '' : 'bg-slate-50/40'}"
+	                                                    onclick={() => showEventDetails(row)}
+	                                                    onkeydown={(keyboardEvent) => handleEventRowKeydown(keyboardEvent, row)}
+	                                                >
                                                     <!-- Event name + alternates badge -->
-                                                    <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName?.value ?? ''}>
+                                                    <td class="px-3 py-2 text-slate-600 max-w-[160px]" title={row.eventName ?? ''}>
                                                     <div class="flex flex-col gap-1">
                                                         <span class="truncate">{colValue(row, 'eventName')}</span>
                                                         {#if hasAlts}
-                                                            <button
+	                                                            <button
+	                                                                type="button"
                                                                 class="w-fit rounded-full bg-violet-100 px-2 py-0.5 text-[10px] font-semibold text-violet-600 hover:bg-violet-200 transition-colors"
                                                                 onclick={(e) => {
                                                                 e.stopPropagation();
@@ -632,9 +635,9 @@
                                                                 {altsExpanded ? '▾' : '▸'} {subs.length} alternate{subs.length > 1 ? 's' : ''}
                                                             </button>
                                                             {/if}
-                                                            {#if row.source?.value}
+                                                            {#if row.source}
                                                             <span class="w-fit rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
-                                                                {row.source.value}
+                                                                {row.source}
                                                             </span>
                                                         {/if}
                                                     </div>
@@ -648,7 +651,8 @@
                                                         <div class="flex flex-col gap-0.5">
                                                         <span>{formatDisasterType(dtypes[0])}</span>
                                                         {#if dtypes.length > 1}
-                                                            <button
+	                                                            <button
+	                                                            type="button"
                                                             class="w-fit text-blue-400 text-[10px] font-medium"
                                                             onclick={(e) => {
                                                                 e.stopPropagation();
@@ -676,12 +680,8 @@
                                                     <td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
                                                     {#if locs.length === 0}
                                                         <span class="text-slate-300">—</span>
-                                                    {:else if expanded}
-                                                        <div class="flex flex-col gap-0.5 text-xs leading-snug">
-                                                        {#each locs as loc}<span>{loc}</span>{/each}
-                                                        </div>
-                                                    {:else}
-                                                        <div class="text-xs leading-snug">
+	                                                    {:else}
+	                                                        <div class="text-xs leading-snug">
                                                         <span>{locs[0]}</span>
                                                         {#if expandable}
                                                             <span class="ml-1 text-blue-400 text-[10px] font-medium whitespace-nowrap">+{locs.length - 1} more</span>
@@ -693,19 +693,23 @@
 
                                                 <!-- Alternate sub-rows -->
                                                 {#if altsExpanded}
-                                                    {#each subs as sub, si}
-                                                    {@const subLocs = (sub.locations?.value ?? '').split('|').filter(Boolean)}
-                                                    {@const subTypes = (sub.disasterType?.value ?? sub.disasterTypes?.value ?? '')
-                                                        .split(',').map(s => s.trim()).filter(Boolean)}
-                                                    {@const subKey = sub.event?.value ?? `sub-${i}-${si}`}
-                                                    {@const subExpanded = expandedRows.has(subKey)}
-                                                    <tr class="bg-violet-50/60 border-l-2 border-violet-300">
+	                                                    {#each subs as sub (sub.event)}
+	                                                    {@const subLocs = sub.locations ?? []}
+	                                                    {@const subTypes = sub.disasterTypes ?? []}
+	                                                    <tr
+	                                                        role="button"
+	                                                        tabindex="0"
+	                                                        aria-label="View details for {sub.eventName || 'unnamed event'}"
+	                                                        class="cursor-pointer border-l-2 border-violet-300 bg-violet-50/60 transition hover:bg-violet-100/70 focus:bg-violet-100/70 focus:outline-none"
+	                                                        onclick={() => showEventDetails(sub)}
+	                                                        onkeydown={(keyboardEvent) => handleEventRowKeydown(keyboardEvent, sub)}
+	                                                    >
                                                         <td class="pl-6 pr-3 py-1.5 text-slate-500 max-w-[160px]">
                                                         <div class="flex flex-col gap-0.5">
-                                                            <span class="truncate text-xs">{sub.eventName?.value ? bindingDisplay(sub.eventName) : '—'}</span>
-                                                            {#if sub.source?.value}
+                                                            <span class="truncate text-xs">{sub.eventName || '—'}</span>
+                                                            {#if sub.source}
                                                             <span class="w-fit rounded-full bg-slate-200 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 uppercase tracking-wide">
-                                                                {sub.source.value}
+                                                                {sub.source}
                                                             </span>
                                                             {/if}
                                                         </div>
@@ -717,24 +721,15 @@
                                                         {/if}
                                                         </td>
                                                         <td class="px-3 py-1.5 text-slate-500 text-xs whitespace-nowrap">
-                                                        {sub.startDate?.value?.split('T')[0] ?? '—'}
+                                                        {sub.startDate || '—'}
                                                         </td>
-                                                        <!-- svelte-ignore a11y_click_events_have_key_events -->
-                                                        <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-                                                        <td
-                                                        class="px-3 py-1.5 text-slate-500 align-top text-xs {subLocs.length > 1 ? 'cursor-pointer' : ''}"
-                                                        style="max-width:180px;"
-                                                        onclick={() => {
-                                                            if (subLocs.length <= 1) return;
-                                                            if (subExpanded) expandedRows = new Set([...expandedRows].filter(k => k !== subKey));
-                                                            else expandedRows = new Set([...expandedRows, subKey]);
-                                                        }}
-                                                        >
-                                                        {#if subLocs.length === 0}
-                                                            <span class="text-slate-300">—</span>
-                                                        {:else if subExpanded}
-                                                            <div class="flex flex-col gap-0.5">{#each subLocs as l}<span>{l}</span>{/each}</div>
-                                                        {:else}
+	                                                        <td
+	                                                        class="px-3 py-1.5 text-slate-500 align-top text-xs"
+	                                                        style="max-width:180px;"
+	                                                        >
+	                                                        {#if subLocs.length === 0}
+	                                                            <span class="text-slate-300">—</span>
+	                                                        {:else}
                                                             {subLocs[0]}{#if subLocs.length > 1}<span class="ml-1 text-blue-400 text-[10px]">+{subLocs.length - 1}</span>{/if}
                                                         {/if}
                                                         </td>

@@ -86,6 +86,12 @@ export function formatProvName(gadmName) {
 	return gadmName.replace(/([a-z])([A-Z])/g, '$1 $2');
 }
 
+export function normalizePsgcCode(code) {
+	const value = String(code ?? '').trim();
+	if (!/^\d+$/.test(value)) return value;
+	return value.padStart(10, '0');
+}
+
 /** Extract the 10-digit PSGC region code from a GADM CC_1 field */
 export function regionPsgcFromCC1(cc1) {
 	const n = parseInt(cc1, 10);

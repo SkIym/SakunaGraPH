@@ -1,3 +1,2 @@
 fastapi[standard]
-google-genai
 httpx
