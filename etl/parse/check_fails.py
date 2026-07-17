@@ -1,13 +1,20 @@
-"""
-check_parsed.py — Quality check for parsed DROMIC event folders.
-Lists subfolders that contain a CSV with a number in its filename
-(e.g. table_1.csv, number_of_affected_1.csv) which indicates a
-duplicate/split table that needs reprocessing.
+"""Quality checks for parsed DROMIC event folders.
 
-Usage:
-    python check_parsed.py --year 2018
-    python check_parsed.py --dir ../data/parsed/dromic/2018
+An event folder needs rerunning only when it contains both an original CSV and
+a numbered copy of that CSV, for example ``damaged_houses.csv`` and
+``damaged_houses_1.csv``. A filename that merely contains or ends in a number
+is not considered a failure when its unnumbered counterpart does not exist.
+
+Run from ``etl/``::
+
+    python parse/check_fails.py --all
+    python parse/check_fails.py --year 2018
+    python parse/check_fails.py --dir ../data/parsed/dromic/2018
+
+With no selection argument, the script checks all year directories.
 """
+
+from __future__ import annotations
 
 import argparse
 import json
@@ -15,82 +22,175 @@ import re
 from pathlib import Path
 
 
-def main() -> None:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--year", default=None)
-    parser.add_argument("--dir",  default=None)
-    args = parser.parse_args()
+DEFAULT_DROMIC_DIR = Path("../data/parsed/dromic")
+NUMBERED_COPY_PATTERN = re.compile(r"^(?P<base>.+)_(?P<number>\d+)$")
 
-    base = (
-        Path(args.dir) if args.dir
-        else Path(f"../data/parsed/dromic/{args.year}")
+
+def duplicate_csv_names(folder: Path) -> list[str]:
+    """Return numbered CSVs whose unnumbered CSV exists in the same folder."""
+    csv_files = sorted(
+        (
+            path
+            for path in folder.iterdir()
+            if path.is_file() and path.suffix.lower() == ".csv"
+        ),
+        key=lambda path: path.name.casefold(),
     )
+    names = {path.name.casefold() for path in csv_files}
+    duplicates: list[str] = []
 
+    for csv_path in csv_files:
+        match = NUMBERED_COPY_PATTERN.fullmatch(csv_path.stem)
+        if match is None:
+            continue
+
+        original_name = f"{match.group('base')}.csv"
+        if original_name.casefold() in names:
+            duplicates.append(csv_path.name)
+
+    return duplicates
+
+
+def source_filename(folder: Path) -> str | None:
+    """Return the source PDF name recorded for one parsed event folder."""
+    source_path = folder / "source.json"
+    if not source_path.exists():
+        return None
+
+    try:
+        with source_path.open("r", encoding="utf-8") as source:
+            data = json.load(source)
+    except (OSError, json.JSONDecodeError) as error:
+        print(f"[WARN] Failed reading {source_path}: {error}")
+        return None
+
+    filename = data.get("reportName")
+    if not isinstance(filename, str) or not filename:
+        return None
+
+    if "pdf" in filename.lower():
+        return re.sub(r"\.(?:docx|doc)$", "", filename, flags=re.IGNORECASE)
+    return re.sub(r"\.(?:docx|doc)$", ".pdf", filename, flags=re.IGNORECASE)
+
+
+def discover_year_directories(base: Path, *, single_directory: bool) -> list[Path]:
+    """Resolve either one explicit year directory or all years below a root."""
     if not base.exists():
-        print(f"[ERROR] Directory not found: {base}")
-        return
+        raise FileNotFoundError(base)
+    if not base.is_dir():
+        raise NotADirectoryError(base)
 
-    subfolders = sorted(p for p in base.iterdir() if p.is_dir())
-    print(f"Checking {len(subfolders)} folders in {base}\n")
+    if single_directory:
+        return [base]
+
+    years = sorted(
+        (path for path in base.iterdir() if path.is_dir() and path.name.isdigit()),
+        key=lambda path: int(path.name),
+    )
+    if not years:
+        raise FileNotFoundError(f"No year subdirectories found under {base}")
+    return years
+
+
+def write_lines(path: Path, values: list[str]) -> None:
+    """Replace a generated list file, including clearing stale entries."""
+    content = "\n".join(values)
+    if content:
+        content += "\n"
+    path.write_text(content, encoding="utf-8")
+
+
+def check_year(year_dir: Path) -> tuple[int, int]:
+    """Check one parsed year and update its rerun and parsed-source lists."""
+    event_folders = sorted(
+        (path for path in year_dir.iterdir() if path.is_dir()),
+        key=lambda path: path.name.casefold(),
+    )
+    print(f"\n[{year_dir.name}] Checking {len(event_folders)} event folders in {year_dir}")
 
     flagged: list[tuple[str, list[str]]] = []
-
     already_parsed: list[str] = []
 
-    for folder in subfolders:
-        numbered = [
-            c.name for c in folder.glob("*.csv")
-            if re.search(r'_\d+\.csv$', c.name)
-        ]
-        if numbered:
-            flagged.append((folder.name, numbered))
+    for folder in event_folders:
+        duplicates = duplicate_csv_names(folder)
+        if duplicates:
+            flagged.append((folder.name, duplicates))
 
-        source_path = folder / "source.json"
-        if source_path.exists():
-            try:
-                with open(source_path, "r", encoding="utf-8") as s:
-                    data = json.load(s)
-
-                filename: str = data.get("reportName")
-                if "pdf" in filename:
-
-                    filename = filename.replace(".docx", "")
-                    filename = filename.replace(".doc", "")
-                else:
-                    filename = filename.replace(".docx", ".pdf")
-                    filename = filename.replace(".doc", ".pdf")
-
-                if filename:
-                    already_parsed.append(filename)
-
-            except Exception as e:
-                print(f"[WARN] Failed reading {source_path}: {e}")
-                
+        parsed_filename = source_filename(folder)
+        if parsed_filename:
+            already_parsed.append(parsed_filename)
 
     if flagged:
-        print(f"{'='*60}")
-        print(f"NEEDS RERUN ({len(flagged)} folders with numbered CSVs):")
-        print(f"{'='*60}")
+        print(f"  NEEDS RERUN ({len(flagged)} folders with duplicate CSVs):")
         for folder_name, csvs in flagged:
-            print(f"  {folder_name}")
-            for c in csvs:
-                print(f"      {c}")
-
-        rerun_path = base / "_needs_rerun.txt"
-        rerun_path.write_text(
-            "\n".join(f for f, _ in flagged), encoding="utf-8"
-        )
-        print(f"\nRerun list written to: {rerun_path}")
+            print(f"    {folder_name}")
+            for csv_name in csvs:
+                print(f"      {csv_name}")
     else:
-        print("All folders look clean - no numbered duplicate CSVs found.")
+        print("  All folders look clean - no duplicate CSVs found.")
+
+    rerun_path = year_dir / "_needs_rerun.txt"
+    write_lines(rerun_path, [folder_name for folder_name, _ in flagged])
+    print(f"  Rerun list updated: {rerun_path}")
 
     if already_parsed:
-        src_out = base / "_parsed.txt"
-        src_out.write_text("\n".join(already_parsed), encoding="utf-8")
-        print(f"Source filenames written to: {src_out}")
+        parsed_path = year_dir / "_parsed.txt"
+        write_lines(parsed_path, already_parsed)
+        print(f"  Source filenames updated: {parsed_path}")
 
-    print(f"\nSummary: {len(flagged)} folders flagged / {len(subfolders)} total")
+    return len(flagged), len(event_folders)
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description="Find parsed DROMIC events containing duplicate CSV outputs."
+    )
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument("--all", action="store_true", help="Check every parsed year")
+    selection.add_argument("--year", help="Check one year under data/parsed/dromic")
+    selection.add_argument(
+        "--dir",
+        type=Path,
+        help="Check one explicit year directory",
+    )
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+
+    if args.year:
+        base = DEFAULT_DROMIC_DIR / args.year
+        single_directory = True
+    elif args.dir:
+        base = args.dir
+        single_directory = True
+    else:
+        base = DEFAULT_DROMIC_DIR
+        single_directory = False
+
+    try:
+        year_directories = discover_year_directories(
+            base,
+            single_directory=single_directory,
+        )
+    except (FileNotFoundError, NotADirectoryError) as error:
+        print(f"[ERROR] Directory not found: {error}")
+        return 1
+
+    total_flagged = 0
+    total_folders = 0
+    for year_dir in year_directories:
+        flagged, checked = check_year(year_dir)
+        total_flagged += flagged
+        total_folders += checked
+
+    print(
+        f"\nSummary: {total_flagged} folders flagged / {total_folders} total "
+        f"across {len(year_directories)} year(s)"
+    )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())

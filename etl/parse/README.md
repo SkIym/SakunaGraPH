@@ -9,5 +9,8 @@
 - To do/fix: Currently, script is prone to column data duplication errors in assistance tables. 
 
 **FAILURE CHECKCING**
-- Run `check_fails.py` for each subdata folder (e.g dromic/2022 ). This logs parsed files/events that contain errors. 
+- Run `python parse/check_fails.py --all` from `etl/` to check every parsed
+  DROMIC year, or use `--year 2022` for one year. An event is registered in
+  `_needs_rerun.txt` only when a numbered CSV has a matching base CSV in the
+  same folder, such as `damaged_houses.csv` and `damaged_houses_1.csv`.
 - Output is checked by the pipeline. Failures are skipped to prevent polluting graph with erratic data.
