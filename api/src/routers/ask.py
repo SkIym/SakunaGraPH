@@ -65,4 +65,8 @@ async def ask_stream(request: AskRequest) -> StreamingResponse:
     return StreamingResponse(
         _stream_with_errors(request.query),
         media_type="text/event-stream",
+        headers={
+            "Cache-Control": "no-cache, no-transform",
+            "X-Accel-Buffering": "no",
+        },
     )

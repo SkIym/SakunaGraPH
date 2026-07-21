@@ -46,5 +46,6 @@ app.include_router(sparql_router.router, prefix="/api")
 
 
 @app.get("/health", tags=["meta"])
+@app.get("/api/health", tags=["meta"], include_in_schema=False)
 async def health():
     return {"status": "ok"}
