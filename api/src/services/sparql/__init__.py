@@ -8,9 +8,11 @@ from src.services.sparql.executor import (
     validate_sparql,
 )
 from src.services.sparql.service import run_sparql_query
+from src.services.sparql.policy import analyze_select_query
 
 __all__ = [
     "execute_sparql",
+    "analyze_select_query",
     "ensure_sparql_prefixes",
     "is_graphdb_error",
     "is_write_operation",

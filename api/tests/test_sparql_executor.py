@@ -1,6 +1,10 @@
 import unittest
 from unittest.mock import AsyncMock, patch
 
+import httpx
+from pydantic import SecretStr
+
+from src.config import settings
 from src.services.sparql.executor import (
     SparqlCorrectionError,
     ensure_sparql_prefixes,
@@ -41,7 +45,7 @@ SELECT ?event WHERE { ?event a :DisasterEvent . }"""
 
         self.assertEqual(normalized.count("PREFIX :"), 1)
         self.assertEqual(normalized.count("PREFIX xsd:"), 1)
-        self.assertIsNone(validate_sparql(normalized))
+        self.assertIn("approved namespace", validate_sparql(normalized))
 
     def test_rejects_undefined_custom_prefix(self) -> None:
         query = ensure_sparql_prefixes(
@@ -98,6 +102,79 @@ class SparqlExecutionTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertIn("Malformed SPARQL query", result)
         client.assert_not_called()
+
+    async def test_unsafe_service_query_prevents_graphdb_request(self) -> None:
+        query = """SELECT ?event WHERE {
+  SERVICE <https://evil.example/sparql> { ?event ?p ?o }
+}
+LIMIT 10"""
+        with patch("src.services.sparql.executor.httpx.AsyncClient") as client:
+            result = await execute_sparql(query)
+
+        self.assertIn("ServiceGraphPattern", result)
+        client.assert_not_called()
+
+    async def test_applies_read_only_credentials_timeout_and_row_cap(self) -> None:
+        bindings = [
+            {"event": {"type": "uri", "value": f"https://sakuna.ph/event/{index}"}}
+            for index in range(3)
+        ]
+        response = unittest.mock.Mock(
+            status_code=200,
+            json=unittest.mock.Mock(
+                return_value={
+                    "head": {"vars": ["event"]},
+                    "results": {"bindings": bindings},
+                }
+            ),
+        )
+        client_context = unittest.mock.MagicMock()
+        client_context.__aenter__ = AsyncMock()
+        client_context.__aenter__.return_value.post = AsyncMock(return_value=response)
+        client_context.__aexit__ = AsyncMock(return_value=False)
+        with (
+            patch.object(settings, "graphdb_read_only_username", "reader"),
+            patch.object(
+                settings,
+                "graphdb_read_only_password",
+                SecretStr("secret"),
+            ),
+            patch(
+                "src.services.sparql.executor.httpx.AsyncClient",
+                return_value=client_context,
+            ) as client,
+        ):
+            result = await execute_sparql(
+                "SELECT ?event WHERE { ?event a :DisasterEvent } LIMIT 10",
+                timeout_seconds=12,
+                max_rows=2,
+            )
+
+        client.assert_called_once_with(timeout=12, auth=("reader", "secret"))
+        self.assertEqual(len(result["results"]["bindings"]), 2)
+        self.assertTrue(result["_truncated"])
+        client_context.__aenter__.return_value.post.assert_awaited_once()
+        self.assertEqual(
+            client_context.__aenter__.return_value.post.await_args.kwargs["params"],
+            {"timeout": "12"},
+        )
+
+    async def test_timeout_is_reported_as_execution_failure(self) -> None:
+        client_context = unittest.mock.MagicMock()
+        client_context.__aenter__ = AsyncMock()
+        client_context.__aenter__.return_value.post = AsyncMock(
+            side_effect=httpx.ReadTimeout("slow query")
+        )
+        client_context.__aexit__ = AsyncMock(return_value=False)
+        with patch(
+            "src.services.sparql.executor.httpx.AsyncClient",
+            return_value=client_context,
+        ):
+            result = await execute_sparql(
+                "SELECT ?event WHERE { ?event a :DisasterEvent } LIMIT 10"
+            )
+
+        self.assertEqual(result, "GraphDB request timed out.")
 
     async def test_correction_failure_preserves_query_and_error(self) -> None:
         generated = "SELECT COUNT ?event WHERE { ?event a :DisasterEvent . }"

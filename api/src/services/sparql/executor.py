@@ -8,6 +8,7 @@ from rdflib.plugins.sparql.parser import parseQuery
 from src.config import settings
 from src.services.common import ServiceError
 from src.services.llm import generate_text_async
+from src.services.sparql.policy import analyze_select_query
 
 SPARQL_PREFIXES: tuple[tuple[str, str], ...] = (
     ("", "https://sakuna.ph/"),
@@ -40,7 +41,7 @@ _STRING_IRI_OR_COMMENT_RE = re.compile(
     r"|'''(?:\\.|(?!''').)*'''"
     r'|"(?:\\.|[^"\\])*"'
     r"|'(?:\\.|[^'\\])*'"
-    r"|<[^>]*>"
+    r"|<(?=[A-Za-z][A-Za-z0-9+.-]*:)[^>\r\n]*>"
     r"|#[^\r\n]*",
     re.DOTALL,
 )
@@ -86,7 +87,8 @@ class SparqlCorrectionError(ServiceError):
 
 
 def is_write_operation(query: str) -> bool:
-    return any(pattern.search(query) for pattern in WRITE_PATTERNS)
+    sanitized = _STRING_IRI_OR_COMMENT_RE.sub("", query)
+    return any(pattern.search(sanitized) for pattern in WRITE_PATTERNS)
 
 
 def is_graphdb_error(error: str) -> bool:
@@ -119,11 +121,8 @@ def validate_sparql(query: str) -> str | None:
         return "A non-empty SPARQL query is required."
 
     body = _PROLOGUE_RE.sub("", query, count=1).lstrip()
-    if not re.match(r"(?i)(SELECT|ASK|CONSTRUCT|DESCRIBE)\b", body):
-        return (
-            "Only SPARQL query forms SELECT, ASK, CONSTRUCT, and DESCRIBE "
-            "are supported."
-        )
+    if not re.match(r"(?i)SELECT\b", body):
+        return "Only SPARQL SELECT queries are supported."
 
     sanitized = _STRING_IRI_OR_COMMENT_RE.sub("", query)
     stack: list[str] = []
@@ -171,6 +170,20 @@ def validate_sparql(query: str) -> str | None:
             f"column {exc.col}: {exc.msg}"
         )
 
+    try:
+        analyze_select_query(
+            query,
+            max_length=1_000_000,
+            max_triples=10_000,
+            max_optionals=10_000,
+            max_unions=10_000,
+            max_subqueries=10_000,
+            row_limit=1_000_000,
+            require_bounded=False,
+        )
+    except ValueError as exc:
+        return str(exc)
+
     return None
 
 
@@ -193,7 +206,12 @@ async def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
     return ensure_sparql_prefixes(_extract_sparql(generated))
 
 
-async def execute_sparql(query: str) -> dict[Any, Any] | str:
+async def execute_sparql(
+    query: str,
+    *,
+    timeout_seconds: float | None = None,
+    max_rows: int | None = None,
+) -> dict[Any, Any] | str:
     if not query or not query.strip():
         return "A non-empty SPARQL query is required."
     if is_write_operation(query):
@@ -204,11 +222,23 @@ async def execute_sparql(query: str) -> dict[Any, Any] | str:
     if validation_error:
         return f"Malformed SPARQL query: {validation_error}"
 
+    username = settings.graphdb_read_only_username
+    password = settings.graphdb_read_only_password
+    if bool(username) != bool(password):
+        return "GraphDB request failed: read-only credentials are incomplete."
+    auth = (
+        (username, password.get_secret_value())
+        if username and password
+        else None
+    )
+    timeout = timeout_seconds or settings.graphdb_query_timeout_seconds
+
     try:
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        async with httpx.AsyncClient(timeout=timeout, auth=auth) as client:
             response = await client.post(
                 settings.graphdb_endpoint,
                 content=query.encode(),
+                params={"timeout": str(max(1, int(timeout)))},
                 headers={
                     "Content-Type": "application/sparql-query",
                     "Accept": "application/sparql-results+json",
@@ -216,7 +246,13 @@ async def execute_sparql(query: str) -> dict[Any, Any] | str:
             )
         if response.status_code != 200:
             return f"GraphDB returned {response.status_code}: {response.text[:500]}"
-        return response.json()
+        payload = response.json()
+        if max_rows is not None and isinstance(payload, dict):
+            bindings = payload.get("results", {}).get("bindings")
+            if isinstance(bindings, list) and len(bindings) > max_rows:
+                payload["results"]["bindings"] = bindings[:max_rows]
+                payload["_truncated"] = True
+        return payload
     except httpx.ConnectError:
         return "Cannot connect to GraphDB"
     except httpx.TimeoutException:

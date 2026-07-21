@@ -8,6 +8,7 @@ from pydantic import ValidationError
 from src.main import app
 from src.schemas.ask import ASK_QUERY_MAX_LENGTH, AskRequest, AskStatus
 from src.schemas.ask_plan import AskPlan
+from src.schemas.query_validation import ParsedQuerySummary, QueryValidationReport
 from src.services.ask import PLANNER_VALIDATION_ERROR_CODE
 from src.services.ask.context import load_ontology_context
 from src.services.common import ServiceError
@@ -25,6 +26,9 @@ ONE_RESULT = {
     },
 }
 OPEN_PLAN = AskPlan(intent="open_graph_query")
+VALIDATION_REPORT = QueryValidationReport(
+    summary=ParsedQuerySummary(projected_columns=["event"], limit=10)
+)
 
 
 class AskRequestValidationTests(unittest.TestCase):
@@ -71,15 +75,19 @@ class AskAsyncGenerationTests(unittest.IsolatedAsyncioTestCase):
             ) as planner,
             patch(
                 "src.services.ask.service.nl_to_sparql",
-                new=AsyncMock(return_value="SELECT * WHERE {}"),
+                new=AsyncMock(return_value="SELECT ?event WHERE {} LIMIT 10"),
             ) as generate,
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=VALIDATION_REPORT),
+            ),
         ):
             response = await preview_question("List events")
 
         planner.assert_awaited_once_with("List events")
         generate.assert_awaited_once()
         self.assertEqual(response.status, AskStatus.QUERY_READY)
-        self.assertEqual(response.sparql, "SELECT * WHERE {}")
+        self.assertEqual(response.sparql, "SELECT ?event WHERE {} LIMIT 10")
 
 
 class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
@@ -90,8 +98,16 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(return_value=OPEN_PLAN),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
-                new=AsyncMock(return_value=("SELECT", ONE_RESULT)),
+                "src.services.ask.service.nl_to_sparql",
+                new=AsyncMock(return_value="SELECT ?event WHERE {} LIMIT 10"),
+            ),
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=VALIDATION_REPORT),
+            ),
+            patch(
+                "src.services.ask.service.execute_sparql",
+                new=AsyncMock(return_value=ONE_RESULT),
             ),
             patch(
                 "src.services.ask.service.ground_answer",
@@ -112,8 +128,16 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(return_value=OPEN_PLAN),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
-                new=AsyncMock(return_value=("SELECT", EMPTY_RESULTS)),
+                "src.services.ask.service.nl_to_sparql",
+                new=AsyncMock(return_value="SELECT ?event WHERE {} LIMIT 10"),
+            ),
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=VALIDATION_REPORT),
+            ),
+            patch(
+                "src.services.ask.service.execute_sparql",
+                new=AsyncMock(return_value=EMPTY_RESULTS),
             ),
             patch(
                 "src.services.ask.service.ground_answer",
@@ -127,26 +151,29 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.answer, "No data was found.")
 
     async def test_query_failure_never_reaches_answer_generation(self) -> None:
-        correction_error = SparqlCorrectionError(
-            sparql="SELECT COUNT ?event WHERE {}",
-            reason="Malformed SPARQL query: bad aggregate",
-            attempts=3,
-        )
         with (
             patch(
                 "src.services.ask.service.plan_question",
                 new=AsyncMock(return_value=OPEN_PLAN),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
-                new=AsyncMock(side_effect=correction_error),
+                "src.services.ask.service.nl_to_sparql",
+                new=AsyncMock(return_value="SELECT ?event WHERE {} LIMIT 10"),
+            ),
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=VALIDATION_REPORT),
+            ),
+            patch(
+                "src.services.ask.service.execute_sparql",
+                new=AsyncMock(return_value="GraphDB request timed out."),
             ),
             patch(
                 "src.services.ask.service.ground_answer",
                 new=AsyncMock(),
             ) as answer,
         ):
-            with self.assertRaises(SparqlCorrectionError):
+            with self.assertRaises(ServiceError):
                 await ask_question("Count events")
 
         answer.assert_not_awaited()

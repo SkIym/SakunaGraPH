@@ -198,6 +198,7 @@ def _artifact(
     return QueryArtifact(
         sparql=SPARQL_PREFIXES + sparql.strip() + "\n",
         origin=origin,
+        projected_columns=columns,
         expected_columns=columns,
         expected_entities=entities,
         expected_metric=resolved.plan.metric,
@@ -262,6 +263,7 @@ LIMIT {resolved.plan.limit}
     unit_select = " ?unit" if has_unit else ""
     unit_group = "GROUP BY ?unit" if has_unit else ""
     unit_order = "ORDER BY ASC(STR(?unit))" if has_unit else ""
+    unit_limit = f"LIMIT {resolved.plan.limit}" if has_unit else ""
     columns = ["total", *(("unit",) if has_unit else ())]
     query = f"""
 SELECT ({aggregate} AS ?total){unit_select}
@@ -270,6 +272,7 @@ WHERE {{
 }}
 {unit_group}
 {unit_order}
+{unit_limit}
 """
     return _artifact(resolved, query, columns, origin=origin)
 
@@ -424,6 +427,7 @@ OPTIONAL {{
 }}
 }}
 ORDER BY ?locationLabel ?disasterTypeLabel
+LIMIT {resolved.plan.limit}
 """
     return _artifact(
         resolved,

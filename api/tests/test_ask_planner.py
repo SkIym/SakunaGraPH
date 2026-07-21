@@ -216,7 +216,7 @@ class PlannerRepairTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(side_effect=error),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
+                "src.services.ask.service.execute_sparql",
                 new=AsyncMock(),
             ) as execute,
         ):

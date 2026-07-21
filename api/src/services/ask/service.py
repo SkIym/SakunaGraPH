@@ -1,14 +1,18 @@
 import json
 from collections.abc import AsyncIterator
 
+from src.config import settings
 from src.schemas.ask import AskPreviewResponse, AskResponse, AskStatus
 from src.schemas.ask_execution import QueryArtifact
 from src.schemas.entity_resolution import ResolvedAskPlan
+from src.schemas.query_validation import ResultValidationReport
 from src.services.ask.answer import build_grounding_prompt, ground_answer
 from src.services.ask.context import load_ontology_context
 from src.services.ask.entity_resolver import resolve_ask_plan
 from src.services.ask.planner import plan_question
 from src.services.ask.query_compiler import compile_query
+from src.services.ask.query_validator import validate_query_artifact
+from src.services.ask.result_validator import validate_query_results
 from src.services.ask.service_router import (
     execute_service_route,
     select_service_route,
@@ -16,7 +20,7 @@ from src.services.ask.service_router import (
 )
 from src.services.common import ServiceError
 from src.services.llm import stream_text_async
-from src.services.sparql import execute_sparql, sparql_with_correction
+from src.services.sparql import execute_sparql
 from src.services.sparql.executor import nl_to_sparql
 
 _ontology_context = load_ontology_context()
@@ -67,13 +71,15 @@ def _ambiguity_answer(resolved_plan: ResolvedAskPlan) -> str:
 def _raw_results_from_rows(
     rows: list[dict[str, str]],
     expected_columns: list[str],
+    *,
+    truncated: bool,
 ) -> dict:
     columns = list(expected_columns)
     for row in rows:
         for key in row:
             if key not in columns:
                 columns.append(key)
-    return {
+    result = {
         "head": {"vars": columns},
         "results": {
             "bindings": [
@@ -85,6 +91,9 @@ def _raw_results_from_rows(
             ]
         },
     }
+    if truncated:
+        result["_truncated"] = True
+    return result
 
 
 def _model_fallback_artifact(
@@ -124,19 +133,25 @@ async def _preview_artifact(
 ) -> QueryArtifact:
     if resolved_plan.plan.intent == "open_graph_query":
         sparql = await nl_to_sparql(query, _ontology_context)
-        return _model_fallback_artifact(sparql, resolved_plan)
-    return _deterministic_artifact(resolved_plan)
+        artifact = _model_fallback_artifact(sparql, resolved_plan)
+    else:
+        artifact = _deterministic_artifact(resolved_plan)
+    report = await validate_query_artifact(artifact, resolved_plan)
+    if not artifact.projected_columns:
+        artifact = artifact.model_copy(
+            update={
+                "projected_columns": report.summary.projected_columns,
+                "expected_columns": report.summary.projected_columns,
+            }
+        )
+    return artifact
 
 
 async def _execute_artifact(
     query: str,
     resolved_plan: ResolvedAskPlan,
-) -> tuple[QueryArtifact, dict]:
-    if resolved_plan.plan.intent == "open_graph_query":
-        sparql, raw_results = await sparql_with_correction(query, _ontology_context)
-        return _model_fallback_artifact(sparql, resolved_plan), raw_results
-
-    artifact = _deterministic_artifact(resolved_plan)
+) -> tuple[QueryArtifact, dict, ResultValidationReport]:
+    artifact = await _preview_artifact(query, resolved_plan)
     if artifact.service_route:
         try:
             service_result = await execute_service_route(resolved_plan, artifact)
@@ -148,19 +163,25 @@ async def _execute_artifact(
                 exc.detail,
                 code=ASK_DETERMINISTIC_EXECUTION_ERROR_CODE,
             ) from exc
-        return artifact, _raw_results_from_rows(
+        raw_results = _raw_results_from_rows(
             service_result.rows,
             artifact.expected_columns,
+            truncated=service_result.truncated,
         )
-
-    result = await execute_sparql(artifact.sparql)
-    if isinstance(result, str):
-        raise ServiceError(
-            502,
-            f"Deterministic Ask query failed: {result}",
-            code=ASK_DETERMINISTIC_EXECUTION_ERROR_CODE,
+    else:
+        raw_results = await execute_sparql(
+            artifact.sparql,
+            timeout_seconds=settings.graphdb_query_timeout_seconds,
+            max_rows=settings.ask_result_row_limit,
         )
-    return artifact, result
+        if isinstance(raw_results, str):
+            raise ServiceError(
+                502,
+                f"Validated Ask query failed: {raw_results}",
+                code=ASK_DETERMINISTIC_EXECUTION_ERROR_CODE,
+            )
+    result_report = validate_query_results(raw_results, artifact, resolved_plan)
+    return artifact, raw_results, result_report
 
 
 async def preview_question(query: str) -> AskPreviewResponse:
@@ -199,7 +220,7 @@ async def ask_question(query: str) -> AskResponse:
             warnings=resolved_plan.warnings,
             ambiguities=resolved_plan.ambiguities,
         )
-    artifact, raw_results = await _execute_artifact(query, resolved_plan)
+    artifact, raw_results, result_report = await _execute_artifact(query, resolved_plan)
     answer = await ground_answer(query, raw_results)
     return AskResponse(
         status=_result_status(raw_results),
@@ -207,9 +228,10 @@ async def ask_question(query: str) -> AskResponse:
         answer=answer,
         rows=_result_rows(raw_results),
         interpretation=resolved_plan,
-        warnings=resolved_plan.warnings,
+        warnings=[*resolved_plan.warnings, *result_report.warnings],
         ambiguities=resolved_plan.ambiguities,
         query_artifact=artifact,
+        truncated=result_report.truncated,
     )
 
 
@@ -237,7 +259,7 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
         yield f"data: {json.dumps({'type': 'done', 'status': status})}\n\n"
         return
 
-    artifact, raw_results = await _execute_artifact(query, resolved_plan)
+    artifact, raw_results, result_report = await _execute_artifact(query, resolved_plan)
     rows = _result_rows(raw_results)
     status = _result_status(raw_results)
 
@@ -247,9 +269,10 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
         "sparql": artifact.sparql,
         "rows": rows,
         "interpretation": interpretation,
-        "warnings": resolved_plan.warnings,
+        "warnings": [*resolved_plan.warnings, *result_report.warnings],
         "ambiguities": ambiguities,
         "query_artifact": artifact.model_dump(mode="json"),
+        "truncated": result_report.truncated,
     }
     yield f"data: {json.dumps(meta)}\n\n"
 

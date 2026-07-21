@@ -22,6 +22,7 @@ class QueryArtifact(BaseModel):
     sparql: str
     origin: QueryOrigin
     service_route: AskServiceRoute | None = None
+    projected_columns: list[str] = Field(default_factory=list)
     expected_columns: list[str] = Field(default_factory=list)
     expected_entities: list[str] = Field(default_factory=list)
     expected_metric: str | None = None
@@ -34,3 +35,4 @@ class DeterministicAskResult(BaseModel):
 
     query: QueryArtifact
     rows: list[dict[str, str]] = Field(default_factory=list)
+    truncated: bool = False

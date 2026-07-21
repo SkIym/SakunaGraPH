@@ -10,6 +10,7 @@ from src.schemas.ask import AskStatus
 from src.schemas.ask_execution import DeterministicAskResult
 from src.schemas.ask_plan import AskPlan
 from src.schemas.entity_resolution import ResolvedAskPlan, ResolvedEntity
+from src.schemas.query_validation import ParsedQuerySummary, QueryValidationReport
 from src.services.ask import query_compiler
 from src.services.ask.query_compiler import compile_query
 from src.services.ask.service import ask_question, preview_question
@@ -49,6 +50,15 @@ EVENT = _entity(
     iri="https://sakuna.ph/events/ndrrmc/event-yolanda",
     label="Super Typhoon Yolanda",
 )
+
+
+def _validation_report() -> QueryValidationReport:
+    return QueryValidationReport(
+        summary=ParsedQuerySummary(
+            projected_columns=["event"],
+            limit=25,
+        )
+    )
 
 
 class QueryCompilerSnapshotTests(unittest.TestCase):
@@ -342,13 +352,13 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(side_effect=service_result),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
-                new=AsyncMock(),
-            ) as model_query,
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=_validation_report()),
+            ),
             patch(
                 "src.services.ask.service.nl_to_sparql",
                 new=AsyncMock(),
-            ) as preview_model,
+            ) as model_query,
             patch(
                 "src.services.ask.service.execute_sparql",
                 new=AsyncMock(),
@@ -365,7 +375,6 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.query_artifact.origin, "service")
         self.assertEqual(response.query_artifact.service_route, "analysis_event_count")
         model_query.assert_not_awaited()
-        preview_model.assert_not_awaited()
         direct_graphdb.assert_not_awaited()
 
     async def test_grouped_question_executes_compiled_query_without_model(self) -> None:
@@ -397,7 +406,11 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(return_value=raw),
             ) as graphdb,
             patch(
-                "src.services.ask.service.sparql_with_correction",
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=_validation_report()),
+            ),
+            patch(
+                "src.services.ask.service.nl_to_sparql",
                 new=AsyncMock(),
             ) as model_query,
             patch(
@@ -423,6 +436,10 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
             patch(
                 "src.services.ask.service.resolve_ask_plan",
                 new=AsyncMock(return_value=resolved),
+            ),
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=_validation_report()),
             ),
             patch(
                 "src.services.ask.service.nl_to_sparql",

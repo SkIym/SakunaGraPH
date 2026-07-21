@@ -178,6 +178,7 @@ async def execute_service_route(
     if route is None:
         raise ValueError("A service-backed query artifact requires service_route.")
     filters = analysis_filters_from_plan(resolved)
+    truncated = False
 
     if route == "analysis_events":
         response = await get_analysis_events(
@@ -188,6 +189,7 @@ async def execute_service_route(
             sort_dir=resolved.plan.sort_direction,
         )
         rows = [_event_row(event) for event in response.items]
+        truncated = response.total > len(response.items)
     elif route == "analysis_event_count":
         response = await get_analysis_events(
             filters=filters,
@@ -221,35 +223,34 @@ async def execute_service_route(
                 }
                 for item in response.items
             ]
+        truncated = len(rows) > resolved.plan.limit
         if resolved.plan.sort_direction == "desc":
             rows.reverse()
         rows = rows[: resolved.plan.limit]
     elif route == "analysis_region_rankings":
         response = await get_region_rankings(filters)
-        rows = _bounded_ranked_rows(
-            [
-                {
-                    "group": item.id,
-                    "groupLabel": item.label,
-                    "total": str(item.count),
-                }
-                for item in response.items
-            ],
-            resolved,
-        )
+        all_rows = [
+            {
+                "group": item.id,
+                "groupLabel": item.label,
+                "total": str(item.count),
+            }
+            for item in response.items
+        ]
+        truncated = len(all_rows) > resolved.plan.limit
+        rows = _bounded_ranked_rows(all_rows, resolved)
     elif route == "analysis_disaster_rankings":
         response = await get_disaster_rankings(filters)
-        rows = _bounded_ranked_rows(
-            [
-                {
-                    "group": item.id,
-                    "groupLabel": item.label,
-                    "total": str(item.dead),
-                }
-                for item in response.items
-            ],
-            resolved,
-        )
+        all_rows = [
+            {
+                "group": item.id,
+                "groupLabel": item.label,
+                "total": str(item.dead),
+            }
+            for item in response.items
+        ]
+        truncated = len(all_rows) > resolved.plan.limit
+        rows = _bounded_ranked_rows(all_rows, resolved)
     elif route == "event_details":
         response = await get_event_details(resolved.events[0].iri)
         rows = [
@@ -292,7 +293,9 @@ async def execute_service_route(
             }
             for item in response.sources
         ]
+        truncated = len(rows) > resolved.plan.limit
+        rows = rows[: resolved.plan.limit]
     else:
         raise ValueError(f"Unknown service route: {route}.")
 
-    return DeterministicAskResult(query=artifact, rows=rows)
+    return DeterministicAskResult(query=artifact, rows=rows, truncated=truncated)

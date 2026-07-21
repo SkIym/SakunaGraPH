@@ -40,6 +40,7 @@ class AskResponse(BaseModel):
     warnings: list[str] | None = None
     ambiguities: list[EntityAmbiguity] | None = None
     query_artifact: QueryArtifact | None = None
+    truncated: bool | None = None
 
 
 class AskPreviewResponse(BaseModel):

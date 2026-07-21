@@ -324,7 +324,7 @@ class AskAmbiguityGateTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(return_value=resolved),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
+                "src.services.ask.service.execute_sparql",
                 new=AsyncMock(),
             ) as execute,
             patch(
@@ -359,7 +359,7 @@ class AskAmbiguityGateTests(unittest.IsolatedAsyncioTestCase):
                 new=AsyncMock(return_value=self._ambiguous_plan()),
             ),
             patch(
-                "src.services.ask.service.sparql_with_correction",
+                "src.services.ask.service.execute_sparql",
                 new=AsyncMock(),
             ) as execute,
         ):
