@@ -4,7 +4,7 @@
 		description = 'Try changing or clearing the active filters.',
 		actionLabel = '',
 		onaction = () => {},
-		tone = 'neutral'
+		tone = 'neutral',
 	} = $props();
 </script>
 
@@ -32,8 +32,12 @@
 			</svg>
 		{/if}
 	</div>
-	<h2 class="mt-4 text-sm font-semibold {tone === 'error' ? 'text-red-800' : 'text-slate-700'}">{title}</h2>
-	<p class="mt-1.5 max-w-md text-xs leading-5 {tone === 'error' ? 'text-red-600' : 'text-slate-500'}">
+	<h2 class="mt-4 text-sm font-semibold {tone === 'error' ? 'text-red-800' : 'text-slate-700'}">
+		{title}
+	</h2>
+	<p
+		class="mt-1.5 max-w-md text-xs leading-5 {tone === 'error' ? 'text-red-600' : 'text-slate-500'}"
+	>
 		{description}
 	</p>
 	{#if actionLabel}
@@ -42,8 +46,8 @@
 			onclick={onaction}
 			class="mt-4 h-9 rounded-md border px-3 text-xs font-semibold transition
 				{tone === 'error'
-					? 'border-red-200 bg-white text-red-700 hover:bg-red-50'
-					: 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}"
+				? 'border-red-200 bg-white text-red-700 hover:bg-red-50'
+				: 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}"
 		>
 			{actionLabel}
 		</button>

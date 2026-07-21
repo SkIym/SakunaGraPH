@@ -1,0 +1,20 @@
+{
+	"build": {
+		"largestInitialRouteJsGzipBytes": 65000,
+		"largestLazyChunkGzipBytes": 80000,
+		"largestCssGzipBytes": 12000
+	},
+	"assets": {
+		"mapGeoJsonBytes": 1800000,
+		"teamImageBytes": 50000
+	},
+	"runtime": {
+		"hydratedMs": 4000,
+		"firstContentfulPaintMs": 3000,
+		"initialJsTransferBytes": 350000,
+		"initialCssTransferBytes": 80000,
+		"mapParseMs": 750,
+		"mapProjectionMs": 2000,
+		"mapInitialRenderMs": 4000
+	}
+}

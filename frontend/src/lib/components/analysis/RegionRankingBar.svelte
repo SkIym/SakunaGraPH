@@ -8,11 +8,22 @@
 	<div class="space-y-3">
 		{#each topItems as item (item.id)}
 			<div>
-				<div class="mb-1 flex justify-between gap-3 text-[11px]"><span class="truncate text-slate-600" title={item.label}>{item.label}</span><span class="font-semibold tabular-nums text-slate-700">{item.count.toLocaleString()}</span></div>
-				<div class="h-2 overflow-hidden rounded-full bg-slate-100"><div class="h-full rounded-full bg-teal-500" style="width:{Math.max(3, item.count / maximum * 100)}%"></div></div>
+				<div class="mb-1 flex justify-between gap-3 text-[11px]">
+					<span class="truncate text-slate-600" title={item.label}>{item.label}</span><span
+						class="font-semibold tabular-nums text-slate-700">{item.count.toLocaleString()}</span
+					>
+				</div>
+				<div class="h-2 overflow-hidden rounded-full bg-slate-100">
+					<div
+						class="h-full rounded-full bg-teal-500"
+						style="width:{Math.max(3, (item.count / maximum) * 100)}%"
+					></div>
+				</div>
 			</div>
 		{/each}
 	</div>
 {:else}
-	<p class="flex h-56 items-center justify-center text-xs text-slate-400">No regional records in this scope.</p>
+	<p class="flex h-56 items-center justify-center text-xs text-slate-400">
+		No regional records in this scope.
+	</p>
 {/if}

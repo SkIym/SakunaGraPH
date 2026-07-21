@@ -10,15 +10,15 @@ export const REGION_LABELS = {
 	'0700000000': 'Region VII — Central Visayas',
 	'0800000000': 'Region VIII — Eastern Visayas',
 	'0900000000': 'Region IX — Zamboanga Peninsula',
-	'1000000000': 'Region X — Northern Mindanao',
-	'1100000000': 'Region XI — Davao Region',
-	'1200000000': 'Region XII — SOCCSKSARGEN',
-	'1300000000': 'National Capital Region (NCR)',
-	'1400000000': 'Cordillera Administrative Region (CAR)',
-	'1600000000': 'Region XIII — Caraga',
-	'1700000000': 'Region IV-B — MIMAROPA',
-	'1800000000': 'Region XVIII — Negros Island Region (NIR)',
-	'1900000000': 'Region XV — BARMM'
+	1000000000: 'Region X — Northern Mindanao',
+	1100000000: 'Region XI — Davao Region',
+	1200000000: 'Region XII — SOCCSKSARGEN',
+	1300000000: 'National Capital Region (NCR)',
+	1400000000: 'Cordillera Administrative Region (CAR)',
+	1600000000: 'Region XIII — Caraga',
+	1700000000: 'Region IV-B — MIMAROPA',
+	1800000000: 'Region XVIII — Negros Island Region (NIR)',
+	1900000000: 'Region XV — BARMM',
 };
 
 // Subtle pastel fill per region — used in "By Region" view so each region
@@ -33,15 +33,15 @@ export const REGION_COLORS = {
 	'0700000000': '#FEF9C3', // Region VII  — yellow-100
 	'0800000000': '#FFE4E6', // Region VIII — rose-100
 	'0900000000': '#DCFCE7', // Region IX   — green-100
-	'1000000000': '#E0E7FF', // Region X    — indigo-100
-	'1100000000': '#FFEDD5', // Region XI   — orange-100
-	'1200000000': '#CCFBF1', // Region XII  — teal-100
-	'1300000000': '#FFF1F2', // NCR         — rose-50
-	'1400000000': '#F3F4F6', // CAR         — gray-100
-	'1600000000': '#F0FDF4', // Caraga      — green-50
-	'1700000000': '#FFFBEB', // MIMAROPA    — amber-50
-	'1800000000': '#FDE68A', // NIR         — amber-200
-	'1900000000': '#FDF4FF'  // BARMM       — fuchsia-50
+	1000000000: '#E0E7FF', // Region X    — indigo-100
+	1100000000: '#FFEDD5', // Region XI   — orange-100
+	1200000000: '#CCFBF1', // Region XII  — teal-100
+	1300000000: '#FFF1F2', // NCR         — rose-50
+	1400000000: '#F3F4F6', // CAR         — gray-100
+	1600000000: '#F0FDF4', // Caraga      — green-50
+	1700000000: '#FFFBEB', // MIMAROPA    — amber-50
+	1800000000: '#FDE68A', // NIR         — amber-200
+	1900000000: '#FDF4FF', // BARMM       — fuchsia-50
 };
 
 // GADM concatenates words; map known tricky cases to proper display names
@@ -77,7 +77,7 @@ const PROV_DISPLAY = {
 	SouthernLeyte: 'Southern Leyte',
 	ZamboangadelNorte: 'Zamboanga del Norte',
 	ZamboangadelSur: 'Zamboanga del Sur',
-	ZamboangaSibugay: 'Zamboanga Sibugay'
+	ZamboangaSibugay: 'Zamboanga Sibugay',
 };
 
 export function formatProvName(gadmName) {

@@ -1,5 +1,7 @@
 <script>
-	let { results, onclose } = $props();
+	import { focusTrap } from '../actions/focus.js';
+
+	let { results, onclose, returnFocus = null } = $props();
 
 	const PAGE_SIZE = 10;
 	let page = $state(0);
@@ -42,8 +44,10 @@
 
 <!-- Backdrop -->
 <div
+	use:focusTrap={{ returnFocus }}
 	role="dialog"
 	aria-modal="true"
+	aria-labelledby="query-results-title"
 	class="fixed inset-0 z-50 flex items-center justify-center p-6"
 	style="background:rgba(15,23,42,0.4); backdrop-filter:blur(4px);"
 	onclick={onBackdrop}
@@ -55,13 +59,11 @@
 		role="document"
 		class="flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
 		style="max-height:80vh;"
-		onclick={(e) => e.stopPropagation()}
-		onkeydown={(e) => e.stopPropagation()}
 	>
 		<!-- Header -->
 		<div class="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4">
 			<div>
-				<h2 class="text-sm font-semibold text-slate-800">Query Results</h2>
+				<h2 id="query-results-title" class="text-sm font-semibold text-slate-800">Query Results</h2>
 				<p class="mt-0.5 text-xs text-slate-400">
 					{bindings.length}
 					{bindings.length === 1 ? 'result' : 'results'}
@@ -70,6 +72,7 @@
 			</div>
 			<button
 				onclick={onclose}
+				data-focus-first
 				class="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
 				aria-label="Close results"
 			>
@@ -170,9 +173,7 @@
 
 					{#each paginationPages() as p}
 						{#if p === null}
-							<span class="flex h-7 w-5 items-center justify-center text-xs text-slate-400"
-								>…</span
-							>
+							<span class="flex h-7 w-5 items-center justify-center text-xs text-slate-400">…</span>
 						{:else}
 							<button
 								onclick={() => (page = p)}

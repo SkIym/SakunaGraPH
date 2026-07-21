@@ -1,0 +1,32 @@
+services:
+  api:
+    environment:
+      GRAPHDB_ENDPOINT: http://deployment-upstream:9090/graphdb
+      LOCAL_LLM_BASE_URL: http://deployment-upstream:9090
+      LOCAL_LLM_CHAT_PATH: /api/v1/chat
+      LOCAL_LLM_MODEL: deployment-test-model
+      LOCAL_LLM_TIMEOUT: 10
+    depends_on:
+      deployment-upstream:
+        condition: service_healthy
+
+  deployment-upstream:
+    image: node:22-bookworm-slim
+    working_dir: /fixture
+    command: ['node', 'upstream-server.js']
+    volumes:
+      - ./frontend/tests/deployment:/fixture:ro
+    expose:
+      - '9090'
+    healthcheck:
+      test:
+        [
+          'CMD',
+          'node',
+          '-e',
+          "fetch('http://127.0.0.1:9090/health').then((response)=>{if(!response.ok)process.exit(1)}).catch(()=>process.exit(1))",
+        ]
+      interval: 2s
+      timeout: 2s
+      start_period: 2s
+      retries: 10

@@ -10,7 +10,7 @@
 	const CONNECT_DIST = 180;
 	const HOVER_RADIUS = 140; // px — mouse influence radius
 	const GRID_SIZE = 55; // grid cell size in px
-	const node_color = "rgba(41,118,158"
+	const node_color = 'rgba(41,118,158';
 
 	let mouseX = -9999;
 	let mouseY = -9999;
@@ -22,12 +22,14 @@
 			vx: (Math.random() - 0.5) * 0.45,
 			vy: (Math.random() - 0.5) * 0.45,
 			r: Math.random() * 4 + 3.5, // bigger: 3.5–7.5 px base radius
-			phase: Math.random() * Math.PI * 2
+			phase: Math.random() * Math.PI * 2,
 		}));
 	}
 
 	onMount(() => {
 		const ctx = canvas.getContext('2d');
+		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
+		let reduceMotion = motionPreference.matches;
 		let nodes = [];
 
 		// Track mouse in viewport coords — canvas is fixed full-screen so they match
@@ -44,6 +46,7 @@
 			canvas.width = window.innerWidth;
 			canvas.height = window.innerHeight;
 			nodes = makeNodes(canvas.width, canvas.height);
+			if (reduceMotion) window.requestAnimationFrame(loop);
 		};
 
 		resize();
@@ -57,19 +60,21 @@
 			const w = canvas.width;
 			const h = canvas.height;
 
-			// Move nodes
-			for (const n of nodes) {
-				n.x += n.vx;
-				n.y += n.vy;
-				if (n.x < 0 || n.x > w) n.vx *= -1;
-				if (n.y < 0 || n.y > h) n.vy *= -1;
+			// Keep the ambient graph completely still when reduced motion is requested.
+			if (!reduceMotion) {
+				for (const n of nodes) {
+					n.x += n.vx;
+					n.y += n.vy;
+					if (n.x < 0 || n.x > w) n.vx *= -1;
+					if (n.y < 0 || n.y > h) n.vy *= -1;
+				}
 			}
 
 			ctx.clearRect(0, 0, w, h);
 
 			// ── Grid ─────────────────────────────────────────────────────────────
 			ctx.beginPath();
-			ctx.strokeStyle = node_color +',0.08)';
+			ctx.strokeStyle = node_color + ',0.08)';
 			ctx.lineWidth = 0.6;
 			for (let x = 0.5; x <= w; x += GRID_SIZE) {
 				ctx.moveTo(x, 0);
@@ -133,9 +138,15 @@
 				ctx.fill();
 			}
 
-			animFrame = requestAnimationFrame(loop);
+			if (!reduceMotion) animFrame = requestAnimationFrame(loop);
 		}
 
+		const onMotionPreferenceChange = (event) => {
+			reduceMotion = event.matches;
+			cancelAnimationFrame(animFrame);
+			animFrame = requestAnimationFrame(loop);
+		};
+		motionPreference.addEventListener('change', onMotionPreferenceChange);
 		animFrame = requestAnimationFrame(loop);
 
 		return () => {
@@ -144,6 +155,7 @@
 				window.removeEventListener('mousemove', onMouseMove);
 				document.removeEventListener('mouseleave', onMouseLeave);
 			}
+			motionPreference.removeEventListener('change', onMotionPreferenceChange);
 			cancelAnimationFrame(animFrame);
 		};
 	});
@@ -151,5 +163,7 @@
 
 <canvas
 	bind:this={canvas}
+	aria-hidden="true"
+	class="ambient-node-canvas"
 	style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"
 ></canvas>

@@ -5,16 +5,16 @@
 	 */
 
 	let {
-		pathData = [],       // [{d, gid, name, regionPsgc, feature}]
+		pathData = [], // [{d, gid, name, regionPsgc, feature}]
 		viewBox = '0 0 700 800',
-		view = 'regions',    // 'regions' | 'provinces'
-		selected = null,     // {psgc?, id?, name}
+		view = 'regions', // 'regions' | 'provinces'
+		selected = null, // {psgc?, id?, name}
 		interactive = true,
 		strokeWidth = 0.7,
 		strokeColor = '#374151',
-		colorMap = {},       // groupKey → default fill color (for region pastels)
+		colorMap = {}, // groupKey → default fill color (for region pastels)
 		onselect = () => {},
-		onhover = () => {}   // onhover(item | null, clientX, clientY)
+		onhover = () => {}, // onhover(item | null, clientX, clientY)
 	} = $props();
 
 	let hoveredKey = $state(null);
@@ -31,9 +31,9 @@
 	function getFill(item) {
 		const gk = groupKey(item);
 		const sk = selectedKey();
-		if (sk && gk === sk) return '#93C5FD';                         // selected — blue-300
-		if (interactive && hoveredKey === gk) return '#BFDBFE';        // hovered  — blue-200
-		return colorMap[gk] ?? '#ffffff';                              // default  — region color or white
+		if (sk && gk === sk) return '#93C5FD'; // selected — blue-300
+		if (interactive && hoveredKey === gk) return '#BFDBFE'; // hovered  — blue-200
+		return colorMap[gk] ?? '#ffffff'; // default  — region color or white
 	}
 
 	function handleEnter(item, e) {
@@ -51,6 +51,12 @@
 		if (!interactive) return;
 		onselect(item);
 	}
+
+	function handleKeydown(item, event) {
+		if (!interactive || !['Enter', ' '].includes(event.key)) return;
+		event.preventDefault();
+		onselect(item);
+	}
 </script>
 
 <svg
@@ -58,19 +64,34 @@
 	class="w-full h-full"
 	preserveAspectRatio="xMidYMid meet"
 	style="overflow:visible;"
+	aria-label="Map of Philippine regions and provinces"
 >
 	{#each pathData as item (item.gid)}
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<path
-			d={item.d}
-			fill={getFill(item)}
-			stroke={strokeColor}
-			stroke-width={strokeWidth}
-			stroke-linejoin="round"
-			class={interactive ? 'cursor-pointer' : ''}
-			onmouseenter={(e) => handleEnter(item, e)}
-			onmouseleave={handleLeave}
-			onclick={() => handleClick(item)}
-		/>
+		{#if interactive}
+			<path
+				d={item.d}
+				fill={getFill(item)}
+				stroke={strokeColor}
+				stroke-width={strokeWidth}
+				stroke-linejoin="round"
+				class="cursor-pointer"
+				role="button"
+				tabindex="0"
+				aria-label={`Select ${item.name}`}
+				aria-pressed={selectedKey() === groupKey(item)}
+				onmouseenter={(e) => handleEnter(item, e)}
+				onmouseleave={handleLeave}
+				onclick={() => handleClick(item)}
+				onkeydown={(event) => handleKeydown(item, event)}
+			/>
+		{:else}
+			<path
+				d={item.d}
+				fill={getFill(item)}
+				stroke={strokeColor}
+				stroke-width={strokeWidth}
+				stroke-linejoin="round"
+			/>
+		{/if}
 	{/each}
 </svg>

@@ -1,0 +1,18 @@
+{
+	"capturedAt": "2026-07-17",
+	"sourceRevision": "2886a80c56946176ad13758b367cf6b1c6b1cf8f",
+	"projects": {
+		"desktop-chromium": { "width": 1440, "height": 900 },
+		"mobile-chromium": { "device": "Pixel 7" }
+	},
+	"routes": [
+		{ "name": "home", "path": "/" },
+		{ "name": "map", "path": "/map" },
+		{ "name": "ontology", "path": "/ontology" },
+		{ "name": "ask", "path": "/ask" },
+		{ "name": "analysis", "path": "/analysis" },
+		{ "name": "analysis-events", "path": "/analysis/events" },
+		{ "name": "analysis-metrics", "path": "/analysis/metrics" },
+		{ "name": "analysis-timeline", "path": "/analysis/timeline" }
+	]
+}

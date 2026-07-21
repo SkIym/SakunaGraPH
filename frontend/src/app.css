@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 :root {
 	--indigo: #6366f1;
@@ -30,4 +30,68 @@ body {
 
 .cm-scroller {
 	font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace !important;
+}
+
+/* Skip layout and paint work for visualization cards until they approach the viewport. */
+.deferred-visualization {
+	content-visibility: auto;
+	contain-intrinsic-size: auto 360px;
+}
+
+/* Slate 300/400 are decorative tones; analysis uses them for readable helper text. */
+.analysis-workspace .text-slate-300,
+.analysis-workspace .text-slate-400 {
+	color: #475569;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html:focus-within {
+		scroll-behavior: auto;
+	}
+
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.01ms !important;
+		animation-iteration-count: 1 !important;
+		scroll-behavior: auto !important;
+		transition-duration: 0.01ms !important;
+	}
+}
+
+@media (forced-colors: active) {
+	:focus-visible {
+		outline: 3px solid Highlight !important;
+		outline-offset: 2px !important;
+	}
+
+	button,
+	a,
+	input,
+	select,
+	textarea,
+	[role='button'] {
+		forced-color-adjust: auto;
+	}
+
+	svg [role='button'] {
+		fill: ButtonFace !important;
+		stroke: ButtonText !important;
+	}
+
+	svg [role='button'][aria-pressed='true'] {
+		fill: Highlight !important;
+		stroke: HighlightText !important;
+	}
+
+	svg[aria-label] circle,
+	svg[aria-label] rect,
+	svg[aria-label] path,
+	svg[aria-label] line {
+		stroke: CanvasText;
+	}
+
+	.ambient-node-canvas {
+		display: none;
+	}
 }

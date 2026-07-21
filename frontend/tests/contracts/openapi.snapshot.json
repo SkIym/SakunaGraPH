@@ -1,0 +1,3648 @@
+{
+	"paths": {
+		"/api/analysis/calendar/days": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "year",
+						"required": true,
+						"schema": {
+							"maximum": 2200,
+							"minimum": 1900,
+							"title": "Year",
+							"type": "integer"
+						}
+					},
+					{
+						"in": "query",
+						"name": "month",
+						"required": true,
+						"schema": {
+							"maximum": 12,
+							"minimum": 1,
+							"title": "Month",
+							"type": "integer"
+						}
+					},
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "include_impacts",
+						"required": false,
+						"schema": {
+							"default": false,
+							"title": "Include Impacts",
+							"type": "boolean"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisCalendarResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/calendar/months": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "year",
+						"required": true,
+						"schema": {
+							"maximum": 2200,
+							"minimum": 1900,
+							"title": "Year",
+							"type": "integer"
+						}
+					},
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "include_impacts",
+						"required": false,
+						"schema": {
+							"default": false,
+							"title": "Include Impacts",
+							"type": "boolean"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisCalendarResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/calendar/years": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "include_impacts",
+						"required": false,
+						"schema": {
+							"default": false,
+							"title": "Include Impacts",
+							"type": "boolean"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisCalendarResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/damage-histogram": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "bins",
+						"required": false,
+						"schema": {
+							"default": 10,
+							"maximum": 50,
+							"minimum": 1,
+							"title": "Bins",
+							"type": "integer"
+						}
+					},
+					{
+						"in": "query",
+						"name": "unit",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 80,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Unit"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisDamageHistogramResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/damage-vs-affected": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisDamageAffectedResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/disaster-counts": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "group_by",
+						"required": false,
+						"schema": {
+							"default": "taxonomy",
+							"enum": ["type", "taxonomy"],
+							"title": "Group By",
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisDisasterCountsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/disaster-rankings": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_id",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 20,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Location Id"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisDisasterRankingsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/events": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"minimum": 1,
+							"title": "Page",
+							"type": "integer"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page_size",
+						"required": false,
+						"schema": {
+							"default": 25,
+							"maximum": 100,
+							"minimum": 1,
+							"title": "Page Size",
+							"type": "integer"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sort_by",
+						"required": false,
+						"schema": {
+							"default": "startDate",
+							"enum": ["startDate", "endDate", "eventName", "eventType", "source"],
+							"title": "Sort By",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sort_dir",
+						"required": false,
+						"schema": {
+							"default": "desc",
+							"enum": ["asc", "desc"],
+							"title": "Sort Dir",
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisEventsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/events/export.csv": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sort_by",
+						"required": false,
+						"schema": {
+							"default": "startDate",
+							"enum": ["startDate", "endDate", "eventName", "eventType", "source"],
+							"title": "Sort By",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "sort_dir",
+						"required": false,
+						"schema": {
+							"default": "desc",
+							"enum": ["asc", "desc"],
+							"title": "Sort Dir",
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/filter-options": {
+			"get": {
+				"parameters": [],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisFilterOptionsResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/region-rankings": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_type",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 120,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Disaster Type"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisRegionRankingsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/summary": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisSummaryResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/timeline/category-stacks": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "bucket",
+						"required": false,
+						"schema": {
+							"default": "month_year",
+							"enum": ["month_year", "month_of_year"],
+							"title": "Bucket",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisTimelineCategoryStacksResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/timeline/date-events": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "date_prefix",
+						"required": true,
+						"schema": {
+							"maxLength": 10,
+							"minLength": 4,
+							"title": "Date Prefix",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisTimelineDateEventsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/analysis/victim-trends": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "event_type",
+						"required": false,
+						"schema": {
+							"default": "all",
+							"enum": ["major", "incidents", "all"],
+							"title": "Event Type",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "start_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Start Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "end_date",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"format": "date",
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "End Date"
+						}
+					},
+					{
+						"in": "query",
+						"name": "location_ids",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Location Ids",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_types",
+						"required": false,
+						"schema": {
+							"items": {
+								"type": "string"
+							},
+							"title": "Disaster Types",
+							"type": "array"
+						}
+					},
+					{
+						"in": "query",
+						"name": "q",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 200,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Q"
+						}
+					},
+					{
+						"in": "query",
+						"name": "disaster_type",
+						"required": false,
+						"schema": {
+							"anyOf": [
+								{
+									"maxLength": 120,
+									"type": "string"
+								},
+								{
+									"type": "null"
+								}
+							],
+							"title": "Disaster Type"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AnalysisVictimTrendsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ask": {
+			"post": {
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AskRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AskResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ask/preview": {
+			"post": {
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AskRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/AskPreviewResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ask/stream": {
+			"post": {
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/AskRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/disasters/details": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "uri",
+						"required": true,
+						"schema": {
+							"title": "Uri",
+							"type": "string"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/EventDetailsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/map/events": {
+			"get": {
+				"parameters": [
+					{
+						"in": "query",
+						"name": "scope",
+						"required": true,
+						"schema": {
+							"enum": ["region", "province"],
+							"title": "Scope",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "id",
+						"required": true,
+						"schema": {
+							"title": "Id",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "mode",
+						"required": false,
+						"schema": {
+							"default": "major",
+							"enum": ["major", "incidents"],
+							"title": "Mode",
+							"type": "string"
+						}
+					},
+					{
+						"in": "query",
+						"name": "page",
+						"required": false,
+						"schema": {
+							"default": 1,
+							"minimum": 1,
+							"title": "Page",
+							"type": "integer"
+						}
+					}
+				],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/MapEventsResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ontology/graph": {
+			"get": {
+				"parameters": [],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/OntologyGraphResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ontology/psgc": {
+			"get": {
+				"parameters": [],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/PsgcGraphResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/ontology/taxonomy": {
+			"get": {
+				"parameters": [],
+				"requestBody": null,
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/TaxonomyNode"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/api/sparql": {
+			"post": {
+				"parameters": [],
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SparqlRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SparqlQueryResponse"
+								}
+							}
+						}
+					},
+					"422": {
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/HTTPValidationError"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"schemas": {
+		"AnalysisCalendarItem": {
+			"properties": {
+				"count": {
+					"title": "Count",
+					"type": "integer"
+				},
+				"dead": {
+					"anyOf": [
+						{
+							"type": "integer"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Dead"
+				},
+				"injured": {
+					"anyOf": [
+						{
+							"type": "integer"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Injured"
+				},
+				"missing": {
+					"anyOf": [
+						{
+							"type": "integer"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Missing"
+				},
+				"period": {
+					"title": "Period",
+					"type": "string"
+				}
+			},
+			"required": ["period", "count"],
+			"title": "AnalysisCalendarItem",
+			"type": "object"
+		},
+		"AnalysisCalendarResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisCalendarItem"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"title": "AnalysisCalendarResponse",
+			"type": "object"
+		},
+		"AnalysisDamageAffectedPoint": {
+			"properties": {
+				"affectedFamilies": {
+					"default": 0,
+					"title": "Affectedfamilies",
+					"type": "integer"
+				},
+				"affectedPersons": {
+					"default": 0,
+					"title": "Affectedpersons",
+					"type": "integer"
+				},
+				"damage": {
+					"title": "Damage",
+					"type": "number"
+				},
+				"event": {
+					"title": "Event",
+					"type": "string"
+				},
+				"eventName": {
+					"title": "Eventname",
+					"type": "string"
+				},
+				"unit": {
+					"title": "Unit",
+					"type": "string"
+				}
+			},
+			"required": ["event", "eventName", "unit", "damage"],
+			"title": "AnalysisDamageAffectedPoint",
+			"type": "object"
+		},
+		"AnalysisDamageAffectedResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDamageAffectedPoint"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"title": "AnalysisDamageAffectedResponse",
+			"type": "object"
+		},
+		"AnalysisDamageAmount": {
+			"properties": {
+				"amount": {
+					"title": "Amount",
+					"type": "number"
+				},
+				"unit": {
+					"title": "Unit",
+					"type": "string"
+				}
+			},
+			"required": ["amount", "unit"],
+			"title": "AnalysisDamageAmount",
+			"type": "object"
+		},
+		"AnalysisDamageHistogramBin": {
+			"properties": {
+				"count": {
+					"title": "Count",
+					"type": "integer"
+				},
+				"lowerBound": {
+					"title": "Lowerbound",
+					"type": "number"
+				},
+				"unit": {
+					"title": "Unit",
+					"type": "string"
+				},
+				"upperBound": {
+					"title": "Upperbound",
+					"type": "number"
+				}
+			},
+			"required": ["unit", "lowerBound", "upperBound", "count"],
+			"title": "AnalysisDamageHistogramBin",
+			"type": "object"
+		},
+		"AnalysisDamageHistogramResponse": {
+			"properties": {
+				"bins": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDamageHistogramBin"
+					},
+					"title": "Bins",
+					"type": "array"
+				}
+			},
+			"title": "AnalysisDamageHistogramResponse",
+			"type": "object"
+		},
+		"AnalysisDisasterCount": {
+			"properties": {
+				"count": {
+					"title": "Count",
+					"type": "integer"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label", "count"],
+			"title": "AnalysisDisasterCount",
+			"type": "object"
+		},
+		"AnalysisDisasterCountsResponse": {
+			"properties": {
+				"group_by": {
+					"enum": ["type", "taxonomy"],
+					"title": "Group By",
+					"type": "string"
+				},
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDisasterCount"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"required": ["group_by"],
+			"title": "AnalysisDisasterCountsResponse",
+			"type": "object"
+		},
+		"AnalysisDisasterRanking": {
+			"properties": {
+				"dead": {
+					"default": 0,
+					"title": "Dead",
+					"type": "integer"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label"],
+			"title": "AnalysisDisasterRanking",
+			"type": "object"
+		},
+		"AnalysisDisasterRankingsResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDisasterRanking"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"title": "AnalysisDisasterRankingsResponse",
+			"type": "object"
+		},
+		"AnalysisEvent": {
+			"properties": {
+				"alternates": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Alternates",
+					"type": "array"
+				},
+				"disasterTypes": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisEventFacet"
+					},
+					"title": "Disastertypes",
+					"type": "array"
+				},
+				"endDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Enddate"
+				},
+				"event": {
+					"title": "Event",
+					"type": "string"
+				},
+				"eventName": {
+					"title": "Eventname",
+					"type": "string"
+				},
+				"eventType": {
+					"enum": ["MajorEvent", "Incident"],
+					"title": "Eventtype",
+					"type": "string"
+				},
+				"impact": {
+					"$ref": "#/components/schemas/AnalysisEventImpact"
+				},
+				"locations": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisEventFacet"
+					},
+					"title": "Locations",
+					"type": "array"
+				},
+				"source": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Source"
+				},
+				"startDate": {
+					"title": "Startdate",
+					"type": "string"
+				}
+			},
+			"required": ["event", "eventName", "eventType", "startDate"],
+			"title": "AnalysisEvent",
+			"type": "object"
+		},
+		"AnalysisEventFacet": {
+			"properties": {
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label"],
+			"title": "AnalysisEventFacet",
+			"type": "object"
+		},
+		"AnalysisEventImpact": {
+			"properties": {
+				"affectedFamilies": {
+					"default": 0,
+					"title": "Affectedfamilies",
+					"type": "integer"
+				},
+				"affectedPersons": {
+					"default": 0,
+					"title": "Affectedpersons",
+					"type": "integer"
+				},
+				"damageAmount": {
+					"anyOf": [
+						{
+							"type": "number"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"default": 0,
+					"title": "Damageamount"
+				},
+				"damageByUnit": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDamageAmount"
+					},
+					"title": "Damagebyunit",
+					"type": "array"
+				},
+				"damageUnit": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Damageunit"
+				},
+				"dead": {
+					"default": 0,
+					"title": "Dead",
+					"type": "integer"
+				},
+				"injured": {
+					"default": 0,
+					"title": "Injured",
+					"type": "integer"
+				},
+				"missing": {
+					"default": 0,
+					"title": "Missing",
+					"type": "integer"
+				}
+			},
+			"title": "AnalysisEventImpact",
+			"type": "object"
+		},
+		"AnalysisEventsResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisEvent"
+					},
+					"title": "Items",
+					"type": "array"
+				},
+				"page": {
+					"title": "Page",
+					"type": "integer"
+				},
+				"page_size": {
+					"title": "Page Size",
+					"type": "integer"
+				},
+				"sort_by": {
+					"enum": ["startDate", "endDate", "eventName", "eventType", "source"],
+					"title": "Sort By",
+					"type": "string"
+				},
+				"sort_dir": {
+					"enum": ["asc", "desc"],
+					"title": "Sort Dir",
+					"type": "string"
+				},
+				"total": {
+					"title": "Total",
+					"type": "integer"
+				}
+			},
+			"required": ["items", "page", "page_size", "total", "sort_by", "sort_dir"],
+			"title": "AnalysisEventsResponse",
+			"type": "object"
+		},
+		"AnalysisFilterOptionsResponse": {
+			"properties": {
+				"disasterTypes": {
+					"$ref": "#/components/schemas/TaxonomyNode"
+				},
+				"locations": {
+					"$ref": "#/components/schemas/PsgcGraphResponse"
+				}
+			},
+			"required": ["locations", "disasterTypes"],
+			"title": "AnalysisFilterOptionsResponse",
+			"type": "object"
+		},
+		"AnalysisRegionRanking": {
+			"properties": {
+				"count": {
+					"title": "Count",
+					"type": "integer"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label", "count"],
+			"title": "AnalysisRegionRanking",
+			"type": "object"
+		},
+		"AnalysisRegionRankingsResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisRegionRanking"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"title": "AnalysisRegionRankingsResponse",
+			"type": "object"
+		},
+		"AnalysisSummaryResponse": {
+			"properties": {
+				"affectedFamilies": {
+					"default": 0,
+					"title": "Affectedfamilies",
+					"type": "integer"
+				},
+				"affectedPersons": {
+					"default": 0,
+					"title": "Affectedpersons",
+					"type": "integer"
+				},
+				"damage": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDamageAmount"
+					},
+					"title": "Damage",
+					"type": "array"
+				},
+				"dead": {
+					"default": 0,
+					"title": "Dead",
+					"type": "integer"
+				},
+				"injured": {
+					"default": 0,
+					"title": "Injured",
+					"type": "integer"
+				},
+				"missing": {
+					"default": 0,
+					"title": "Missing",
+					"type": "integer"
+				},
+				"record_count": {
+					"default": 0,
+					"title": "Record Count",
+					"type": "integer"
+				}
+			},
+			"title": "AnalysisSummaryResponse",
+			"type": "object"
+		},
+		"AnalysisTimelineCategoryStack": {
+			"properties": {
+				"categories": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisDisasterCount"
+					},
+					"title": "Categories",
+					"type": "array"
+				},
+				"period": {
+					"title": "Period",
+					"type": "string"
+				}
+			},
+			"required": ["period"],
+			"title": "AnalysisTimelineCategoryStack",
+			"type": "object"
+		},
+		"AnalysisTimelineCategoryStacksResponse": {
+			"properties": {
+				"bucket": {
+					"enum": ["month_year", "month_of_year"],
+					"title": "Bucket",
+					"type": "string"
+				},
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisTimelineCategoryStack"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"required": ["bucket"],
+			"title": "AnalysisTimelineCategoryStacksResponse",
+			"type": "object"
+		},
+		"AnalysisTimelineDateEventsResponse": {
+			"properties": {
+				"date_prefix": {
+					"title": "Date Prefix",
+					"type": "string"
+				},
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisEvent"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"required": ["date_prefix"],
+			"title": "AnalysisTimelineDateEventsResponse",
+			"type": "object"
+		},
+		"AnalysisVictimTrend": {
+			"properties": {
+				"dead": {
+					"default": 0,
+					"title": "Dead",
+					"type": "integer"
+				},
+				"injured": {
+					"default": 0,
+					"title": "Injured",
+					"type": "integer"
+				},
+				"missing": {
+					"default": 0,
+					"title": "Missing",
+					"type": "integer"
+				},
+				"year": {
+					"title": "Year",
+					"type": "integer"
+				}
+			},
+			"required": ["year"],
+			"title": "AnalysisVictimTrend",
+			"type": "object"
+		},
+		"AnalysisVictimTrendsResponse": {
+			"properties": {
+				"items": {
+					"items": {
+						"$ref": "#/components/schemas/AnalysisVictimTrend"
+					},
+					"title": "Items",
+					"type": "array"
+				}
+			},
+			"title": "AnalysisVictimTrendsResponse",
+			"type": "object"
+		},
+		"AskPreviewResponse": {
+			"properties": {
+				"sparql": {
+					"title": "Sparql",
+					"type": "string"
+				}
+			},
+			"required": ["sparql"],
+			"title": "AskPreviewResponse",
+			"type": "object"
+		},
+		"AskRequest": {
+			"properties": {
+				"query": {
+					"title": "Query",
+					"type": "string"
+				}
+			},
+			"required": ["query"],
+			"title": "AskRequest",
+			"type": "object"
+		},
+		"AskResponse": {
+			"properties": {
+				"answer": {
+					"title": "Answer",
+					"type": "string"
+				},
+				"rows": {
+					"items": {
+						"additionalProperties": {
+							"type": "string"
+						},
+						"type": "object"
+					},
+					"title": "Rows",
+					"type": "array"
+				},
+				"sparql": {
+					"title": "Sparql",
+					"type": "string"
+				}
+			},
+			"required": ["sparql", "answer", "rows"],
+			"title": "AskResponse",
+			"type": "object"
+		},
+		"EventDetailDisasterType": {
+			"properties": {
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"uri": {
+					"title": "Uri",
+					"type": "string"
+				}
+			},
+			"required": ["uri", "id", "label"],
+			"title": "EventDetailDisasterType",
+			"type": "object"
+		},
+		"EventDetailLocation": {
+			"properties": {
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"uri": {
+					"title": "Uri",
+					"type": "string"
+				}
+			},
+			"required": ["uri", "id", "label"],
+			"title": "EventDetailLocation",
+			"type": "object"
+		},
+		"EventDetailRelatedEvent": {
+			"properties": {
+				"endDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Enddate"
+				},
+				"eventType": {
+					"anyOf": [
+						{
+							"enum": ["MajorEvent", "Incident"],
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Eventtype"
+				},
+				"name": {
+					"title": "Name",
+					"type": "string"
+				},
+				"startDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Startdate"
+				},
+				"uri": {
+					"title": "Uri",
+					"type": "string"
+				}
+			},
+			"required": ["uri", "name"],
+			"title": "EventDetailRelatedEvent",
+			"type": "object"
+		},
+		"EventDetailSource": {
+			"properties": {
+				"attributedTo": {
+					"items": {
+						"$ref": "#/components/schemas/IriLabel"
+					},
+					"title": "Attributedto",
+					"type": "array"
+				},
+				"format": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Format"
+				},
+				"lastUpdateDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Lastupdatedate"
+				},
+				"obtainedDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Obtaineddate"
+				},
+				"reportLink": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Reportlink"
+				},
+				"reportName": {
+					"title": "Reportname",
+					"type": "string"
+				},
+				"uri": {
+					"title": "Uri",
+					"type": "string"
+				}
+			},
+			"required": ["uri", "reportName"],
+			"title": "EventDetailSource",
+			"type": "object"
+		},
+		"EventDetailsResponse": {
+			"properties": {
+				"alternates": {
+					"items": {
+						"$ref": "#/components/schemas/EventDetailRelatedEvent"
+					},
+					"title": "Alternates",
+					"type": "array"
+				},
+				"disasterTypes": {
+					"items": {
+						"$ref": "#/components/schemas/EventDetailDisasterType"
+					},
+					"title": "Disastertypes",
+					"type": "array"
+				},
+				"endDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Enddate"
+				},
+				"event": {
+					"title": "Event",
+					"type": "string"
+				},
+				"eventType": {
+					"enum": ["MajorEvent", "Incident"],
+					"title": "Eventtype",
+					"type": "string"
+				},
+				"incidents": {
+					"items": {
+						"$ref": "#/components/schemas/EventDetailRelatedEvent"
+					},
+					"title": "Incidents",
+					"type": "array"
+				},
+				"locations": {
+					"items": {
+						"$ref": "#/components/schemas/EventDetailLocation"
+					},
+					"title": "Locations",
+					"type": "array"
+				},
+				"majorEvents": {
+					"items": {
+						"$ref": "#/components/schemas/EventDetailRelatedEvent"
+					},
+					"title": "Majorevents",
+					"type": "array"
+				},
+				"name": {
+					"title": "Name",
+					"type": "string"
+				},
+				"remarks": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Remarks",
+					"type": "array"
+				},
+				"sources": {
+					"items": {
+						"$ref": "#/components/schemas/EventDetailSource"
+					},
+					"title": "Sources",
+					"type": "array"
+				},
+				"startDate": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Startdate"
+				}
+			},
+			"required": ["event", "name", "eventType"],
+			"title": "EventDetailsResponse",
+			"type": "object"
+		},
+		"HTTPValidationError": {
+			"properties": {
+				"detail": {
+					"items": {
+						"$ref": "#/components/schemas/ValidationError"
+					},
+					"title": "Detail",
+					"type": "array"
+				}
+			},
+			"title": "HTTPValidationError",
+			"type": "object"
+		},
+		"IriLabel": {
+			"properties": {
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"uri": {
+					"title": "Uri",
+					"type": "string"
+				}
+			},
+			"required": ["uri", "label"],
+			"title": "IriLabel",
+			"type": "object"
+		},
+		"MapEvent": {
+			"properties": {
+				"alternates": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Alternates",
+					"type": "array"
+				},
+				"disasterTypes": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Disastertypes",
+					"type": "array"
+				},
+				"event": {
+					"title": "Event",
+					"type": "string"
+				},
+				"eventName": {
+					"title": "Eventname",
+					"type": "string"
+				},
+				"locations": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Locations",
+					"type": "array"
+				},
+				"source": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Source"
+				},
+				"startDate": {
+					"title": "Startdate",
+					"type": "string"
+				}
+			},
+			"required": ["event", "eventName", "startDate"],
+			"title": "MapEvent",
+			"type": "object"
+		},
+		"MapEventsResponse": {
+			"properties": {
+				"events": {
+					"items": {
+						"$ref": "#/components/schemas/MapEvent"
+					},
+					"title": "Events",
+					"type": "array"
+				},
+				"incidentCount": {
+					"title": "Incidentcount",
+					"type": "integer"
+				},
+				"majorCount": {
+					"title": "Majorcount",
+					"type": "integer"
+				}
+			},
+			"required": ["events", "majorCount", "incidentCount"],
+			"title": "MapEventsResponse",
+			"type": "object"
+		},
+		"OntologyDataProperty": {
+			"properties": {
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"range": {
+					"title": "Range",
+					"type": "string"
+				}
+			},
+			"required": ["label", "range"],
+			"title": "OntologyDataProperty",
+			"type": "object"
+		},
+		"OntologyGraphResponse": {
+			"properties": {
+				"links": {
+					"items": {
+						"$ref": "#/components/schemas/OntologyLink"
+					},
+					"title": "Links",
+					"type": "array"
+				},
+				"nodes": {
+					"items": {
+						"$ref": "#/components/schemas/OntologyNode"
+					},
+					"title": "Nodes",
+					"type": "array"
+				}
+			},
+			"required": ["nodes", "links"],
+			"title": "OntologyGraphResponse",
+			"type": "object"
+		},
+		"OntologyLink": {
+			"properties": {
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"source": {
+					"title": "Source",
+					"type": "string"
+				},
+				"target": {
+					"title": "Target",
+					"type": "string"
+				},
+				"type": {
+					"enum": ["subClassOf", "objectProperty"],
+					"title": "Type",
+					"type": "string"
+				}
+			},
+			"required": ["source", "target", "type", "label"],
+			"title": "OntologyLink",
+			"type": "object"
+		},
+		"OntologyNode": {
+			"properties": {
+				"dataProperties": {
+					"anyOf": [
+						{
+							"items": {
+								"$ref": "#/components/schemas/OntologyDataProperty"
+							},
+							"type": "array"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Dataproperties"
+				},
+				"definition": {
+					"title": "Definition",
+					"type": "string"
+				},
+				"group": {
+					"title": "Group",
+					"type": "string"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label", "group", "definition"],
+			"title": "OntologyNode",
+			"type": "object"
+		},
+		"PsgcCityMunicipality": {
+			"properties": {
+				"cityType": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Citytype"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"incomeClass": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Incomeclass"
+				},
+				"island": {
+					"title": "Island",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"level": {
+					"enum": ["City", "Municipality"],
+					"title": "Level",
+					"type": "string"
+				},
+				"note": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Note"
+				},
+				"parentId": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Parentid"
+				},
+				"parentLabel": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Parentlabel"
+				},
+				"population": {
+					"title": "Population",
+					"type": "integer"
+				},
+				"psgcCode": {
+					"title": "Psgccode",
+					"type": "string"
+				},
+				"regionId": {
+					"title": "Regionid",
+					"type": "string"
+				},
+				"regionLabel": {
+					"title": "Regionlabel",
+					"type": "string"
+				}
+			},
+			"required": [
+				"id",
+				"label",
+				"level",
+				"island",
+				"population",
+				"psgcCode",
+				"regionId",
+				"regionLabel"
+			],
+			"title": "PsgcCityMunicipality",
+			"type": "object"
+		},
+		"PsgcGraphResponse": {
+			"properties": {
+				"links": {
+					"items": {
+						"$ref": "#/components/schemas/PsgcLink"
+					},
+					"title": "Links",
+					"type": "array"
+				},
+				"nodes": {
+					"items": {
+						"discriminator": {
+							"mapping": {
+								"City": "#/components/schemas/PsgcCityMunicipality",
+								"Municipality": "#/components/schemas/PsgcCityMunicipality",
+								"Province": "#/components/schemas/PsgcProvince",
+								"Region": "#/components/schemas/PsgcRegion"
+							},
+							"propertyName": "level"
+						},
+						"oneOf": [
+							{
+								"$ref": "#/components/schemas/PsgcRegion"
+							},
+							{
+								"$ref": "#/components/schemas/PsgcProvince"
+							},
+							{
+								"$ref": "#/components/schemas/PsgcCityMunicipality"
+							}
+						]
+					},
+					"title": "Nodes",
+					"type": "array"
+				}
+			},
+			"required": ["nodes", "links"],
+			"title": "PsgcGraphResponse",
+			"type": "object"
+		},
+		"PsgcLink": {
+			"properties": {
+				"source": {
+					"title": "Source",
+					"type": "string"
+				},
+				"target": {
+					"title": "Target",
+					"type": "string"
+				}
+			},
+			"required": ["source", "target"],
+			"title": "PsgcLink",
+			"type": "object"
+		},
+		"PsgcProvince": {
+			"properties": {
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"incomeClass": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Incomeclass"
+				},
+				"island": {
+					"title": "Island",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"level": {
+					"const": "Province",
+					"default": "Province",
+					"title": "Level",
+					"type": "string"
+				},
+				"population": {
+					"title": "Population",
+					"type": "integer"
+				},
+				"psgcCode": {
+					"title": "Psgccode",
+					"type": "string"
+				},
+				"regionId": {
+					"title": "Regionid",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label", "island", "population", "psgcCode", "regionId"],
+			"title": "PsgcProvince",
+			"type": "object"
+		},
+		"PsgcRegion": {
+			"properties": {
+				"fullName": {
+					"title": "Fullname",
+					"type": "string"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"island": {
+					"title": "Island",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				},
+				"level": {
+					"const": "Region",
+					"default": "Region",
+					"title": "Level",
+					"type": "string"
+				},
+				"population": {
+					"title": "Population",
+					"type": "integer"
+				},
+				"psgcCode": {
+					"title": "Psgccode",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label", "fullName", "island", "population", "psgcCode"],
+			"title": "PsgcRegion",
+			"type": "object"
+		},
+		"SparqlHead": {
+			"additionalProperties": true,
+			"properties": {
+				"vars": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Vars",
+					"type": "array"
+				}
+			},
+			"title": "SparqlHead",
+			"type": "object"
+		},
+		"SparqlQueryResponse": {
+			"additionalProperties": true,
+			"properties": {
+				"boolean": {
+					"anyOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Boolean"
+				},
+				"head": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/SparqlHead"
+						},
+						{
+							"additionalProperties": true,
+							"type": "object"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Head"
+				},
+				"results": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/SparqlResults"
+						},
+						{
+							"additionalProperties": true,
+							"type": "object"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Results"
+				}
+			},
+			"title": "SparqlQueryResponse",
+			"type": "object"
+		},
+		"SparqlRequest": {
+			"properties": {
+				"query": {
+					"title": "Query",
+					"type": "string"
+				}
+			},
+			"required": ["query"],
+			"title": "SparqlRequest",
+			"type": "object"
+		},
+		"SparqlResults": {
+			"additionalProperties": true,
+			"properties": {
+				"bindings": {
+					"items": {
+						"additionalProperties": {
+							"$ref": "#/components/schemas/SparqlTerm"
+						},
+						"type": "object"
+					},
+					"title": "Bindings",
+					"type": "array"
+				}
+			},
+			"title": "SparqlResults",
+			"type": "object"
+		},
+		"SparqlTerm": {
+			"additionalProperties": true,
+			"properties": {
+				"datatype": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Datatype"
+				},
+				"type": {
+					"title": "Type",
+					"type": "string"
+				},
+				"value": {
+					"title": "Value"
+				}
+			},
+			"required": ["value", "type"],
+			"title": "SparqlTerm",
+			"type": "object"
+		},
+		"TaxonomyNode": {
+			"properties": {
+				"children": {
+					"anyOf": [
+						{
+							"items": {
+								"$ref": "#/components/schemas/TaxonomyNode"
+							},
+							"type": "array"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Children"
+				},
+				"definition": {
+					"title": "Definition",
+					"type": "string"
+				},
+				"group": {
+					"title": "Group",
+					"type": "string"
+				},
+				"id": {
+					"title": "Id",
+					"type": "string"
+				},
+				"label": {
+					"title": "Label",
+					"type": "string"
+				}
+			},
+			"required": ["id", "label", "group", "definition"],
+			"title": "TaxonomyNode",
+			"type": "object"
+		},
+		"ValidationError": {
+			"properties": {
+				"ctx": {
+					"title": "Context",
+					"type": "object"
+				},
+				"input": {
+					"title": "Input"
+				},
+				"loc": {
+					"items": {
+						"anyOf": [
+							{
+								"type": "string"
+							},
+							{
+								"type": "integer"
+							}
+						]
+					},
+					"title": "Location",
+					"type": "array"
+				},
+				"msg": {
+					"title": "Message",
+					"type": "string"
+				},
+				"type": {
+					"title": "Error Type",
+					"type": "string"
+				}
+			},
+			"required": ["loc", "msg", "type"],
+			"title": "ValidationError",
+			"type": "object"
+		}
+	}
+}

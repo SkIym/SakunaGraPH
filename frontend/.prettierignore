@@ -1,0 +1,8 @@
+.svelte-kit
+build
+node_modules
+playwright-report
+test-results
+static/data/regions.geojson
+tests/visual-baselines
+package-lock.json
