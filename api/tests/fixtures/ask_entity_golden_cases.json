@@ -1,0 +1,28 @@
+{
+  "threshold": 0.95,
+  "cases": [
+    {"mention": "1300000000", "entity_type": "location", "expected_id": "1300000000"},
+    {"mention": "National Capital Region", "entity_type": "location", "expected_id": "1300000000"},
+    {"mention": "NCR", "entity_type": "location", "expected_id": "1300000000"},
+    {"mention": "Ilocos Region", "entity_type": "location", "expected_id": "0100000000"},
+    {"mention": "Abra Province", "entity_type": "location", "expected_id": "1401000000"},
+    {"mention": "Cebu Province", "entity_type": "location", "expected_id": "0706000000"},
+    {"mention": "City of Cebu", "entity_type": "location", "expected_id": "0730600000"},
+    {"mention": "Davao del Sur Province", "entity_type": "location", "expected_id": "1102400000"},
+    {"mention": "Davao City", "entity_type": "location", "expected_id": "1130700000"},
+    {"mention": "Baguio City", "entity_type": "location", "expected_id": "1430300000"},
+    {"mention": "Flood", "entity_type": "disaster_type", "expected_id": "Flood"},
+    {"mention": "floods", "entity_type": "disaster_type", "expected_id": "Flood"},
+    {"mention": "typhoon", "entity_type": "disaster_type", "expected_id": "TropicalCyclone"},
+    {"mention": "Tropical Cyclone", "entity_type": "disaster_type", "expected_id": "TropicalCyclone"},
+    {"mention": "quake", "entity_type": "disaster_type", "expected_id": "Earthquake"},
+    {"mention": "Drought", "entity_type": "disaster_type", "expected_id": "Drought"},
+    {"mention": "Super Typhoon Yolanda", "entity_type": "event", "expected_id": "event-yolanda"},
+    {"mention": "Haiyan", "entity_type": "event", "expected_id": "event-yolanda"},
+    {"mention": "NDRRMC", "entity_type": "organization", "expected_id": "NDRRMC"},
+    {"mention": "National Disaster Risk Reduction and Management Council", "entity_type": "organization", "expected_id": "NDRRMC"},
+    {"mention": "fatalities", "entity_type": "casualty_type", "expected_id": "Dead"},
+    {"mention": "wounded", "entity_type": "casualty_type", "expected_id": "Injured"},
+    {"mention": "unaccounted for", "entity_type": "casualty_type", "expected_id": "Missing"}
+  ]
+}

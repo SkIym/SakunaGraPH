@@ -35,7 +35,12 @@ from src.services.ask.answer import ground_answer  # noqa: E402
 from src.services.ask.context import load_ontology_context  # noqa: E402
 from src.services.common import ServiceError  # noqa: E402
 from src.services.llm import active_model_info  # noqa: E402
-from src.services.sparql import execute_sparql, sparql_with_correction  # noqa: E402
+from src.services.sparql import (  # noqa: E402
+    SparqlCorrectionError,
+    execute_sparql,
+    is_graphdb_error,
+    sparql_with_correction,
+)
 
 DEFAULT_FIXTURES = API_ROOT / "tests" / "fixtures" / "ask_golden_questions.json"
 DEFAULT_REPORT_DIR = API_ROOT / "evaluation" / "reports"
@@ -46,8 +51,6 @@ NO_DATA_PATTERNS = (
     "did not return any",
     "there are no",
 )
-
-
 def _now_iso() -> str:
     return datetime.now(UTC).isoformat()
 
@@ -184,11 +187,19 @@ def infer_actual_status(execution_success: bool) -> str:
     return "answered" if execution_success else "execution_failed"
 
 
+def graphdb_error_from_result(result: dict[str, Any]) -> str | None:
+    error = result.get("execution", {}).get("error")
+    if isinstance(error, str) and is_graphdb_error(error):
+        return error
+    return None
+
+
 async def evaluate_case(
     case: dict[str, Any],
     *,
     ontology_context: str,
     generate_answer: bool,
+    stop_on_graphdb_error: bool = False,
 ) -> dict[str, Any]:
     started = time.perf_counter()
     sparql = ""
@@ -204,17 +215,26 @@ async def evaluate_case(
     generation_started = time.perf_counter()
     try:
         sparql, raw_results = await sparql_with_correction(
-            case["question"], ontology_context
+            case["question"],
+            ontology_context,
+            stop_on_graphdb_error=stop_on_graphdb_error,
         )
+    except SparqlCorrectionError as exc:
+        sparql = exc.sparql
+        execution_error = exc.reason
     except Exception as exc:  # Keep the baseline run alive across service failures.
         generation_error = _error_text(exc)
     generation_ms = _duration_ms(generation_started)
 
-    # The current production helper returns an empty dict after exhausting its
-    # repair attempts. Re-run only that final query to recover the masked
-    # GraphDB error and distinguish it from a successful empty result set.
+    # Re-run only when a helper unexpectedly returns no result and no explicit
+    # error. Exhausted correction attempts normally preserve their final error.
     execution_success = bool(raw_results)
-    if sparql and not raw_results and generation_error is None:
+    if (
+        sparql
+        and not raw_results
+        and generation_error is None
+        and execution_error is None
+    ):
         verification_started = time.perf_counter()
         verification = await execute_sparql(sparql)
         verification_ms = _duration_ms(verification_started)
@@ -226,12 +246,11 @@ async def evaluate_case(
     elif generation_error is not None:
         execution_error = "Query generation did not complete."
 
-    if generate_answer and generation_error is None:
+    if generate_answer and generation_error is None and execution_success:
         answer_started = time.perf_counter()
         try:
-            # This deliberately mirrors current behavior, including grounding
-            # on {} after a masked query failure, so false no-data answers are
-            # visible in the baseline.
+            # Answers are grounded only after confirmed successful execution;
+            # query failures must not be presented as valid no-data answers.
             answer = await ground_answer(case["question"], raw_results)
         except Exception as exc:
             answer_error = _error_text(exc)
@@ -392,13 +411,20 @@ def build_report(
     started_at: str,
     finished_at: str,
     generate_answer: bool,
+    abort_reason: str | None = None,
+    continue_on_graphdb_error: bool = False,
 ) -> dict[str, Any]:
     fixture_bytes = fixture_path.read_bytes()
     return {
-        "report_version": "1.0.0",
+        "report_version": "1.1.0",
         "pipeline": "current_text_to_sparql_baseline",
         "started_at": started_at,
         "finished_at": finished_at,
+        "run": {
+            "status": "aborted" if abort_reason else "completed",
+            "evaluated_cases": len(results),
+            "abort_reason": abort_reason,
+        },
         "model": active_model_info(),
         "graphdb": {"endpoint": settings.graphdb_endpoint},
         "fixture": {
@@ -411,11 +437,12 @@ def build_report(
         "configuration": {
             "generate_answers": generate_answer,
             "execution_order": "sequential",
+            "stop_on_graphdb_error": not continue_on_graphdb_error,
             "semantic_scoring": "case-insensitive required/forbidden terms with prefixed-name boundaries",
             "notes": [
                 "Planner-field accuracy is not scored because the current pipeline does not emit AskPlan.",
                 "Unexpected empty results are candidates for review, not automatically classified as false negatives.",
-                "A final query is re-executed only when the current correction helper masks failure as an empty dict.",
+                "Exhausted query corrections preserve the final query and execution error.",
             ],
         },
         "summary": summarize_results(results),
@@ -470,6 +497,14 @@ def parse_args(argv: list[str] | None = None) -> argparse.Namespace:
         action="store_true",
         help="Validate and list selected fixtures without calling the model or GraphDB.",
     )
+    parser.add_argument(
+        "--continue-on-graphdb-error",
+        action="store_true",
+        help=(
+            "Record final GraphDB errors and continue evaluating. By default, the "
+            "partial report is written and evaluation stops at the first such error."
+        ),
+    )
     return parser.parse_args(argv)
 
 
@@ -513,19 +548,30 @@ async def async_main(args: argparse.Namespace) -> int:
     started_at = _now_iso()
     ontology_context = load_ontology_context()
     results: list[dict[str, Any]] = []
+    abort_reason: str | None = None
     for index, case in enumerate(selected, start=1):
         print(
             f"[{index}/{len(selected)}] {case['id']}",
             file=sys.stderr,
             flush=True,
         )
-        results.append(
-            await evaluate_case(
-                case,
-                ontology_context=ontology_context,
-                generate_answer=not args.no_answer,
-            )
+        result = await evaluate_case(
+            case,
+            ontology_context=ontology_context,
+            generate_answer=not args.no_answer,
+            stop_on_graphdb_error=not args.continue_on_graphdb_error,
         )
+        results.append(result)
+
+        graphdb_error = graphdb_error_from_result(result)
+        if graphdb_error and not args.continue_on_graphdb_error:
+            abort_reason = f"{case['id']}: {graphdb_error}"
+            print(
+                f"Stopping after GraphDB error in {case['id']}: {graphdb_error}",
+                file=sys.stderr,
+                flush=True,
+            )
+            break
 
     finished_at = _now_iso()
     output_path = (args.output or default_output_path()).expanduser().resolve()
@@ -538,6 +584,8 @@ async def async_main(args: argparse.Namespace) -> int:
         started_at=started_at,
         finished_at=finished_at,
         generate_answer=not args.no_answer,
+        abort_reason=abort_reason,
+        continue_on_graphdb_error=args.continue_on_graphdb_error,
     )
     output_path.write_text(
         json.dumps(report, indent=2, ensure_ascii=False) + "\n",
@@ -545,7 +593,7 @@ async def async_main(args: argparse.Namespace) -> int:
     )
     print(json.dumps(report["summary"], indent=2, ensure_ascii=False))
     print(f"Report written to {output_path}", file=sys.stderr)
-    return 0
+    return 1 if abort_reason else 0
 
 
 def main(argv: list[str] | None = None) -> int:

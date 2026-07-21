@@ -5,6 +5,7 @@ from pathlib import Path
 
 from scripts.evaluate_ask import (
     answer_claims_no_data,
+    graphdb_error_from_result,
     load_fixture_document,
     result_is_empty,
     result_row_count,
@@ -98,6 +99,30 @@ class ScoringTests(unittest.TestCase):
     def test_detects_common_no_data_claims(self) -> None:
         self.assertTrue(answer_claims_no_data("No data was found for that period."))
         self.assertFalse(answer_claims_no_data("Three events were found."))
+
+    def test_identifies_only_graphdb_execution_errors_as_fatal(self) -> None:
+        self.assertEqual(
+            graphdb_error_from_result(
+                {"execution": {"error": "GraphDB returned 500: unavailable"}}
+            ),
+            "GraphDB returned 500: unavailable",
+        )
+        self.assertEqual(
+            graphdb_error_from_result(
+                {"execution": {"error": "Cannot connect to GraphDB"}}
+            ),
+            "Cannot connect to GraphDB",
+        )
+        self.assertIsNone(
+            graphdb_error_from_result(
+                {"execution": {"error": "Malformed SPARQL query: bad aggregate"}}
+            )
+        )
+        self.assertIsNone(
+            graphdb_error_from_result(
+                {"execution": {"succeeded": True, "error": None, "row_count": 0}}
+            )
+        )
 
     def test_summarizes_case_results(self) -> None:
         result = {
