@@ -153,6 +153,8 @@ LIMIT 10"""
         client.assert_called_once_with(timeout=12, auth=("reader", "secret"))
         self.assertEqual(len(result["results"]["bindings"]), 2)
         self.assertTrue(result["_truncated"])
+        self.assertEqual(result["_truncation_limit"], 2)
+        self.assertEqual(result["_truncation_reason"], "API safety limit")
         client_context.__aenter__.return_value.post.assert_awaited_once()
         self.assertEqual(
             client_context.__aenter__.return_value.post.await_args.kwargs["params"],

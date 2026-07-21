@@ -1,3 +1,10 @@
+from src.schemas.answer_context import (
+    AskAnswerContext,
+    AskAnswerRow,
+    AskEvidence,
+    AskProvenance,
+    AskResultTerm,
+)
 from src.schemas.ask_plan import AskPlan
 from src.schemas.ask_execution import DeterministicAskResult, QueryArtifact
 from src.schemas.entity_resolution import (
@@ -15,7 +22,12 @@ from src.schemas.query_validation import (
 )
 
 __all__ = [
+    "AskAnswerContext",
+    "AskAnswerRow",
+    "AskEvidence",
     "AskPlan",
+    "AskProvenance",
+    "AskResultTerm",
     "DeterministicAskResult",
     "EntityAmbiguity",
     "EntityCatalogEntry",

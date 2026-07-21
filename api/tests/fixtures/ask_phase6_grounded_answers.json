@@ -1,0 +1,51 @@
+{
+  "threshold": 1.0,
+  "cases": [
+    {
+      "id": "simple-event-count",
+      "intent": "event_count",
+      "metric": "events",
+      "columns": ["total"],
+      "rows": [{"total": "3"}],
+      "expected_answer": "The validated count is 3 events [E1]."
+    },
+    {
+      "id": "casualty-total-with-unit",
+      "intent": "impact_summary",
+      "metric": "dead",
+      "columns": ["metric", "total"],
+      "rows": [{"metric": "dead", "total": "12"}],
+      "expected_answer": "Validated totals — deaths: 12 persons [E1]."
+    },
+    {
+      "id": "damage-totals-preserve-units",
+      "intent": "impact_summary",
+      "metric": "damage",
+      "columns": ["metric", "total", "unit"],
+      "rows": [
+        {"metric": "damage", "total": "1250000", "unit": "PHP"},
+        {"metric": "damage", "total": "4.5", "unit": "USD"}
+      ],
+      "expected_answer": "Validated totals — damage: 1,250,000 PHP [E1]; damage: 4.5 USD [E2]."
+    },
+    {
+      "id": "event-list-with-evidence",
+      "intent": "list_events",
+      "metric": null,
+      "columns": ["event", "eventName"],
+      "rows": [
+        {"event": "https://sakuna.ph/events/ndrrmc/one", "eventName": "Typhoon One"},
+        {"event": "https://sakuna.ph/events/ndrrmc/two", "eventName": "Flood Two"}
+      ],
+      "expected_answer": "Found 2 matching events: Typhoon One [E1]; Flood Two [E2]."
+    },
+    {
+      "id": "valid-empty-results",
+      "intent": "list_events",
+      "metric": null,
+      "columns": ["event", "eventName"],
+      "rows": [],
+      "expected_answer": "No matching data was found in the validated query results [E1]."
+    }
+  ]
+}

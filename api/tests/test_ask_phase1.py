@@ -148,7 +148,11 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(response.status, AskStatus.NO_DATA)
         self.assertEqual(response.rows, [])
-        self.assertEqual(response.answer, "No data was found.")
+        self.assertEqual(
+            response.answer,
+            "No matching data was found in the validated query results [E1].",
+        )
+        self.assertEqual(response.evidence[0].values, {"rowCount": "0"})
 
     async def test_query_failure_never_reaches_answer_generation(self) -> None:
         with (
@@ -197,7 +201,12 @@ class AskApiCompatibilityTests(unittest.TestCase):
             response = self.client.post("/api/ask", json={"query": "List events"})
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), response_payload)
+        payload = response.json()
+        self.assertEqual(
+            {field: payload[field] for field in response_payload},
+            response_payload,
+        )
+        self.assertEqual(payload["evidence"], [])
 
     def test_validation_failure_preserves_detail_and_adds_status(self) -> None:
         error = SparqlCorrectionError(

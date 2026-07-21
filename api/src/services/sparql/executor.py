@@ -252,6 +252,8 @@ async def execute_sparql(
             if isinstance(bindings, list) and len(bindings) > max_rows:
                 payload["results"]["bindings"] = bindings[:max_rows]
                 payload["_truncated"] = True
+                payload["_truncation_limit"] = max_rows
+                payload["_truncation_reason"] = "API safety limit"
         return payload
     except httpx.ConnectError:
         return "Cannot connect to GraphDB"

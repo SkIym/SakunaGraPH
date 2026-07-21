@@ -87,8 +87,13 @@ def validate_query_results(
     truncated = bool(raw_results.get("_truncated", False))
     warnings = []
     if truncated:
+        truncation_limit = raw_results.get(
+            "_truncation_limit",
+            settings.ask_result_row_limit,
+        )
+        reason = raw_results.get("_truncation_reason", "API safety limit")
         warnings.append(
-            f"Results were truncated to {settings.ask_result_row_limit} rows by the API."
+            f"Results were truncated to {truncation_limit} rows by the {reason}."
         )
     return ResultValidationReport(
         row_count=len(bindings),

@@ -6,7 +6,13 @@ from src.schemas.ask import AskPreviewResponse, AskResponse, AskStatus
 from src.schemas.ask_execution import QueryArtifact
 from src.schemas.entity_resolution import ResolvedAskPlan
 from src.schemas.query_validation import ResultValidationReport
-from src.services.ask.answer import build_grounding_prompt, ground_answer
+from src.services.ask.answer import (
+    build_answer_context,
+    build_grounding_prompt,
+    deterministic_answer,
+    evidence_citation_suffix,
+    ground_answer,
+)
 from src.services.ask.context import load_ontology_context
 from src.services.ask.entity_resolver import resolve_ask_plan
 from src.services.ask.planner import plan_question
@@ -73,6 +79,7 @@ def _raw_results_from_rows(
     expected_columns: list[str],
     *,
     truncated: bool,
+    truncation_limit: int | None = None,
 ) -> dict:
     columns = list(expected_columns)
     for row in rows:
@@ -93,6 +100,8 @@ def _raw_results_from_rows(
     }
     if truncated:
         result["_truncated"] = True
+        result["_truncation_limit"] = truncation_limit or len(rows)
+        result["_truncation_reason"] = "requested result limit"
     return result
 
 
@@ -167,6 +176,7 @@ async def _execute_artifact(
             service_result.rows,
             artifact.expected_columns,
             truncated=service_result.truncated,
+            truncation_limit=resolved_plan.plan.limit,
         )
     else:
         raw_results = await execute_sparql(
@@ -221,17 +231,29 @@ async def ask_question(query: str) -> AskResponse:
             ambiguities=resolved_plan.ambiguities,
         )
     artifact, raw_results, result_report = await _execute_artifact(query, resolved_plan)
-    answer = await ground_answer(query, raw_results)
+    answer_context = build_answer_context(
+        query,
+        raw_results,
+        resolved_plan,
+        artifact,
+        result_report,
+    )
+    answer = deterministic_answer(answer_context)
+    if answer is None:
+        answer = await ground_answer(answer_context)
     return AskResponse(
         status=_result_status(raw_results),
         sparql=artifact.sparql,
         answer=answer,
         rows=_result_rows(raw_results),
         interpretation=resolved_plan,
-        warnings=[*resolved_plan.warnings, *result_report.warnings],
+        warnings=answer_context.warnings,
         ambiguities=resolved_plan.ambiguities,
         query_artifact=artifact,
         truncated=result_report.truncated,
+        approximate=answer_context.approximate,
+        evidence=answer_context.evidence,
+        answer_context=answer_context,
     )
 
 
@@ -253,15 +275,32 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
             "interpretation": interpretation,
             "warnings": resolved_plan.warnings,
             "ambiguities": ambiguities,
+            "truncated": False,
+            "approximate": False,
+            "evidence": [],
         }
         yield f"data: {json.dumps(meta)}\n\n"
         yield f"data: {json.dumps({'type': 'token', 'text': _ambiguity_answer(resolved_plan)})}\n\n"
-        yield f"data: {json.dumps({'type': 'done', 'status': status})}\n\n"
+        done = {
+            "type": "done",
+            "status": status,
+            "evidence_count": 0,
+            "truncated": False,
+            "approximate": False,
+        }
+        yield f"data: {json.dumps(done)}\n\n"
         return
 
     artifact, raw_results, result_report = await _execute_artifact(query, resolved_plan)
     rows = _result_rows(raw_results)
     status = _result_status(raw_results)
+    answer_context = build_answer_context(
+        query,
+        raw_results,
+        resolved_plan,
+        artifact,
+        result_report,
+    )
 
     meta = {
         "type": "meta",
@@ -269,15 +308,47 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
         "sparql": artifact.sparql,
         "rows": rows,
         "interpretation": interpretation,
-        "warnings": [*resolved_plan.warnings, *result_report.warnings],
+        "warnings": answer_context.warnings,
         "ambiguities": ambiguities,
         "query_artifact": artifact.model_dump(mode="json"),
         "truncated": result_report.truncated,
+        "approximate": answer_context.approximate,
+        "evidence": [item.model_dump(mode="json") for item in answer_context.evidence],
+        "answer_context": answer_context.model_dump(mode="json"),
     }
     yield f"data: {json.dumps(meta)}\n\n"
 
-    prompt = build_grounding_prompt(query, raw_results)
-    async for text in stream_text_async(prompt):
-        yield f"data: {json.dumps({'type': 'token', 'text': text})}\n\n"
+    results_event = {
+        "type": "results",
+        "status": status,
+        "rows": rows,
+        "evidence": [item.model_dump(mode="json") for item in answer_context.evidence],
+        "truncated": answer_context.truncated,
+        "approximate": answer_context.approximate,
+    }
+    yield f"data: {json.dumps(results_event)}\n\n"
 
-    yield f"data: {json.dumps({'type': 'done', 'status': status})}\n\n"
+    for warning in answer_context.warnings:
+        yield f"data: {json.dumps({'type': 'warning', 'text': warning})}\n\n"
+
+    fixed_answer = deterministic_answer(answer_context)
+    if fixed_answer is not None:
+        yield f"data: {json.dumps({'type': 'token', 'text': fixed_answer})}\n\n"
+    else:
+        prompt = build_grounding_prompt(answer_context)
+        streamed_answer = ""
+        async for text in stream_text_async(prompt):
+            streamed_answer += text
+            yield f"data: {json.dumps({'type': 'token', 'text': text})}\n\n"
+        citation_suffix = evidence_citation_suffix(answer_context, streamed_answer)
+        if citation_suffix:
+            yield f"data: {json.dumps({'type': 'token', 'text': citation_suffix})}\n\n"
+
+    done = {
+        "type": "done",
+        "status": status,
+        "evidence_count": len(answer_context.evidence),
+        "truncated": answer_context.truncated,
+        "approximate": answer_context.approximate,
+    }
+    yield f"data: {json.dumps(done)}\n\n"

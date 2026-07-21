@@ -1,4 +1,10 @@
-from src.services.ask.answer import build_grounding_prompt, ground_answer
+from src.services.ask.answer import (
+    build_answer_context,
+    build_grounding_prompt,
+    deterministic_answer,
+    evidence_citation_suffix,
+    ground_answer,
+)
 from src.services.ask.context import load_ontology_context
 from src.services.ask.entity_resolver import (
     clear_entity_resolution_caches,
@@ -37,10 +43,13 @@ __all__ = [
     "ASK_DETERMINISTIC_EXECUTION_ERROR_CODE",
     "ASK_QUERY_VALIDATION_ERROR_CODE",
     "ASK_RESULT_VALIDATION_ERROR_CODE",
+    "build_answer_context",
     "build_grounding_prompt",
     "clear_entity_resolution_caches",
     "clear_schema_catalog_cache",
     "compile_query",
+    "deterministic_answer",
+    "evidence_citation_suffix",
     "ground_answer",
     "get_schema_catalog",
     "load_ontology_context",
