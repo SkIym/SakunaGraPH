@@ -18,7 +18,8 @@ PREFIX cur:  <http://qudt.org/vocab/currency/>
 - :Incident               - individual occurrence linked to a MajorEvent via :hasRelatedIncident
 - :DisasterType           - type/category of a disaster (instances form a skos:broader* hierarchy)
 - :AffectedPopulation     - affected/displaced persons and families (:affectedPersons, :affectedFamilies, :displacedPersons, :displacedFamilies, :evacuationCenters)
-- :Casualties             - deaths, injured, missing (:casualtyCount, :isOfCasualtyType ["dead"|"injured"|"missing"], :casualtyCause)
+- :Casualties             - casualty records (:casualtyCount, :isOfCasualtyType, :casualtyCause)
+- :CasualtyType           - controlled casualty category with named individuals :Dead, :Injured, and :Missing
 - :HousingDamage          - :totallyDamagedHouses, :partiallyDamagedHouses
 - :InfrastructureDamage   - :infraDamageAmount, :commercialDamageAmount, :socialDamageAmount (values via qudt:numericValue)
 - :AgricultureDamage      - :agriDamageAmount, :productionLossCost, :productionLossVolume
@@ -50,6 +51,13 @@ PREFIX cur:  <http://qudt.org/vocab/currency/>
 - rdfs:label                    - human-readable label for locations and types
 - skos:prefLabel                - preferred label on :DisasterType instances
 
+## Controlled Casualty Resources
+- :Dead, :Injured, and :Missing are IRIs and instances of :CasualtyType.
+- Match casualty categories with an IRI triple such as
+  `?casualty :isOfCasualtyType :Dead`.
+- Never compare :isOfCasualtyType to lowercase string literals such as "dead",
+  "injured", or "missing".
+
 ## Disaster Type Hierarchy (partial, via skos:broader)
 Natural -> Meteorological -> Storm -> TropicalCyclone
 Natural -> Hydrological -> Flood -> FlashFlood, RiverineFlood
@@ -58,7 +66,32 @@ Natural -> Geophysical -> VolcanicActivity -> Ashfall, Lahar, LavaFlow, Pyroclas
 Technological -> FireMiscellaneous, FireIndustrial, Wildfire, Transport
 Extra -> ArmedConflict
 
+## SPARQL Construction Rules
+- Predicates such as skos:prefLabel may appear only in graph patterns, never as
+  operators inside FILTER. Bind a value first (`?dtype skos:prefLabel ?label`),
+  then filter `?label`.
+- When the question names known disaster types, match their ontology IRIs with
+  VALUES. For example: `VALUES ?dtype { :FlashFlood :RiverineFlood }`.
+- Do not replace known disaster-type IRIs with label-string comparisons.
+- FILTER must contain a valid expression over already-bound variables.
+
 ## Few-Shot Examples
+
+### Q: Which Flash Flood or Riverine Flood events affected locations in regions?
+```sparql
+SELECT ?event ?eventName ?locationLabel ?regionLabel
+WHERE {
+  VALUES ?dtype { :FlashFlood :RiverineFlood }
+  ?event a :DisasterEvent ;
+         :hasDisasterType ?dtype ;
+         :hasLocation ?location .
+  ?location rdfs:label ?locationLabel ;
+            :isPartOf* ?region .
+  ?region a :Region ;
+          rdfs:label ?regionLabel .
+  OPTIONAL { ?event :eventName ?eventName }
+}
+```
 
 ### Q: How many people were affected by each disaster type?
 ```sparql
@@ -72,6 +105,19 @@ WHERE {
 }
 GROUP BY ?disasterType
 ORDER BY DESC(?totalAffected)
+```
+
+### Q: How many deaths were reported for each disaster event?
+```sparql
+SELECT ?event (SUM(?count) AS ?totalDeaths)
+WHERE {
+  ?event a :DisasterEvent ;
+         :hasCasualties ?casualty .
+  ?casualty :isOfCasualtyType :Dead ;
+            :casualtyCount ?count .
+}
+GROUP BY ?event
+ORDER BY DESC(?totalDeaths)
 ```
 
 ### Q: Which disaster events happened in Cebu?

@@ -2,9 +2,62 @@ import re
 from typing import Any
 
 import httpx
+from pyparsing import ParseBaseException
+from rdflib.plugins.sparql.parser import parseQuery
 
 from src.config import settings
-from src.services.llm import generate_text
+from src.services.common import ServiceError
+from src.services.llm import generate_text_async
+
+SPARQL_PREFIXES: tuple[tuple[str, str], ...] = (
+    ("", "https://sakuna.ph/"),
+    ("org", "https://sakuna.ph/org/"),
+    ("rdf", "http://www.w3.org/1999/02/22-rdf-syntax-ns#"),
+    ("rdfs", "http://www.w3.org/2000/01/rdf-schema#"),
+    ("owl", "http://www.w3.org/2002/07/owl#"),
+    ("skos", "http://www.w3.org/2004/02/skos/core#"),
+    ("prov", "http://www.w3.org/ns/prov#"),
+    ("xsd", "http://www.w3.org/2001/XMLSchema#"),
+    ("qudt", "http://qudt.org/schema/qudt/"),
+    ("cur", "http://qudt.org/vocab/currency/"),
+)
+GRAPHDB_ERROR_PREFIXES = (
+    "GraphDB returned ",
+    "Cannot connect to GraphDB",
+    "GraphDB request timed out",
+    "GraphDB request failed",
+)
+
+_PREFIX_DECLARATION_RE = re.compile(
+    r"(?i)\bPREFIX\s+([A-Za-z][\w.-]*)?\s*:\s*<[^>]+>"
+)
+_PROLOGUE_RE = re.compile(
+    r"(?is)\A\s*(?:(?:PREFIX\s+(?:[A-Za-z][\w.-]*)?\s*:\s*<[^>]+>\s*)|"
+    r"(?:BASE\s*<[^>]+>\s*))*"
+)
+_STRING_IRI_OR_COMMENT_RE = re.compile(
+    r'"""(?:\\.|(?!""").)*"""'
+    r"|'''(?:\\.|(?!''').)*'''"
+    r'|"(?:\\.|[^"\\])*"'
+    r"|'(?:\\.|[^'\\])*'"
+    r"|<[^>]*>"
+    r"|#[^\r\n]*",
+    re.DOTALL,
+)
+_PREFIXED_NAME_RE = re.compile(
+    r"(?<![\w?])(?P<prefix>[A-Za-z][\w.-]*)?:(?P<local>[A-Za-z0-9_][\w.-]*)"
+)
+_BAD_AGGREGATE_RE = re.compile(
+    r"\b(?:COUNT|SUM|AVG|MIN|MAX|SAMPLE|GROUP_CONCAT)\s+(?!\()",
+    re.IGNORECASE,
+)
+_FILTER_TRIPLE_PATTERN_RE = re.compile(
+    r"\bFILTER\s*\([^{}]*?"
+    r"\?[A-Za-z_][\w-]*\s+"
+    r"(?P<predicate>(?:[A-Za-z][\w.-]*)?:[A-Za-z0-9_][\w.-]*)\s*"
+    r"(?==|!=|<=|>=|<|>)",
+    re.IGNORECASE | re.DOTALL,
+)
 
 WRITE_PATTERNS = [
     re.compile(r"\bINSERT\b", re.IGNORECASE),
@@ -18,8 +71,107 @@ WRITE_PATTERNS = [
 ]
 
 
+class SparqlCorrectionError(ServiceError):
+    """Raised when model-generated SPARQL remains invalid after repair attempts."""
+
+    def __init__(self, sparql: str, reason: str, attempts: int) -> None:
+        self.sparql = sparql
+        self.reason = reason
+        self.attempts = attempts
+        super().__init__(
+            502,
+            f"Could not generate executable SPARQL after {attempts} attempts. "
+            f"Final error: {reason}",
+        )
+
+
 def is_write_operation(query: str) -> bool:
     return any(pattern.search(query) for pattern in WRITE_PATTERNS)
+
+
+def is_graphdb_error(error: str) -> bool:
+    return error.startswith(GRAPHDB_ERROR_PREFIXES)
+
+
+def ensure_sparql_prefixes(query: str) -> str:
+    """Add the project's known prefixes without duplicating model declarations."""
+    stripped = query.strip()
+    if not stripped:
+        return stripped
+
+    declared = {
+        match.group(1) or ""
+        for match in _PREFIX_DECLARATION_RE.finditer(stripped)
+    }
+    missing = [
+        f"PREFIX {prefix}: <{iri}>" if prefix else f"PREFIX : <{iri}>"
+        for prefix, iri in SPARQL_PREFIXES
+        if prefix not in declared
+    ]
+    if not missing:
+        return stripped
+    return "\n".join([*missing, stripped])
+
+
+def validate_sparql(query: str) -> str | None:
+    """Return a useful error for common generated-query syntax defects."""
+    if not query or not query.strip():
+        return "A non-empty SPARQL query is required."
+
+    body = _PROLOGUE_RE.sub("", query, count=1).lstrip()
+    if not re.match(r"(?i)(SELECT|ASK|CONSTRUCT|DESCRIBE)\b", body):
+        return (
+            "Only SPARQL query forms SELECT, ASK, CONSTRUCT, and DESCRIBE "
+            "are supported."
+        )
+
+    sanitized = _STRING_IRI_OR_COMMENT_RE.sub("", query)
+    stack: list[str] = []
+    closing = {"}": "{", ")": "(", "]": "["}
+    for character in sanitized:
+        if character in "{([":
+            stack.append(character)
+        elif character in closing:
+            if not stack or stack.pop() != closing[character]:
+                return f"Unbalanced delimiter: unexpected '{character}'."
+    if stack:
+        return f"Unbalanced delimiter: missing a closing delimiter for '{stack[-1]}'."
+
+    declared = {
+        match.group(1) or ""
+        for match in _PREFIX_DECLARATION_RE.finditer(query)
+    }
+    used = {
+        match.group("prefix") or ""
+        for match in _PREFIXED_NAME_RE.finditer(sanitized)
+    }
+    undefined = sorted(prefix or ":" for prefix in used - declared)
+    if undefined:
+        return f"Undefined prefix declaration(s): {', '.join(undefined)}."
+
+    bad_aggregate = _BAD_AGGREGATE_RE.search(sanitized)
+    if bad_aggregate:
+        aggregate = bad_aggregate.group(0).strip().split()[0].upper()
+        return f"Aggregate {aggregate} must be followed by a parenthesized expression."
+
+    filter_triple = _FILTER_TRIPLE_PATTERN_RE.search(sanitized)
+    if filter_triple:
+        predicate = filter_triple.group("predicate")
+        return (
+            f"FILTER cannot use RDF predicate {predicate} as an operator. "
+            "Bind the predicate's object in a WHERE triple and filter that variable, "
+            "or use VALUES for known resource IRIs."
+        )
+
+    try:
+        parseQuery(query)
+    except ParseBaseException as exc:
+        return (
+            f"SPARQL parser rejected the query at line {exc.lineno}, "
+            f"column {exc.col}: {exc.msg}"
+        )
+
+    return None
 
 
 def _extract_sparql(text: str) -> str:
@@ -29,7 +181,7 @@ def _extract_sparql(text: str) -> str:
     return text.strip()
 
 
-def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
+async def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
     prompt = (
         f"{ontology_context}\n\n"
         "Convert the following natural language question into a valid SPARQL SELECT query "
@@ -37,7 +189,8 @@ def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
         "Return ONLY the SPARQL query inside a ```sparql code block, no explanation.\n\n"
         f"Question: {nl_query}"
     )
-    return _extract_sparql(generate_text(prompt))
+    generated = await generate_text_async(prompt)
+    return ensure_sparql_prefixes(_extract_sparql(generated))
 
 
 async def execute_sparql(query: str) -> dict[Any, Any] | str:
@@ -45,6 +198,11 @@ async def execute_sparql(query: str) -> dict[Any, Any] | str:
         return "A non-empty SPARQL query is required."
     if is_write_operation(query):
         return "Write operations (INSERT, DELETE, CLEAR, DROP, LOAD, etc.) are not permitted."
+
+    query = ensure_sparql_prefixes(query)
+    validation_error = validate_sparql(query)
+    if validation_error:
+        return f"Malformed SPARQL query: {validation_error}"
 
     try:
         async with httpx.AsyncClient(timeout=30.0) as client:
@@ -61,6 +219,10 @@ async def execute_sparql(query: str) -> dict[Any, Any] | str:
         return response.json()
     except httpx.ConnectError:
         return "Cannot connect to GraphDB"
+    except httpx.TimeoutException:
+        return "GraphDB request timed out."
+    except httpx.HTTPError as exc:
+        return f"GraphDB request failed: {exc}"
     except Exception as exc:
         return str(exc)
 
@@ -69,13 +231,23 @@ async def sparql_with_correction(
     nl_query: str,
     ontology_context: str,
     max_retries: int = 2,
+    stop_on_graphdb_error: bool = False,
 ) -> tuple[str, dict[Any, Any]]:
-    sparql = nl_to_sparql(nl_query, ontology_context)
+    sparql = await nl_to_sparql(nl_query, ontology_context)
+    final_error = "Unknown SPARQL execution error."
 
     for attempt in range(max_retries + 1):
         result = await execute_sparql(sparql)
         if isinstance(result, dict):
             return sparql, result
+        final_error = result
+
+        if stop_on_graphdb_error and is_graphdb_error(result):
+            raise SparqlCorrectionError(
+                sparql=sparql,
+                reason=result,
+                attempts=attempt + 1,
+            )
 
         if attempt < max_retries:
             correction_prompt = (
@@ -85,6 +257,11 @@ async def sparql_with_correction(
                 f"Error:\n{result}\n\n"
                 "Fix the query and return ONLY the corrected SPARQL inside a ```sparql code block."
             )
-            sparql = _extract_sparql(generate_text(correction_prompt))
+            corrected = await generate_text_async(correction_prompt)
+            sparql = ensure_sparql_prefixes(_extract_sparql(corrected))
 
-    return sparql, {}
+    raise SparqlCorrectionError(
+        sparql=sparql,
+        reason=final_error,
+        attempts=max_retries + 1,
+    )

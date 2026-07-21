@@ -15,7 +15,7 @@ class Settings(BaseSettings):
     local_llm_timeout: float = 120.0
     local_llm_store: bool = False
 
-    graphdb_endpoint: str = "http://localhost:7200/repositories/SakunaGraph"
+    graphdb_endpoint: str = "http://localhost:7200/repositories/sakunagraph"
 
 
 settings = Settings()
