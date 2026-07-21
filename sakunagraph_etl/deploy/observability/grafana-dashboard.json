@@ -1,0 +1,39 @@
+{
+  "annotations": {"list": []},
+  "editable": true,
+  "panels": [
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {"unit": "s"}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 0, "y": 0},
+      "id": 1,
+      "targets": [{"expr": "sakunagraph_task_duration_seconds", "legendFormat": "{{workflow}} / {{task}}"}],
+      "title": "Latest task duration",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0},
+      "id": 2,
+      "targets": [{"expr": "sum by (workflow, task, status) (sakunagraph_task_runs_total)", "legendFormat": "{{workflow}} / {{task}} / {{status}}"}],
+      "title": "Task outcomes",
+      "type": "timeseries"
+    },
+    {
+      "datasource": {"type": "prometheus", "uid": "${DS_PROMETHEUS}"},
+      "fieldConfig": {"defaults": {}, "overrides": []},
+      "gridPos": {"h": 8, "w": 24, "x": 0, "y": 8},
+      "id": 3,
+      "targets": [{"expr": "sakunagraph_task_attempts", "legendFormat": "{{workflow}} / {{task}}"}],
+      "title": "Attempts used by latest task run",
+      "type": "bargauge"
+    }
+  ],
+  "schemaVersion": 41,
+  "tags": ["sakunagraph", "etl"],
+  "templating": {"list": []},
+  "time": {"from": "now-7d", "to": "now"},
+  "title": "SakunaGraPH ETL Operations",
+  "uid": "sakunagraph-etl"
+}

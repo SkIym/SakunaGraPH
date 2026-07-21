@@ -1,0 +1,2 @@
+# Optional cloud-profile adapter, pinned independently from the local core.
+boto3==1.43.51

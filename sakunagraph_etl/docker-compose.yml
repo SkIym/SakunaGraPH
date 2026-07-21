@@ -1,0 +1,49 @@
+name: sakunagraph-etl
+
+x-etl-common: &etl-common
+  working_dir: /workspace
+  user: "10001:10001"
+  read_only: true
+  init: true
+  environment:
+    SAKUNA_ETL_PROFILE: ${SAKUNA_ETL_PROFILE:-onprem}
+    SAKUNA_REPOSITORY_ROOT: /workspace
+    SAKUNA_DATA_ROOT: /data
+    SAKUNA_ARTIFACT_ROOT: /artifacts
+    SAKUNA_LOGS_ROOT: /logs
+    SAKUNA_ONTOLOGY_ROOT: /workspace/ontology
+    SAKUNA_CONSTANTS_ROOT: /workspace/constants
+    GRAPHDB_HOST: ${GRAPHDB_HOST:-http://graphdb:7200}
+    GRAPHDB_REPOSITORY: ${GRAPHDB_REPOSITORY:-sakunagraph}
+  volumes:
+    - ../data:/data
+    - ../data/artifacts:/artifacts
+    - ../logs:/logs
+    - ../ontology:/workspace/ontology:ro
+    - ../constants:/workspace/constants:ro
+    - model-cache:/models
+  tmpfs:
+    - /tmp:size=1g,uid=10001,gid=10001
+
+services:
+  core:
+    <<: *etl-common
+    image: sakunagraph-etl-core:0.9.0
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.core
+      args:
+        PYTHON_IMAGE: python:3.12.13-slim-bookworm@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b
+
+  documents:
+    <<: *etl-common
+    image: sakunagraph-etl-documents:0.9.0
+    profiles: [documents]
+    build:
+      context: .
+      dockerfile: deploy/docker/Dockerfile.documents
+      args:
+        CORE_IMAGE: sakunagraph-etl-core:0.9.0
+
+volumes:
+  model-cache:

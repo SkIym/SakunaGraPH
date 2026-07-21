@@ -1,0 +1,5 @@
+<https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://sakuna.ph/MajorEvent> .
+<https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1> <https://sakuna.ph/endDate> "2026-01-03T00:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1> <https://sakuna.ph/eventName> "Fixture Typhoon" .
+<https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1> <https://sakuna.ph/hasDisasterType> <https://sakuna.ph/TropicalCyclone> .
+<https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1> <https://sakuna.ph/startDate> "2026-01-02T00:00:00"^^<http://www.w3.org/2001/XMLSchema#dateTime> .

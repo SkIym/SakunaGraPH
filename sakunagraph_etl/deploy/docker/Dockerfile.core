@@ -1,0 +1,46 @@
+ARG PYTHON_IMAGE=python:3.12.13-slim-bookworm@sha256:d50fb7611f86d04a3b0471b46d7557818d88983fc3136726336b2a4c657aa30b
+FROM ${PYTHON_IMAGE} AS builder
+
+ENV PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PYTHONDONTWRITEBYTECODE=1
+WORKDIR /build
+COPY requirements-core.txt requirements-cloud.txt constraints.txt ./
+RUN python -m pip wheel --wheel-dir /wheels \
+      --requirement requirements-core.txt --constraint constraints.txt \
+    && python -m pip wheel --wheel-dir /wheels \
+      --requirement requirements-cloud.txt --constraint constraints.txt
+COPY pyproject.toml README.md ./
+COPY src ./src
+RUN python -m pip wheel --wheel-dir /wheels --no-deps .
+
+FROM ${PYTHON_IMAGE} AS runtime
+
+ENV PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    SAKUNA_REPOSITORY_ROOT=/workspace \
+    SAKUNA_DATA_ROOT=/data \
+    SAKUNA_ARTIFACT_ROOT=/artifacts \
+    SAKUNA_LOGS_ROOT=/logs \
+    SAKUNA_DISASTER_MODEL=sentence-transformers/all-mpnet-base-v2 \
+    SAKUNA_DISASTER_MODEL_REVISION=e8c3b32edf5434bc2275fc9bab85f82640a19130 \
+    HF_HOME=/models
+
+COPY --from=builder /wheels /wheels
+COPY requirements-core.txt requirements-cloud.txt /tmp/
+RUN python -m pip install --no-cache-dir --no-index --find-links=/wheels \
+      --requirement /tmp/requirements-core.txt \
+      --requirement /tmp/requirements-cloud.txt \
+    && python -m pip install --no-cache-dir --no-index --find-links=/wheels \
+      --no-deps sakunagraph-etl==0.9.0 \
+    && addgroup --gid 10001 sakuna \
+    && adduser --uid 10001 --gid 10001 --disabled-password --gecos "" sakuna \
+    && mkdir -p /workspace /data /artifacts /logs /models \
+    && chown -R 10001:10001 /workspace /data /artifacts /logs /models \
+    && rm -rf /wheels /tmp/requirements-core.txt /tmp/requirements-cloud.txt
+
+USER 10001:10001
+WORKDIR /workspace
+ENTRYPOINT ["sakuna-etl"]
+CMD ["--help"]

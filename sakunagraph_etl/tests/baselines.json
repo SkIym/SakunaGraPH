@@ -1,0 +1,42 @@
+{
+  "dromic": {
+    "fixture": "golden/dromic_fixture.nt",
+    "fixture_builder": "tests.test_stage4_sources.stage4_fixture_graphs",
+    "sha256": "7a0aba4afcbbb3249db037a3139f01ba1b8de4ca27b89e3c5da9d00982afafb0",
+    "triple_count": 5,
+    "deterministic_iri": "https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04",
+    "representative_triple": "<https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04> <https://sakuna.ph/eventName> \"Fixture Flood\" ."
+  },
+  "emdat": {
+    "fixture": "golden/emdat_fixture.nt",
+    "fixture_builder": "tests.test_emdat_stage3._write_workbook",
+    "sha256": "6f0529d30b9129039a6b0d348edc56ebc5899501c2d970f3e8550f978f69f86d",
+    "triple_count": 49,
+    "deterministic_iri": "https://sakuna.ph/emdat/08987141-dd08-5ec6-9677-66d97fc2adb4",
+    "representative_triple": "<https://sakuna.ph/emdat/08987141-dd08-5ec6-9677-66d97fc2adb4/affected_population> <https://sakuna.ph/affectedPersons> \"100\"^^<http://www.w3.org/2001/XMLSchema#integer> ."
+  },
+  "gda": {
+    "fixture": "golden/gda_fixture.nt",
+    "fixture_builder": "tests.test_stage4_sources.stage4_fixture_graphs",
+    "sha256": "c6fd83a3b385ea358bca9b22f353515900209ffb0ea89265787ad249b6e7000d",
+    "triple_count": 12,
+    "deterministic_iri": "https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc",
+    "representative_triple": "<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <http://www.w3.org/ns/prov#wasDerivedFrom> <https://sakuna.ph/gda_row_1> ."
+  },
+  "ndrrmc": {
+    "fixture": "golden/ndrrmc_fixture.nt",
+    "fixture_builder": "tests.test_stage4_sources.stage4_fixture_graphs",
+    "sha256": "2fae2f91038ce97e17bbeaec07dda8a22ea56808a509ace5060b758d44e40917",
+    "triple_count": 5,
+    "deterministic_iri": "https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1",
+    "representative_triple": "<https://sakuna.ph/ndrrmc/6e5bc6b8-a0bc-5b85-9485-c4b140337cb1> <https://sakuna.ph/eventName> \"Fixture Typhoon\" ."
+  },
+  "psgc": {
+    "fixture": "golden/psgc_fixture.nt",
+    "fixture_builder": "tests.test_stage4_sources.stage4_fixture_graphs",
+    "sha256": "f3aa4fb416b881e4c8a2cd06ee640c4af936f50568f4344014f59ad8da7c0934",
+    "triple_count": 8,
+    "deterministic_iri": "https://sakuna.ph/1300000000",
+    "representative_triple": "<https://sakuna.ph/1300000000> <http://www.w3.org/2000/01/rdf-schema#label> \"National Capital Region\"@en ."
+  }
+}

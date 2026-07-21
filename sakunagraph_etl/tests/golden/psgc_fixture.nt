@@ -1,0 +1,8 @@
+<https://sakuna.ph/1300000000> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#NamedIndividual> .
+<https://sakuna.ph/1300000000> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://sakuna.ph/Region> .
+<https://sakuna.ph/1300000000> <http://www.w3.org/2000/01/rdf-schema#label> "National Capital Region"@en .
+<https://sakuna.ph/1300000000> <https://sakuna.ph/geographicLevel> "Reg"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://sakuna.ph/1300000000> <https://sakuna.ph/isPartOf> <https://sakuna.ph/Luzon> .
+<https://sakuna.ph/1300000000> <https://sakuna.ph/population2024> "14000000"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sakuna.ph/1300000000> <https://sakuna.ph/psgcCode> "1300000000"^^<http://www.w3.org/2001/XMLSchema#string> .
+<https://sakuna.ph/1300000000> <https://sakuna.ph/status> "Active"^^<http://www.w3.org/2001/XMLSchema#string> .

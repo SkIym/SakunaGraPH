@@ -1,0 +1,12 @@
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://sakuna.ph/MajorEvent> .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <http://www.w3.org/ns/prov#wasDerivedFrom> <https://sakuna.ph/gda_row_1> .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/endDate> "2026-01-03"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/eventName> "Fixture Flood" .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/hasDisasterSubtype> <https://sakuna.ph/FlashFlood> .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/hasDisasterType> <https://sakuna.ph/Flood> .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/hasLocation> <https://sakuna.ph/psgc/1300000000> .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/reference> "https://example.test/gda" .
+<https://sakuna.ph/gda/c43f4ae7-dae2-5c54-a96d-5ef3155b56bc> <https://sakuna.ph/startDate> "2026-01-02"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
+<https://sakuna.ph/gda_row_1> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/ns/prov#Entity> .
+<https://sakuna.ph/gda_row_1> <http://www.w3.org/ns/prov#value> "1"^^<http://www.w3.org/2001/XMLSchema#integer> .
+<https://sakuna.ph/gda_row_1> <http://www.w3.org/ns/prov#wasDerivedFrom> <https://sakuna.ph/source/gda> .

@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the NDRRMC ETL workflow daily
+
+[Timer]
+OnCalendar=*-*-* 02:00:00 Asia/Manila
+Persistent=true
+RandomizedDelaySec=5m
+Unit=sakunagraph-etl@source-ndrrmc.service
+
+[Install]
+WantedBy=timers.target

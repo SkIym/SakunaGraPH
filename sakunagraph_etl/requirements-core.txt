@@ -1,0 +1,13 @@
+# Dependencies for the minimal ETL image. Keep exact versions in constraints.txt.
+attrs==26.1.0
+requests==2.34.2
+pandas==3.0.3
+python-dateutil==2.9.0.post0
+rdflib==7.6.0
+openpyxl==3.1.5
+thefuzz==0.22.1
+polars==1.42.0
+sentence-transformers==5.6.0
+fastexcel==0.20.2
+lxml==6.1.1
+pyshacl==0.31.0

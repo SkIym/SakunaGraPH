@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the DROMIC ETL workflow daily
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 Asia/Manila
+Persistent=true
+RandomizedDelaySec=5m
+Unit=sakunagraph-etl@source-dromic.service
+
+[Install]
+WantedBy=timers.target

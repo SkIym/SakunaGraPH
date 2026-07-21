@@ -1,0 +1,151 @@
+"""
+json_to_orgs_ttl.py
+~~~~~~~~~~~~~~~~~~~~
+Convert org_registry.json → orgs.ttl.
+
+Registry shape expected:
+    {
+        "NDRRMC": [
+            "National Disaster Risk Reduction and Management Council",
+            "NDRRMCC"
+        ],
+        ...
+    }
+
+Convention used here:
+  - The slug (key)      → skos:altLabel  (always the acronym/short form)
+  - First alias         → skos:prefLabel (assumed to be the full proper name)
+  - Remaining aliases   → skos:altLabel  (abbreviations, variants, misspellings)
+
+If a slug has no aliases at all, the slug itself becomes the prefLabel.
+
+Usage:
+    python json_to_orgs_ttl.py                          # uses defaults
+    python json_to_orgs_ttl.py registry.json orgs.ttl  # explicit paths
+"""
+
+import argparse
+import json
+from collections.abc import Sequence
+from datetime import date
+from pathlib import Path
+
+from rdflib import Graph, Literal, Namespace, URIRef
+from rdflib.namespace import OWL, RDF, RDFS, SKOS, XSD
+
+from sakunagraph_etl.rdf.graph import PROV, ORG
+from sakunagraph_etl.config import PROFILE_CHOICES, SETTINGS, EtlSettings, load_settings
+from sakunagraph_etl.io import record_artifact_run
+
+DATA_DIR = SETTINGS.paths.constants_root
+OUT_DIR = SETTINGS.paths.rdf_root / "orgs"
+
+# ── Namespaces ───────────────────────────────────────────────────────────────
+
+org_base_iri = URIRef("https://sakuna.ph/org/")
+
+# ── Helpers ──────────────────────────────────────────────────────────────────
+
+def _lit(text: str) -> Literal:
+    return Literal(text.strip(), lang="en")
+
+
+def _org_iri(slug: str) -> URIRef:
+    return ORG[slug]
+
+
+# ── Core conversion ──────────────────────────────────────────────────────────
+
+def build_graph(registry: dict[str, list[str]]) -> Graph:
+    g = Graph()
+    g.bind("owl",  OWL)
+    g.bind("rdf",  RDF)
+    g.bind("rdfs", RDFS)
+    g.bind("skos", SKOS)
+    g.bind("xsd",  XSD)
+    g.bind("orgs",  ORG)
+
+    for slug, aliases in registry.items():
+        iri = _org_iri(slug)
+
+        # Type declarations — real-world entity, not a vocabulary concept
+        g.add((iri, RDF.type,   OWL.NamedIndividual))
+        g.add((iri, RDF.type,   PROV.Organization))
+
+        # Slug is always the short/acronym form → altLabel
+        g.add((iri, SKOS.altLabel, _lit(slug)))
+
+        if aliases:
+            # First alias → prefLabel (full proper name)
+            g.add((iri, SKOS.prefLabel, _lit(aliases[0])))
+            # Remaining aliases → altLabel (variants, abbreviations, misspellings)
+            for alt in aliases[1:]:
+                g.add((iri, SKOS.altLabel, _lit(alt)))
+        else:
+            # No aliases: slug doubles as the prefLabel
+            g.add((iri, SKOS.prefLabel, _lit(slug)))
+
+    return g
+
+
+def convert(
+    registry_path: Path,
+    output_path: Path,
+    *,
+    settings: EtlSettings = SETTINGS,
+) -> None:
+    with open(registry_path, encoding="utf-8") as f:
+        registry: dict[str, list[str]] = json.load(f)
+
+    g = build_graph(registry)
+
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    g.serialize(destination=str(output_path), format="turtle")
+    record_artifact_run(
+        "organization-registry",
+        input_paths=(registry_path,),
+        output_paths=(output_path,),
+        validation_status="NOT_RUN",
+        settings=settings,
+        metadata={"triple_count": len(g)},
+    )
+    print(f"Wrote {len(g)} triples → {output_path}")
+
+
+def build_parser() -> argparse.ArgumentParser:
+    """Build the organization-registry conversion parser."""
+    parser = argparse.ArgumentParser(
+        description="Convert org_registry.json to orgs.ttl."
+    )
+    parser.add_argument(
+        "-i", "--input",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="Path to org_registry.json (default: %(default)s)",
+    )
+    parser.add_argument(
+        "-o", "--output",
+        type=Path,
+        default=None,
+        metavar="PATH",
+        help="Destination path for orgs.ttl (default: %(default)s)",
+    )
+    parser.add_argument("--profile", choices=PROFILE_CHOICES, help="Deployment profile")
+    return parser
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    """Convert the configured organization registry to RDF."""
+    args = build_parser().parse_args(argv)
+    settings = load_settings(args.profile)
+    convert(
+        args.input or settings.paths.constants_root / "org_registry.json",
+        args.output or settings.paths.rdf_root / "orgs" / "orgs.ttl",
+        settings=settings,
+    )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

@@ -1,0 +1,75 @@
+[build-system]
+requires = ["setuptools==81.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sakunagraph-etl"
+version = "0.9.0"
+description = "ETL pipeline for the SakunaGraPH Philippine disaster knowledge graph"
+readme = "README.md"
+requires-python = ">=3.12,<3.13"
+dynamic = ["dependencies"]
+
+[project.optional-dependencies]
+cloud = ["boto3==1.43.51"]
+documents = [
+  "selenium==4.45.0",
+  "pdfplumber==0.11.10",
+  "gliner2[local]==1.3.1",
+  "docx2pdf==0.1.8",
+  "docling==2.107.0",
+]
+all = [
+  "boto3==1.43.51",
+  "selenium==4.45.0",
+  "pdfplumber==0.11.10",
+  "gliner2[local]==1.3.1",
+  "docx2pdf==0.1.8",
+  "docling==2.107.0",
+]
+
+[project.scripts]
+sakuna-etl = "sakunagraph_etl.cli:main"
+
+[tool.setuptools]
+packages = [
+  "sakunagraph_etl",
+  "sakunagraph_etl.cli",
+  "sakunagraph_etl.enrichment",
+  "sakunagraph_etl.io",
+  "sakunagraph_etl.orchestration",
+  "sakunagraph_etl.quality",
+  "sakunagraph_etl.rdf",
+  "sakunagraph_etl.resolution",
+  "sakunagraph_etl.sources",
+  "sakunagraph_etl.sources.dromic",
+  "sakunagraph_etl.sources.emdat",
+  "sakunagraph_etl.sources.gda",
+  "sakunagraph_etl.sources.ndrrmc",
+  "sakunagraph_etl.sources.psgc",
+  "sakunagraph_etl.transform",
+]
+
+[tool.setuptools.package-dir]
+sakunagraph_etl = "src/sakunagraph_etl"
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements-core.txt"]}
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "../etl"]
+
+[tool.coverage.run]
+branch = true
+source = [
+  "src/sakunagraph_etl",
+]
+
+[tool.ruff]
+target-version = "py312"
+line-length = 100
+extend-exclude = [".venv"]
+
+[tool.ruff.lint]
+select = ["E4", "E7", "E9", "F"]

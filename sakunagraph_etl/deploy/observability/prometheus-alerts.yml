@@ -1,0 +1,27 @@
+groups:
+  - name: sakunagraph-etl
+    rules:
+      - alert: SakunaEtlTaskFailure
+        expr: increase(sakunagraph_task_runs_total{status="FAILED"}[30m]) > 0
+        for: 0m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SakunaGraPH ETL task failed"
+          description: "Workflow {{ $labels.workflow }} task {{ $labels.task }} failed."
+
+      - alert: SakunaEtlTaskRetrying
+        expr: sakunagraph_task_attempts > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SakunaGraPH ETL task required retries"
+
+      - alert: SakunaEtlTaskDurationHigh
+        expr: sakunagraph_task_duration_seconds > 10800
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "SakunaGraPH ETL task exceeded three hours"

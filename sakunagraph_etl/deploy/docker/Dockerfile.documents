@@ -1,0 +1,19 @@
+ARG CORE_IMAGE=sakunagraph-etl-core:0.9.0
+FROM ${CORE_IMAGE}
+
+USER root
+COPY requirements-document.txt constraints.txt /tmp/
+RUN apt-get update \
+    && apt-get install --yes --no-install-recommends \
+      chromium chromium-driver libreoffice poppler-utils \
+    && python -m pip install --no-cache-dir \
+      --requirement /tmp/requirements-document.txt \
+      --constraint /tmp/constraints.txt \
+    && rm -rf /var/lib/apt/lists/* /tmp/requirements-document.txt /tmp/constraints.txt
+
+ENV CHROME_BIN=/usr/bin/chromium \
+    CHROMEDRIVER_PATH=/usr/bin/chromedriver \
+    GLINER2_MODEL=fastino/gliner2-base-v1 \
+    GLINER2_MODEL_REVISION=839d6dcc640d712ecf0b5a6e54d0558c7ef9885e
+
+USER 10001:10001

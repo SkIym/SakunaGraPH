@@ -1,0 +1,11 @@
+[Unit]
+Description=Run SakunaGraPH cross-source integration daily
+
+[Timer]
+OnCalendar=*-*-* 04:00:00 Asia/Manila
+Persistent=true
+RandomizedDelaySec=5m
+Unit=sakunagraph-etl@integration.service
+
+[Install]
+WantedBy=timers.target

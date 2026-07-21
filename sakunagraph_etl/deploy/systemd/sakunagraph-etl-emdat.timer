@@ -1,0 +1,11 @@
+[Unit]
+Description=Run the EM-DAT ETL workflow monthly
+
+[Timer]
+OnCalendar=*-*-01 02:00:00 Asia/Manila
+Persistent=true
+RandomizedDelaySec=5m
+Unit=sakunagraph-etl@source-emdat.service
+
+[Install]
+WantedBy=timers.target

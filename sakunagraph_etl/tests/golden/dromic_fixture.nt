@@ -1,0 +1,5 @@
+<https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <https://sakuna.ph/MajorEvent> .
+<https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04> <https://sakuna.ph/eventName> "Fixture Flood" .
+<https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04> <https://sakuna.ph/hasDisasterType> <https://sakuna.ph/Flood> .
+<https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04> <https://sakuna.ph/hasLocation> <https://sakuna.ph/psgc/1300000000> .
+<https://sakuna.ph/dromic/801372fd-45b0-5c59-8d65-58c9d628ec04> <https://sakuna.ph/remarks> "Fixture remarks" .

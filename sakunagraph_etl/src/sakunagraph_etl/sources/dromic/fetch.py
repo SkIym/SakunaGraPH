@@ -1,0 +1,455 @@
+# scraper.py — DROMIC situation report scraper (stateful + idempotent)
+
+from __future__ import annotations
+
+import argparse
+import json
+import logging
+import os
+import re
+import sys
+import time
+from dataclasses import asdict, dataclass, field
+from datetime import datetime, timezone
+from pathlib import Path
+from typing import Optional
+from urllib.parse import parse_qs, unquote, urlparse
+
+import requests
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.chrome.webdriver import WebDriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from sakunagraph_etl.config import PROFILE_CHOICES, load_settings
+
+log = logging.getLogger(__name__)
+
+# =============================================================================
+# CLI
+# =============================================================================
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="DROMIC situation report scraper")
+    parser.add_argument("--year", type=int, required=True)
+    parser.add_argument("--download-dir", type=Path, help="Raw report output directory.")
+    parser.add_argument("--log-dir", type=Path, help="Scraper log directory.")
+    parser.add_argument("--profile", choices=PROFILE_CHOICES, help="Deployment profile.")
+    parser.add_argument("--page", type=int)
+    parser.add_argument(
+        "--last-scrape-date",
+        type=str,
+        default=None,
+        help="Override last scrape date (YYYY-MM-DD). Defaults to value in manifest.",
+    )
+    parser.add_argument(
+        "--max-pages",
+        type=int,
+        default=100,
+        help="Maximum number of listing pages to scrape.",
+    )
+    return parser.parse_args()
+
+
+# =============================================================================
+# MANIFEST
+# =============================================================================
+
+@dataclass
+class ManifestEntry:
+    filename: str
+    download_url: str
+    downloaded_at: str  # ISO-8601
+    post_url: str
+    page: int
+
+
+@dataclass
+class Manifest:
+    last_scrape_date: Optional[str] = None
+    entries: list[ManifestEntry] = field(default_factory=list)
+
+
+def load_manifest(path: Path) -> Manifest:
+    if not path.exists():
+        return Manifest()
+
+    with path.open("r", encoding="utf-8") as f:
+        data = json.load(f)
+
+    if isinstance(data, list):
+        return Manifest(entries=[ManifestEntry(**entry) for entry in data])
+
+    return Manifest(
+        last_scrape_date=data.get("last_scrape_date"),
+        entries=[ManifestEntry(**entry) for entry in data.get("entries", [])],
+    )
+
+
+def save_manifest(path: Path, manifest: Manifest) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open("w", encoding="utf-8") as f:
+        json.dump(
+            {
+                "last_scrape_date": manifest.last_scrape_date,
+                "entries": [asdict(entry) for entry in manifest.entries],
+            },
+            f,
+            indent=2,
+            ensure_ascii=False,
+        )
+
+
+# =============================================================================
+# HELPERS
+# =============================================================================
+
+def get_post_date(driver: WebDriver) -> datetime:
+    """Return the publication datetime of the currently loaded post."""
+    date_el = driver.find_element(By.CSS_SELECTOR, "span.published.updated")
+    return datetime.strptime(date_el.text.strip(), "%B %d, %Y")
+
+
+def make_direct_download_link(url: str) -> str:
+    """Rewrite viewer/embed URLs to direct download links where possible."""
+    if "/document/d/" in url:
+        file_id = url.split("/document/d/")[1].split("/")[0]
+        return f"https://docs.google.com/document/d/{file_id}/export?format=docx"
+
+    if "docs.google.com/viewer" in url:
+        qs = parse_qs(urlparse(url).query)
+        if "url" in qs:
+            actual_url = unquote(qs["url"][0])
+            log.info("Extracted direct file URL: %s", actual_url)
+            return actual_url
+
+    return url
+
+
+def sanitize_filename(name: str) -> str:
+    return re.sub(r'[<>:"/\\|?*]+', "", name).strip()
+
+
+def resolve_filename(
+    response: requests.Response, url: str, fallback: Optional[str]
+) -> str:
+    """Derive a clean filename from response headers, URL, or fallback hint."""
+    content_disp = response.headers.get("content-disposition", "")
+    if content_disp:
+        match = re.search(r"filename\*\s*=\s*UTF-8''([^;]+)", content_disp)
+        if not match:
+            match = re.search(r'filename="?([^";]+)"?', content_disp)
+        if match:
+            return sanitize_filename(unquote(match.group(1)))
+
+    name = os.path.basename(url.split("?")[0])
+    if name and name.lower() not in ("", "download", "viewer"):
+        return sanitize_filename(name)
+
+    name = fallback or f"downloaded_{int(time.time())}"
+
+    # Append an extension if missing
+    if not os.path.splitext(name)[1]:
+        ctype = response.headers.get("content-type", "")
+        if "pdf" in ctype:
+            name += ".pdf"
+        elif "word" in ctype or ".doc" in url:
+            name += ".docx"
+        else:
+            name += ".bin"
+
+    return sanitize_filename(name)
+
+
+def download_file(
+    url: str,
+    download_dir: Path,
+    manifest: Manifest,
+    post_url: str,
+    page: int,
+    filename_hint: Optional[str] = None,
+) -> bool:
+    """Download a file, record it in the manifest, and return success."""
+    try:
+        r = requests.get(url, timeout=30, allow_redirects=True)
+        if r.status_code != 200:
+            log.warning("Skipped (HTTP %d): %s", r.status_code, url)
+            return False
+
+        filename = resolve_filename(r, url, filename_hint)
+        dest = download_dir / filename
+
+        log.info("Downloading → %s", filename)
+        dest.write_bytes(r.content)
+        log.info("Saved: %s", filename)
+
+        manifest.entries.append(
+            ManifestEntry(
+                filename=filename,
+                download_url=url,
+                downloaded_at=datetime.now(timezone.utc).isoformat(timespec="seconds") + "Z",
+                post_url=post_url,
+                page=page
+            )
+        )
+        return True
+
+    except Exception:
+        log.exception("Download error: %s", url)
+        return False
+
+
+def extract_first_download_link(driver: WebDriver) -> tuple[Optional[str], Optional[str]]:
+    """Return (download_url, link_text) for the first attachable file in the post."""
+    selectors = [
+        "div.post-content a[href*='.pdf']",
+        "div.post-content a[href*='.docx']",
+        "div.post-content a[href*='.doc']",
+        "div.post-content a[href*='docs.google.com']",
+        ".wp-block-file a[href]",
+        "p.embed_download a[href]",
+    ]
+
+    title = driver.find_element(By.CSS_SELECTOR, "h1.post-title")
+    log.info("Post title: %s", title.text.strip())
+
+    for sel in selectors:
+        elems = driver.find_elements(By.CSS_SELECTOR, sel)
+        if elems:
+            href = elems[0].get_attribute("href")
+            text = elems[0].text.strip() or "downloaded_file"
+            if href:
+                return make_direct_download_link(href), text
+
+    return None, None
+
+
+# =============================================================================
+# PAGE HANDLING
+# =============================================================================
+
+def handle_page(
+    driver: WebDriver,
+    wait: WebDriverWait[WebDriver],
+    scraped_urls: set[str],
+    manifest: Manifest,
+    manifest_path: Path,
+    last_scrape_date: datetime,
+    download_dir: Path,
+    page: int
+) -> bool:
+    """
+    Process all posts on the current listing page.
+
+    Returns True if the scraper should stop (post published date is older then last scraped date meaning we've gone past new content).
+    """
+    read_mores = driver.find_elements(
+        By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]"
+    )
+    log.info("Found %d posts on page", len(read_mores))
+
+
+    for i in range(len(read_mores)):
+        # Re-query after each navigation to avoid stale element refs
+        read_mores = driver.find_elements(
+            By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]"
+        )
+        if i >= len(read_mores):
+            break
+
+        btn = read_mores[i]
+        post_url = btn.get_attribute("href")
+        
+        if not post_url: 
+            log.info("Skipping a post. No read more found")
+            continue
+
+        driver.execute_script("arguments[0].scrollIntoView(true);", btn)
+        time.sleep(0.5)
+        driver.execute_script("arguments[0].click();", btn)
+
+        navigated_away = False
+        try:
+            wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.post-content")))
+            navigated_away = True  # driver is now on the post page
+
+            post_date = get_post_date(driver)
+            log.info("Post date: %s", post_date.date())
+
+            if post_date <= last_scrape_date:
+                log.info("Post is older than last scrape date — stopping")
+
+                driver.back()
+                wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, "//a[contains(.,'Read More')]")
+                ))
+                return True
+            
+            elif post_url in scraped_urls:
+                log.info("Skipping. Post already scraped.")
+                navigated_away = False
+                driver.back()
+                wait.until(EC.presence_of_all_elements_located(
+                    (By.XPATH, "//a[contains(.,'Read More')]")
+                ))
+
+            else:
+
+                file_url, file_name = extract_first_download_link(driver)
+
+                if file_url:
+                    success = download_file(file_url, download_dir, manifest, post_url, page,  file_name)
+                    if success:
+                        scraped_urls.add(post_url)
+                        save_manifest(manifest_path, manifest)
+                else:
+                    log.warning("No downloadable link found for: %s", post_url)
+
+        except Exception:
+            log.exception("Error processing post: %s", post_url)
+
+        finally:
+            # Always return to the listing page if we navigated away
+            if navigated_away:
+                try:
+                    driver.back()
+                    wait.until(EC.presence_of_all_elements_located(
+                        (By.XPATH, "//a[contains(.,'Read More')]")
+                    ))
+                    time.sleep(1)
+                except Exception:
+                    log.exception("Failed to navigate back to listing page")
+
+    return False
+
+
+def goto_page(
+    driver: WebDriver, wait: WebDriverWait[WebDriver], page_num: int, retries: int = 2
+) -> bool:
+    """
+    Click the pagination link for page_num. Returns False only when the link
+    genuinely doesn't exist (i.e. no more pages). Retries on transient errors.
+    """
+    for attempt in range(1, retries + 1):
+        try:
+            el = wait.until(
+                EC.element_to_be_clickable((
+                    By.XPATH,
+                    f"//ul[contains(@class,'pagination')]//li//*[normalize-space()='{page_num}']",
+                ))
+            )
+            driver.execute_script("arguments[0].scrollIntoView();", el)
+            el.click()
+            wait.until(
+                EC.presence_of_all_elements_located(
+                    (By.XPATH, "//a[contains(.,'Read More')]")
+                )
+            )
+            return True
+        except Exception as e:
+            if attempt < retries:
+                log.warning(
+                    "goto_page(%d) attempt %d failed (%s) — retrying",
+                    page_num, attempt, e,
+                )
+                time.sleep(2)
+            else:
+                log.info("Pagination link for page %d not found — assuming last page", page_num)
+    return False
+
+
+# =============================================================================
+# MAIN
+# =============================================================================
+
+def setup_logging(log_file: Path) -> None:
+    log_file.parent.mkdir(parents=True, exist_ok=True)
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s — %(levelname)s — %(message)s",
+        handlers=[
+            logging.FileHandler(log_file, encoding="utf-8"),
+            logging.StreamHandler(sys.stdout),
+        ],
+    )
+
+
+def main() -> None:
+    args = parse_args()
+    settings = load_settings(args.profile)
+
+    download_dir = args.download_dir or settings.paths.raw_root / "dromic-new" / str(args.year)
+    log_dir = args.log_dir or settings.paths.logs_root / "dromic"
+    manifest_path = download_dir / "manifest.json"
+    log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
+
+    download_dir.mkdir(parents=True, exist_ok=True)
+    setup_logging(log_file)
+
+    manifest = load_manifest(manifest_path)
+
+
+    if args.last_scrape_date:
+        last_scrape_date = datetime.strptime(args.last_scrape_date, "%Y-%m-%d")
+    elif manifest.last_scrape_date and not args.page:
+        last_scrape_date = datetime.strptime(manifest.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
+    else:
+        last_scrape_date = datetime.min
+
+    scraped_urls: set[str] = {
+        entry.post_url for entry in manifest.entries if entry.post_url
+    }
+
+    opts = Options()
+    opts.add_experimental_option(
+        "prefs",
+        {
+            "download.default_directory": str(download_dir.resolve()),
+            "download.prompt_for_download": False,
+            "safebrowsing.enabled": True,
+        },
+    )
+
+    driver = WebDriver(options=opts)
+    wait = WebDriverWait(driver, 10)
+
+    base_url = f"https://dromic.dswd.gov.ph/category/situation-reports/{args.year}/"
+
+    if args.page:
+        base_url += f"page/{args.page}"
+
+    driver.get(base_url)
+
+    page = args.page if args.page else 1
+    try:
+        while page <= args.max_pages:
+            log.info("Processing page %d", page)
+
+            should_stop = handle_page(
+                driver=driver,
+                wait=wait,
+                scraped_urls=scraped_urls,
+                manifest=manifest,
+                manifest_path=manifest_path,
+                last_scrape_date=last_scrape_date,
+                download_dir=download_dir,
+                page=page
+            )
+
+            if should_stop:
+                break
+
+            page += 1
+
+            if not goto_page(driver, wait, page):
+                log.info("No more pages")
+                break
+    finally:
+        driver.quit()
+        manifest.last_scrape_date = datetime.now(timezone.utc).strftime("%Y-%m-%d, %H:%M:%S")
+        save_manifest(manifest_path, manifest)
+        log.info("Done. Manifest written to: %s", manifest_path)
+
+
+if __name__ == "__main__":
+    main()

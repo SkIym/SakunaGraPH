@@ -1,0 +1,22 @@
+[Unit]
+Description=SakunaGraPH ETL workflow %i
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=sakuna
+Group=sakuna
+Environment=SAKUNA_ETL_PROFILE=onprem
+EnvironmentFile=-/etc/sakunagraph/etl.env
+ExecStart=/opt/sakunagraph/venv/bin/sakuna-etl workflow run %i --profile onprem --params-file /etc/sakunagraph/workflows/%i.json
+TimeoutStartSec=6h
+Nice=10
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/srv/sakunagraph/data /srv/sakunagraph/logs /srv/sakunagraph/artifacts
+
+[Install]
+WantedBy=multi-user.target
