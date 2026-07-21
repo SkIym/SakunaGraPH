@@ -10,12 +10,21 @@ from src.services.ask.planner import (
     parse_plan_output,
     plan_question,
 )
-from src.services.ask.service import ask_question, preview_question, stream_answer_events
+from src.services.ask.query_compiler import ASK_COMPILATION_ERROR_CODE, compile_query
+from src.services.ask.service import (
+    ASK_DETERMINISTIC_EXECUTION_ERROR_CODE,
+    ask_question,
+    preview_question,
+    stream_answer_events,
+)
 
 __all__ = [
     "ask_question",
+    "ASK_COMPILATION_ERROR_CODE",
+    "ASK_DETERMINISTIC_EXECUTION_ERROR_CODE",
     "build_grounding_prompt",
     "clear_entity_resolution_caches",
+    "compile_query",
     "ground_answer",
     "load_ontology_context",
     "parse_plan_output",

@@ -1,0 +1,45 @@
+PREFIX :     <https://sakuna.ph/>
+PREFIX rdf:  <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+SELECT ?group ?groupLabel (COUNT(DISTINCT ?event) AS ?total)
+WHERE {
+VALUES ?eventClass { :MajorEvent }
+?event a ?eventClass ;
+         :startDate ?startDate .
+OPTIONAL { ?event :eventName ?eventNameValue }
+OPTIONAL { ?event :incidentDescription ?incidentDescription }
+BIND(COALESCE(?eventNameValue, ?incidentDescription) AS ?eventName)
+OPTIONAL { ?event :endDate ?endDate }
+FILTER NOT EXISTS {
+  ?event prov:alternateOf ?alternateCandidate .
+  ?alternateCandidate :startDate ?alternateStartDate .
+  FILTER(
+    SUBSTR(STR(?alternateStartDate), 1, 10) < SUBSTR(STR(?startDate), 1, 10) ||
+    (
+      SUBSTR(STR(?alternateStartDate), 1, 10) = SUBSTR(STR(?startDate), 1, 10) &&
+      STR(?alternateCandidate) < STR(?event)
+    )
+  )
+}
+FILTER(SUBSTR(STR(?startDate), 1, 10) >= "2024-01-01")
+FILTER(SUBSTR(STR(?startDate), 1, 10) <= "2024-12-31")
+FILTER EXISTS {
+  VALUES ?selectedLocation { :0706000000 }
+  ?event :hasLocation ?filterLocation .
+  ?filterLocation :isPartOf* ?selectedLocation .
+}
+FILTER EXISTS {
+  VALUES ?selectedDisasterType { :Flood }
+  ?event (:hasDisasterType|:hasDisasterSubtype) ?filterDisasterType .
+  ?filterDisasterType skos:broader* ?selectedDisasterType .
+}
+BIND(SUBSTR(STR(?startDate), 1, 4) AS ?group)
+BIND(?group AS ?groupLabel)
+}
+GROUP BY ?group ?groupLabel
+ORDER BY DESC(?total) ASC(STR(?group))
+LIMIT 10

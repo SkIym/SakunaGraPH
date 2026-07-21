@@ -14,6 +14,8 @@ from src.schemas.ask import (
 )
 from src.services.common import ServiceError
 from src.services.ask import (
+    ASK_COMPILATION_ERROR_CODE,
+    ASK_DETERMINISTIC_EXECUTION_ERROR_CODE,
     PLANNER_VALIDATION_ERROR_CODE,
     ask_question,
     preview_question,
@@ -30,8 +32,10 @@ def _to_http_error(exc: ServiceError) -> HTTPException:
 
 
 def _ask_failure_status(exc: ServiceError) -> AskStatus:
-    if exc.code == PLANNER_VALIDATION_ERROR_CODE:
+    if exc.code in {PLANNER_VALIDATION_ERROR_CODE, ASK_COMPILATION_ERROR_CODE}:
         return AskStatus.VALIDATION_FAILED
+    if exc.code == ASK_DETERMINISTIC_EXECUTION_ERROR_CODE:
+        return AskStatus.EXECUTION_FAILED
     if isinstance(exc, SparqlCorrectionError):
         if is_graphdb_error(exc.reason):
             return AskStatus.EXECUTION_FAILED

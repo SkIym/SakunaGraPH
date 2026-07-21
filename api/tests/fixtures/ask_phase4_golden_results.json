@@ -1,0 +1,52 @@
+{
+  "cases": [
+    {
+      "intent": "event_count",
+      "metric": "events",
+      "service_payload": {
+        "record_count": 3,
+        "dead": 0,
+        "injured": 0,
+        "missing": 0,
+        "affectedFamilies": 0,
+        "affectedPersons": 0,
+        "damage": []
+      },
+      "expected_rows": [{"total": "3"}]
+    },
+    {
+      "intent": "impact_summary",
+      "metric": "dead",
+      "service_payload": {
+        "record_count": 2,
+        "dead": 12,
+        "injured": 7,
+        "missing": 1,
+        "affectedFamilies": 40,
+        "affectedPersons": 160,
+        "damage": []
+      },
+      "expected_rows": [{"metric": "dead", "total": "12"}]
+    },
+    {
+      "intent": "impact_summary",
+      "metric": "damage",
+      "service_payload": {
+        "record_count": 1,
+        "dead": 0,
+        "injured": 0,
+        "missing": 0,
+        "affectedFamilies": 0,
+        "affectedPersons": 0,
+        "damage": [
+          {"amount": 1250000.0, "unit": "PHP"},
+          {"amount": 4.5, "unit": "USD"}
+        ]
+      },
+      "expected_rows": [
+        {"metric": "damage", "total": "1250000.0", "unit": "PHP"},
+        {"metric": "damage", "total": "4.5", "unit": "USD"}
+      ]
+    }
+  ]
+}

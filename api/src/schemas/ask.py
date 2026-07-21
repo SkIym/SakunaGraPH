@@ -2,6 +2,7 @@ from enum import StrEnum
 
 from pydantic import BaseModel, Field, field_validator
 
+from src.schemas.ask_execution import QueryArtifact
 from src.schemas.entity_resolution import EntityAmbiguity, ResolvedAskPlan
 
 
@@ -38,6 +39,7 @@ class AskResponse(BaseModel):
     interpretation: ResolvedAskPlan | None = None
     warnings: list[str] | None = None
     ambiguities: list[EntityAmbiguity] | None = None
+    query_artifact: QueryArtifact | None = None
 
 
 class AskPreviewResponse(BaseModel):
@@ -46,6 +48,7 @@ class AskPreviewResponse(BaseModel):
     interpretation: ResolvedAskPlan | None = None
     warnings: list[str] | None = None
     ambiguities: list[EntityAmbiguity] | None = None
+    query_artifact: QueryArtifact | None = None
 
 
 class AskErrorResponse(BaseModel):

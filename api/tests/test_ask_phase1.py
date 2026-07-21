@@ -24,7 +24,7 @@ ONE_RESULT = {
         ]
     },
 }
-VALID_PLAN = AskPlan(intent="list_events")
+OPEN_PLAN = AskPlan(intent="open_graph_query")
 
 
 class AskRequestValidationTests(unittest.TestCase):
@@ -67,7 +67,7 @@ class AskAsyncGenerationTests(unittest.IsolatedAsyncioTestCase):
         with (
             patch(
                 "src.services.ask.service.plan_question",
-                new=AsyncMock(return_value=VALID_PLAN),
+                new=AsyncMock(return_value=OPEN_PLAN),
             ) as planner,
             patch(
                 "src.services.ask.service.nl_to_sparql",
@@ -87,7 +87,7 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
         with (
             patch(
                 "src.services.ask.service.plan_question",
-                new=AsyncMock(return_value=VALID_PLAN),
+                new=AsyncMock(return_value=OPEN_PLAN),
             ),
             patch(
                 "src.services.ask.service.sparql_with_correction",
@@ -109,7 +109,7 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
         with (
             patch(
                 "src.services.ask.service.plan_question",
-                new=AsyncMock(return_value=VALID_PLAN),
+                new=AsyncMock(return_value=OPEN_PLAN),
             ),
             patch(
                 "src.services.ask.service.sparql_with_correction",
@@ -135,7 +135,7 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
         with (
             patch(
                 "src.services.ask.service.plan_question",
-                new=AsyncMock(return_value=VALID_PLAN),
+                new=AsyncMock(return_value=OPEN_PLAN),
             ),
             patch(
                 "src.services.ask.service.sparql_with_correction",
