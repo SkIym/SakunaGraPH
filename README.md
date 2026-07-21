@@ -33,4 +33,6 @@ SakunaGraPH/
 
 ## Getting Started
 
-See [`etl/README.md`](etl/README.md) for pipeline usage and [`ontology/README.md`](ontology/README.md) for ontology details.
+See [`etl/README.md`](etl/README.md) for historical pipeline usage,
+[`ontology/README.md`](ontology/README.md) for ontology details, and
+[`deploy/README.md`](deploy/README.md) for the containerized frontend/API stack.

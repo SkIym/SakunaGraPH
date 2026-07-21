@@ -1,0 +1,19 @@
+{
+	admin off
+	auto_https off
+}
+
+:8080 {
+	route {
+		reverse_proxy /api/* api:8000 {
+			flush_interval -1
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+
+		reverse_proxy frontend:3000 {
+			header_up X-Forwarded-Host {host}
+			header_up X-Forwarded-Proto {scheme}
+		}
+	}
+}
