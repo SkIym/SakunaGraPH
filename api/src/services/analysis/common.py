@@ -108,7 +108,11 @@ def source_from_event_iri(event_iri: str) -> str | None:
     return next((labels[part.lower()] for part in parts if part.lower() in labels), None)
 
 
-def event_filter_where(filters: AnalysisFilters) -> str:
+def event_filter_where(
+    filters: AnalysisFilters,
+    *,
+    include_event_details: bool = True,
+) -> str:
     event_classes = {
         "major": ":MajorEvent",
         "incidents": ":Incident",
@@ -118,10 +122,18 @@ def event_filter_where(filters: AnalysisFilters) -> str:
     fragments = [
         f"VALUES ?eventClass {{ {event_classes} }}",
         "?event a ?eventClass ;\n         :startDate ?startDate .",
-        "OPTIONAL { ?event :eventName ?eventNameValue }",
-        "OPTIONAL { ?event :incidentDescription ?incidentDescription }",
-        "BIND(COALESCE(?eventNameValue, ?incidentDescription) AS ?eventName)",
-        "OPTIONAL { ?event :endDate ?endDate }",
+    ]
+    if include_event_details or filters.q:
+        fragments.extend(
+            (
+                "OPTIONAL { ?event :eventName ?eventNameValue }",
+                "OPTIONAL { ?event :incidentDescription ?incidentDescription }",
+                "BIND(COALESCE(?eventNameValue, ?incidentDescription) AS ?eventName)",
+            )
+        )
+    if include_event_details:
+        fragments.append("OPTIONAL { ?event :endDate ?endDate }")
+    fragments.append(
         """FILTER NOT EXISTS {
   ?event prov:alternateOf ?alternateCandidate .
   ?alternateCandidate :startDate ?alternateStartDate .
@@ -132,8 +144,8 @@ def event_filter_where(filters: AnalysisFilters) -> str:
       STR(?alternateCandidate) < STR(?event)
     )
   )
-}""",
-    ]
+}"""
+    )
 
     if filters.start_date:
         fragments.append(

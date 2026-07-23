@@ -93,13 +93,22 @@ def _ensure_compilable(resolved: ResolvedAskPlan) -> None:
             _validated_iri(entity.iri)
 
 
-def _base_where(resolved: ResolvedAskPlan) -> str:
+def _base_where(
+    resolved: ResolvedAskPlan,
+    *,
+    include_event_details: bool = True,
+) -> str:
     fragments: list[str] = []
     if resolved.events:
         fragments.append(_values("event", resolved.events))
     if resolved.organizations:
         fragments.append(_values("selectedOrganization", resolved.organizations))
-    fragments.append(event_filter_where(analysis_filters_from_plan(resolved)))
+    fragments.append(
+        event_filter_where(
+            analysis_filters_from_plan(resolved),
+            include_event_details=include_event_details,
+        )
+    )
     if resolved.organizations:
         fragments.append(
             """FILTER EXISTS {
@@ -241,6 +250,30 @@ ORDER BY {direction}(?startDate) ASC(STR(?event))
 LIMIT {resolved.plan.limit}
 """
     return _artifact(resolved, query, columns, origin=origin)
+
+
+def _compile_disaster_type_listing(
+    resolved: ResolvedAskPlan,
+    *,
+    origin: QueryOrigin,
+) -> QueryArtifact:
+    query = f"""
+SELECT DISTINCT ?disasterType ?disasterTypeLabel
+WHERE {{
+{_base_where(resolved, include_event_details=False)}
+?event (:hasDisasterType|:hasDisasterSubtype) ?disasterType .
+OPTIONAL {{ ?disasterType (skos:prefLabel|rdfs:label) ?disasterTypeLabel }}
+}}
+ORDER BY {resolved.plan.sort_direction.upper()}(?disasterTypeLabel)
+         ASC(STR(?disasterType))
+LIMIT {resolved.plan.limit}
+"""
+    return _artifact(
+        resolved,
+        query,
+        ["disasterType", "disasterTypeLabel"],
+        origin=origin,
+    )
 
 
 def _compile_grouped_aggregate(
@@ -499,6 +532,8 @@ def compile_query(
         raise _compilation_error("Open graph questions require the constrained fallback.")
     if plan.intent == "list_events":
         return _compile_event_listing(resolved, origin=origin)
+    if plan.intent == "list_disaster_types":
+        return _compile_disaster_type_listing(resolved, origin=origin)
     if plan.intent == "event_count":
         return _compile_grouped_aggregate(
             resolved,

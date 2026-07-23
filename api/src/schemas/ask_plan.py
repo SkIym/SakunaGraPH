@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 AskIntent = Literal[
     "list_events",
+    "list_disaster_types",
     "event_count",
     "impact_summary",
     "victim_trend",

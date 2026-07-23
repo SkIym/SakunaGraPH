@@ -184,6 +184,27 @@ class StructuredAnswerContextTests(unittest.TestCase):
                 )
                 self.assertEqual(context.rows[0].values["total"].unit, expected_unit)
 
+    def test_disaster_type_rows_have_type_evidence_and_uri(self) -> None:
+        plan = AskPlan(intent="list_disaster_types")
+        context = _context(
+            plan,
+            ["disasterType", "disasterTypeLabel"],
+            [
+                {
+                    "disasterType": "https://sakuna.ph/Flood",
+                    "disasterTypeLabel": "Flood",
+                }
+            ],
+        )
+
+        self.assertEqual(context.evidence[0].kind, "disaster_type")
+        self.assertEqual(context.evidence[0].label, "Flood")
+        self.assertEqual(context.evidence[0].uri, "https://sakuna.ph/Flood")
+        self.assertEqual(
+            context.rows[0].values["disasterType"].term_type,
+            "uri",
+        )
+
 
 class DeterministicGroundingGoldenTests(unittest.TestCase):
     def test_simple_answer_faithfulness_meets_phase_six_target(self) -> None:

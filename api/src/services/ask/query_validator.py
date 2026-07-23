@@ -270,8 +270,8 @@ def _validate_plan_alignment(
             )
     if intent in {"region_ranking", "disaster_ranking"} and "ORDER BY" not in query.upper():
         raise _validation_error("Ranking queries require deterministic ORDER BY.")
-    if intent == "list_events" and limit is None:
-        raise _validation_error("Event listings require a bounded LIMIT.")
+    if intent in {"list_events", "list_disaster_types"} and limit is None:
+        raise _validation_error("Listings require a bounded LIMIT.")
 
     expected_projection = artifact.projected_columns or artifact.expected_columns
     missing = [column for column in expected_projection if column not in projected_columns]

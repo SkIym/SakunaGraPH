@@ -40,6 +40,17 @@
       "expected_answer": "Found 2 matching events: Typhoon One [E1]; Flood Two [E2]."
     },
     {
+      "id": "disaster-type-list-with-evidence",
+      "intent": "list_disaster_types",
+      "metric": null,
+      "columns": ["disasterType", "disasterTypeLabel"],
+      "rows": [
+        {"disasterType": "https://sakuna.ph/Flood", "disasterTypeLabel": "Flood"},
+        {"disasterType": "https://sakuna.ph/TropicalCyclone", "disasterTypeLabel": "Tropical Cyclone"}
+      ],
+      "expected_answer": "Found 2 disaster types: Flood [E1]; Tropical Cyclone [E2]."
+    },
+    {
       "id": "valid-empty-results",
       "intent": "list_events",
       "metric": null,

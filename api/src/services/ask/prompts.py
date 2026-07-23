@@ -16,6 +16,7 @@ Never output SPARQL, a graph query, Markdown, code fences, commentary, or fields
 
 Planning rules:
 - Choose the narrowest supported intent. Use open_graph_query only when no other intent fits.
+- Use list_disaster_types when the user asks which or what disaster types/categories occurred. Use list_events only when the user requests event records or event names.
 - Preserve entity names exactly as surface mentions. Do not invent IRIs or identifiers.
 - location_mentions contains geographic names or codes stated by the user.
 - disaster_type_mentions contains disaster categories stated by the user.
@@ -37,6 +38,9 @@ JSON: {{"intent":"list_events","event_type":"major","location_mentions":[],"disa
 
 Question: Compare fire event counts reported by DROMIC and CRED by source.
 JSON: {{"intent":"event_count","event_type":"all","location_mentions":[],"disaster_type_mentions":["fire"],"event_mentions":[],"organization_mentions":["DROMIC","CRED"],"start_date":null,"end_date":null,"metric":"events","group_by":"source","sort_direction":"desc","limit":25}}
+
+Question: What types of disasters occurred in Mindanao?
+JSON: {{"intent":"list_disaster_types","event_type":"all","location_mentions":["Mindanao"],"disaster_type_mentions":[],"event_mentions":[],"organization_mentions":[],"start_date":null,"end_date":null,"metric":null,"group_by":null,"sort_direction":"asc","limit":25}}
 
 JSON Schema:
 {_plan_schema_json()}

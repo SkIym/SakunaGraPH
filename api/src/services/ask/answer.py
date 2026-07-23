@@ -16,7 +16,7 @@ from src.schemas.query_validation import ResultValidationReport
 from src.services.llm import generate_text_async
 
 
-_URI_COLUMNS = {"event", "group", "source"}
+_URI_COLUMNS = {"event", "disasterType", "group", "source"}
 _PERSON_METRICS = {"dead", "injured", "missing", "affected_persons"}
 _METRIC_LABELS = {
     "events": "events",
@@ -192,6 +192,8 @@ def _row_provenance(
 def _evidence_kind(binding: dict[str, Any]) -> str:
     if _row_value(binding, "event"):
         return "event"
+    if _row_value(binding, "disasterType"):
+        return "disaster_type"
     if _row_value(binding, "source"):
         return "source"
     if _row_value(binding, "total"):
@@ -200,17 +202,23 @@ def _evidence_kind(binding: dict[str, Any]) -> str:
 
 
 def _evidence_label(binding: dict[str, Any], index: int) -> str:
-    for column in ("eventName", "sourceLabel", "groupLabel", "metric"):
+    for column in (
+        "eventName",
+        "disasterTypeLabel",
+        "sourceLabel",
+        "groupLabel",
+        "metric",
+    ):
         if value := _row_value(binding, column):
             return value
-    for column in ("event", "source", "group"):
+    for column in ("event", "disasterType", "source", "group"):
         if value := _row_value(binding, column):
             return _display_value(value, "uri" if value.startswith("http") else "literal")
     return f"Validated query result row {index + 1}"
 
 
 def _evidence_uri(binding: dict[str, Any]) -> str | None:
-    for column in ("event", "source", "group"):
+    for column in ("event", "disasterType", "source", "group"):
         value = _row_value(binding, column)
         if value.startswith(("http://", "https://")):
             return value
@@ -334,18 +342,18 @@ def deterministic_answer(context: AskAnswerContext) -> str | None:
         summary = _deterministic_summary(context)
         return summary + _truncation_sentence(context) if summary else None
 
-    if plan.intent in {"list_events", "source_lookup"}:
+    if plan.intent in {"list_events", "list_disaster_types", "source_lookup"}:
         names = []
+        display_columns = {
+            "list_events": ("eventName", "event"),
+            "list_disaster_types": ("disasterTypeLabel", "disasterType"),
+            "source_lookup": ("sourceLabel", "source"),
+        }
         for row, evidence in zip(context.rows, context.evidence, strict=True):
-            columns = (
-                ("eventName", "event")
-                if plan.intent == "list_events"
-                else ("sourceLabel", "source")
-            )
             term = next(
                 (
                     row.values.get(column)
-                    for column in columns
+                    for column in display_columns[plan.intent]
                     if row.values.get(column)
                 ),
                 None,
@@ -353,9 +361,13 @@ def deterministic_answer(context: AskAnswerContext) -> str | None:
             if term:
                 names.append(f"{term.display} [{evidence.id}]")
         if names:
-            noun = "matching events" if plan.intent == "list_events" else "sources"
+            nouns = {
+                "list_events": "matching events",
+                "list_disaster_types": "disaster types",
+                "source_lookup": "sources",
+            }
             return (
-                f"Found {len(names)} {noun}: "
+                f"Found {len(names)} {nouns[plan.intent]}: "
                 + "; ".join(names)
                 + "."
                 + _truncation_sentence(context)

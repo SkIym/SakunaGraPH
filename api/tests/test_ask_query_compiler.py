@@ -140,6 +140,42 @@ class QueryCompilerBehaviorTests(unittest.TestCase):
         self.assertIn("?filterLocation :isPartOf* ?selectedLocation", query)
         self.assertIsNone(validate_sparql(query))
 
+    def test_disaster_type_listing_projects_types_instead_of_events(self) -> None:
+        resolved = ResolvedAskPlan(
+            plan=AskPlan(
+                intent="list_disaster_types",
+                location_mentions=["Mindanao"],
+                sort_direction="asc",
+                limit=25,
+            ),
+            locations=[MINDANAO],
+        )
+
+        artifact = compile_query(resolved)
+
+        self.assertEqual(
+            artifact.expected_columns,
+            ["disasterType", "disasterTypeLabel"],
+        )
+        self.assertIn(
+            "SELECT DISTINCT ?disasterType ?disasterTypeLabel",
+            artifact.sparql,
+        )
+        self.assertIn(
+            "VALUES ?selectedLocation { <https://sakuna.ph/Mindanao> }",
+            artifact.sparql,
+        )
+        self.assertIn(
+            "?event (:hasDisasterType|:hasDisasterSubtype) ?disasterType",
+            artifact.sparql,
+        )
+        self.assertNotIn("SELECT DISTINCT ?event", artifact.sparql)
+        self.assertNotIn(":eventName", artifact.sparql)
+        self.assertNotIn(":incidentDescription", artifact.sparql)
+        self.assertNotIn(":endDate", artifact.sparql)
+        self.assertTrue(artifact.sparql.rstrip().endswith("LIMIT 25"))
+        self.assertIsNone(validate_sparql(artifact.sparql))
+
     def test_casualty_and_damage_queries_use_controlled_graph_shapes(self) -> None:
         casualty = compile_query(
             ResolvedAskPlan(
@@ -168,6 +204,7 @@ class QueryCompilerBehaviorTests(unittest.TestCase):
     def test_supported_query_variants_parse_and_are_read_only(self) -> None:
         plans = [
             ResolvedAskPlan(plan=AskPlan(intent="list_events", group_by="region")),
+            ResolvedAskPlan(plan=AskPlan(intent="list_disaster_types")),
             ResolvedAskPlan(plan=AskPlan(intent="event_count", group_by="source")),
             ResolvedAskPlan(plan=AskPlan(intent="impact_summary")),
             ResolvedAskPlan(plan=AskPlan(intent="victim_trend")),

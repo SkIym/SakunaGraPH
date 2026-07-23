@@ -10,6 +10,7 @@ from scripts.evaluate_ask_planner import score_plan, summarize_plan_results
 from src.schemas.ask_plan import AskPlan
 from src.services.ask.normalization import (
     normalize_date_range,
+    normalize_intent,
     normalize_metric,
     normalize_plan_payload,
 )
@@ -65,6 +66,11 @@ class AskPlanSchemaTests(unittest.TestCase):
 
     def test_schema_has_no_sparql_output(self) -> None:
         self.assertNotIn("sparql", AskPlan.model_json_schema()["properties"])
+
+    def test_accepts_disaster_type_listing_intent(self) -> None:
+        plan = AskPlan(intent="list_disaster_types")
+
+        self.assertEqual(plan.intent, "list_disaster_types")
 
 
 class PlannerNormalizationTests(unittest.TestCase):
@@ -150,6 +156,55 @@ class PlannerNormalizationTests(unittest.TestCase):
             "affected_persons",
         )
 
+    def test_corrects_disaster_type_discovery_misclassified_as_event_listing(
+        self,
+    ) -> None:
+        payload = json.loads(
+            _plan_json(
+                intent="list_events",
+                location_mentions=["Mindanao"],
+                metric="events",
+                group_by="disaster_type",
+            )
+        )
+
+        normalized = normalize_plan_payload(
+            "What types of disasters occurred in Mindanao?",
+            payload,
+            today=date(2026, 7, 21),
+        )
+
+        self.assertEqual(normalized["intent"], "list_disaster_types")
+        self.assertEqual(normalized["location_mentions"], ["Mindanao"])
+        self.assertIsNone(normalized["metric"])
+        self.assertIsNone(normalized["group_by"])
+
+    def test_disaster_rankings_are_not_rewritten_as_type_listings(self) -> None:
+        self.assertEqual(
+            normalize_intent(
+                "What disaster types had the most deaths?",
+                "disaster_ranking",
+            ),
+            "disaster_ranking",
+        )
+        self.assertEqual(
+            normalize_intent("What types of casualties exist?", "open_graph_query"),
+            "open_graph_query",
+        )
+
+    def test_natural_disaster_type_listing_variants_are_normalized(self) -> None:
+        for question in (
+            "What are the disaster types?",
+            "Which categories of disasters occurred?",
+            "Show me the disaster kinds.",
+            "What types are there?",
+        ):
+            with self.subTest(question=question):
+                self.assertEqual(
+                    normalize_intent(question, "list_events"),
+                    "list_disaster_types",
+                )
+
 
 class PlannerParsingTests(unittest.TestCase):
     def test_parses_fenced_json_and_applies_deterministic_normalization(self) -> None:
@@ -233,6 +288,8 @@ class PlannerPromptTests(unittest.TestCase):
         self.assertIn("Return exactly one JSON object", prompt)
         self.assertIn("Never output SPARQL", prompt)
         self.assertIn('"intent"', prompt)
+        self.assertIn("Use list_disaster_types", prompt)
+        self.assertIn("What types of disasters occurred in Mindanao?", prompt)
 
 
 class PlannerEvaluationTests(unittest.TestCase):

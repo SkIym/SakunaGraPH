@@ -43,6 +43,18 @@ _TEMPORAL_YEAR_RE = re.compile(
     r"\b(?:year)\s+(19\d{2}|20\d{2}|2100)\b",
     re.IGNORECASE,
 )
+_DISASTER_TYPE_LIST_RE = re.compile(
+    r"\b(?:(?:what|which)(?:\s+(?:are|were))?|"
+    r"(?:list|show)(?:\s+me)?)\s+(?:the\s+)?"
+    r"(?:disaster\s+(?:types?|categor(?:y|ies)|kinds?)|"
+    r"(?:types?|categor(?:y|ies)|kinds?)\s+of\s+disasters?|"
+    r"types(?!\s+of\b))\b",
+    re.IGNORECASE,
+)
+_RANKING_OR_COUNT_RE = re.compile(
+    r"\b(?:how\s+many|count|number|most|least|top|rank|ranking|frequency)\b",
+    re.IGNORECASE,
+)
 
 _METRIC_ALIASES = {
     "event": "events",
@@ -261,6 +273,16 @@ def normalize_metric(question: str, raw_metric: Any, *, intent: Any) -> str | No
     return _normalize_metric_value(raw_metric)
 
 
+def normalize_intent(question: str, raw_intent: Any) -> Any:
+    """Correct a common planner ambiguity without broad keyword intent routing."""
+    if (
+        _DISASTER_TYPE_LIST_RE.search(question)
+        and not _RANKING_OR_COUNT_RE.search(question)
+    ):
+        return "list_disaster_types"
+    return raw_intent
+
+
 def normalize_plan_payload(
     question: str,
     payload: dict[str, Any],
@@ -268,6 +290,10 @@ def normalize_plan_payload(
     today: date,
 ) -> dict[str, Any]:
     normalized = dict(payload)
+    normalized["intent"] = normalize_intent(
+        question,
+        normalized.get("intent"),
+    )
     start_date, end_date = normalize_date_range(
         question,
         normalized.get("start_date"),
@@ -276,9 +302,13 @@ def normalize_plan_payload(
     )
     normalized["start_date"] = start_date
     normalized["end_date"] = end_date
-    normalized["metric"] = normalize_metric(
-        question,
-        normalized.get("metric"),
-        intent=normalized.get("intent"),
-    )
+    if normalized["intent"] == "list_disaster_types":
+        normalized["metric"] = None
+        normalized["group_by"] = None
+    else:
+        normalized["metric"] = normalize_metric(
+            question,
+            normalized.get("metric"),
+            intent=normalized.get("intent"),
+        )
     return normalized

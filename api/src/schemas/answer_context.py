@@ -6,7 +6,14 @@ from src.schemas.ask_execution import AskServiceRoute, QueryArtifact, QueryOrigi
 from src.schemas.entity_resolution import ResolvedAskPlan
 
 
-EvidenceKind = Literal["result_set", "result", "aggregate", "event", "source"]
+EvidenceKind = Literal[
+    "result_set",
+    "result",
+    "aggregate",
+    "event",
+    "disaster_type",
+    "source",
+]
 
 
 class AskResultTerm(BaseModel):
