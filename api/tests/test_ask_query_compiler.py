@@ -42,6 +42,7 @@ def _entity(
 
 
 CEBU = _entity("location", "0706000000", label="Cebu")
+MINDANAO = _entity("location", "Mindanao", label="Mindanao")
 FLOOD = _entity("disaster_type", "Flood")
 DEAD = _entity("casualty_type", "Dead")
 EVENT = _entity(
@@ -119,6 +120,25 @@ class QueryCompilerBehaviorTests(unittest.TestCase):
         self.assertIn('>= "2023-01-01"', query)
         self.assertIn('<= "2023-12-31"', query)
         self.assertTrue(query.rstrip().endswith("LIMIT 15"))
+
+    def test_island_group_location_uses_catalog_iri_without_psgc_code(self) -> None:
+        resolved = ResolvedAskPlan(
+            plan=AskPlan(
+                intent="event_count",
+                location_mentions=["Mindanao"],
+                metric="events",
+            ),
+            locations=[MINDANAO],
+        )
+
+        query = compile_query(resolved).sparql
+
+        self.assertIn(
+            "VALUES ?selectedLocation { <https://sakuna.ph/Mindanao> }",
+            query,
+        )
+        self.assertIn("?filterLocation :isPartOf* ?selectedLocation", query)
+        self.assertIsNone(validate_sparql(query))
 
     def test_casualty_and_damage_queries_use_controlled_graph_shapes(self) -> None:
         casualty = compile_query(

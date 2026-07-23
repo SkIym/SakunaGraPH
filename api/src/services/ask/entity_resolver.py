@@ -34,6 +34,7 @@ SELECT DISTINCT ?entity ?code ?label ?altLabel ?levelLabel
        ?parent ?parentLabel ?region ?regionLabel
 WHERE {
   VALUES (?level ?levelLabel) {
+    (:IslandGroup "Island Group")
     (:Region "Region")
     (:Province "Province")
     (:City "City")
@@ -41,8 +42,9 @@ WHERE {
     (:Barangay "Barangay")
   }
   ?entity a ?level ;
-          :psgcCode ?code ;
           rdfs:label ?label .
+  OPTIONAL { ?entity :psgcCode ?code }
+  FILTER(?level = :IslandGroup || BOUND(?code))
   OPTIONAL { ?entity skos:altLabel ?altLabel }
   OPTIONAL {
     ?entity :isPartOf ?parent .
@@ -254,13 +256,16 @@ def _build_location_catalog(bindings: list[dict[Any, Any]]) -> list[EntityCatalo
         iri = binding_value(binding, "entity", "")
         code = binding_value(binding, "code", "")
         label = binding_value(binding, "label", "")
-        if not iri or not code or not label:
+        if not iri or not label:
+            continue
+        identifier = code or _local_name(iri)
+        if not identifier:
             continue
         item = grouped.setdefault(
             iri,
             {
                 "iri": iri,
-                "id": code,
+                "id": identifier,
                 "label": label,
                 "entity_type": "location",
                 "aliases": [],

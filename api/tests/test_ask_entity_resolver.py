@@ -77,6 +77,7 @@ LOCATION_CATALOG = [
     ),
     _entry("location", "1130700000", "Davao City", level="City"),
     _entry("location", "1430300000", "Baguio City", level="City"),
+    _entry("location", "Mindanao", "Mindanao", level="Island Group"),
 ]
 
 DISASTER_CATALOG = [
@@ -247,6 +248,39 @@ class GraphDbCatalogTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(first.locations[0].iri, graphdb_iri)
         self.assertEqual(second.locations[0].iri, graphdb_iri)
         self.assertEqual(first.locations[0].match_type, "hierarchy")
+
+    async def test_island_group_without_psgc_code_is_in_location_catalog(self) -> None:
+        graphdb_iri = "https://sakuna.ph/Mindanao"
+        result = {
+            "results": {
+                "bindings": [
+                    {
+                        "entity": _term(graphdb_iri),
+                        "label": _term("Mindanao"),
+                        "levelLabel": _term("Island Group"),
+                        "parent": _term("https://sakuna.ph/Philippines"),
+                        "parentLabel": _term("Philippines"),
+                    }
+                ]
+            }
+        }
+        plan = AskPlan(intent="list_events", location_mentions=["Mindanao"])
+        with patch(
+            "src.services.ask.entity_resolver.execute_sparql",
+            new=AsyncMock(return_value=result),
+        ):
+            resolved = await resolve_ask_plan("List events in Mindanao", plan)
+
+        self.assertEqual(len(resolved.locations), 1)
+        self.assertEqual(resolved.locations[0].iri, graphdb_iri)
+        self.assertEqual(resolved.locations[0].id, "Mindanao")
+        self.assertEqual(resolved.locations[0].match_type, "exact")
+        self.assertFalse(resolved.warnings)
+        self.assertIn(":IslandGroup", entity_resolver._LOCATION_CATALOG_QUERY)
+        self.assertIn(
+            "OPTIONAL { ?entity :psgcCode ?code }",
+            entity_resolver._LOCATION_CATALOG_QUERY,
+        )
 
     async def test_taxonomy_casualty_event_and_organization_resolution(self) -> None:
         plan = AskPlan(

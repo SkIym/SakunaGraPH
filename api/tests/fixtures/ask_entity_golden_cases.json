@@ -11,6 +11,7 @@
     {"mention": "Davao del Sur Province", "entity_type": "location", "expected_id": "1102400000"},
     {"mention": "Davao City", "entity_type": "location", "expected_id": "1130700000"},
     {"mention": "Baguio City", "entity_type": "location", "expected_id": "1430300000"},
+    {"mention": "Mindanao", "entity_type": "location", "expected_id": "Mindanao"},
     {"mention": "Flood", "entity_type": "disaster_type", "expected_id": "Flood"},
     {"mention": "floods", "entity_type": "disaster_type", "expected_id": "Flood"},
     {"mention": "typhoon", "entity_type": "disaster_type", "expected_id": "TropicalCyclone"},

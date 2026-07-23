@@ -54,11 +54,22 @@ def _values(variable: str, entities: Iterable[ResolvedEntity]) -> str:
 
 
 def analysis_filters_from_plan(resolved: ResolvedAskPlan) -> AnalysisFilters:
+    psgc_locations = [
+        entity.id
+        for entity in resolved.locations
+        if re.fullmatch(r"\d{10}", entity.id)
+    ]
+    wildcard_locations = [
+        entity.iri
+        for entity in resolved.locations
+        if not re.fullmatch(r"\d{10}", entity.id)
+    ]
     return make_analysis_filters(
         event_type=resolved.plan.event_type,
         start_date=resolved.plan.start_date,
         end_date=resolved.plan.end_date,
-        location_ids=[entity.id for entity in resolved.locations],
+        location_ids=psgc_locations,
+        location_iris=wildcard_locations,
         disaster_types=[entity.id for entity in resolved.disaster_types],
     )
 
