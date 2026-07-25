@@ -126,13 +126,13 @@
 								onSelect(item);
 							}
 						}}
-						class="cursor-pointer align-top transition hover:bg-indigo-50/50 focus:bg-indigo-50/50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-300 {row %
+						class="cursor-pointer align-middle transition hover:bg-indigo-50/50 focus:bg-indigo-50/50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-300 {row %
 						2
 							? 'bg-slate-50/20'
 							: ''}"
 					>
 						{#each visible as column (column.id)}
-							<td class="px-3 py-3.5 text-slate-600 first:pl-5 last:pr-5">
+							<td class="px-3 py-3.5 align-middle text-slate-600 first:pl-5 last:pr-5">
 								{#if column.id === 'eventName'}
 									<div class="max-w-64">
 										<p

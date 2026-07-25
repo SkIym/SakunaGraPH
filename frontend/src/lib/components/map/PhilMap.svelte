@@ -74,7 +74,7 @@
 				stroke={strokeColor}
 				stroke-width={strokeWidth}
 				stroke-linejoin="round"
-				class="cursor-pointer"
+				class="map-area cursor-pointer outline-none"
 				role="button"
 				tabindex="0"
 				aria-label={`Select ${item.name}`}
@@ -95,3 +95,11 @@
 		{/if}
 	{/each}
 </svg>
+
+<style>
+	.map-area:focus-visible {
+		stroke: #1d4ed8;
+		stroke-width: 1.5;
+		filter: drop-shadow(0 0 1px rgb(29 78 216 / 0.45));
+	}
+</style>

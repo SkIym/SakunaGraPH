@@ -207,10 +207,24 @@
 						>
 						<span
 							aria-hidden="true"
-							class="text-sm text-slate-400 transition-transform {locationsExpanded
-								? 'rotate-180'
-								: ''}">⌄</span
+							class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-slate-400 transition {locationsExpanded
+								? 'rotate-180 bg-slate-100 text-slate-600'
+								: ''}"
 						>
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								width="16"
+								height="16"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="m6 9 6 6 6-6" />
+							</svg>
+						</span>
 					</button>
 					{#if locationsExpanded}
 						{#if details.locations.length}
@@ -286,10 +300,24 @@
 							>
 							<span
 								aria-hidden="true"
-								class="text-sm text-slate-400 transition-transform {incidentsExpanded
-									? 'rotate-180'
-									: ''}">⌄</span
+								class="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-slate-400 transition {incidentsExpanded
+									? 'rotate-180 bg-slate-100 text-slate-600'
+									: ''}"
 							>
+								<svg
+									xmlns="http://www.w3.org/2000/svg"
+									width="16"
+									height="16"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="2"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+								>
+									<path d="m6 9 6 6 6-6" />
+								</svg>
+							</span>
 						</button>
 						{#if incidentsExpanded}
 							{#if details.incidents.length}

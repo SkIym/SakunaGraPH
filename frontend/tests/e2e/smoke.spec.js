@@ -35,11 +35,13 @@ test('map loads and supports keyboard selection and event details', async ({ pag
 	await gotoReady(page, '/map');
 	const area = page.getByRole('button', { name: /^Select / }).first();
 	await expect(area).toBeVisible();
+	await expect(area).toHaveClass(/outline-none/);
 	await area.focus();
 	await page.keyboard.press('Enter');
 
 	const eventRow = page.getByRole('button', { name: 'View details for Typhoon Salome' });
 	await expect(eventRow).toBeVisible();
+	await expect(eventRow.locator('td').last()).toHaveCSS('vertical-align', 'middle');
 	await eventRow.click();
 	await expect(page.getByRole('dialog', { name: /Typhoon Salome/ })).toBeVisible();
 });
@@ -61,7 +63,10 @@ test('analysis overview, table, metrics, timeline, and event details load', asyn
 
 	await gotoReady(page, '/analysis/events');
 	await expect(page.getByRole('heading', { name: 'Disaster event records' })).toBeVisible();
-	await page.getByRole('button', { name: 'View details for Typhoon Salome' }).click();
+	const analysisEventRow = page.getByRole('button', { name: 'View details for Typhoon Salome' });
+	await expect(analysisEventRow.locator('td').first()).toHaveCSS('vertical-align', 'middle');
+	await expect(analysisEventRow.locator('td').last()).toHaveCSS('vertical-align', 'middle');
+	await analysisEventRow.click();
 	await expect(page.getByRole('dialog', { name: /Typhoon Salome/ })).toBeVisible();
 	await page.keyboard.press('Escape');
 

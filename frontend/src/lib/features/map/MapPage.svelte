@@ -551,7 +551,7 @@
 														role="button"
 														tabindex="0"
 														aria-label="View details for {row.eventName || 'unnamed event'}"
-														class="cursor-pointer transition-colors hover:bg-blue-50/60 focus:bg-blue-50/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-300 {i %
+														class="cursor-pointer align-middle transition-colors hover:bg-blue-50/60 focus:bg-blue-50/60 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-blue-300 {i %
 															2 ===
 														0
 															? ''
@@ -561,7 +561,7 @@
 													>
 														<!-- Event name + alternates badge -->
 														<td
-															class="px-3 py-2 text-slate-600 max-w-[160px]"
+															class="max-w-[160px] px-3 py-2 align-middle text-slate-600"
 															title={row.eventName ?? ''}
 														>
 															<div class="flex flex-col gap-1">
@@ -598,7 +598,7 @@
 														</td>
 
 														<!-- Disaster type: first + +N more -->
-														<td class="px-3 py-2 text-slate-600">
+														<td class="px-3 py-2 align-middle text-slate-600">
 															{#if dtypes.length === 0}
 																<span class="text-slate-300">—</span>
 															{:else}
@@ -629,12 +629,15 @@
 														</td>
 
 														<!-- Date -->
-														<td class="px-3 py-2 text-slate-600 whitespace-nowrap">
+														<td class="px-3 py-2 align-middle text-slate-600 whitespace-nowrap">
 															{colValue(row, 'startDate')}
 														</td>
 
 														<!-- Locations -->
-														<td class="px-3 py-2 text-slate-600 align-top" style="max-width:180px;">
+														<td
+															class="px-3 py-2 align-middle text-slate-600"
+															style="max-width:180px;"
+														>
 															{#if locs.length === 0}
 																<span class="text-slate-300">—</span>
 															{:else}
@@ -660,12 +663,14 @@
 																role="button"
 																tabindex="0"
 																aria-label="View details for {sub.eventName || 'unnamed event'}"
-																class="cursor-pointer border-l-2 border-violet-300 bg-violet-50/60 transition hover:bg-violet-100/70 focus:bg-violet-100/70 focus:outline-none"
+																class="cursor-pointer border-l-2 border-violet-300 bg-violet-50/60 align-middle transition hover:bg-violet-100/70 focus:bg-violet-100/70 focus:outline-none"
 																onclick={() => showEventDetails(sub)}
 																onkeydown={(keyboardEvent) =>
 																	handleEventRowKeydown(keyboardEvent, sub)}
 															>
-																<td class="pl-6 pr-3 py-1.5 text-slate-500 max-w-[160px]">
+																<td
+																	class="max-w-[160px] py-1.5 pr-3 pl-6 align-middle text-slate-500"
+																>
 																	<div class="flex flex-col gap-0.5">
 																		<span class="truncate text-xs">{sub.eventName || '—'}</span>
 																		{#if sub.source}
@@ -677,17 +682,19 @@
 																		{/if}
 																	</div>
 																</td>
-																<td class="px-3 py-1.5 text-slate-500 text-xs">
+																<td class="px-3 py-1.5 align-middle text-xs text-slate-500">
 																	{subTypes.length ? formatDisasterType(subTypes[0]) : '—'}
 																	{#if subTypes.length > 1}
 																		<span class="text-slate-400"> +{subTypes.length - 1}</span>
 																	{/if}
 																</td>
-																<td class="px-3 py-1.5 text-slate-500 text-xs whitespace-nowrap">
+																<td
+																	class="px-3 py-1.5 align-middle text-xs whitespace-nowrap text-slate-500"
+																>
 																	{sub.startDate || '—'}
 																</td>
 																<td
-																	class="px-3 py-1.5 text-slate-500 align-top text-xs"
+																	class="px-3 py-1.5 align-middle text-xs text-slate-500"
 																	style="max-width:180px;"
 																>
 																	{#if subLocs.length === 0}

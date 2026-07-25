@@ -7,6 +7,7 @@ export default defineConfig({
 	plugins: [svelte(), svelteTesting()],
 	resolve: {
 		alias: {
+			$lib: fileURLToPath(new URL('./src/lib', import.meta.url)),
 			'$env/dynamic/public': fileURLToPath(
 				new URL('./tests/mocks/dynamic-public.js', import.meta.url),
 			),
