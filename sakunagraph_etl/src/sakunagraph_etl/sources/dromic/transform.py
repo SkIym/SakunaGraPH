@@ -4,11 +4,10 @@ from typing import Iterable, List, Optional, Tuple
 
 from rdflib import URIRef
 from sakunagraph_etl.transform.helpers import load_csv_df, to_int, to_million_php
-from sakunagraph_etl.rdf.iris import DROMIC_EVENT_NS
-from .rdf import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, ORG_MAPPING, AffectedPopulation, Assistance, Event, Housing, PEvac, Provenance
+from .rdf import AFF_POP_TOKENS, ASSISTANCE_TOKENS, HOUSING_TOKENS, ORG_MAPPING, AffectedPopulation, Assistance, Event, Housing, PEvac, Provenance, ReportVersion
+from .identity import canonical_event_id, legacy_event_id
 import os
 import json
-import uuid
 from datetime import datetime
 import re
 import polars as pl
@@ -77,10 +76,18 @@ def _parse_date(value: str) -> Optional[datetime]:
     print(f"  [WARN] Could not parse date: {value!r}")
     return None
 
-def _event_id(event_name: str, start_date: str | None) -> str:
-    """Deterministic hex ID from event name + start date."""
-    key = f"{event_name.strip().lower()}:{start_date or ''}"
-    return uuid.uuid5(DROMIC_EVENT_NS, key).hex
+def _event_id(
+    event_name: str,
+    start_date: str | None,
+    report_link: str | None = None,
+) -> str:
+    """Return the canonical post-based ID with a legacy metadata fallback."""
+
+    return canonical_event_id(
+        report_link,
+        event_name=event_name,
+        start_date=start_date,
+    )
 
 def _extract_barangay(text: str) -> tuple[str | None, str]:
     """
@@ -106,6 +113,12 @@ def load_event(file_path: str) -> Event:
     with open(file_path, "r", encoding="utf-8") as f:
         meta: dict[str, str] = json.load(f)
 
+    source_path = Path(file_path).with_name("source.json")
+    source: dict[str, str] = {}
+    if source_path.is_file():
+        with source_path.open("r", encoding="utf-8") as file:
+            source = json.load(file)
+
     event_name = meta.get("eventName", "") 
     remarks = meta.get("remarks", "") 
     pred, _ = DISASTER_CLASSIFIER.classify(
@@ -125,15 +138,22 @@ def load_event(file_path: str) -> Event:
     # if not meta["startDate"]:
     #     print('Missing dates in metadata.json: ', event_name)
 
+    legacy_id = legacy_event_id(event_name, meta.get("startDate"))
+    event_id = _event_id(
+        event_name,
+        meta.get("startDate"),
+        source.get("reportLink"),
+    )
     event = Event(
-        id=_event_id(event_name, meta.get("startDate")),
+        id=event_id,
         eventName=event_name,
         startDate=_parse_date(meta.get("startDate", "")),
         endDate=_parse_date(meta.get("endDate", "")),
         remarks=remarks,
         hasDisasterType=pred,
         hasBarangay=hasBarangay if hasBarangay else None,
-        hasLocation=URIRef(str(hasLocation)) if hasLocation else None
+        hasLocation=URIRef(str(hasLocation)) if hasLocation else None,
+        legacy_id=legacy_id if event_id != legacy_id else None,
     )
 
     return event
@@ -141,15 +161,33 @@ def load_event(file_path: str) -> Event:
 def load_provenance(file_path: str) -> Provenance:
 
     with open(file_path, "r", encoding="utf-8") as f:
-        src: dict[str, str] = json.load(f)
+        src: dict[str, object] = json.load(f)
 
     # if not src["lastUpdateDate"]: print("Missing last update date on file: ", src["reportName"])
-    
+
+    raw_versions = src.get("reportVersions", [])
+    versions = tuple(
+        ReportVersion(
+            reportName=str(entry.get("filename") or ""),
+            reportLink=str(entry.get("post_url") or "") or None,
+            downloadUrl=str(entry.get("download_url") or "") or None,
+            obtainedDate=str(entry.get("downloaded_at") or "") or None,
+            postDate=str(entry.get("post_date") or "") or None,
+            sha256=str(entry.get("sha256") or "") or None,
+        )
+        for entry in raw_versions
+        if isinstance(entry, dict) and entry.get("filename")
+    ) if isinstance(raw_versions, list) else ()
+
     return Provenance(
-        lastUpdateDate=_parse_date(src.get("lastUpdateDate", "")),
-        reportLink=src.get("reportLink"),
-        reportName=src.get("reportName", ""),
-        obtainedDate=src.get("obtainedDate"),
+        lastUpdateDate=_parse_date(str(src.get("lastUpdateDate") or "")),
+        reportLink=str(src.get("reportLink") or "") or None,
+        reportName=str(src.get("reportName") or ""),
+        obtainedDate=str(src.get("obtainedDate") or "") or None,
+        downloadUrl=str(src.get("downloadUrl") or "") or None,
+        postDate=str(src.get("postDate") or "") or None,
+        sha256=str(src.get("sha256") or "") or None,
+        versions=versions,
     )
 
 def load_aff_pop(folder_path: str) -> Tuple[List[AffectedPopulation] | None, List[PEvac] | None]:

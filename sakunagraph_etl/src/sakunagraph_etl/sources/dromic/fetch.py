@@ -3,25 +3,25 @@
 from __future__ import annotations
 
 import argparse
-import json
+import hashlib
 import logging
 import os
 import re
 import sys
 import time
-from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Optional
+from typing import TYPE_CHECKING, Optional
 from urllib.parse import parse_qs, unquote, urlparse
 
 import requests
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.chrome.webdriver import WebDriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.support.ui import WebDriverWait
 from sakunagraph_etl.config import PROFILE_CHOICES, load_settings
+from .identity import canonical_post_url
+from .manifest import Manifest, ManifestEntry, load_manifest, save_manifest
+
+if TYPE_CHECKING:
+    from selenium.webdriver.chrome.webdriver import WebDriver
+    from selenium.webdriver.support.ui import WebDriverWait
 
 log = logging.getLogger(__name__)
 
@@ -52,62 +52,31 @@ def parse_args() -> argparse.Namespace:
 
 
 # =============================================================================
-# MANIFEST
-# =============================================================================
-
-@dataclass
-class ManifestEntry:
-    filename: str
-    download_url: str
-    downloaded_at: str  # ISO-8601
-    post_url: str
-    page: int
-
-
-@dataclass
-class Manifest:
-    last_scrape_date: Optional[str] = None
-    entries: list[ManifestEntry] = field(default_factory=list)
-
-
-def load_manifest(path: Path) -> Manifest:
-    if not path.exists():
-        return Manifest()
-
-    with path.open("r", encoding="utf-8") as f:
-        data = json.load(f)
-
-    if isinstance(data, list):
-        return Manifest(entries=[ManifestEntry(**entry) for entry in data])
-
-    return Manifest(
-        last_scrape_date=data.get("last_scrape_date"),
-        entries=[ManifestEntry(**entry) for entry in data.get("entries", [])],
-    )
-
-
-def save_manifest(path: Path, manifest: Manifest) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(
-            {
-                "last_scrape_date": manifest.last_scrape_date,
-                "entries": [asdict(entry) for entry in manifest.entries],
-            },
-            f,
-            indent=2,
-            ensure_ascii=False,
-        )
-
-
-# =============================================================================
 # HELPERS
 # =============================================================================
 
 def get_post_date(driver: WebDriver) -> datetime:
     """Return the publication datetime of the currently loaded post."""
+    from selenium.webdriver.common.by import By
+
     date_el = driver.find_element(By.CSS_SELECTOR, "span.published.updated")
     return datetime.strptime(date_el.text.strip(), "%B %d, %Y")
+
+
+def should_fetch_post(post_date: datetime, last_scrape_date: datetime) -> bool:
+    """Use the post's displayed update date as the sole fetch eligibility gate."""
+
+    return post_date > last_scrape_date
+
+
+def get_canonical_post_url(driver: WebDriver, fallback: str) -> str:
+    """Read WordPress's canonical permalink, falling back to the listing URL."""
+
+    from selenium.webdriver.common.by import By
+
+    links = driver.find_elements(By.CSS_SELECTOR, "link[rel='canonical']")
+    href = links[0].get_attribute("href") if links else None
+    return canonical_post_url(href or fallback) or fallback
 
 
 def make_direct_download_link(url: str) -> str:
@@ -168,6 +137,7 @@ def download_file(
     post_url: str,
     page: int,
     filename_hint: Optional[str] = None,
+    post_date: datetime | None = None,
 ) -> bool:
     """Download a file, record it in the manifest, and return success."""
     try:
@@ -187,9 +157,15 @@ def download_file(
             ManifestEntry(
                 filename=filename,
                 download_url=url,
-                downloaded_at=datetime.now(timezone.utc).isoformat(timespec="seconds") + "Z",
+                downloaded_at=(
+                    datetime.now(timezone.utc)
+                    .isoformat(timespec="seconds")
+                    .replace("+00:00", "Z")
+                ),
                 post_url=post_url,
-                page=page
+                page=page,
+                post_date=post_date.strftime("%Y-%m-%d") if post_date else None,
+                sha256=hashlib.sha256(r.content).hexdigest(),
             )
         )
         return True
@@ -201,6 +177,8 @@ def download_file(
 
 def extract_first_download_link(driver: WebDriver) -> tuple[Optional[str], Optional[str]]:
     """Return (download_url, link_text) for the first attachable file in the post."""
+    from selenium.webdriver.common.by import By
+
     selectors = [
         "div.post-content a[href*='.pdf']",
         "div.post-content a[href*='.docx']",
@@ -231,7 +209,6 @@ def extract_first_download_link(driver: WebDriver) -> tuple[Optional[str], Optio
 def handle_page(
     driver: WebDriver,
     wait: WebDriverWait[WebDriver],
-    scraped_urls: set[str],
     manifest: Manifest,
     manifest_path: Path,
     last_scrape_date: datetime,
@@ -243,6 +220,9 @@ def handle_page(
 
     Returns True if the scraper should stop (post published date is older then last scraped date meaning we've gone past new content).
     """
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
+
     read_mores = driver.find_elements(
         By.XPATH, "//a[contains(.,'Read More')] | //button[contains(.,'Read More')]"
     )
@@ -272,35 +252,36 @@ def handle_page(
         try:
             wait.until(EC.presence_of_element_located((By.CSS_SELECTOR, "div.post-content")))
             navigated_away = True  # driver is now on the post page
+            post_url = get_canonical_post_url(driver, post_url)
 
             post_date = get_post_date(driver)
             log.info("Post date: %s", post_date.date())
 
-            if post_date <= last_scrape_date:
+            if not should_fetch_post(post_date, last_scrape_date):
                 log.info("Post is older than last scrape date — stopping")
 
                 driver.back()
                 wait.until(EC.presence_of_all_elements_located(
                     (By.XPATH, "//a[contains(.,'Read More')]")
                 ))
+                navigated_away = False
                 return True
             
-            elif post_url in scraped_urls:
-                log.info("Skipping. Post already scraped.")
-                navigated_away = False
-                driver.back()
-                wait.until(EC.presence_of_all_elements_located(
-                    (By.XPATH, "//a[contains(.,'Read More')]")
-                ))
-
             else:
 
                 file_url, file_name = extract_first_download_link(driver)
 
                 if file_url:
-                    success = download_file(file_url, download_dir, manifest, post_url, page,  file_name)
+                    success = download_file(
+                        file_url,
+                        download_dir,
+                        manifest,
+                        post_url,
+                        page,
+                        file_name,
+                        post_date,
+                    )
                     if success:
-                        scraped_urls.add(post_url)
                         save_manifest(manifest_path, manifest)
                 else:
                     log.warning("No downloadable link found for: %s", post_url)
@@ -330,6 +311,9 @@ def goto_page(
     Click the pagination link for page_num. Returns False only when the link
     genuinely doesn't exist (i.e. no more pages). Retries on transient errors.
     """
+    from selenium.webdriver.common.by import By
+    from selenium.webdriver.support import expected_conditions as EC
+
     for attempt in range(1, retries + 1):
         try:
             el = wait.until(
@@ -376,6 +360,10 @@ def setup_logging(log_file: Path) -> None:
 
 def main() -> None:
     args = parse_args()
+    from selenium.webdriver.chrome.options import Options
+    from selenium.webdriver.chrome.webdriver import WebDriver
+    from selenium.webdriver.support.ui import WebDriverWait
+
     settings = load_settings(args.profile)
 
     download_dir = args.download_dir or settings.paths.raw_root / "dromic-new" / str(args.year)
@@ -395,10 +383,6 @@ def main() -> None:
         last_scrape_date = datetime.strptime(manifest.last_scrape_date, "%Y-%m-%d, %H:%M:%S")
     else:
         last_scrape_date = datetime.min
-
-    scraped_urls: set[str] = {
-        entry.post_url for entry in manifest.entries if entry.post_url
-    }
 
     opts = Options()
     opts.add_experimental_option(
@@ -428,7 +412,6 @@ def main() -> None:
             should_stop = handle_page(
                 driver=driver,
                 wait=wait,
-                scraped_urls=scraped_urls,
                 manifest=manifest,
                 manifest_path=manifest_path,
                 last_scrape_date=last_scrape_date,

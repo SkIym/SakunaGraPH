@@ -39,6 +39,7 @@ class EventStatusRecord:
     updated_at: str
     reason: str | None = None
     source_filename: str | None = None
+    source_version: str | None = None
 
     @classmethod
     def create(
@@ -49,6 +50,7 @@ class EventStatusRecord:
         *,
         reason: str | None = None,
         source_filename: str | None = None,
+        source_version: str | None = None,
     ) -> "EventStatusRecord":
         return cls(
             event_id=event_id,
@@ -57,6 +59,7 @@ class EventStatusRecord:
             updated_at=datetime.now(timezone.utc).isoformat(),
             reason=reason,
             source_filename=source_filename,
+            source_version=source_version,
         )
 
     @classmethod
@@ -72,6 +75,11 @@ class EventStatusRecord:
                 if value.get("source_filename") is not None
                 else None
             ),
+            source_version=(
+                str(value["source_version"])
+                if value.get("source_version") is not None
+                else None
+            ),
         )
 
 
@@ -80,7 +88,7 @@ class DromicStateManifest:
     year: str
     updated_at: str
     events: Mapping[str, Mapping[str, EventStatusRecord]] = field(default_factory=dict)
-    schema_version: int = 1
+    schema_version: int = 2
 
     def to_dict(self) -> dict[str, object]:
         return {
@@ -200,8 +208,36 @@ class DromicStateStore:
     def events_requiring_rerun(self) -> set[str]:
         return set(self._failure_events(self.load()))
 
-    def parsed_sources(self) -> set[str]:
-        return set(self._parsed_sources(self.load()))
+    def parsed_sources(
+        self,
+        manifest: DromicStateManifest | None = None,
+    ) -> set[str]:
+        return set(self._parsed_sources(manifest or self.load()))
+
+    def source_is_current(
+        self,
+        event_id: str,
+        *,
+        producer: str,
+        source_filename: str,
+        source_version: str | None,
+        manifest: DromicStateManifest | None = None,
+    ) -> bool:
+        """Return whether producer state already covers this acquired version."""
+
+        current = manifest or self.load()
+        record = current.events.get(event_id, {}).get(producer)
+        if record is None or record.status not in {
+            EventStatus.PARSED,
+            EventStatus.MAPPED,
+            EventStatus.DUPLICATE_CSV,
+        }:
+            return False
+        if record.source_filename != source_filename:
+            return False
+        if not source_version or not record.source_version:
+            return True
+        return record.source_version == source_version
 
 
 __all__ = [

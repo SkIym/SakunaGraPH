@@ -43,6 +43,7 @@ GRAPH_BASE_IRI = "https://sakuna.ph"
 SCOPES = ("ontology", "events", "orgs", "prov", "psgc", "resolution")
 REPLACE_GRAPH_PREDICATE = "http://www.ontotext.com/replaceGraph"
 REPLACE_GRAPH_MARKER = "urn:sakunagraph:loader"
+DROMIC_GRAPH_IRI = f"{GRAPH_BASE_IRI}/events/dromic"
 
 
 class LoadTarget(NamedTuple):
@@ -223,6 +224,35 @@ def group_targets_by_context(
     for target in targets:
         grouped.setdefault(target.context, []).append(target)
     return [(context, grouped[context]) for context in sorted(grouped)]
+
+
+def contains_mutable_dromic_graph(targets: Iterable[LoadTarget]) -> bool:
+    """Return whether publication includes DROMIC's latest-only active graph."""
+
+    return any(target.context == DROMIC_GRAPH_IRI for target in targets)
+
+
+def complete_dromic_replacement_targets(
+    targets: Iterable[LoadTarget],
+    rdf_root: Path,
+) -> list[LoadTarget]:
+    """Include every year file when replacing DROMIC's shared source graph."""
+
+    selected = list(targets)
+    if not contains_mutable_dromic_graph(selected):
+        return selected
+
+    selected_names = {
+        target.path.name
+        for target in selected
+        if target.context == DROMIC_GRAPH_IRI
+    }
+    dromic_dir = rdf_root / "events" / "dromic"
+    for path in sorted(dromic_dir.glob("*.ttl")):
+        resolved = path.resolve()
+        if resolved.is_file() and resolved.name not in selected_names:
+            selected.append(LoadTarget(resolved, DROMIC_GRAPH_IRI))
+    return sorted(set(selected))
 
 
 def _request_error_detail(error: requests.RequestException) -> str:
@@ -480,12 +510,23 @@ def main(argv: Sequence[str] | None = None) -> int:
         print("No Turtle files matched the requested scope or file selection.")
         return 0
 
+    if args.replace:
+        targets = complete_dromic_replacement_targets(targets, rdf_root)
+
     print(f"Selected {len(targets)} Turtle file(s):")
     for target in targets:
         print(f"  {display_path(target.path)} -> <{target.context}>")
 
     if args.dry_run:
         return 0
+
+    if contains_mutable_dromic_graph(targets) and not args.replace:
+        print(
+            "ERROR: DROMIC publication requires --replace so superseded facts "
+            "cannot survive in the active named graph.",
+            file=sys.stderr,
+        )
+        return 2
 
     from sakunagraph_etl.rdf.publication import (
         GraphDbPublisher,

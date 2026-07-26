@@ -7,8 +7,9 @@ import unittest
 from unittest import mock
 
 import polars as pl
-from rdflib import Graph, URIRef
+from rdflib import Graph, Literal, URIRef
 from rdflib.compare import to_canonical_graph
+from rdflib.namespace import DCTERMS, OWL
 
 from mappings import dromic as legacy_dromic_rdf
 from mappings import gda as legacy_gda_rdf
@@ -19,7 +20,8 @@ from pipeline import run_gda as legacy_gda_job
 from pipeline import run_ndrrmc as legacy_ndrrmc_job
 from pipeline import run_psgc as legacy_psgc_job
 from sakunagraph_etl.cli import COMMANDS
-from sakunagraph_etl.rdf.graph import create_graph
+from sakunagraph_etl.rdf.graph import PROV, SKG, create_graph
+from sakunagraph_etl.rdf.iris import event_uri
 from sakunagraph_etl.rdf.validation import ShaclValidationService
 from sakunagraph_etl.sources.dromic import job as dromic_job
 from sakunagraph_etl.sources.dromic import quality as dromic_quality
@@ -180,6 +182,65 @@ class Stage4SourceMigrationTests(unittest.TestCase):
                     encoding="utf-8"
                 )
                 self.assertEqual(canonical_rdf(graph), expected)
+
+    def test_dromic_canonical_event_replaces_legacy_event_iri(self) -> None:
+        graph = create_graph()
+        event = dromic_rdf.Event(
+            eventName="Fixture Flood",
+            hasDisasterType="Flood",
+            startDate=None,
+            endDate=None,
+            id="canonical-id",
+            remarks="Fixture remarks",
+            hasBarangay=None,
+            hasLocation=None,
+            legacy_id="legacy-id",
+        )
+
+        canonical = dromic_rdf.event_mapping(graph, event)
+
+        self.assertIn(
+            (canonical, DCTERMS.replaces, event_uri("dromic", "legacy-id")),
+            graph,
+        )
+
+    def test_dromic_retains_report_history_without_retaining_old_facts(self) -> None:
+        graph = create_graph()
+        event = URIRef("https://sakuna.ph/event/current")
+        old = dromic_rdf.ReportVersion(
+            reportName="report-1.pdf",
+            reportLink="https://dromic.dswd.gov.ph/example/",
+            obtainedDate="2026-07-20T00:00:00Z",
+            postDate="2026-07-20",
+            sha256="a" * 64,
+        )
+        latest = dromic_rdf.ReportVersion(
+            reportName="report-2.pdf",
+            reportLink="https://dromic.dswd.gov.ph/example/",
+            obtainedDate="2026-07-23T00:00:00Z",
+            postDate="2026-07-23",
+            sha256="b" * 64,
+        )
+        provenance = dromic_rdf.Provenance(
+            lastUpdateDate=None,
+            reportName=latest.reportName,
+            reportLink=latest.reportLink,
+            obtainedDate=latest.obtainedDate,
+            postDate=latest.postDate,
+            sha256=latest.sha256,
+            versions=(old, latest),
+        )
+
+        current_source = dromic_rdf.prov_mapping(graph, provenance, event)
+        old_source = next(
+            graph.subjects(SKG.reportName, Literal(old.reportName))
+        )
+
+        self.assertIn((event, PROV.wasDerivedFrom, current_source), graph)
+        self.assertNotIn((event, PROV.wasDerivedFrom, old_source), graph)
+        self.assertIn((current_source, PROV.wasRevisionOf, old_source), graph)
+        self.assertTrue(any(graph.triples((old_source, None, None))))
+        self.assertFalse(any(graph.triples((None, OWL.sameAs, None))))
 
     def test_source_golden_graphs_pass_shacl(self) -> None:
         shapes = Graph().parse(

@@ -1,6 +1,9 @@
 import argparse
 import os
+import shutil
+import tempfile
 from typing import Any
+import uuid
 from docling.document_converter import DocumentConverter, PdfFormatOption
 from docling.datamodel.pipeline_options import PdfPipelineOptions, TableFormerMode, TableStructureOptions
 from docling.datamodel.base_models import InputFormat
@@ -13,12 +16,17 @@ from pathlib import Path
 from pdfplumber.page import Page
 from rapidfuzz import fuzz
 from datetime import datetime
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 import json
 import torch
 from docling_core.types.doc.document import DoclingDocument
 
 from sakunagraph_etl.config import SETTINGS
+from .manifest import (
+    entries_for_post_url,
+    latest_entry_for_filename,
+    source_version_for_filename,
+)
 from .state import DromicStateStore, EventStatus, EventStatusRecord
 
 
@@ -43,6 +51,9 @@ class DromicEvent:
     obtainedDate   : str = ""
     reportLink     : str = ""
     downloadUrl    : str = ""
+    postDate       : str = ""
+    sha256         : str = ""
+    reportVersions : list[dict[str, Any]] = field(default_factory=list)
     page           : int | None = 0
     remarks        : str = ""
 
@@ -63,26 +74,24 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
     full_text = "\n".join(first_page_texts)
 
     manifest_entry = None
+    raw: object = {}
     if manifest_path.exists():
         with open(manifest_path, encoding="utf-8", errors="replace") as f:
             raw = json.load(f)
 
-        # Archive manifests are now stored as {"entries": [...]}, while older
-        # runs used the list directly.  Normalise both shapes before looking up
-        # the source record; ignore malformed non-object entries safely.
-        if isinstance(raw, dict):
-            raw = raw.get("entries", [])
-        if not isinstance(raw, list):
-            raw = []
+        manifest_entry = latest_entry_for_filename(raw, pdf_path.name)
 
-        manifest_entry = next(
-            (
-                e for e in raw
-                if isinstance(e, dict)
-                and Path(str(e.get("filename", ""))).stem == pdf_path.stem
-            ),
-            None,
-        )
+    report_versions = (
+        [
+            dict(entry)
+            for entry in entries_for_post_url(
+                raw,
+                str(manifest_entry.get("post_url") or ""),
+            )
+        ]
+        if manifest_entry
+        else []
+    )
 
     event_name = ""
     title_match = re.search(
@@ -298,6 +307,9 @@ def extract_report_metadata(doc: DoclingDocument, pdf_path: Path, manifest_path:
         reportLink   = manifest_entry["post_url"]     if manifest_entry else "",
         downloadUrl  = manifest_entry["download_url"] if manifest_entry else "",
         obtainedDate = manifest_entry["downloaded_at"] if manifest_entry else "",
+        postDate     = str(manifest_entry.get("post_date") or "") if manifest_entry else "",
+        sha256       = str(manifest_entry.get("sha256") or "") if manifest_entry else "",
+        reportVersions = report_versions,
         page         = manifest_entry["page"]         if manifest_entry and "page" in manifest_entry else None,
         recordedBy   = "DROMIC",
     )
@@ -839,7 +851,7 @@ converter = DocumentConverter(
     }
 )
 
-def process_file(pdf_path: Path, output_dir: Path):
+def _process_file_into_root(pdf_path: Path, output_dir: Path) -> Path:
 
     result = converter.convert(pdf_path)
     doc = result.document
@@ -1159,6 +1171,47 @@ def process_file(pdf_path: Path, output_dir: Path):
             df.to_csv(output_dir / filename, index=False)
         print(f"Saved: {filename} ({len(df)} rows)")
 
+    return output_dir
+
+
+def process_file(pdf_path: Path, output_dir: Path) -> None:
+    """Parse into staging and atomically replace an existing report snapshot."""
+
+    output_root = Path(output_dir)
+    output_root.mkdir(parents=True, exist_ok=True)
+    staging_root = Path(
+        tempfile.mkdtemp(prefix="_dromic_parse_", dir=output_root)
+    )
+    final_directory: Path | None = None
+    backup_directory: Path | None = None
+
+    try:
+        staged_directory = _process_file_into_root(pdf_path, staging_root)
+        final_directory = output_root / staged_directory.name
+        if final_directory.exists():
+            backup_directory = output_root / (
+                f"_dromic_previous_{final_directory.name}_{uuid.uuid4().hex}"
+            )
+            os.replace(final_directory, backup_directory)
+        os.replace(staged_directory, final_directory)
+        if backup_directory is not None:
+            shutil.rmtree(backup_directory)
+            backup_directory = None
+    except Exception:
+        if (
+            backup_directory is not None
+            and backup_directory.exists()
+            and final_directory is not None
+            and not final_directory.exists()
+        ):
+            os.replace(backup_directory, final_directory)
+            backup_directory = None
+        raise
+    finally:
+        if backup_directory is not None and backup_directory.exists():
+            shutil.rmtree(backup_directory)
+        shutil.rmtree(staging_root, ignore_errors=True)
+
 
 def parse_args(argv: list[str] | None = None):
     parser = argparse.ArgumentParser()
@@ -1178,9 +1231,18 @@ def main(argv: list[str] | None = None) -> int:
     input_dir = args.input_dir or SETTINGS.paths.raw_root / "dromic-new" / f"{args.year}-pdf"
     output_dir = args.output_dir or SETTINGS.paths.parsed_root / "dromic" / args.year
     state = DromicStateStore(output_dir)
+    acquisition_manifest_path = input_dir / "manifest.json"
+    acquisition_manifest: object = {}
+    if acquisition_manifest_path.is_file():
+        with acquisition_manifest_path.open("r", encoding="utf-8") as source:
+            acquisition_manifest = json.load(source)
 
     if args.single:
         source_path = input_dir / args.single
+        source_version = source_version_for_filename(
+            acquisition_manifest,
+            source_path.name,
+        )
         try:
             process_file(source_path, output_dir)
         except Exception as error:
@@ -1191,6 +1253,7 @@ def main(argv: list[str] | None = None) -> int:
                     "dromic-parser",
                     reason=str(error),
                     source_filename=source_path.name,
+                    source_version=source_version,
                 )]
             )
             raise
@@ -1200,6 +1263,7 @@ def main(argv: list[str] | None = None) -> int:
                 EventStatus.PARSED,
                 "dromic-parser",
                 source_filename=source_path.name,
+                source_version=source_version,
             )]
         )
         return 0
@@ -1209,7 +1273,8 @@ def main(argv: list[str] | None = None) -> int:
     skipped = 0
     parsed = 0
 
-    already_parsed = load_parsed_files(str(output_dir))
+    state_manifest = state.load()
+    already_parsed = state.parsed_sources(state_manifest)
     for file in files:
         if file.suffix != ".pdf":
             continue
@@ -1221,7 +1286,21 @@ def main(argv: list[str] | None = None) -> int:
             sanitized_name = file.name.replace(".docx", "")
             sanitized_name = sanitized_name.replace(".doc", "")
 
-        if sanitized_name in already_parsed:
+        source_version = source_version_for_filename(
+            acquisition_manifest,
+            file.name,
+        )
+        parser_record = state_manifest.events.get(file.stem, {}).get("dromic-parser")
+        if (
+            parser_record is None
+            and sanitized_name in already_parsed
+        ) or state.source_is_current(
+            file.stem,
+            producer="dromic-parser",
+            source_filename=sanitized_name,
+            source_version=source_version,
+            manifest=state_manifest,
+        ):
             skipped += 1
             continue
         
@@ -1237,6 +1316,7 @@ def main(argv: list[str] | None = None) -> int:
                     EventStatus.PARSED,
                     "dromic-parser",
                     source_filename=sanitized_name,
+                    source_version=source_version,
                 )]
             )
         except Exception as e:
@@ -1248,6 +1328,7 @@ def main(argv: list[str] | None = None) -> int:
                     "dromic-parser",
                     reason=str(e),
                     source_filename=sanitized_name,
+                    source_version=source_version,
                 )]
             )
 

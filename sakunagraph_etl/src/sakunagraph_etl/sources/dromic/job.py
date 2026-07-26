@@ -39,6 +39,7 @@ from sakunagraph_etl.io import (
 from sakunagraph_etl.quality.contracts import validate_source_input
 from sakunagraph_etl.quality.schemas import QualityPolicy, enforce_production_quality
 from .state import DromicStateStore, EventStatus, EventStatusRecord, STATE_FILENAME
+from .versioning import select_latest_report_folders
 
 
 log = logging.getLogger(__name__)
@@ -75,22 +76,23 @@ def _map_event(
     log.info("Event IRI: %s", event_iri)
 
     prov = load_provenance(os.path.join(folder_path, "source.json"))
-    prov_mapping(g, prov, event_iri)
+    source_iri = prov_mapping(g, prov, event_iri)
+    fact_source_iri = source_iri if getattr(prov, "versions", ()) else None
 
     aps, pevacs = load_aff_pop(folder_path)
     if aps:
-        aff_pop_mapping(g, aps, event_iri)
+        aff_pop_mapping(g, aps, event_iri, fact_source_iri)
     if pevacs:
-        pevac_mapping(g, pevacs, event_iri)
+        pevac_mapping(g, pevacs, event_iri, fact_source_iri)
 
     hs = load_housing(folder_path)
     if hs:
-        housing_mapping(g, hs, event_iri)
+        housing_mapping(g, hs, event_iri, fact_source_iri)
 
     try:
         assistance = load_assistance(folder_path, debug_dir=debug_dir)
         if assistance:
-            assistance_mapping(g, assistance, event_iri)
+            assistance_mapping(g, assistance, event_iri, fact_source_iri)
     except Exception as exc:
         _record_assistance_failure(folder_path, needs_rerun_path, exc)
 
@@ -356,6 +358,13 @@ def run(
     else:
         folders = [folder for folder in manifest_folders if folder not in needs_rerun]
         skipped = len(manifest_folders) - len(folders)
+    folders, superseded = select_latest_report_folders(sub_data_dir, folders)
+    skipped += superseded
+    if superseded:
+        log.info(
+            "Excluded %d superseded DROMIC report folder(s) from active facts",
+            superseded,
+        )
     stop = start + limit if limit is not None else None
     selected_folders = folders[start:stop]
     quality_report = validate_source_input(

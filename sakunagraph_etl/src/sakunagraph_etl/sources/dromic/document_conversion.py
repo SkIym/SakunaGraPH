@@ -3,10 +3,6 @@ import shutil
 import time
 from typing import Any
 from pathlib import Path
-import win32com.client
-from docx import Document
-from docx.oxml.ns import qn
-from lxml import etree
 from concurrent.futures import ThreadPoolExecutor
 
 from sakunagraph_etl.config import SETTINGS
@@ -41,6 +37,10 @@ def enforce_min_row_height(docx_path: Path, output_path: Path, min_height_pt: fl
     but won't shrink below min_height_pt — prevents rows from being so compact
     that Docling and pdfplumber merge adjacent rows in the output PDF.
     """
+    from docx import Document
+    from docx.oxml.ns import qn
+    from lxml import etree
+
     try:
         doc = Document(str(docx_path))
         min_twips = int(min_height_pt * 20)  # 1pt = 20 twips in OOXML
@@ -111,12 +111,34 @@ def enforce_table_headers(doc: Any, header_rows: int = 1):
 # CONVERSION
 # =============================================================================
 
+def _source_requires_refresh(
+    source: Path,
+    target: Path,
+    *,
+    compare_size: bool = True,
+) -> bool:
+    if not target.exists():
+        return True
+    source_stat = source.stat()
+    target_stat = target.stat()
+    return (
+        (compare_size and source_stat.st_size != target_stat.st_size)
+        or source_stat.st_mtime_ns > target_stat.st_mtime_ns
+    )
+
+
 def convert_docx_to_pdf_word(src: Path, dest: Path, retries: int=3, delay: float=1.5, min_row_height_pt: float=14.0) -> list[Path]:
+    import win32com.client
+
     dest.mkdir(parents=True, exist_ok=True)
 
     files = [f for f in src.rglob("*")
              if f.is_file() and f.suffix.lower() in {".doc", ".docx"}
-             and not (dest / f.with_suffix(".pdf").name).exists()]
+             and _source_requires_refresh(
+                 f,
+                 dest / f.with_suffix(".pdf").name,
+                 compare_size=False,
+             )]
 
     print(f"Pre-processing {len(files)} files...")
     docx_files = [f for f in files if f.suffix.lower() == ".docx"]
@@ -168,13 +190,18 @@ def convert_docx_to_pdf_word(src: Path, dest: Path, retries: int=3, delay: float
 
 
 def copy_pdfs_jsons(src: Path, dst: Path) -> None:
-    """Copy any PDFs that already exist and jsons in src into dst (no conversion needed)."""
+    """Refresh source PDFs and always propagate the latest acquisition manifest."""
+
     dst.mkdir(parents=True, exist_ok=True)
-    for p in list(src.rglob("*.pdf")) + list(src.rglob("*.json")):
+    for p in src.rglob("*.pdf"):
         if p.is_file():
             target = dst / p.name
-            if target.exists():
-                continue
+            if _source_requires_refresh(p, target):
+                shutil.copy2(p, target)
+
+    for p in src.rglob("*.json"):
+        if p.is_file():
+            target = dst / p.name
             shutil.copy2(p, target)
 
 
