@@ -366,7 +366,7 @@ def main() -> None:
 
     settings = load_settings(args.profile)
 
-    download_dir = args.download_dir or settings.paths.raw_root / "dromic-new" / str(args.year)
+    download_dir = args.download_dir or settings.paths.raw_root / "dromic" / str(args.year)
     log_dir = args.log_dir or settings.paths.logs_root / "dromic"
     manifest_path = download_dir / "manifest.json"
     log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"

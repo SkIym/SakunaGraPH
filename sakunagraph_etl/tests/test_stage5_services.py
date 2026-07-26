@@ -46,26 +46,26 @@ class FakeResponse:
 
 
 class ReplacementSession:
-    def __init__(self, *, fail_action: str | None = None) -> None:
-        self.fail_action = fail_action
+    def __init__(
+        self,
+        *,
+        fail: bool = False,
+        fail_graph: str | None = None,
+    ) -> None:
+        self.fail = fail
+        self.fail_graph = fail_graph
         self.calls: list[tuple[str, str, str | None]] = []
-
-    def post(self, url: str, **kwargs):
-        self.calls.append(("POST", url, None))
-        return FakeResponse(headers={"Location": "transactions/tx-1"})
+        self.payload = b""
 
     def put(self, url: str, **kwargs):
-        action = kwargs.get("params", {}).get("action")
-        self.calls.append(("PUT", url, action))
-        if action == self.fail_action:
+        graph = kwargs.get("params", {}).get("graph")
+        self.calls.append(("PUT", url, graph))
+        self.payload = kwargs["data"].read()
+        if self.fail or graph == self.fail_graph:
             return FakeResponse(
                 error=requests.HTTPError("request failed"),
                 text="invalid RDF",
             )
-        return FakeResponse()
-
-    def delete(self, url: str, **kwargs):
-        self.calls.append(("DELETE", url, None))
         return FakeResponse()
 
 
@@ -191,7 +191,44 @@ class Stage5EnrichmentTests(unittest.TestCase):
 
 
 class Stage5PublicationTests(unittest.TestCase):
-    def test_failed_graphdb_add_rolls_back_without_committing(self) -> None:
+    def test_graphdb_replacement_bundles_context_in_one_put(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            first_path = Path(temp) / "first.ttl"
+            second_path = Path(temp) / "second.ttl"
+            first_path.write_text(
+                "<https://sakuna.ph/event> <https://sakuna.ph/name> \"Event\" .\n",
+                encoding="utf-8",
+            )
+            second_path.write_text(
+                "<https://sakuna.ph/other> <https://sakuna.ph/name> \"Other\" .\n",
+                encoding="utf-8",
+            )
+            context = "https://sakuna.ph/events/test"
+            session = ReplacementSession()
+
+            graphdb.replace_context(
+                session,
+                "http://graphdb/repositories/test/rdf-graphs/service",
+                context,
+                [
+                    graphdb.LoadTarget(first_path, context),
+                    graphdb.LoadTarget(second_path, context),
+                ],
+                30,
+            )
+
+        self.assertEqual(
+            session.calls,
+            [(
+                "PUT",
+                "http://graphdb/repositories/test/rdf-graphs/service",
+                context,
+            )],
+        )
+        self.assertIn(b"https://sakuna.ph/event", session.payload)
+        self.assertIn(b"https://sakuna.ph/other", session.payload)
+
+    def test_failed_graph_store_put_reports_replacement_failure(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             ttl_path = Path(temp) / "event.ttl"
             ttl_path.write_text(
@@ -199,43 +236,55 @@ class Stage5PublicationTests(unittest.TestCase):
                 encoding="utf-8",
             )
             target = graphdb.LoadTarget(ttl_path, "https://sakuna.ph/events/test")
-            session = ReplacementSession(fail_action="ADD")
-
-            with self.assertRaisesRegex(graphdb.LoaderError, "Could not add"):
-                graphdb.replace_context(
-                    session,
-                    "http://graphdb/repositories/test/transactions",
-                    target.context,
-                    [target],
-                    30,
-                )
-
-        actions = [action for method, _, action in session.calls if method == "PUT"]
-        self.assertNotIn("COMMIT", actions)
-        self.assertEqual(sum(method == "DELETE" for method, _, _ in session.calls), 1)
-        rollback_url = next(url for method, url, _ in session.calls if method == "DELETE")
-        self.assertIn("transactions/tx-1", rollback_url)
-
-    def test_failed_graphdb_commit_rolls_back_transaction(self) -> None:
-        with tempfile.TemporaryDirectory() as temp:
-            ttl_path = Path(temp) / "event.ttl"
-            ttl_path.write_text(
-                "<https://sakuna.ph/event> <https://sakuna.ph/name> \"Event\" .\n",
-                encoding="utf-8",
-            )
-            target = graphdb.LoadTarget(ttl_path, "https://sakuna.ph/events/test")
-            session = ReplacementSession(fail_action="COMMIT")
+            session = ReplacementSession(fail=True)
 
             with self.assertRaisesRegex(graphdb.LoaderError, "Could not replace"):
                 graphdb.replace_context(
                     session,
-                    "http://graphdb/repositories/test/transactions",
+                    "http://graphdb/repositories/test/rdf-graphs/service",
                     target.context,
                     [target],
                     30,
                 )
 
-        self.assertEqual(sum(method == "DELETE" for method, _, _ in session.calls), 1)
+        self.assertEqual(len(session.calls), 1)
+
+    def test_publication_attempts_other_contexts_after_one_put_fails(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            failed_path = root / "failed.ttl"
+            successful_path = root / "successful.ttl"
+            failed_path.write_text("<urn:failed> <urn:p> <urn:o> .", encoding="utf-8")
+            successful_path.write_text(
+                "<urn:successful> <urn:p> <urn:o> .",
+                encoding="utf-8",
+            )
+            failed_graph = "https://sakuna.ph/events/failed"
+            successful_graph = "https://sakuna.ph/events/successful"
+            session = ReplacementSession(fail_graph=failed_graph)
+            publisher = GraphDbPublisher(
+                host="http://graphdb",
+                repository="test",
+                session=session,
+                validate_connection=False,
+            )
+
+            with self.assertRaisesRegex(
+                graphdb.LoaderError,
+                "1 GraphDB publication request",
+            ):
+                publisher.publish(
+                    [
+                        PublicationTarget(failed_path, failed_graph),
+                        PublicationTarget(successful_path, successful_graph),
+                    ],
+                    mode=PublicationMode.REPLACE,
+                )
+
+        self.assertEqual(
+            {graph for _, _, graph in session.calls},
+            {failed_graph, successful_graph},
+        )
 
     def test_shacl_failure_prevents_all_graphdb_requests(self) -> None:
         with tempfile.TemporaryDirectory() as temp:

@@ -160,12 +160,13 @@ class GraphDbPublisher:
         import requests
 
         from sakunagraph_etl.io.graphdb import (
+            LoaderError,
             LoadTarget,
+            graph_store_url,
             graphdb_url,
             group_targets_by_context,
             load_target,
             replace_context,
-            transactions_url,
             validate_repository,
         )
 
@@ -182,20 +183,33 @@ class GraphDbPublisher:
             if self.validate_connection:
                 validate_repository(session, self.host, self.repository)
 
+            failures: list[str] = []
             if mode is PublicationMode.REPLACE:
-                transaction_endpoint = transactions_url(self.host, self.repository)
+                replacement_endpoint = graph_store_url(self.host, self.repository)
                 for context, context_targets in group_targets_by_context(loader_targets):
-                    replace_context(
-                        session,
-                        transaction_endpoint,
-                        context,
-                        context_targets,
-                        self.timeout,
-                    )
+                    try:
+                        replace_context(
+                            session,
+                            replacement_endpoint,
+                            context,
+                            context_targets,
+                            self.timeout,
+                        )
+                    except LoaderError as error:
+                        failures.append(str(error))
             else:
                 endpoint = graphdb_url(self.host, self.repository)
                 for target in loader_targets:
-                    load_target(session, endpoint, target, self.timeout)
+                    try:
+                        load_target(session, endpoint, target, self.timeout)
+                    except LoaderError as error:
+                        failures.append(str(error))
+
+            if failures:
+                raise LoaderError(
+                    f"{len(failures)} GraphDB publication request(s) failed: "
+                    + "; ".join(failures)
+                )
 
             return PublicationResult(
                 published_files=len(publication_targets),

@@ -222,12 +222,12 @@ def main(argv: list[str] | None = None) -> int:
     input_dir = (
         Path(args.input_dir)
         if args.input_dir
-        else SETTINGS.paths.raw_root / "dromic-new" / args.year
+        else SETTINGS.paths.raw_root / "dromic" / args.year
     )
     output_dir = (
         Path(args.output_dir)
         if args.output_dir
-        else SETTINGS.paths.raw_root / "dromic-new" / f"{args.year}-pdf"
+        else SETTINGS.paths.raw_root / "dromic" / f"{args.year}-pdf"
     )
 
     print(f"Input:  {input_dir}")

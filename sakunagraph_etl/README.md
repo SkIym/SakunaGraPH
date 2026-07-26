@@ -168,12 +168,16 @@ python -m pipeline.build_alignment --sources ../data/rdf/events --stats
 sakuna-etl load-graphdb --scope events --replace
 python -m sakunagraph_etl.io.graphdb --scope events --replace
 python -m pipeline.load_graphdb --scope events --replace
+
+# Replace one source graph without publishing unrelated event sources:
+sakuna-etl load-graphdb --scope events/ndrrmc --replace
 ```
 
-GraphDB replacement uses one RDF4J transaction per named graph. The `onprem`
-and `cloud` profiles always parse and SHACL-validate each complete context
-before opening a GraphDB connection; `--no-validate` is rejected for those
-profiles. Local publication can opt in with `--validate`.
+GraphDB replacement bundles every selected file for a named graph and sends
+one atomic Graph Store Protocol PUT per graph. The `onprem` and `cloud`
+profiles always parse and SHACL-validate each complete context before opening
+a GraphDB connection; `--no-validate` is rejected for those profiles. Local
+publication can opt in with `--validate`.
 
 Run `sakuna-etl --help` for all commands. The installed command works from the
 repository root, the standalone or legacy project, or another working directory. Wheel deployments that

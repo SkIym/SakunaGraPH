@@ -1228,7 +1228,7 @@ def load_parsed_files(sub_data_dir: str) -> set[str]:
 def main(argv: list[str] | None = None) -> int:
     args = parse_args(argv)
 
-    input_dir = args.input_dir or SETTINGS.paths.raw_root / "dromic-new" / f"{args.year}-pdf"
+    input_dir = args.input_dir or SETTINGS.paths.raw_root / "dromic" / f"{args.year}-pdf"
     output_dir = args.output_dir or SETTINGS.paths.parsed_root / "dromic" / args.year
     state = DromicStateStore(output_dir)
     acquisition_manifest_path = input_dir / "manifest.json"

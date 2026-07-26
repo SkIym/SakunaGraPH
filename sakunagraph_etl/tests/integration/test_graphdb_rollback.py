@@ -11,10 +11,10 @@ from sakunagraph_etl.io.graphdb import (
     LoadTarget,
     LoaderError,
     clear_context,
+    graph_store_url,
     graphdb_url,
     load_target,
     replace_context,
-    transactions_url,
     validate_repository,
 )
 
@@ -27,8 +27,8 @@ REPOSITORY = os.getenv("SAKUNA_TEST_GRAPHDB_REPOSITORY")
     HOST and REPOSITORY,
     "set SAKUNA_TEST_GRAPHDB_HOST and SAKUNA_TEST_GRAPHDB_REPOSITORY",
 )
-class GraphDbRollbackIntegrationTests(unittest.TestCase):
-    """Exercise rollback against an isolated, disposable named graph."""
+class GraphDbAtomicReplacementIntegrationTests(unittest.TestCase):
+    """Exercise Graph Store PUT atomicity against a disposable named graph."""
 
     def test_invalid_replacement_keeps_previous_named_graph(self) -> None:
         assert HOST is not None
@@ -56,7 +56,7 @@ class GraphDbRollbackIntegrationTests(unittest.TestCase):
                 with self.assertRaises(LoaderError):
                     replace_context(
                         session,
-                        transactions_url(HOST, REPOSITORY),
+                        graph_store_url(HOST, REPOSITORY),
                         context,
                         [LoadTarget(invalid_path, context)],
                         30,
