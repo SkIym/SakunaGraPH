@@ -13,6 +13,21 @@ from typing import Any, Iterator, Protocol, runtime_checkable
 
 
 StorageKey = str | os.PathLike[str]
+ATOMIC_REPLACE_TIMEOUT_SECONDS = 5.0
+
+
+def _replace_with_retry(source: Path, destination: Path) -> None:
+    """Replace a file, tolerating short-lived Windows destination locks."""
+
+    deadline = time.monotonic() + ATOMIC_REPLACE_TIMEOUT_SECONDS
+    while True:
+        try:
+            os.replace(source, destination)
+            return
+        except PermissionError:
+            if time.monotonic() >= deadline:
+                raise
+            time.sleep(0.05)
 
 
 @runtime_checkable
@@ -95,7 +110,7 @@ class LocalFileStorage:
                 temporary.flush()
                 os.fsync(temporary.fileno())
                 temporary_path = Path(temporary.name)
-            temporary_path.replace(destination)
+            _replace_with_retry(temporary_path, destination)
         finally:
             if temporary_path is not None and temporary_path.exists():
                 temporary_path.unlink()
