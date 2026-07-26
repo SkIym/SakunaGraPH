@@ -51,9 +51,27 @@ class AnalysisFilterTests(unittest.TestCase):
             make_analysis_filters(disaster_types=["Flood> } UNION {"])
         with self.assertRaises(ServiceError):
             make_analysis_filters(
+                location_iris=["https://sakuna.ph/Mindanao> } UNION {"],
+            )
+        with self.assertRaises(ServiceError):
+            make_analysis_filters(
                 start_date=date(2025, 1, 2),
                 end_date=date(2025, 1, 1),
             )
+
+    def test_filter_fragment_accepts_catalog_location_iri(self) -> None:
+        filters = make_analysis_filters(
+            location_ids=["1300000000"],
+            location_iris=["https://sakuna.ph/Mindanao"],
+        )
+
+        fragment = event_filter_where(filters)
+
+        self.assertEqual(filters.location_iris, ("https://sakuna.ph/Mindanao",))
+        self.assertIn(
+            "VALUES ?selectedLocation { :1300000000 <https://sakuna.ph/Mindanao> }",
+            fragment,
+        )
 
 
 class AnalysisEventMappingTests(unittest.TestCase):

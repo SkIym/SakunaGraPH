@@ -2,6 +2,7 @@ import json
 import re
 from dataclasses import dataclass
 from datetime import date
+from urllib.parse import urlsplit
 
 from src.schemas.analysis import AnalysisEventType
 from src.services.common import ServiceError
@@ -17,6 +18,7 @@ PREFIX qudt: <http://qudt.org/schema/qudt/>
 
 _PSGC_RE = re.compile(r"^\d{10}$")
 _LOCAL_NAME_RE = re.compile(r"^[A-Za-z][A-Za-z0-9._~-]*$")
+_IRI_FORBIDDEN_RE = re.compile(r'[\s<>"{}|^`]')
 
 
 @dataclass(frozen=True)
@@ -25,6 +27,7 @@ class AnalysisFilters:
     start_date: date | None = None
     end_date: date | None = None
     location_ids: tuple[str, ...] = ()
+    location_iris: tuple[str, ...] = ()
     disaster_types: tuple[str, ...] = ()
     q: str | None = None
 
@@ -35,6 +38,7 @@ def make_analysis_filters(
     start_date: date | None = None,
     end_date: date | None = None,
     location_ids: list[str] | None = None,
+    location_iris: list[str] | None = None,
     disaster_types: list[str] | None = None,
     q: str | None = None,
 ) -> AnalysisFilters:
@@ -45,6 +49,16 @@ def make_analysis_filters(
     for location_id in normalized_locations:
         if not _PSGC_RE.fullmatch(location_id):
             raise ServiceError(422, "location_ids values must be exactly 10 digits")
+
+    normalized_location_iris = tuple(sorted(set(location_iris or [])))
+    for location_iri in normalized_location_iris:
+        parsed = urlsplit(location_iri)
+        if (
+            parsed.scheme not in {"http", "https"}
+            or not parsed.netloc
+            or _IRI_FORBIDDEN_RE.search(location_iri)
+        ):
+            raise ServiceError(422, "location_iris values must be valid HTTP IRIs")
 
     normalized_types = tuple(sorted(set(disaster_types or [])))
     for disaster_type in normalized_types:
@@ -60,6 +74,7 @@ def make_analysis_filters(
         start_date=start_date,
         end_date=end_date,
         location_ids=normalized_locations,
+        location_iris=normalized_location_iris,
         disaster_types=normalized_types,
         q=normalized_q or None,
     )
@@ -93,7 +108,11 @@ def source_from_event_iri(event_iri: str) -> str | None:
     return next((labels[part.lower()] for part in parts if part.lower() in labels), None)
 
 
-def event_filter_where(filters: AnalysisFilters) -> str:
+def event_filter_where(
+    filters: AnalysisFilters,
+    *,
+    include_event_details: bool = True,
+) -> str:
     event_classes = {
         "major": ":MajorEvent",
         "incidents": ":Incident",
@@ -103,10 +122,18 @@ def event_filter_where(filters: AnalysisFilters) -> str:
     fragments = [
         f"VALUES ?eventClass {{ {event_classes} }}",
         "?event a ?eventClass ;\n         :startDate ?startDate .",
-        "OPTIONAL { ?event :eventName ?eventNameValue }",
-        "OPTIONAL { ?event :incidentDescription ?incidentDescription }",
-        "BIND(COALESCE(?eventNameValue, ?incidentDescription) AS ?eventName)",
-        "OPTIONAL { ?event :endDate ?endDate }",
+    ]
+    if include_event_details or filters.q:
+        fragments.extend(
+            (
+                "OPTIONAL { ?event :eventName ?eventNameValue }",
+                "OPTIONAL { ?event :incidentDescription ?incidentDescription }",
+                "BIND(COALESCE(?eventNameValue, ?incidentDescription) AS ?eventName)",
+            )
+        )
+    if include_event_details:
+        fragments.append("OPTIONAL { ?event :endDate ?endDate }")
+    fragments.append(
         """FILTER NOT EXISTS {
   ?event prov:alternateOf ?alternateCandidate .
   ?alternateCandidate :startDate ?alternateStartDate .
@@ -117,8 +144,8 @@ def event_filter_where(filters: AnalysisFilters) -> str:
       STR(?alternateCandidate) < STR(?event)
     )
   )
-}""",
-    ]
+}"""
+    )
 
     if filters.start_date:
         fragments.append(
@@ -131,8 +158,13 @@ def event_filter_where(filters: AnalysisFilters) -> str:
             f'"{filters.end_date.isoformat()}")'
         )
 
-    if filters.location_ids:
-        selected_locations = " ".join(f":{value}" for value in filters.location_ids)
+    if filters.location_ids or filters.location_iris:
+        selected_locations = " ".join(
+            [
+                *(f":{value}" for value in filters.location_ids),
+                *(f"<{value}>" for value in filters.location_iris),
+            ]
+        )
         fragments.append(
             f"""FILTER EXISTS {{
   VALUES ?selectedLocation {{ {selected_locations} }}

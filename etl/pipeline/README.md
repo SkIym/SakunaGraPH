@@ -178,8 +178,9 @@ Run it from `etl/`:
 # All data RDF plus the top-level ontology Turtle files
 python -m pipeline.load_graphdb
 
-# Select logical subgraphs (may be repeated)
+# Select logical subgraphs or nested source subtrees (may be repeated)
 python -m pipeline.load_graphdb --scope ontology --scope events
+python -m pipeline.load_graphdb --scope events/ndrrmc --replace
 python -m pipeline.load_graphdb --scope psgc
 
 # Select individual files; paths may be relative to data/rdf or the repository
@@ -194,9 +195,15 @@ python -m pipeline.load_graphdb --scope events --replace
 python -m pipeline.load_graphdb --clear-repository
 ```
 
-`--replace` clears only the selected named graphs before loading. When loading
-one DROMIC year, it clears the shared DROMIC graph first, so use it only when
-the selection contains every file that should remain in that source graph.
+`--replace` bundles all selected files for each named graph and sends one atomic
+Graph Store Protocol `PUT`. When loading one DROMIC year, it replaces the shared
+DROMIC graph, so use it only when the selection contains every file that should
+remain in that source graph.
+Selecting a complete source subtree such as `--scope events/ndrrmc` includes
+all Turtle files for that source and can safely replace only its named graph.
+Replacement requests default to a one-hour timeout because GraphDB may perform
+an expensive inferred-closure update before responding; override this with
+`--timeout` when necessary.
 `--clear-repository` (with legacy alias `--clear`) deletes every graph in the
 repository. Use `--username`/`--password`, or `GRAPHDB_USERNAME` and
 `GRAPHDB_PASSWORD`, when GraphDB requires HTTP basic authentication.

@@ -16,6 +16,9 @@ async def run_sparql_query(query: str) -> SparqlQueryResponse:
     if result.startswith("Write operations"):
         raise ServiceError(403, result)
 
+    if result.startswith("Malformed SPARQL"):
+        raise ServiceError(400, result)
+
     if result.startswith("GraphDB returned"):
         match = re.search(r"GraphDB returned (\d+)", result)
         status_code = int(match.group(1)) if match else 502
