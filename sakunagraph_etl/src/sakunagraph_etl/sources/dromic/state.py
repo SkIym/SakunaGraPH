@@ -7,6 +7,7 @@ from datetime import datetime, timezone
 from enum import Enum
 import json
 from pathlib import Path
+import re
 from typing import Iterable, Mapping
 
 from sakunagraph_etl.io.storage import LocalFileStorage, NetworkFileStorage
@@ -205,14 +206,66 @@ class DromicStateStore:
             )
             return updated
 
-    def events_requiring_rerun(self) -> set[str]:
-        return set(self._failure_events(self.load()))
+    def events_requiring_rerun(
+        self,
+        manifest: DromicStateManifest | None = None,
+    ) -> set[str]:
+        return set(self._failure_events(manifest or self.load()))
+
+    def failed_sources(
+        self,
+        manifest: DromicStateManifest | None = None,
+    ) -> set[str]:
+        """Return source filenames whose current producer state is a failure."""
+
+        current = manifest or self.load()
+        return {
+            record.source_filename
+            for records in current.events.values()
+            for record in records.values()
+            if record.source_filename and record.status.requires_rerun
+        }
 
     def parsed_sources(
         self,
         manifest: DromicStateManifest | None = None,
     ) -> set[str]:
-        return set(self._parsed_sources(manifest or self.load()))
+        parsed = set(self._parsed_sources(manifest or self.load()))
+        if self.storage.exists("_parsed.txt"):
+            parsed.update(
+                value.strip()
+                for value in self.storage.read_text("_parsed.txt").splitlines()
+                if value.strip()
+            )
+        for folder in self.year_dir.iterdir() if self.year_dir.is_dir() else ():
+            if not folder.is_dir():
+                continue
+            source_path = folder / "source.json"
+            if not source_path.is_file():
+                continue
+            try:
+                source = json.loads(source_path.read_text(encoding="utf-8"))
+            except (OSError, json.JSONDecodeError):
+                continue
+            filename = source.get("reportName") if isinstance(source, Mapping) else None
+            if not isinstance(filename, str) or not filename:
+                continue
+            if "pdf" in filename.casefold():
+                filename = re.sub(
+                    r"\.(?:docx|doc)$",
+                    "",
+                    filename,
+                    flags=re.IGNORECASE,
+                )
+            else:
+                filename = re.sub(
+                    r"\.(?:docx|doc)$",
+                    ".pdf",
+                    filename,
+                    flags=re.IGNORECASE,
+                )
+            parsed.add(filename)
+        return parsed
 
     def source_is_current(
         self,

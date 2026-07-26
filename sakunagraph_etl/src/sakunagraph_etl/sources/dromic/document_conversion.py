@@ -227,7 +227,7 @@ def main(argv: list[str] | None = None) -> int:
     output_dir = (
         Path(args.output_dir)
         if args.output_dir
-        else SETTINGS.paths.raw_root / "dromic" / f"{args.year}-pdf"
+        else SETTINGS.paths.raw_root / "dromic" / args.year
     )
 
     print(f"Input:  {input_dir}")
@@ -238,7 +238,8 @@ def main(argv: list[str] | None = None) -> int:
         input_dir, output_dir,
         min_row_height_pt=args.min_row_height,
     )
-    copy_pdfs_jsons(input_dir, output_dir)
+    if input_dir.resolve() != output_dir.resolve():
+        copy_pdfs_jsons(input_dir, output_dir)
 
     print(f"\nDone. Converted {len(converted)} file(s).")
 

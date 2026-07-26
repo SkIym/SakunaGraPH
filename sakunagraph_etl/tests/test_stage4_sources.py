@@ -239,6 +239,10 @@ class Stage4SourceMigrationTests(unittest.TestCase):
         self.assertIn((event, PROV.wasDerivedFrom, current_source), graph)
         self.assertNotIn((event, PROV.wasDerivedFrom, old_source), graph)
         self.assertIn((current_source, PROV.wasRevisionOf, old_source), graph)
+        self.assertFalse(any(graph.triples((None, PROV.specializationOf, None))))
+        self.assertFalse(
+            any("/dromic/report-series/" in str(node) for node in graph.all_nodes())
+        )
         self.assertTrue(any(graph.triples((old_source, None, None))))
         self.assertFalse(any(graph.triples((None, OWL.sameAs, None))))
 

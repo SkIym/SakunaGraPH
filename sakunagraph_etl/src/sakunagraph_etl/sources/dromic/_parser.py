@@ -1225,11 +1225,22 @@ def load_parsed_files(sub_data_dir: str) -> set[str]:
     """Load authoritative parsed-source state (compatibility name)."""
     return DromicStateStore(sub_data_dir).parsed_sources()
 
-def main(argv: list[str] | None = None) -> int:
-    args = parse_args(argv)
 
-    input_dir = args.input_dir or SETTINGS.paths.raw_root / "dromic" / f"{args.year}-pdf"
-    output_dir = args.output_dir or SETTINGS.paths.parsed_root / "dromic" / args.year
+@dataclass(frozen=True, slots=True)
+class ParseSummary:
+    parsed: int
+    skipped: int
+    failed: int
+
+
+def parse_pending(
+    input_dir: str | Path,
+    output_dir: str | Path,
+    *,
+    single: str | None = None,
+) -> ParseSummary:
+    input_dir = Path(input_dir)
+    output_dir = Path(output_dir)
     state = DromicStateStore(output_dir)
     acquisition_manifest_path = input_dir / "manifest.json"
     acquisition_manifest: object = {}
@@ -1237,8 +1248,8 @@ def main(argv: list[str] | None = None) -> int:
         with acquisition_manifest_path.open("r", encoding="utf-8") as source:
             acquisition_manifest = json.load(source)
 
-    if args.single:
-        source_path = input_dir / args.single
+    if single:
+        source_path = input_dir / single
         source_version = source_version_for_filename(
             acquisition_manifest,
             source_path.name,
@@ -1266,15 +1277,42 @@ def main(argv: list[str] | None = None) -> int:
                 source_version=source_version,
             )]
         )
-        return 0
+        return ParseSummary(parsed=1, skipped=0, failed=0)
 
 
     files = list(input_dir.glob("*"))
     skipped = 0
     parsed = 0
+    failed = 0
 
     state_manifest = state.load()
     already_parsed = state.parsed_sources(state_manifest)
+    legacy_records: list[EventStatusRecord] = []
+    for file in files:
+        if file.suffix != ".pdf":
+            continue
+        sanitized_name = file.name
+        if ".docx" in file.name:
+            sanitized_name = file.name.replace(".docx", "").replace(".doc", "")
+        parser_record = state_manifest.events.get(file.stem, {}).get("dromic-parser")
+        if parser_record is not None or sanitized_name not in already_parsed:
+            continue
+        legacy_records.append(
+            EventStatusRecord.create(
+                file.stem,
+                EventStatus.PARSED,
+                "dromic-parser",
+                reason="Migrated current source from _parsed.txt",
+                source_filename=sanitized_name,
+                source_version=source_version_for_filename(
+                    acquisition_manifest,
+                    file.name,
+                ),
+            )
+        )
+    if legacy_records:
+        state_manifest = state.update(legacy_records)
+
     for file in files:
         if file.suffix != ".pdf":
             continue
@@ -1291,10 +1329,7 @@ def main(argv: list[str] | None = None) -> int:
             file.name,
         )
         parser_record = state_manifest.events.get(file.stem, {}).get("dromic-parser")
-        if (
-            parser_record is None
-            and sanitized_name in already_parsed
-        ) or state.source_is_current(
+        if state.source_is_current(
             file.stem,
             producer="dromic-parser",
             source_filename=sanitized_name,
@@ -1320,6 +1355,7 @@ def main(argv: list[str] | None = None) -> int:
                 )]
             )
         except Exception as e:
+            failed += 1
             print(f"[ERROR] {file.name}: {e}")
             state.update(
                 [EventStatusRecord.create(
@@ -1332,7 +1368,19 @@ def main(argv: list[str] | None = None) -> int:
                 )]
             )
 
-    print(f"Serialized {parsed} events → {output_dir} (skipped {skipped})")
+    print(f"Serialized {parsed} events -> {output_dir} (skipped {skipped})")
+    return ParseSummary(parsed=parsed, skipped=skipped, failed=failed)
+
+
+def main(argv: list[str] | None = None) -> int:
+    args = parse_args(argv)
+    input_dir = args.input_dir or SETTINGS.paths.raw_root / "dromic" / args.year
+    output_dir = args.output_dir or SETTINGS.paths.parsed_root / "dromic" / args.year
+    parse_pending(
+        input_dir,
+        output_dir,
+        single=args.single,
+    )
     return 0
 
 

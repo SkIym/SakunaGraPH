@@ -49,6 +49,35 @@ OUT_DIR = SETTINGS.paths.event_rdf_root / "dromic"
 DEFAULT_BATCH_SIZE = 100
 
 
+def _parse_unparsed_documents(
+    input_dir: str | Path,
+    output_dir: str | Path,
+    *,
+    year: str,
+) -> tuple[int, int, int]:
+    """Run the resumable parser without importing its heavy stack at CLI startup."""
+
+    from .parse import parse_pending
+
+    result = parse_pending(input_dir, output_dir)
+    log.info(
+        "DROMIC parser result for %s: %d parsed, %d skipped, %d failed",
+        year,
+        result.parsed,
+        result.skipped,
+        result.failed,
+    )
+    return result.parsed, result.skipped, result.failed
+
+
+def _check_parsed_failures(year_dir: str | Path) -> tuple[int, int]:
+    """Refresh authoritative failure state before RDF transformation."""
+
+    from .quality import check_year
+
+    return check_year(Path(year_dir))
+
+
 def _record_assistance_failure(folder_path: str, needs_rerun_path: str, exc: Exception) -> None:
     log.warning("Skipping assistance for %s: %s", folder_path, exc)
     folder = Path(folder_path).stem.strip()
@@ -121,19 +150,53 @@ def load_needs_rerun(needs_rerun_path: str) -> set[str]:
         return {line.strip() for line in f if line.strip()}
 
 
-def _event_folders(sub_data_dir: str, needs_rerun: set[str]) -> tuple[list[str], int]:
+def _source_filename(folder_path: Path) -> str | None:
+    source_path = folder_path / "source.json"
+    if not source_path.is_file():
+        return None
+    try:
+        import json
+
+        source = json.loads(source_path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return None
+    report_name = source.get("reportName") if isinstance(source, dict) else None
+    if not isinstance(report_name, str) or not report_name:
+        return None
+    lowered = report_name.casefold()
+    if lowered.endswith(".docx") or lowered.endswith(".doc"):
+        return str(Path(report_name).with_suffix(".pdf"))
+    return report_name
+
+
+def _event_folders(
+    sub_data_dir: str,
+    needs_rerun: set[str],
+    failed_sources: set[str] | None = None,
+) -> tuple[list[str], int]:
     if not os.path.isdir(sub_data_dir):
         raise FileNotFoundError(f"DROMIC parsed data directory not found: {sub_data_dir}")
 
+    failed_source_names = {
+        name.casefold()
+        for name in (failed_sources or ())
+    }
     folders: list[str] = []
     skipped = 0
     for folder in next(os.walk(sub_data_dir))[1]:
-        if folder in needs_rerun:
+        folder_path = Path(sub_data_dir) / folder
+        source_name = _source_filename(folder_path)
+        if (
+            folder in needs_rerun
+            or (
+                source_name is not None
+                and source_name.casefold() in failed_source_names
+            )
+        ):
             skipped += 1
             continue
 
-        folder_path = os.path.join(sub_data_dir, folder)
-        if os.path.exists(os.path.join(folder_path, "metadata.json")):
+        if (folder_path / "metadata.json").exists():
             folders.append(folder)
 
     return folders, skipped
@@ -302,6 +365,9 @@ def run(
     sub_data_dir: str | Path,
     out_file: str | Path,
     *,
+    input_dir: str | Path | None = None,
+    year: str | None = None,
+    force_transform: bool = False,
     start: int = 0,
     count: int | None = None,
     limit: int | None = None,
@@ -333,6 +399,42 @@ def run(
     sub_data_dir = os.fspath(sub_data_dir)
     out_file = Path(out_file)
     log.info("=== DROMIC pipeline start: %s ===", sub_data_dir)
+    effective_year = year or Path(sub_data_dir).name
+    if input_dir is not None and input_manifest is not None:
+        raise ValueError("input_dir and input_manifest cannot be used together")
+    if input_dir is not None:
+        log.info("Step 1/6: Parsing new or updated DROMIC documents from %s", input_dir)
+        parsed_count, parser_skipped, parser_failed = _parse_unparsed_documents(
+            input_dir,
+            sub_data_dir,
+            year=effective_year,
+        )
+        if parsed_count == 0 and out_file.is_file() and not force_transform:
+            log.info(
+                "No new or updated DROMIC documents for %s; keeping %s unchanged",
+                effective_year,
+                out_file,
+            )
+            return record_artifact_run(
+                "dromic",
+                input_paths=(),
+                output_paths=(out_file,),
+                validation_status="NOT_RUN",
+                settings=settings,
+                storage=artifact_storage,
+                parameters={
+                    "year": effective_year,
+                    "unchanged": True,
+                },
+                metadata={
+                    "parsed_document_count": parsed_count,
+                    "parser_skipped_count": parser_skipped,
+                    "parser_failed_count": parser_failed,
+                },
+            )
+    else:
+        log.info("Step 1/6: Raw parsing skipped; no PDF input directory selected")
+
     if input_manifest is not None:
         manifest_inputs = local_input_paths_from_manifest(input_manifest)
         event_directories = sorted(
@@ -348,15 +450,39 @@ def run(
         manifest_folders = [directory.name for directory in event_directories]
     else:
         manifest_folders = None
+
+    log.info("Step 2/6: Checking parsed DROMIC folders for known failures")
+    flagged, checked = _check_parsed_failures(sub_data_dir)
+    log.info(
+        "Checked %d parsed folder(s); %d failed folder(s) will be excluded",
+        checked,
+        flagged,
+    )
+
     state_store = DromicStateStore(sub_data_dir)
     needs_rerun_path = os.path.join(sub_data_dir, "_needs_rerun.txt")
-    needs_rerun = load_needs_rerun(needs_rerun_path)
+    state_manifest = state_store.load()
+    needs_rerun = state_store.events_requiring_rerun(state_manifest)
+    failed_sources = state_store.failed_sources(state_manifest)
+    failed_source_names = {name.casefold() for name in failed_sources}
 
-    log.info("Step 1/4: Discovering DROMIC event folders")
+    log.info("Step 3/6: Discovering eligible DROMIC event folders")
     if manifest_folders is None:
-        folders, skipped = _event_folders(sub_data_dir, needs_rerun)
+        folders, skipped = _event_folders(
+            sub_data_dir,
+            needs_rerun,
+            failed_sources,
+        )
     else:
-        folders = [folder for folder in manifest_folders if folder not in needs_rerun]
+        folders = [
+            folder
+            for folder in manifest_folders
+            if folder not in needs_rerun
+            and (
+                (_source_filename(Path(sub_data_dir) / folder) or "").casefold()
+                not in failed_source_names
+            )
+        ]
         skipped = len(manifest_folders) - len(folders)
     folders, superseded = select_latest_report_folders(sub_data_dir, folders)
     skipped += superseded
@@ -384,17 +510,17 @@ def run(
 
     validator = None
     if validate_output:
-        log.info("Step 2/4: Loading SHACL validation context")
+        log.info("Step 4/6: Loading SHACL validation context")
         if not include_context_graphs:
             log.info("SHACL validation context graphs are disabled")
         validator = ShaclValidator.from_paths(
             include_context_graphs=include_context_graphs,
         )
     else:
-        log.info("Step 2/4: SHACL validation disabled")
+        log.info("Step 4/6: SHACL validation disabled")
 
     log.info(
-        "Step 3/4: Processing DROMIC events in batches of %d",
+        "Step 5/6: Processing DROMIC events in batches of %d",
         effective_batch_size,
     )
     main_graph = create_graph()
@@ -411,7 +537,7 @@ def run(
     )
 
     out_file.parent.mkdir(parents=True, exist_ok=True)
-    log.info("Step 4/4: Serializing graph to %s", out_file)
+    log.info("Step 6/6: Serializing graph to %s", out_file)
     turtle = main_graph.serialize(format="turtle", encoding="utf-8")
     if not isinstance(turtle, bytes):
         turtle = turtle.encode("utf-8")
@@ -452,6 +578,34 @@ def _year_dirs(data_dir: str | Path) -> list[str]:
     return list(next(os.walk(data_dir))[1])
 
 
+def _pipeline_years(
+    data_dir: str | Path,
+    input_root: str | Path,
+) -> list[str]:
+    """Discover years available in either parsed data or raw ``YEAR`` inputs."""
+
+    years = {
+        path.name
+        for path in Path(data_dir).iterdir()
+        if path.is_dir() and path.name.isdigit()
+    } if Path(data_dir).is_dir() else set()
+
+    raw_root = Path(input_root)
+    if raw_root.is_dir():
+        years.update(
+            path.name
+            for path in raw_root.iterdir()
+            if path.is_dir()
+            and path.name.isdigit()
+        )
+
+    if not years:
+        raise FileNotFoundError(
+            f"No DROMIC year directories found under {data_dir} or {input_root}"
+        )
+    return sorted(years, key=int)
+
+
 def build_parser(*, require_input: bool = False) -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Build SakunaGraPH RDF from DROMIC.")
     parser.add_argument("--year", type=str, default="2026")
@@ -460,7 +614,15 @@ def build_parser(*, require_input: bool = False) -> argparse.ArgumentParser:
         "--data-dir",
         type=Path,
         required=require_input,
-        help="Parsed DROMIC year root.",
+        help="Parsed DROMIC root containing year directories.",
+    )
+    parser.add_argument(
+        "--input-dir",
+        type=Path,
+        help=(
+            "PDF input directory for the selected year. The pipeline parses only "
+            "documents whose recorded acquisition version is not current."
+        ),
     )
     parser.add_argument("--out-dir", type=Path, help="RDF output directory.")
     parser.add_argument("--debug-dir", type=Path, help="Optional diagnostic CSV root.")
@@ -500,6 +662,11 @@ def build_parser(*, require_input: bool = False) -> argparse.ArgumentParser:
         action="store_true",
         help="Run SHACL validation without external context graphs.",
     )
+    parser.add_argument(
+        "--force-transform",
+        action="store_true",
+        help="Transform the selected year even when parsing finds no changed PDFs.",
+    )
     parser.add_argument("--all", action="store_true")
     return parser
 
@@ -511,8 +678,6 @@ def main(argv: list[str] | None = None) -> int:
     )
     parser = build_parser()
     args = parser.parse_args(argv)
-    if args.data_dir is None and args.input_manifest is None:
-        parser.error("one of --data-dir or --input-manifest is required")
     return _run_from_args(args)
 
 
@@ -531,12 +696,23 @@ def _run_from_args(args: argparse.Namespace) -> int:
     data_dir = args.data_dir or settings.paths.parsed_root / "dromic"
     out_dir = args.out_dir or settings.paths.event_rdf_root / "dromic"
     debug_dir = args.debug_dir or settings.paths.debug_root
+    raw_root = settings.paths.raw_root / "dromic"
 
     if args.all:
-        for folder in _year_dirs(data_dir):
+        for folder in _pipeline_years(data_dir, args.input_dir or raw_root):
             run(
                 sub_data_dir=data_dir / folder,
                 out_file=out_dir / f"{args.out}-{folder}.ttl",
+                input_dir=(
+                    None
+                    if args.input_manifest is not None
+                    else (
+                        (args.input_dir / folder)
+                        if args.input_dir is not None
+                        else raw_root / folder
+                    )
+                ),
+                year=folder,
                 start=args.start,
                 count=args.count,
                 limit=args.limit,
@@ -546,12 +722,19 @@ def _run_from_args(args: argparse.Namespace) -> int:
                 include_context_graphs=not args.no_context,
                 debug_dir=debug_dir,
                 input_manifest=args.input_manifest,
+                force_transform=args.force_transform,
                 settings=settings,
             )
     else:
         run(
             sub_data_dir=data_dir / str(args.year),
             out_file=out_dir / f"{args.out}-{args.year}.ttl",
+            input_dir=(
+                None
+                if args.input_manifest is not None
+                else args.input_dir or raw_root / str(args.year)
+            ),
+            year=str(args.year),
             start=args.start,
             count=args.count,
             limit=args.limit,
@@ -561,6 +744,7 @@ def _run_from_args(args: argparse.Namespace) -> int:
             include_context_graphs=not args.no_context,
             debug_dir=debug_dir,
             input_manifest=args.input_manifest,
+            force_transform=args.force_transform,
             settings=settings,
         )
     return 0

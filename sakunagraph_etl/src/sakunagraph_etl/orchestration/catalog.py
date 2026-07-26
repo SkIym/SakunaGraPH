@@ -70,7 +70,7 @@ WORKFLOWS: dict[str, WorkflowSpec] = {
     "source-dromic": _source_workflow(
         "dromic",
         (
-            "dromic", "--data-dir", "{input}", "--out", "{output}",
+            "dromic", "--input-dir", "{input}", "--out", "{output}",
             "--validate", "--profile", "{profile}",
         ),
         schedule=ScheduleSpec("cron(30 2 * * ? *)", systemd_on_calendar="*-*-* 02:30:00"),

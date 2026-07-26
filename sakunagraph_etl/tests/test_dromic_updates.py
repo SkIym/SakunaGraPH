@@ -4,7 +4,10 @@ import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
+from sakunagraph_etl.config import SETTINGS
+from sakunagraph_etl.sources.dromic import job as dromic_job
 from sakunagraph_etl.sources.dromic.document_conversion import copy_pdfs_jsons
 from sakunagraph_etl.sources.dromic.fetch import should_fetch_post
 from sakunagraph_etl.sources.dromic.identity import (
@@ -296,6 +299,244 @@ class DromicParserVersionStateTests(unittest.TestCase):
                     source_version="2026-07-21T00:00:00Z",
                     manifest=manifest,
                 )
+            )
+
+    def test_failed_source_filename_is_excluded_from_transform_discovery(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            year_dir = Path(temp)
+            failed = year_dir / "failed-folder"
+            good = year_dir / "good-folder"
+            for folder, report_name in (
+                (failed, "failed-report.pdf"),
+                (good, "good-report.pdf"),
+            ):
+                folder.mkdir()
+                (folder / "metadata.json").write_text("{}", encoding="utf-8")
+                (folder / "source.json").write_text(
+                    json.dumps({"reportName": report_name}),
+                    encoding="utf-8",
+                )
+
+            folders, skipped = dromic_job._event_folders(
+                str(year_dir),
+                set(),
+                {"failed-report.pdf"},
+            )
+
+            self.assertEqual(folders, ["good-folder"])
+            self.assertEqual(skipped, 1)
+
+
+class DromicIntegratedPipelineTests(unittest.TestCase):
+    def test_all_year_discovery_uses_plain_year_subdirectories(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            parsed = root / "parsed"
+            raw = root / "raw"
+            (parsed / "2024").mkdir(parents=True)
+            (raw / "2025").mkdir(parents=True)
+            (raw / "2026-pdf").mkdir()
+
+            years = dromic_job._pipeline_years(parsed, raw)
+
+            self.assertEqual(years, ["2024", "2025"])
+
+    def test_pipeline_parses_checks_failures_then_transforms_only_clean_folders(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            raw = root / "raw"
+            parsed = root / "parsed" / "2026"
+            output = root / "dromic-2026.ttl"
+            raw.mkdir()
+            order: list[str] = []
+            transformed: list[str] = []
+
+            def parse_pending(input_dir, output_dir, *, year):
+                order.append("parse")
+                self.assertEqual(
+                    (Path(input_dir), Path(output_dir), year),
+                    (raw, parsed, "2026"),
+                )
+                for folder_name, report_name in (
+                    ("failed-folder", "failed-report.pdf"),
+                    ("good-folder", "good-report.pdf"),
+                ):
+                    folder = parsed / folder_name
+                    folder.mkdir(parents=True)
+                    (folder / "metadata.json").write_text("{}", encoding="utf-8")
+                    (folder / "source.json").write_text(
+                        json.dumps({"reportName": report_name}),
+                        encoding="utf-8",
+                    )
+                DromicStateStore(parsed).update([
+                    EventStatusRecord.create(
+                        "failed-report",
+                        EventStatus.PARSE_ERROR,
+                        "dromic-parser",
+                        reason="fixture parse failure",
+                        source_filename="failed-report.pdf",
+                        source_version="fixture-v2",
+                    )
+                ])
+                return 2, 0, 1
+
+            def check_failures(year_dir):
+                order.append("check")
+                self.assertEqual(Path(year_dir), parsed)
+                return 0, 2
+
+            def transform(folders, graph, **kwargs):
+                del graph, kwargs
+                order.append("transform")
+                transformed.extend(folders)
+                return len(transformed)
+
+            quality_report = mock.Mock()
+            quality_report.to_dict.return_value = {}
+            with (
+                mock.patch.object(
+                    dromic_job,
+                    "_parse_unparsed_documents",
+                    side_effect=parse_pending,
+                ),
+                mock.patch.object(
+                    dromic_job,
+                    "_check_parsed_failures",
+                    side_effect=check_failures,
+                ),
+                mock.patch.object(
+                    dromic_job,
+                    "validate_source_input",
+                    return_value=quality_report,
+                ),
+                mock.patch.object(dromic_job, "enforce_production_quality"),
+                mock.patch.object(
+                    dromic_job,
+                    "process_event_batches",
+                    side_effect=transform,
+                ),
+                mock.patch.object(dromic_job, "record_artifact_run", return_value=mock.Mock()),
+            ):
+                dromic_job.run(
+                    parsed,
+                    output,
+                    input_dir=raw,
+                    year="2026",
+                    settings=SETTINGS,
+                )
+
+            self.assertEqual(order, ["parse", "check", "transform"])
+            self.assertEqual(transformed, ["good-folder"])
+
+    def test_unchanged_year_keeps_existing_rdf_without_transforming(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            raw = root / "raw" / "2020"
+            parsed = root / "parsed" / "2020"
+            output = root / "dromic-2020.ttl"
+            raw.mkdir(parents=True)
+            parsed.mkdir(parents=True)
+            output.write_text(
+                "<https://sakuna.ph/event> a <https://sakuna.ph/Event> .\n",
+                encoding="utf-8",
+            )
+
+            with (
+                mock.patch.object(
+                    dromic_job,
+                    "_parse_unparsed_documents",
+                    return_value=(0, 12, 0),
+                ),
+                mock.patch.object(dromic_job, "_check_parsed_failures") as check,
+                mock.patch.object(dromic_job, "process_event_batches") as transform,
+                mock.patch.object(
+                    dromic_job,
+                    "record_artifact_run",
+                    return_value=mock.Mock(),
+                ) as record,
+            ):
+                dromic_job.run(
+                    parsed,
+                    output,
+                    input_dir=raw,
+                    year="2020",
+                    settings=SETTINGS,
+                )
+
+            check.assert_not_called()
+            transform.assert_not_called()
+            record.assert_called_once()
+
+    def test_legacy_parsed_list_is_loaded_as_parser_input(self) -> None:
+        with tempfile.TemporaryDirectory() as temp:
+            year = Path(temp) / "2020"
+            year.mkdir()
+            (year / "_parsed.txt").write_text(
+                "old-report.pdf\n",
+                encoding="utf-8",
+            )
+            store = DromicStateStore(year)
+
+            loaded = store.load()
+            self.assertIn("old-report.pdf", store.parsed_sources(loaded))
+
+    def test_parser_seeds_versioned_state_from_legacy_parsed_list(self) -> None:
+        from sakunagraph_etl.sources.dromic import _parser
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            raw = root / "raw" / "2020"
+            parsed = root / "parsed" / "2020"
+            raw.mkdir(parents=True)
+            parsed.mkdir(parents=True)
+            (raw / "old-report.pdf").touch()
+            (raw / "recovered-report.pdf").touch()
+            (raw / "manifest.json").write_text(
+                json.dumps({
+                    "entries": [
+                        {
+                            "filename": "old-report.pdf",
+                            "sha256": "a" * 64,
+                        },
+                        {
+                            "filename": "recovered-report.pdf",
+                            "sha256": "b" * 64,
+                        },
+                    ]
+                }),
+                encoding="utf-8",
+            )
+            (parsed / "_parsed.txt").write_text(
+                "old-report.pdf\n",
+                encoding="utf-8",
+            )
+            recovered_folder = parsed / "Recovered event"
+            recovered_folder.mkdir()
+            (recovered_folder / "source.json").write_text(
+                json.dumps({"reportName": "recovered-report.docx"}),
+                encoding="utf-8",
+            )
+
+            with mock.patch.object(_parser, "process_file") as process:
+                summary = _parser.parse_pending(raw, parsed)
+
+            process.assert_not_called()
+            self.assertEqual(
+                (summary.parsed, summary.skipped, summary.failed),
+                (0, 2, 0),
+            )
+            records = DromicStateStore(parsed).load().events
+            self.assertEqual(
+                records["old-report"]["dromic-parser"].source_version,
+                "a" * 64,
+            )
+            self.assertEqual(
+                records["recovered-report"]["dromic-parser"].source_version,
+                "b" * 64,
+            )
+            self.assertEqual(
+                (parsed / "_parsed.txt").read_text(encoding="utf-8").splitlines(),
+                ["old-report.pdf", "recovered-report.pdf"],
             )
 
 

@@ -6,7 +6,7 @@ from datetime import datetime
 
 from sakunagraph_etl.rdf.iris import aff_pop_iri, assistance_iri, event_uri, housing_iri, pevac_iri, prov_iri
 from sakunagraph_etl.rdf.graph import ORG, SKG, Graph, PROV, add_monetary
-from .identity import report_series_id, report_version_id
+from .identity import report_version_id
 from .versioning import source_recency_key
 
 
@@ -221,21 +221,11 @@ def _report_version_iri(version: ReportVersion) -> URIRef:
     return URIRef(SKG[f"dromic/report-version/{identifier}"])
 
 
-def _report_series_iri(version: ReportVersion) -> URIRef:
-    identifier = report_series_id(version.reportLink, version.reportName)
-    return URIRef(SKG[f"dromic/report-series/{identifier}"])
-
-
 def _map_report_version(g: Graph, version: ReportVersion) -> URIRef:
     uri = _report_version_iri(version)
-    series_uri = _report_series_iri(version)
     g.add((uri, RDF.type, SKG.Source))
     g.add((uri, RDF.type, PROV.Entity))
     g.add((uri, PROV.wasAttributedTo, ORG.DROMIC))
-    g.add((uri, PROV.specializationOf, series_uri))
-    g.add((series_uri, RDF.type, PROV.Entity))
-    if version.reportLink:
-        g.add((series_uri, SKG.reportLink, Literal(version.reportLink)))
 
     file_format = version.reportName.rsplit(".", 1)[-1] if "." in version.reportName else ""
     if file_format:

@@ -1,7 +1,10 @@
+import os
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
+import sakunagraph_etl.io.storage as storage_module
 from sakunagraph_etl.io import (
     ArtifactManifest,
     JsonManifestStore,
@@ -29,6 +32,32 @@ class LocalStorageTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "escapes configured root"):
                 storage.write_text(Path("..") / "outside.txt", "unsafe")
+
+    def test_atomic_write_retries_a_transient_windows_replace_lock(self) -> None:
+        real_replace = os.replace
+        attempts = 0
+
+        def transient_replace(source, destination):
+            nonlocal attempts
+            attempts += 1
+            if attempts == 1:
+                raise PermissionError("fixture destination lock")
+            real_replace(source, destination)
+
+        with tempfile.TemporaryDirectory() as temp:
+            storage = LocalFileStorage(temp)
+            with (
+                mock.patch.object(
+                    storage_module.os,
+                    "replace",
+                    side_effect=transient_replace,
+                ),
+                mock.patch.object(storage_module.time, "sleep"),
+            ):
+                storage.write_text("state.json", "{}\n")
+
+            self.assertEqual(storage.read_text("state.json"), "{}\n")
+            self.assertEqual(attempts, 2)
 
 
 class ManifestTests(unittest.TestCase):

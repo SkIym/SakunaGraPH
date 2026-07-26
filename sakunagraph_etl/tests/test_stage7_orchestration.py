@@ -89,6 +89,8 @@ class Stage7WorkflowTests(unittest.TestCase):
         for workflow in WORKFLOWS.values():
             for task in workflow.tasks:
                 self.assertNotEqual(task.command[0], "python")
+        self.assertIn("--input-dir", WORKFLOWS["source-dromic"].tasks[0].command)
+        self.assertNotIn("--data-dir", WORKFLOWS["source-dromic"].tasks[0].command)
 
     def test_artifact_boundary_emits_a_small_retry_stable_envelope(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
