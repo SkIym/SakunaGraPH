@@ -190,8 +190,8 @@ def main():
                         help="Minimum table row height in points (default: 14.0)")
     args = parser.parse_args()
 
-    input_dir  = Path(args.input_dir)  if args.input_dir  else Path(f"../data/raw/dromic-new/{args.year}")
-    output_dir = Path(args.output_dir) if args.output_dir else Path(f"../data/raw/dromic-new/{args.year}-pdf")
+    input_dir  = Path(args.input_dir)  if args.input_dir  else Path(f"../data/raw/dromic/{args.year}")
+    output_dir = Path(args.output_dir) if args.output_dir else Path(f"../data/raw/dromic/{args.year}-pdf")
 
     print(f"Input:  {input_dir}")
     print(f"Output: {output_dir}")

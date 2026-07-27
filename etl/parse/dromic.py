@@ -1174,7 +1174,7 @@ def load_parsed_files(sub_data_dir: str) -> set[str]:
 def main() -> None:
     args = parse_args()
 
-    input_dir = Path(f"../data/raw/dromic-new/{args.year}-pdf")
+    input_dir = Path(f"../data/raw/dromic/{args.year}-pdf")
     output_dir =  Path(f"../data/parsed/dromic/{args.year}")
 
     if args.single:

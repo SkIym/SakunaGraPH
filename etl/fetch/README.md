@@ -44,8 +44,8 @@ It then opens each report post and looks for the first downloadable attachment:
 
 For each year, the scraper writes to:
 
-- `../data/raw/dromic-new/{year}/` for downloaded files
-- `../data/raw/dromic-new/{year}/manifest.json` for per-file provenance metadata and resume state
+- `../data/raw/dromic/{year}/` for downloaded files
+- `../data/raw/dromic/{year}/manifest.json` for per-file provenance metadata and resume state
 - `../logs/dromic/{year}_scraper_{timestamp}.log` for runtime logs
 
 The manifest stores the latest scrape timestamp plus one entry per successful

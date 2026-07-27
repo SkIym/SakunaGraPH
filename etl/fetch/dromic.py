@@ -373,7 +373,7 @@ def setup_logging(log_file: Path) -> None:
 def main() -> None:
     args = parse_args()
 
-    download_dir = Path(f"../data/raw/dromic-new/{args.year}")
+    download_dir = Path(f"../data/raw/dromic/{args.year}")
     log_dir = Path("../logs/dromic")
     manifest_path = Path(os.path.join(download_dir, "manifest.json"))
     log_file = log_dir / f"{args.year}_scraper_{datetime.now().strftime('%Y%m%d_%H%M%S')}.log"
