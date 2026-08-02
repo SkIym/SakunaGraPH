@@ -301,6 +301,43 @@ class DromicParserVersionStateTests(unittest.TestCase):
                 )
             )
 
+    def test_invalid_parsed_metadata_forces_current_source_to_be_reparsed(self) -> None:
+        from sakunagraph_etl.sources.dromic import _parser
+
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            raw = root / "raw" / "2026"
+            parsed = root / "parsed" / "2026"
+            raw.mkdir(parents=True)
+            parsed.mkdir(parents=True)
+            (raw / "report.pdf").touch()
+            corrupt_event = parsed / "Corrupt event"
+            corrupt_event.mkdir()
+            (corrupt_event / "metadata.json").write_bytes(b"\x00" * 32)
+            (corrupt_event / "source.json").write_text(
+                json.dumps({"reportName": "report.pdf"}),
+                encoding="utf-8",
+            )
+
+            store = DromicStateStore(parsed)
+            store.update([
+                EventStatusRecord.create(
+                    "report",
+                    EventStatus.PARSED,
+                    "dromic-parser",
+                    source_filename="report.pdf",
+                ),
+            ])
+
+            with mock.patch.object(_parser, "process_file") as process:
+                summary = _parser.parse_pending(raw, parsed)
+
+            process.assert_called_once_with(raw / "report.pdf", parsed)
+            self.assertEqual(
+                (summary.parsed, summary.skipped, summary.failed),
+                (1, 0, 0),
+            )
+
     def test_failed_source_filename_is_excluded_from_transform_discovery(self) -> None:
         with tempfile.TemporaryDirectory() as temp:
             year_dir = Path(temp)

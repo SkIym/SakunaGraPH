@@ -246,6 +246,90 @@ class Stage4SourceMigrationTests(unittest.TestCase):
         self.assertTrue(any(graph.triples((old_source, None, None))))
         self.assertFalse(any(graph.triples((None, OWL.sameAs, None))))
 
+    def test_dromic_fact_provenance_is_resolved_through_event(self) -> None:
+        graph = create_graph()
+        event = URIRef("https://sakuna.ph/event/current")
+        provenance = dromic_rdf.Provenance(
+            lastUpdateDate=None,
+            reportName="report-2.pdf",
+            reportLink="https://dromic.dswd.gov.ph/example/",
+            obtainedDate="2026-07-23T00:00:00Z",
+            postDate="2026-07-23",
+            sha256="b" * 64,
+            versions=(
+                dromic_rdf.ReportVersion(
+                    reportName="report-2.pdf",
+                    reportLink="https://dromic.dswd.gov.ph/example/",
+                    obtainedDate="2026-07-23T00:00:00Z",
+                    postDate="2026-07-23",
+                    sha256="b" * 64,
+                ),
+            ),
+        )
+        source = dromic_rdf.prov_mapping(graph, provenance, event)
+        dromic_rdf.aff_pop_mapping(
+            graph,
+            [
+                dromic_rdf.AffectedPopulation(
+                    id="affected-population-1",
+                    affectedBarangays=1,
+                    affectedFamilies=2,
+                    affectedPersons=3,
+                    displacedFamilies=0,
+                    displacedPersons=0,
+                    hasLocation=URIRef("https://sakuna.ph/1300000000"),
+                )
+            ],
+            event,
+        )
+        dromic_rdf.housing_mapping(
+            graph,
+            [
+                dromic_rdf.Housing(
+                    id="housing-1",
+                    hasLocation=URIRef("https://sakuna.ph/1300000000"),
+                    totallyDamagedHouses=1,
+                    partiallyDamagedHouses=2,
+                )
+            ],
+            event,
+        )
+        dromic_rdf.assistance_mapping(
+            graph,
+            [
+                dromic_rdf.Assistance(
+                    id="assistance-1",
+                    hasLocation=URIRef("https://sakuna.ph/1300000000"),
+                    contributingOrg=URIRef("https://sakuna.ph/org/DSWD"),
+                    contributionAmount=1.0,
+                )
+            ],
+            event,
+        )
+        dromic_rdf.pevac_mapping(
+            graph,
+            [
+                dromic_rdf.PEvac(
+                    id="preemptive-evacuation-1",
+                    hasLocation=URIRef("https://sakuna.ph/1300000000"),
+                    evacuationCenters=1,
+                )
+            ],
+            event,
+        )
+
+        self.assertIn((event, PROV.wasDerivedFrom, source), graph)
+        fact_nodes = {
+            *graph.objects(event, SKG.hasAffectedPopulation),
+            *graph.objects(event, SKG.hasHousingDamage),
+            *graph.objects(event, SKG.hasAssistance),
+            *graph.objects(event, SKG.hasPreemptiveEvacuation),
+        }
+        self.assertEqual(len(fact_nodes), 4)
+        self.assertTrue(
+            all((fact, PROV.wasDerivedFrom, source) not in graph for fact in fact_nodes)
+        )
+
     def test_source_golden_graphs_pass_shacl(self) -> None:
         shapes = Graph().parse(
             data="""

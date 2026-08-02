@@ -318,7 +318,6 @@ def aff_pop_mapping(
     g: Graph,
     aps: List[AffectedPopulation],
     event_iri: URIRef,
-    source_iri: URIRef | None = None,
 ):
 
     for ap in aps:
@@ -326,8 +325,6 @@ def aff_pop_mapping(
         
         g.add((uri, RDF.type, SKG.AffectedPopulation))
         g.add((event_iri, SKG.hasAffectedPopulation, uri))
-        if source_iri is not None:
-            g.add((uri, PROV.wasDerivedFrom, source_iri))
 
         for f in fields(ap):
 
@@ -347,7 +344,6 @@ def housing_mapping(
     g: Graph,
     hs: List[Housing],
     event_iri: URIRef,
-    source_iri: URIRef | None = None,
 ):
 
     for h in hs:
@@ -355,8 +351,6 @@ def housing_mapping(
         
         g.add((uri, RDF.type, SKG.HousingDamage))
         g.add((event_iri, SKG.hasHousingDamage, uri))
-        if source_iri is not None:
-            g.add((uri, PROV.wasDerivedFrom, source_iri))
 
         for f in fields(h):
 
@@ -374,7 +368,6 @@ def assistance_mapping(
     g: Graph,
     assis: List[Assistance],
     event_iri: URIRef,
-    source_iri: URIRef | None = None,
 ):
 
     for a in assis:
@@ -382,8 +375,6 @@ def assistance_mapping(
 
         g.add((uri, RDF.type, SKG.Assistance))
         g.add((event_iri, SKG.hasAssistance, uri))
-        if source_iri is not None:
-            g.add((uri, PROV.wasDerivedFrom, source_iri))
 
         for f in fields(a):
             if f.name == "id": continue
@@ -402,7 +393,6 @@ def pevac_mapping(
     g: Graph,
     pevac: List[PEvac],
     event_iri: URIRef,
-    source_iri: URIRef | None = None,
 ):
 
     for p in pevac:
@@ -413,8 +403,6 @@ def pevac_mapping(
 
         g.add((uri, RDF.type, SKG.PreemptiveEvacuation))
         g.add((event_iri, SKG.hasPreemptiveEvacuation, uri))
-        if source_iri is not None:
-            g.add((uri, PROV.wasDerivedFrom, source_iri))
 
         for f in fields(p):
             if f.name == "id": continue

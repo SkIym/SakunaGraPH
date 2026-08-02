@@ -103,7 +103,13 @@ def event_metadata_rows(
     selected = (
         [directory / folder for folder in folders]
         if folders is not None
-        else sorted(path for path in directory.iterdir() if path.is_dir())
+        else sorted(
+            path
+            for path in directory.iterdir()
+            if path.is_dir()
+            and path.name != ".locks"
+            and not path.name.startswith(("_dromic_parse_", "_dromic_previous_"))
+        )
     )
     rows: list[dict[str, Any]] = []
     for event_directory in selected:

@@ -105,23 +105,25 @@ def _map_event(
     log.info("Event IRI: %s", event_iri)
 
     prov = load_provenance(os.path.join(folder_path, "source.json"))
-    source_iri = prov_mapping(g, prov, event_iri)
-    fact_source_iri = source_iri if getattr(prov, "versions", ()) else None
+    # Provenance is intentionally event-level. Impact, response, and
+    # preparedness resources are traced to the current report through their
+    # owning event rather than carrying duplicate wasDerivedFrom statements.
+    prov_mapping(g, prov, event_iri)
 
     aps, pevacs = load_aff_pop(folder_path)
     if aps:
-        aff_pop_mapping(g, aps, event_iri, fact_source_iri)
+        aff_pop_mapping(g, aps, event_iri)
     if pevacs:
-        pevac_mapping(g, pevacs, event_iri, fact_source_iri)
+        pevac_mapping(g, pevacs, event_iri)
 
     hs = load_housing(folder_path)
     if hs:
-        housing_mapping(g, hs, event_iri, fact_source_iri)
+        housing_mapping(g, hs, event_iri)
 
     try:
         assistance = load_assistance(folder_path, debug_dir=debug_dir)
         if assistance:
-            assistance_mapping(g, assistance, event_iri, fact_source_iri)
+            assistance_mapping(g, assistance, event_iri)
     except Exception as exc:
         _record_assistance_failure(folder_path, needs_rerun_path, exc)
 
@@ -208,11 +210,13 @@ def _quality_folders(
 ) -> list[str]:
     """Include silent discovery rejects in quality accounting."""
 
+    from .quality import is_event_directory
+
     root = Path(sub_data_dir)
     missing_metadata = sorted(
         path.name
         for path in root.iterdir()
-        if path.is_dir() and not (path / "metadata.json").is_file()
+        if is_event_directory(path) and not (path / "metadata.json").is_file()
     )
     return list(dict.fromkeys([*selected_folders, *missing_metadata]))
 

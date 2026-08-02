@@ -22,6 +22,7 @@ import torch
 from docling_core.types.doc.document import DoclingDocument
 
 from sakunagraph_etl.config import SETTINGS
+from sakunagraph_etl.io.storage import LocalFileStorage
 from .manifest import (
     entries_for_post_url,
     latest_entry_for_filename,
@@ -322,10 +323,17 @@ def generate_json(event: DromicEvent, output_dir: Path) -> None:
     event_dict = asdict(event)
     metadata = {k: v for k, v in event_dict.items() if k in METADATA_KEYS}
     source   = {k: v for k, v in event_dict.items() if k not in METADATA_KEYS}
-    with open(output_dir / "metadata.json", "w") as f:
-        json.dump(metadata, f, indent=4)
-    with open(output_dir / "source.json", "w") as f:
-        json.dump(source, f, indent=4)
+    storage = LocalFileStorage(output_dir)
+    storage.write_text(
+        "metadata.json",
+        json.dumps(metadata, indent=4) + "\n",
+        atomic=True,
+    )
+    storage.write_text(
+        "source.json",
+        json.dumps(source, indent=4) + "\n",
+        atomic=True,
+    )
 
 def safe_filename(name: str) -> str:
     return re.sub(r'[^\w\-. ]', '', name)
@@ -1233,6 +1241,25 @@ class ParseSummary:
     failed: int
 
 
+def _invalid_parsed_sources(output_dir: Path) -> set[str]:
+    """Return source filenames whose existing parsed metadata cannot be loaded."""
+
+    from .quality import is_event_directory, metadata_error, source_filename
+
+    if not output_dir.is_dir():
+        return set()
+    invalid: set[str] = set()
+    for folder in output_dir.iterdir():
+        if not is_event_directory(folder):
+            continue
+        if metadata_error(folder) is None:
+            continue
+        filename = source_filename(folder)
+        if filename:
+            invalid.add(filename.casefold())
+    return invalid
+
+
 def parse_pending(
     input_dir: str | Path,
     output_dir: str | Path,
@@ -1287,6 +1314,11 @@ def parse_pending(
 
     state_manifest = state.load()
     already_parsed = state.parsed_sources(state_manifest)
+    failed_sources = {
+        filename.casefold()
+        for filename in state.failed_sources(state_manifest)
+    }
+    failed_sources.update(_invalid_parsed_sources(output_dir))
     legacy_records: list[EventStatusRecord] = []
     for file in files:
         if file.suffix != ".pdf":
@@ -1335,7 +1367,7 @@ def parse_pending(
             source_filename=sanitized_name,
             source_version=source_version,
             manifest=state_manifest,
-        ):
+        ) and sanitized_name.casefold() not in failed_sources:
             skipped += 1
             continue
         

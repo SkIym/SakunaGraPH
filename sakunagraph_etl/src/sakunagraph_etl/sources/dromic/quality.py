@@ -1,9 +1,10 @@
 """Quality checks for parsed DROMIC event folders.
 
-An event folder needs rerunning only when it contains both an original CSV and
-a numbered copy of that CSV, for example ``damaged_houses.csv`` and
-``damaged_houses_1.csv``. A filename that merely contains or ends in a number
-is not considered a failure when its unnumbered counterpart does not exist.
+An event folder needs rerunning when its metadata is missing or malformed, or
+when it contains both an original CSV and a numbered copy of that CSV, for
+example ``damaged_houses.csv`` and ``damaged_houses_1.csv``. A filename that
+merely contains or ends in a number is not considered a duplicate-output
+failure when its unnumbered counterpart does not exist.
 
 Run from the standalone project::
 
@@ -28,6 +29,17 @@ from .state import DromicStateStore, EventStatus, EventStatusRecord
 
 DEFAULT_DROMIC_DIR = SETTINGS.paths.parsed_root / "dromic"
 NUMBERED_COPY_PATTERN = re.compile(r"^(?P<base>.+)_(?P<number>\d+)$")
+OPERATIONAL_DIRECTORY_PREFIXES = ("_dromic_parse_", "_dromic_previous_")
+
+
+def is_event_directory(path: Path) -> bool:
+    """Return whether a child directory represents parsed event data."""
+
+    return (
+        path.is_dir()
+        and path.name != ".locks"
+        and not path.name.startswith(OPERATIONAL_DIRECTORY_PREFIXES)
+    )
 
 
 def duplicate_csv_names(folder: Path) -> list[str]:
@@ -77,6 +89,20 @@ def source_filename(folder: Path) -> str | None:
     return re.sub(r"\.(?:docx|doc)$", ".pdf", filename, flags=re.IGNORECASE)
 
 
+def metadata_error(folder: Path) -> str | None:
+    """Return a diagnostic when an event's metadata is not a JSON object."""
+
+    metadata_path = folder / "metadata.json"
+    try:
+        with metadata_path.open("r", encoding="utf-8") as metadata_file:
+            metadata = json.load(metadata_file)
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        return f"Invalid metadata.json: {type(error).__name__}: {error}"
+    if not isinstance(metadata, dict):
+        return "Invalid metadata.json: root value must be a JSON object"
+    return None
+
+
 def discover_year_directories(base: Path, *, single_directory: bool) -> list[Path]:
     """Resolve either one explicit year directory or all years below a root."""
     if not base.exists():
@@ -107,7 +133,7 @@ def write_lines(path: Path, values: list[str]) -> None:
 def check_year(year_dir: Path) -> tuple[int, int]:
     """Check one parsed year and update its rerun and parsed-source lists."""
     event_folders = sorted(
-        (path for path in year_dir.iterdir() if path.is_dir()),
+        (path for path in year_dir.iterdir() if is_event_directory(path)),
         key=lambda path: path.name.casefold(),
     )
     print(f"\n[{year_dir.name}] Checking {len(event_folders)} event folders in {year_dir}")
@@ -117,32 +143,44 @@ def check_year(year_dir: Path) -> tuple[int, int]:
 
     for folder in event_folders:
         duplicates = duplicate_csv_names(folder)
-        if duplicates:
-            flagged.append((folder.name, duplicates))
+        metadata_failure = metadata_error(folder)
+        problems = [
+            *(f"Duplicate CSV: {name}" for name in duplicates),
+            *([metadata_failure] if metadata_failure else []),
+        ]
+        if problems:
+            flagged.append((folder.name, problems))
 
         parsed_filename = source_filename(folder)
+        if metadata_failure:
+            status = EventStatus.PARSE_ERROR
+            reason = metadata_failure
+            if duplicates:
+                reason += "; numbered CSV duplicates: " + ", ".join(duplicates)
+        elif duplicates:
+            status = EventStatus.DUPLICATE_CSV
+            reason = "Numbered CSV duplicates: " + ", ".join(duplicates)
+        else:
+            status = EventStatus.PARSED
+            reason = "Parsed folder passed metadata and duplicate-output checks"
         records.append(
             EventStatusRecord.create(
                 folder.name,
-                EventStatus.DUPLICATE_CSV if duplicates else EventStatus.PARSED,
+                status,
                 "dromic-quality",
-                reason=(
-                    "Numbered CSV duplicates: " + ", ".join(duplicates)
-                    if duplicates
-                    else "Parsed folder passed duplicate-output checks"
-                ),
+                reason=reason,
                 source_filename=parsed_filename,
             )
         )
 
     if flagged:
-        print(f"  NEEDS RERUN ({len(flagged)} folders with duplicate CSVs):")
-        for folder_name, csvs in flagged:
+        print(f"  NEEDS RERUN ({len(flagged)} folders with invalid parsed outputs):")
+        for folder_name, problems in flagged:
             print(f"    {folder_name}")
-            for csv_name in csvs:
-                print(f"      {csv_name}")
+            for problem in problems:
+                print(f"      {problem}")
     else:
-        print("  All folders look clean - no duplicate CSVs found.")
+        print("  All folders have valid metadata and no duplicate CSVs.")
 
     DromicStateStore(year_dir).update(records)
     rerun_path = year_dir / "_needs_rerun.txt"
