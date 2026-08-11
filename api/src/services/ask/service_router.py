@@ -14,7 +14,7 @@ from src.services.analysis import (
     get_summary,
     get_victim_trends,
 )
-from src.services.ask.query_compiler import analysis_filters_from_plan, compile_query
+from src.services.ask.query_compiler import analysis_filters_from_plan
 from src.services.disasters import get_disaster_sources, get_event_details
 
 
@@ -114,11 +114,11 @@ def _bounded_ranked_rows(
     return rows[: resolved.plan.limit]
 
 
-def service_query_artifact(
+def service_execution_artifact(
     resolved: ResolvedAskPlan,
     route: AskServiceRoute,
 ) -> QueryArtifact:
-    artifact = compile_query(resolved, origin="service")
+    """Describe a service execution without manufacturing unused SPARQL."""
     columns = {
         "analysis_events": [
             "event",
@@ -162,21 +162,33 @@ def service_query_artifact(
         ],
         "event_sources": ["source", "sourceLabel", "recordCount", "records"],
     }[route]
-    return artifact.model_copy(
-        update={
-            "service_route": route,
-            "expected_columns": columns,
-        }
+    expected_entities = [
+        entity.iri
+        for entities in (
+            resolved.locations,
+            resolved.disaster_types,
+            resolved.events,
+            resolved.organizations,
+            resolved.casualty_types,
+        )
+        for entity in entities
+    ]
+    return QueryArtifact(
+        sparql="",
+        origin="service",
+        service_route=route,
+        expected_columns=columns,
+        expected_entities=expected_entities,
+        expected_metric=resolved.plan.metric,
+        expected_group_by=resolved.plan.group_by,
+        warnings=list(resolved.warnings),
     )
 
 
 async def execute_service_route(
     resolved: ResolvedAskPlan,
-    artifact: QueryArtifact,
+    route: AskServiceRoute,
 ) -> DeterministicAskResult:
-    route = artifact.service_route
-    if route is None:
-        raise ValueError("A service-backed query artifact requires service_route.")
     filters = analysis_filters_from_plan(resolved)
     truncated = False
 
@@ -298,4 +310,4 @@ async def execute_service_route(
     else:
         raise ValueError(f"Unknown service route: {route}.")
 
-    return DeterministicAskResult(query=artifact, rows=rows, truncated=truncated)
+    return DeterministicAskResult(rows=rows, truncated=truncated)

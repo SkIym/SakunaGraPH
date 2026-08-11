@@ -166,6 +166,49 @@ class StructuredAnswerContextTests(unittest.TestCase):
         self.assertIn("approximately matched", context.warnings[0])
         self.assertIn("91%", context.warnings[0])
 
+    def test_service_provenance_hashes_the_execution_plan_without_sparql(self) -> None:
+        artifact = QueryArtifact(
+            sparql="",
+            origin="service",
+            service_route="analysis_event_count",
+            expected_columns=["total"],
+        )
+        raw = _raw_results(["total"], [{"total": "2"}])
+        report = ResultValidationReport(row_count=1)
+        first = build_answer_context(
+            "Count 2023 events",
+            raw,
+            ResolvedAskPlan(
+                plan=AskPlan(
+                    intent="event_count",
+                    metric="events",
+                    start_date="2023-01-01",
+                    end_date="2023-12-31",
+                )
+            ),
+            artifact,
+            report,
+        )
+        second = build_answer_context(
+            "Count 2024 events",
+            raw,
+            ResolvedAskPlan(
+                plan=AskPlan(
+                    intent="event_count",
+                    metric="events",
+                    start_date="2024-01-01",
+                    end_date="2024-12-31",
+                )
+            ),
+            artifact,
+            report,
+        )
+
+        first_hash = first.evidence[0].provenance.query_hash
+        second_hash = second.evidence[0].provenance.query_hash
+        self.assertEqual(len(first_hash), 64)
+        self.assertNotEqual(first_hash, second_hash)
+
     def test_ranking_totals_receive_semantic_units(self) -> None:
         cases = (
             (AskPlan(intent="region_ranking"), "events"),

@@ -2,7 +2,7 @@ import re
 from collections.abc import Iterable
 from urllib.parse import urlsplit
 
-from src.schemas.ask_execution import QueryArtifact, QueryOrigin
+from src.schemas.ask_execution import QueryArtifact
 from src.schemas.entity_resolution import ResolvedAskPlan, ResolvedEntity
 from src.services.analysis.common import (
     SPARQL_PREFIXES,
@@ -74,7 +74,8 @@ def analysis_filters_from_plan(resolved: ResolvedAskPlan) -> AnalysisFilters:
     )
 
 
-def _ensure_compilable(resolved: ResolvedAskPlan) -> None:
+def ensure_resolved_plan_ready(resolved: ResolvedAskPlan) -> None:
+    """Reject a plan that would silently omit or misuse requested entities."""
     if resolved.ambiguities:
         raise _compilation_error("Ambiguous entities must be clarified before compilation.")
     if resolved.warnings:
@@ -201,8 +202,6 @@ def _artifact(
     resolved: ResolvedAskPlan,
     sparql: str,
     columns: list[str],
-    *,
-    origin: QueryOrigin,
 ) -> QueryArtifact:
     entities = [
         entity.iri
@@ -217,7 +216,7 @@ def _artifact(
     ]
     return QueryArtifact(
         sparql=SPARQL_PREFIXES + sparql.strip() + "\n",
-        origin=origin,
+        origin="compiler",
         projected_columns=columns,
         expected_columns=columns,
         expected_entities=entities,
@@ -227,11 +226,7 @@ def _artifact(
     )
 
 
-def _compile_event_listing(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin,
-) -> QueryArtifact:
+def _compile_event_listing(resolved: ResolvedAskPlan) -> QueryArtifact:
     group_by = resolved.plan.group_by
     group_select = ""
     group_pattern = ""
@@ -249,14 +244,10 @@ WHERE {{
 ORDER BY {direction}(?startDate) ASC(STR(?event))
 LIMIT {resolved.plan.limit}
 """
-    return _artifact(resolved, query, columns, origin=origin)
+    return _artifact(resolved, query, columns)
 
 
-def _compile_disaster_type_listing(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin,
-) -> QueryArtifact:
+def _compile_disaster_type_listing(resolved: ResolvedAskPlan) -> QueryArtifact:
     query = f"""
 SELECT DISTINCT ?disasterType ?disasterTypeLabel
 WHERE {{
@@ -272,7 +263,6 @@ LIMIT {resolved.plan.limit}
         resolved,
         query,
         ["disasterType", "disasterTypeLabel"],
-        origin=origin,
     )
 
 
@@ -280,8 +270,6 @@ def _compile_grouped_aggregate(
     resolved: ResolvedAskPlan,
     metric: str,
     group_by: str | None,
-    *,
-    origin: QueryOrigin,
 ) -> QueryArtifact:
     metric_pattern, aggregate, has_unit = _metric_pattern(resolved, metric)
     metric_clause = f"{metric_pattern}\n" if metric_pattern else ""
@@ -302,7 +290,7 @@ GROUP BY ?group ?groupLabel{unit_group}
 ORDER BY {resolved.plan.sort_direction.upper()}(?total) ASC(STR(?group))
 LIMIT {resolved.plan.limit}
 """
-        return _artifact(resolved, query, columns, origin=origin)
+        return _artifact(resolved, query, columns)
 
     unit_select = " ?unit" if has_unit else ""
     unit_group = "GROUP BY ?unit" if has_unit else ""
@@ -318,27 +306,21 @@ WHERE {{
 {unit_order}
 {unit_limit}
 """
-    return _artifact(resolved, query, columns, origin=origin)
+    return _artifact(resolved, query, columns)
 
 
-def _compile_victim_trend(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin,
-) -> QueryArtifact:
+def _compile_victim_trend(resolved: ResolvedAskPlan) -> QueryArtifact:
     if resolved.plan.metric in {"dead", "injured", "missing"}:
         return _compile_grouped_aggregate(
             resolved,
             resolved.plan.metric,
             "year",
-            origin=origin,
         )
     if resolved.plan.metric not in {None, "events"}:
         return _compile_grouped_aggregate(
             resolved,
             resolved.plan.metric,
             "year",
-            origin=origin,
         )
 
     query = f"""
@@ -362,15 +344,10 @@ LIMIT {resolved.plan.limit}
         resolved,
         query,
         ["year", "dead", "injured", "missing"],
-        origin=origin,
     )
 
 
-def _compile_full_summary(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin,
-) -> QueryArtifact:
+def _compile_full_summary(resolved: ResolvedAskPlan) -> QueryArtifact:
     base = _base_where(resolved)
     impact_properties = " ".join(_EVENT_IMPACT_PROPERTIES)
     damage_properties = " ".join(_DAMAGE_AMOUNT_PROPERTIES)
@@ -438,15 +415,10 @@ ORDER BY ?metric ?unit
         resolved,
         query,
         ["metric", "total", "unit"],
-        origin=origin,
     )
 
 
-def _compile_event_details(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin,
-) -> QueryArtifact:
+def _compile_event_details(resolved: ResolvedAskPlan) -> QueryArtifact:
     if len(resolved.events) != 1:
         raise _compilation_error("Event details require exactly one resolved event.")
     query = f"""
@@ -487,15 +459,10 @@ LIMIT {resolved.plan.limit}
             "disasterType",
             "disasterTypeLabel",
         ],
-        origin=origin,
     )
 
 
-def _compile_source_lookup(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin,
-) -> QueryArtifact:
+def _compile_source_lookup(resolved: ResolvedAskPlan) -> QueryArtifact:
     event_scope = _base_where(resolved)
     query = f"""
 SELECT DISTINCT ?event ?eventName ?source ?sourceLabel ?record ?recordLabel
@@ -516,58 +483,49 @@ LIMIT {resolved.plan.limit}
         resolved,
         query,
         ["event", "eventName", "source", "sourceLabel", "record", "recordLabel"],
-        origin=origin,
     )
 
 
-def compile_query(
-    resolved: ResolvedAskPlan,
-    *,
-    origin: QueryOrigin = "compiler",
-) -> QueryArtifact:
+def compile_query(resolved: ResolvedAskPlan) -> QueryArtifact:
     """Compile supported Ask plans without incorporating user-authored query text."""
-    _ensure_compilable(resolved)
+    ensure_resolved_plan_ready(resolved)
     plan = resolved.plan
     if plan.intent == "open_graph_query":
         raise _compilation_error("Open graph questions require the constrained fallback.")
     if plan.intent == "list_events":
-        return _compile_event_listing(resolved, origin=origin)
+        return _compile_event_listing(resolved)
     if plan.intent == "list_disaster_types":
-        return _compile_disaster_type_listing(resolved, origin=origin)
+        return _compile_disaster_type_listing(resolved)
     if plan.intent == "event_count":
         return _compile_grouped_aggregate(
             resolved,
             "events",
             plan.group_by,
-            origin=origin,
         )
     if plan.intent == "impact_summary":
         if plan.metric is None:
-            return _compile_full_summary(resolved, origin=origin)
+            return _compile_full_summary(resolved)
         return _compile_grouped_aggregate(
             resolved,
             plan.metric,
             plan.group_by,
-            origin=origin,
         )
     if plan.intent == "victim_trend":
-        return _compile_victim_trend(resolved, origin=origin)
+        return _compile_victim_trend(resolved)
     if plan.intent == "region_ranking":
         return _compile_grouped_aggregate(
             resolved,
             plan.metric or "events",
             "region",
-            origin=origin,
         )
     if plan.intent == "disaster_ranking":
         return _compile_grouped_aggregate(
             resolved,
             plan.metric or "dead",
             "disaster_type",
-            origin=origin,
         )
     if plan.intent == "event_details":
-        return _compile_event_details(resolved, origin=origin)
+        return _compile_event_details(resolved)
     if plan.intent == "source_lookup":
-        return _compile_source_lookup(resolved, origin=origin)
+        return _compile_source_lookup(resolved)
     raise _compilation_error(f"Unsupported Ask intent: {plan.intent!r}.")

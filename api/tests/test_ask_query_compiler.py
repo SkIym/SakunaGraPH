@@ -17,7 +17,7 @@ from src.services.ask.service import ask_question, preview_question
 from src.services.ask.service_router import (
     execute_service_route,
     select_service_route,
-    service_query_artifact,
+    service_execution_artifact,
 )
 from src.services.common import ServiceError
 from src.services.sparql.executor import is_write_operation, validate_sparql
@@ -366,7 +366,8 @@ class ServiceRouterTests(unittest.IsolatedAsyncioTestCase):
             )
             route = select_service_route(resolved)
             self.assertIsNotNone(route)
-            artifact = service_query_artifact(resolved, route)
+            artifact = service_execution_artifact(resolved, route)
+            self.assertEqual(artifact.sparql, "")
             if route == "analysis_event_count":
                 response = AnalysisEventsResponse(
                     items=[],
@@ -381,7 +382,7 @@ class ServiceRouterTests(unittest.IsolatedAsyncioTestCase):
                 response = AnalysisSummaryResponse.model_validate(case["service_payload"])
                 target = "src.services.ask.service_router.get_summary"
             with patch(target, new=AsyncMock(return_value=response)):
-                result = await execute_service_route(resolved, artifact)
+                result = await execute_service_route(resolved, route)
 
             with self.subTest(intent=case["intent"], metric=case["metric"]):
                 self.assertEqual(result.rows, case["expected_rows"])
@@ -392,8 +393,8 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
         plan = AskPlan(intent="event_count", metric="events")
         resolved = ResolvedAskPlan(plan=plan)
 
-        async def service_result(_resolved, artifact):
-            return DeterministicAskResult(query=artifact, rows=[{"total": "3"}])
+        async def service_result(_resolved, _route):
+            return DeterministicAskResult(rows=[{"total": "3"}])
 
         with (
             patch(
@@ -411,7 +412,7 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
             patch(
                 "src.services.ask.service.validate_query_artifact",
                 new=AsyncMock(return_value=_validation_report()),
-            ),
+            ) as query_validator,
             patch(
                 "src.services.ask.service.nl_to_sparql",
                 new=AsyncMock(),
@@ -431,6 +432,8 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.rows, [{"total": "3"}])
         self.assertEqual(response.query_artifact.origin, "service")
         self.assertEqual(response.query_artifact.service_route, "analysis_event_count")
+        self.assertEqual(response.sparql, "")
+        query_validator.assert_not_awaited()
         model_query.assert_not_awaited()
         direct_graphdb.assert_not_awaited()
 
@@ -465,7 +468,7 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
             patch(
                 "src.services.ask.service.validate_query_artifact",
                 new=AsyncMock(return_value=_validation_report()),
-            ),
+            ) as query_validator,
             patch(
                 "src.services.ask.service.nl_to_sparql",
                 new=AsyncMock(),
@@ -479,6 +482,7 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(response.query_artifact.origin, "compiler")
         self.assertEqual(response.rows[0]["total"], "5")
+        query_validator.assert_awaited_once()
         graphdb.assert_awaited_once()
         model_query.assert_not_awaited()
 
@@ -497,7 +501,7 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
             patch(
                 "src.services.ask.service.validate_query_artifact",
                 new=AsyncMock(return_value=_validation_report()),
-            ),
+            ) as query_validator,
             patch(
                 "src.services.ask.service.nl_to_sparql",
                 new=AsyncMock(),
@@ -507,8 +511,48 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
 
         self.assertEqual(response.status, AskStatus.QUERY_READY)
         self.assertEqual(response.query_artifact.origin, "service")
-        self.assertIn("LIMIT 5", response.sparql)
+        self.assertEqual(response.query_artifact.service_route, "analysis_events")
+        self.assertEqual(response.sparql, "")
+        query_validator.assert_not_awaited()
         model_query.assert_not_awaited()
+
+    async def test_unresolved_service_filter_is_rejected_before_execution(self) -> None:
+        plan = AskPlan(
+            intent="event_count",
+            metric="events",
+            disaster_type_mentions=["unknown hazard"],
+        )
+        resolved = ResolvedAskPlan(
+            plan=plan,
+            warnings=[
+                "No disaster type entity in GraphDB matched 'unknown hazard'."
+            ],
+        )
+
+        with (
+            patch(
+                "src.services.ask.service.plan_question",
+                new=AsyncMock(return_value=plan),
+            ),
+            patch(
+                "src.services.ask.service.resolve_ask_plan",
+                new=AsyncMock(return_value=resolved),
+            ),
+            patch(
+                "src.services.ask.service.execute_service_route",
+                new=AsyncMock(),
+            ) as service,
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(),
+            ) as query_validator,
+        ):
+            with self.assertRaises(ServiceError) as raised:
+                await ask_question("How many unknown hazard events occurred?")
+
+        self.assertEqual(raised.exception.code, "ask_compilation")
+        service.assert_not_awaited()
+        query_validator.assert_not_awaited()
 
 
 if __name__ == "__main__":

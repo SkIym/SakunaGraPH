@@ -16,13 +16,16 @@ from src.services.ask.answer import (
 from src.services.ask.context import load_ontology_context
 from src.services.ask.entity_resolver import resolve_ask_plan
 from src.services.ask.planner import plan_question
-from src.services.ask.query_compiler import compile_query
+from src.services.ask.query_compiler import (
+    compile_query,
+    ensure_resolved_plan_ready,
+)
 from src.services.ask.query_validator import validate_query_artifact
 from src.services.ask.result_validator import validate_query_results
 from src.services.ask.service_router import (
     execute_service_route,
     select_service_route,
-    service_query_artifact,
+    service_execution_artifact,
 )
 from src.services.common import ServiceError
 from src.services.llm import stream_text_async
@@ -132,7 +135,8 @@ def _model_fallback_artifact(
 def _deterministic_artifact(resolved_plan: ResolvedAskPlan) -> QueryArtifact:
     route = select_service_route(resolved_plan)
     if route:
-        return service_query_artifact(resolved_plan, route)
+        ensure_resolved_plan_ready(resolved_plan)
+        return service_execution_artifact(resolved_plan, route)
     return compile_query(resolved_plan)
 
 
@@ -141,10 +145,13 @@ async def _preview_artifact(
     resolved_plan: ResolvedAskPlan,
 ) -> QueryArtifact:
     if resolved_plan.plan.intent == "open_graph_query":
+        ensure_resolved_plan_ready(resolved_plan)
         sparql = await nl_to_sparql(query, _ontology_context)
         artifact = _model_fallback_artifact(sparql, resolved_plan)
     else:
         artifact = _deterministic_artifact(resolved_plan)
+    if artifact.service_route is not None:
+        return artifact
     report = await validate_query_artifact(artifact, resolved_plan)
     if not artifact.projected_columns:
         artifact = artifact.model_copy(
@@ -163,7 +170,10 @@ async def _execute_artifact(
     artifact = await _preview_artifact(query, resolved_plan)
     if artifact.service_route:
         try:
-            service_result = await execute_service_route(resolved_plan, artifact)
+            service_result = await execute_service_route(
+                resolved_plan,
+                artifact.service_route,
+            )
         except ServiceError as exc:
             if exc.status_code < 500:
                 raise

@@ -33,6 +33,5 @@ class QueryArtifact(BaseModel):
 class DeterministicAskResult(BaseModel):
     model_config = ConfigDict(extra="forbid")
 
-    query: QueryArtifact
     rows: list[dict[str, str]] = Field(default_factory=list)
     truncated: bool = False

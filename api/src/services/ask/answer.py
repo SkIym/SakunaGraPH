@@ -143,6 +143,7 @@ def _json_objects(value: str) -> list[dict[str, Any]]:
 def _row_provenance(
     artifact: QueryArtifact,
     binding: dict[str, Any],
+    resolved: ResolvedAskPlan,
 ) -> AskProvenance:
     source_iris: list[str] = []
     source_labels: list[str] = []
@@ -178,9 +179,25 @@ def _row_provenance(
         if label := item.get("label"):
             source_labels.append(str(label))
 
+    if artifact.sparql:
+        execution_identity = artifact.sparql
+    else:
+        execution_identity = json.dumps(
+            {
+                "origin": artifact.origin,
+                "service_route": artifact.service_route,
+                "expected_columns": artifact.expected_columns,
+                "expected_entities": artifact.expected_entities,
+                "plan": resolved.plan.model_dump(mode="json"),
+            },
+            ensure_ascii=False,
+            separators=(",", ":"),
+            sort_keys=True,
+        )
+
     return AskProvenance(
         query_origin=artifact.origin,
-        query_hash=hashlib.sha256(artifact.sparql.encode("utf-8")).hexdigest(),
+        query_hash=hashlib.sha256(execution_identity.encode("utf-8")).hexdigest(),
         service_route=artifact.service_route,
         source_iris=_unique(source_iris),
         source_labels=_unique(source_labels),
@@ -225,14 +242,17 @@ def _evidence_uri(binding: dict[str, Any]) -> str | None:
     return None
 
 
-def _empty_evidence(artifact: QueryArtifact) -> AskEvidence:
+def _empty_evidence(
+    artifact: QueryArtifact,
+    resolved: ResolvedAskPlan,
+) -> AskEvidence:
     return AskEvidence(
         id="E1",
         kind="result_set",
         label="Validated query returned zero rows",
         values={"rowCount": "0"},
         unit="rows",
-        provenance=_row_provenance(artifact, {}),
+        provenance=_row_provenance(artifact, {}, resolved),
     )
 
 
@@ -268,12 +288,12 @@ def build_answer_context(
                 uri=_evidence_uri(binding),
                 values={column: term.value for column, term in values.items()},
                 unit=total_term.unit if total_term else None,
-                provenance=_row_provenance(artifact, binding),
+                provenance=_row_provenance(artifact, binding, resolved),
             )
         )
 
     if not evidence:
-        evidence.append(_empty_evidence(artifact))
+        evidence.append(_empty_evidence(artifact, resolved))
 
     approximation_warnings = _approximation_warnings(resolved)
     warnings = _unique(
