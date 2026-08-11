@@ -8,36 +8,50 @@ SakunaGraPH is a knowledge graph system for Philippine disaster data integration
 
 ## Running the Pipeline
 
-All pipeline scripts must be run from the `etl/` directory — relative paths like `../data/...` resolve from there.
+The standalone production application lives in `sakunagraph_etl/`; install and
+test it from that directory. The historical commands remain in the sibling
+`etl/` directory and should still be launched there when compatibility behavior
+is being exercised. Explicit production paths resolve from the repository root.
 
 ```bash
-cd etl/
-pip install -r ../requirements.txt
+cd sakunagraph_etl/
+pip install --editable . --constraint constraints.txt
+
+# Stage 1 quality checks:
+python -m unittest discover -s tests -t . -v
+python -m compileall -q src/sakunagraph_etl
 
 # Per-source ETL (produces Turtle RDF files):
-python -m pipeline.run_ndrrmc [--out ndrrmc] [--start 0] [--count 10]
-python -m pipeline.run_gda [--out gda.ttl]
-python -m pipeline.run_emdat [--out emdat.ttl]
-python -m pipeline.run_dromic
+sakuna-etl ndrrmc --data-dir PATH [--out ndrrmc] [--start 0] [--limit 10]
+sakuna-etl gda --input PATH [--out gda.ttl]
+python -m sakunagraph_etl.sources.emdat.job [--out emdat.ttl]
+sakuna-etl emdat --input PATH [--out emdat.ttl]
+sakuna-etl dromic --data-dir PATH --year YYYY
 
 # Prerequisites for NDRRMC:
-python ./parse/ndrrmc.py        # PDF → CSV (pdfplumber)
-python ./transform/psgc_datafile.py  # PSGC XLSX → psgc.ttl
+sakuna-etl parse-ndrrmc --input-dir PATH --output-dir PATH
+sakuna-etl psgc --input PATH --out PATH/psgc.ttl
 
 # Cross-source entity resolution (run after all source TTLs are generated):
-python pipeline/build_alignment.py [--sources DIR] [--skip-merge] [--stats] [--incremental] [--verbose]
+sakuna-etl align [--sources DIR] [--skip-merge] [--stats] [--incremental] [--verbose]
 
 # DROMIC web scraper (Selenium, stateful/resumable):
-python -m fetch.dromic --year [YYYY]
+sakuna-etl fetch-dromic --year [YYYY]
 
 # Organization registry → RDF:
-python semantic_processing/org_registry.py [-i registry.json] [-o orgs.ttl]
+python -m sakunagraph_etl.enrichment.organization_registry [-i registry.json] [-o orgs.ttl]
 
 # Load into GraphDB (manual):
-python pipeline/load_graphdb.py
+sakuna-etl load-graphdb
 ```
 
-There is no automated test suite or lint configuration.
+Focused regression tests live in `sakunagraph_etl/tests/`. Package and tool metadata
+live in `sakunagraph_etl/pyproject.toml`; CI runs the tests and validates editable package
+metadata.
+
+The standalone package is `sakunagraph_etl/src/sakunagraph_etl/`. The unified
+`sakuna-etl` console command owns production behavior; legacy `python -m
+pipeline...` commands under `etl/` remain supported wrappers.
 
 ## Architecture
 
@@ -45,31 +59,36 @@ There is no automated test suite or lint configuration.
 
 ```
 Raw files (PDF/XLSX/Web)
-  → fetch/     (Selenium scraping for DROMIC)
-  → parse/     (pdfplumber PDF extraction for NDRRMC)
-  → transform/ (normalize to typed Python dataclasses)
-  → semantic_processing/ (location/org/disaster-type resolution via NLP)
-  → mappings/  (dataclass → RDF triples via rdflib)
-  → pipeline/  (orchestrate per source, then cross-source alignment)
+  → sources/{source}/fetch or parse
+  → sources/{source}/transform
+  → enrichment/ (location/org/disaster-type resolution)
+  → sources/{source}/rdf
+  → source job and resolution workflow
   → GraphDB    (RDF triple store, loaded manually)
 ```
 
 ### Layer Responsibilities
 
-**`transform/`** — Each source has its own module (`ndrrmc.py`, `emdat.py`, `gda.py`, `dromic.py`) that loads raw/parsed data and produces typed Python dataclasses (e.g., `Event`, `Incident`, `Casualties`, `AffectedPopulation`). These dataclasses are the internal exchange format between transform and mappings.
+**`sources/{source}/`** — Each source owns its parser, transform, RDF mappings,
+and job. Typed dataclasses remain the internal exchange format.
 
-**`semantic_processing/`** — Three key singletons, each pre-loaded once and reused across the pipeline:
-- `LOCATION_MATCHER` (`location_matcher_v2.py`) — Resolves messy location strings to PSGC IRIs by loading `psgc.ttl` and doing multi-tier fuzzy matching (City → Province → Region).
-- `ORG_RESOLVER` (`org_resolver.py`) — Maps org names to canonical IRIs via fuzzy matching against `constants/org_registry.json`.
-- `DISASTER_CLASSIFIER` (`disaster_classifier.py`) — Classifies disaster types using sentence-transformers cosine similarity against ontology definitions
+**`enrichment/`** — Shared services are package-owned and reused across jobs:
+- `LOCATION_MATCHER` (`locations.py`) — Resolves messy location strings to PSGC IRIs using hierarchical and single-location matching.
+- `ORG_RESOLVER` (`organizations.py`) — Maps organization names to canonical IRIs via the shared registry.
+- `DISASTER_CLASSIFIER` (`disaster_types.py`) — Classifies disaster types using sentence-transformers cosine similarity against ontology definitions.
+- `PARAMS_EXTRACTOR` (`climate_parameters.py`) — Extracts climate measurements and warnings from NDRRMC narrative text.
 
-**`mappings/`** — Each source has a mapping module with 10–20+ functions that accept dataclasses and emit rdflib triples. All IRIs are minted deterministically via UUID5 in `mappings/iris.py`. The IRI namespace is `https://sakuna.ph/{source}/{uuid}` for events; sub-resources extend as `{event_iri}/{segment}/{optional_id}`.
+**`rdf/` and `sources/{source}/rdf.py`** — Mapping modules accept dataclasses
+and emit RDFLib triples. Shared deterministic UUID5 construction lives in
+`rdf/iris.py`.
 
-**`pipeline/`** — Orchestrates each source end-to-end. `run_ndrrmc.py` uses `ProcessPoolExecutor` for batch-parallel processing (each batch worker re-initializes logging). `build_alignment.py` performs cross-source entity resolution: it extracts event features from all source TTLs, blocks by date/type, scores pairwise similarity, and outputs `alignments.ttl` (with `owl:sameAs`) plus `dedup_registry.json`.
+**`orchestration/` and `resolution/`** — Package-owned workflows orchestrate
+source jobs, while resolution extracts features, blocks and scores pairs, and
+emits deterministic alignments and registry artifacts.
 
 **`ontology/`** — OWL 2 ontology in `sakunagraph.ttl`. Core classes: `DisasterEvent`, `Incident`, impact classes (`AffectedPopulation`, `Casualties`, `HousingDamage`, etc.), response classes (`Relief`, `Assistance`), and geographic hierarchy (`Region` → `Province` → `Municipality` → `Barangay`). Imports GeoSPARQL 1.1, W3C PROV, SKOS, QUDT, and beAWARE.
 
-### Data Directories (relative to `etl/`)
+### Data Directories (relative to `sakunagraph_etl/`)
 
 | Path | Contents |
 |---|---|
