@@ -92,7 +92,7 @@
 	</section>
 
 	<section
-		class="border-t border-slate-200 bg-white/65 px-5 py-10 lg:px-8"
+		class="border-y border-slate-200 bg-[var(--color-research-surface)] px-5 py-10 lg:px-8"
 		aria-labelledby="research-tools-title"
 	>
 		<div class="mx-auto grid max-w-6xl gap-7 lg:grid-cols-[15rem_minmax(0,1fr)] lg:gap-10">
