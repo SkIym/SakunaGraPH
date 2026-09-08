@@ -2,9 +2,9 @@
 	let { citations = [], retrieval = null } = $props();
 
 	const modeLabels = {
-		graphrag: 'GraphRAG',
-		legacy: 'Legacy SPARQL',
-		fallback: 'Fallback',
+		graphrag: 'Graph-grounded retrieval',
+		legacy: 'SPARQL retrieval',
+		fallback: 'Fallback retrieval',
 	};
 
 	function citationHref(uri) {
@@ -33,7 +33,9 @@
 
 {#if citations?.length}
 	<section class="border-t border-slate-100 px-5 py-3" aria-label="Answer sources">
-		<h2 class="mb-2 text-[11px] font-semibold tracking-widest text-slate-500 uppercase">Sources</h2>
+		<h2 class="mb-2 text-[11px] font-semibold tracking-widest text-slate-500 uppercase">
+			Sources used
+		</h2>
 		<ol class="space-y-2">
 			{#each citations as citation, index (citation.id)}
 				<li class="text-xs leading-relaxed text-slate-600">

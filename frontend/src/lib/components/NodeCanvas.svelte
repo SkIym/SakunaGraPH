@@ -1,169 +1,162 @@
 <script>
-	import { onMount } from 'svelte';
-
-	let { interactive = true } = $props();
-
-	let canvas;
-	let animFrame;
-
-	const NODE_COUNT = 42;
-	const CONNECT_DIST = 180;
-	const HOVER_RADIUS = 140; // px — mouse influence radius
-	const GRID_SIZE = 55; // grid cell size in px
-	const node_color = 'rgba(41,118,158';
-
-	let mouseX = -9999;
-	let mouseY = -9999;
-
-	function makeNodes(w, h) {
-		return Array.from({ length: NODE_COUNT }, () => ({
-			x: Math.random() * w,
-			y: Math.random() * h,
-			vx: (Math.random() - 0.5) * 0.45,
-			vy: (Math.random() - 0.5) * 0.45,
-			r: Math.random() * 4 + 3.5, // bigger: 3.5–7.5 px base radius
-			phase: Math.random() * Math.PI * 2,
-		}));
-	}
-
-	onMount(() => {
-		const ctx = canvas.getContext('2d');
-		const motionPreference = window.matchMedia('(prefers-reduced-motion: reduce)');
-		let reduceMotion = motionPreference.matches;
-		let nodes = [];
-
-		// Track mouse in viewport coords — canvas is fixed full-screen so they match
-		const onMouseMove = (e) => {
-			mouseX = e.clientX;
-			mouseY = e.clientY;
-		};
-		const onMouseLeave = () => {
-			mouseX = -9999;
-			mouseY = -9999;
-		};
-
-		const resize = () => {
-			canvas.width = window.innerWidth;
-			canvas.height = window.innerHeight;
-			nodes = makeNodes(canvas.width, canvas.height);
-			if (reduceMotion) window.requestAnimationFrame(loop);
-		};
-
-		resize();
-		window.addEventListener('resize', resize);
-		if (interactive) {
-			window.addEventListener('mousemove', onMouseMove);
-			document.addEventListener('mouseleave', onMouseLeave);
-		}
-
-		function loop(ts) {
-			const w = canvas.width;
-			const h = canvas.height;
-
-			// Keep the ambient graph completely still when reduced motion is requested.
-			if (!reduceMotion) {
-				for (const n of nodes) {
-					n.x += n.vx;
-					n.y += n.vy;
-					if (n.x < 0 || n.x > w) n.vx *= -1;
-					if (n.y < 0 || n.y > h) n.vy *= -1;
-				}
-			}
-
-			ctx.clearRect(0, 0, w, h);
-
-			// ── Grid ─────────────────────────────────────────────────────────────
-			ctx.beginPath();
-			ctx.strokeStyle = node_color + ',0.08)';
-			ctx.lineWidth = 0.6;
-			for (let x = 0.5; x <= w; x += GRID_SIZE) {
-				ctx.moveTo(x, 0);
-				ctx.lineTo(x, h);
-			}
-			for (let y = 0.5; y <= h; y += GRID_SIZE) {
-				ctx.moveTo(0, y);
-				ctx.lineTo(w, y);
-			}
-			ctx.stroke();
-
-			// ── Edges ────────────────────────────────────────────────────────────
-			for (let i = 0; i < nodes.length; i++) {
-				for (let j = i + 1; j < nodes.length; j++) {
-					const dx = nodes[i].x - nodes[j].x;
-					const dy = nodes[i].y - nodes[j].y;
-					const d = Math.sqrt(dx * dx + dy * dy);
-					if (d < CONNECT_DIST) {
-						const alpha = 0.14 * (1 - d / CONNECT_DIST);
-						ctx.beginPath();
-						ctx.moveTo(nodes[i].x, nodes[i].y);
-						ctx.lineTo(nodes[j].x, nodes[j].y);
-						ctx.strokeStyle = `${node_color},${alpha})`;
-						ctx.lineWidth = 0.9;
-						ctx.stroke();
-					}
-				}
-			}
-
-			// ── Nodes ────────────────────────────────────────────────────────────
-			for (const n of nodes) {
-				// How close is the mouse? — smooth 0→1 influence factor
-				const mdx = mouseX - n.x;
-				const mdy = mouseY - n.y;
-				const mouseDist = Math.sqrt(mdx * mdx + mdy * mdy);
-				const hoverT = Math.max(0, 1 - mouseDist / HOVER_RADIUS);
-				// Ease in: slow ramp at edges, full glow near centre
-				const t = hoverT * hoverT;
-
-				const pulse = Math.sin(ts * 0.0008 + n.phase) * 0.5 + 0.5;
-				const baseAlpha = 0.14 + pulse * 0.16;
-				const alpha = baseAlpha + t * 0.55;
-				const r = n.r + t * n.r * 2.0; // up to 3× base on hover
-
-				// Soft radial glow halo on hover
-				if (t > 0) {
-					const glowR = r + 22 * t;
-					const grd = ctx.createRadialGradient(n.x, n.y, r * 0.4, n.x, n.y, glowR);
-					grd.addColorStop(0, node_color + `,${0.32 * t})`);
-					grd.addColorStop(1, node_color + ',0)');
-					ctx.beginPath();
-					ctx.arc(n.x, n.y, glowR, 0, Math.PI * 2);
-					ctx.fillStyle = grd;
-					ctx.fill();
-				}
-
-				// Core dot
-				ctx.beginPath();
-				ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
-				ctx.fillStyle = node_color + `,${alpha})`;
-				ctx.fill();
-			}
-
-			if (!reduceMotion) animFrame = requestAnimationFrame(loop);
-		}
-
-		const onMotionPreferenceChange = (event) => {
-			reduceMotion = event.matches;
-			cancelAnimationFrame(animFrame);
-			animFrame = requestAnimationFrame(loop);
-		};
-		motionPreference.addEventListener('change', onMotionPreferenceChange);
-		animFrame = requestAnimationFrame(loop);
-
-		return () => {
-			window.removeEventListener('resize', resize);
-			if (interactive) {
-				window.removeEventListener('mousemove', onMouseMove);
-				document.removeEventListener('mouseleave', onMouseLeave);
-			}
-			motionPreference.removeEventListener('change', onMotionPreferenceChange);
-			cancelAnimationFrame(animFrame);
-		};
-	});
+	let { active = false } = $props();
 </script>
 
-<canvas
-	bind:this={canvas}
+<svg
 	aria-hidden="true"
-	class="ambient-node-canvas"
-	style="position:fixed;inset:0;width:100%;height:100%;pointer-events:none;z-index:0;"
-></canvas>
+	class:query-active={active}
+	class="schema-field"
+	fill="none"
+	focusable="false"
+	pointer-events="none"
+	viewBox="0 0 1440 900"
+	preserveAspectRatio="xMidYMid slice"
+>
+	<g class="schema-cluster">
+		<path fill="none" d="M78 132 188 84 276 158 372 104" />
+		<path fill="none" d="M188 84 214 218 276 158 328 244" />
+		<circle cx="78" cy="132" r="5" />
+		<circle cx="188" cy="84" r="9" />
+		<circle cx="214" cy="218" r="5" />
+		<circle cx="276" cy="158" r="7" />
+		<circle cx="328" cy="244" r="5" />
+		<circle cx="372" cy="104" r="4" />
+	</g>
+
+	<g class="schema-cluster">
+		<path fill="none" d="M1112 118 1218 86 1338 154 1284 278 1172 236 1112 118" />
+		<path fill="none" d="M1218 86 1172 236 1284 278 1364 344" />
+		<circle cx="1112" cy="118" r="5" />
+		<circle cx="1218" cy="86" r="8" />
+		<circle cx="1338" cy="154" r="5" />
+		<circle cx="1284" cy="278" r="8" />
+		<circle cx="1172" cy="236" r="5" />
+		<circle cx="1364" cy="344" r="4" />
+	</g>
+
+	<g class="schema-cluster">
+		<path fill="none" d="M122 716 246 648 354 734 474 666" />
+		<path fill="none" d="M246 648 288 824 354 734 438 816" />
+		<circle cx="122" cy="716" r="4" />
+		<circle cx="246" cy="648" r="8" />
+		<circle cx="288" cy="824" r="5" />
+		<circle cx="354" cy="734" r="7" />
+		<circle cx="438" cy="816" r="5" />
+		<circle cx="474" cy="666" r="4" />
+	</g>
+
+	<g class="schema-cluster">
+		<path fill="none" d="M1032 706 1140 642 1248 734 1360 662" />
+		<path fill="none" d="M1140 642 1196 838 1248 734 1328 820" />
+		<circle cx="1032" cy="706" r="4" />
+		<circle cx="1140" cy="642" r="8" />
+		<circle cx="1196" cy="838" r="5" />
+		<circle cx="1248" cy="734" r="7" />
+		<circle cx="1328" cy="820" r="5" />
+		<circle cx="1360" cy="662" r="4" />
+	</g>
+
+	<g class="schema-spine">
+		<path fill="none" d="M520 448 H650 L704 394 H790 L842 448 H930" />
+		<rect x="507" y="435" width="26" height="26" rx="5" />
+		<circle cx="650" cy="448" r="5" />
+		<circle cx="704" cy="394" r="7" />
+		<circle cx="790" cy="394" r="5" />
+		<circle cx="842" cy="448" r="7" />
+		<rect x="927" y="435" width="26" height="26" rx="5" />
+	</g>
+
+	<path class="query-trace" pathLength="100" d="M520 448 H650 L704 394 H790 L842 448 H940" />
+</svg>
+
+<style>
+	.schema-field {
+		position: fixed;
+		inset: 0;
+		z-index: 0;
+		width: 100vw;
+		max-width: 100vw;
+		height: 100dvh;
+		overflow: hidden;
+		pointer-events: none;
+	}
+
+	.schema-cluster,
+	.schema-spine {
+		fill: none;
+		stroke: var(--color-brand, #305bb2);
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.schema-cluster {
+		opacity: 0.13;
+	}
+
+	.schema-spine {
+		opacity: 0.08;
+	}
+
+	.schema-cluster circle,
+	.schema-spine circle,
+	.schema-spine rect {
+		fill: var(--color-canvas, #ffffff);
+	}
+
+	.schema-cluster circle:nth-of-type(2),
+	.schema-cluster circle:nth-of-type(4),
+	.schema-spine circle:nth-of-type(2),
+	.schema-spine circle:nth-of-type(4) {
+		fill: var(--color-brand, #305bb2);
+		fill-opacity: 0.24;
+	}
+
+	.query-trace {
+		fill: none;
+		opacity: 0;
+		stroke: var(--color-brand, #305bb2);
+		stroke-dasharray: 18 82;
+		stroke-linecap: round;
+		stroke-width: 2;
+		vector-effect: non-scaling-stroke;
+	}
+
+	.query-active .query-trace {
+		animation: schema-trace 900ms cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+
+	@keyframes schema-trace {
+		0% {
+			opacity: 0;
+			stroke-dashoffset: 22;
+		}
+		18% {
+			opacity: 0.58;
+		}
+		100% {
+			opacity: 0;
+			stroke-dashoffset: -82;
+		}
+	}
+
+	@media (max-width: 639px) {
+		.schema-field {
+			display: none;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.query-active .query-trace {
+			animation: none;
+			opacity: 0.22;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.schema-field {
+			display: none;
+		}
+	}
+</style>

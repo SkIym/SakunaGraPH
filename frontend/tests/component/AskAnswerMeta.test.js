@@ -17,7 +17,7 @@ describe('AskAnswerMeta', () => {
 			],
 		});
 
-		expect(screen.getByText('GraphRAG')).toBeVisible();
+		expect(screen.getByText('Graph-grounded retrieval')).toBeVisible();
 		expect(screen.getByText(/1 source/)).toBeVisible();
 		expect(screen.getByText(/Index 2026-07/)).toBeVisible();
 		expect(screen.getByRole('region', { name: 'Answer sources' })).toBeVisible();

@@ -20,7 +20,7 @@
 			<h2 class="text-sm font-semibold text-slate-800">Filters</h2>
 			{#if analysisFilters.activeCount > 0}
 				<span
-					class="flex h-5 min-w-5 items-center justify-center rounded-full bg-indigo-50 px-1.5 text-[10px] font-semibold tabular-nums text-indigo-700"
+					class="brand-count flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums"
 				>
 					{analysisFilters.activeCount}
 				</span>
@@ -33,7 +33,7 @@
 				onclick={onClose}
 				aria-label="Close filters"
 				title="Close filters"
-				class="flex h-8 w-8 items-center justify-center text-xl leading-none text-slate-400 transition hover:text-slate-700"
+				class="flex h-11 w-11 items-center justify-center rounded-lg text-xl leading-none text-slate-400 transition hover:bg-slate-50 hover:text-slate-700"
 			>
 				&times;
 			</button>
@@ -49,7 +49,7 @@
 				Event type
 			</h2>
 			<div
-				class="mt-3 grid h-9 grid-cols-3 overflow-hidden rounded-md border border-slate-200"
+				class="mt-3 grid min-h-11 grid-cols-3 overflow-hidden rounded-lg border border-slate-200"
 				role="group"
 				aria-label="Event type"
 			>
@@ -60,7 +60,7 @@
 						aria-pressed={analysisFilters.eventType === option.value}
 						class="border-r border-slate-200 px-2 text-[11px] font-medium transition last:border-r-0
 						{analysisFilters.eventType === option.value
-							? 'bg-indigo-600 text-white'
+							? 'bg-slate-800 text-white'
 							: 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700'}"
 					>
 						{option.label}
@@ -80,7 +80,7 @@
 				value={analysisFilters.q}
 				oninput={(event) => analysisFilters.setQuery(event.currentTarget.value)}
 				placeholder="Search event names"
-				class="mt-3 block h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+				class="brand-field mt-3 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
 			/>
 		</section>
 
@@ -113,7 +113,7 @@
 			type="button"
 			onclick={() => analysisFilters.reset()}
 			disabled={!analysisFilters.hasActiveFilters}
-			class="text-[11px] font-semibold text-indigo-600 transition hover:text-indigo-800 disabled:cursor-default disabled:text-slate-300"
+			class="brand-link min-h-11 rounded-lg px-2 text-[11px] font-semibold transition disabled:cursor-default disabled:text-slate-300"
 		>
 			Clear all
 		</button>

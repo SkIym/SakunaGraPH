@@ -21,6 +21,12 @@ for (const entry of manifest.routes) {
 	test(`capture ${entry.name}`, async ({ page }, testInfo) => {
 		await gotoReady(page, entry.path);
 		await page.locator('body').waitFor();
+		if (entry.path === '/map') {
+			await page.getByLabel('Map of Philippine regions and provinces').waitFor();
+		}
+		if (entry.path === '/query') {
+			await page.locator('.cm-editor').waitFor();
+		}
 		const filename = `${entry.name}-${testInfo.project.name}.jpg`;
 		mkdirSync(outputDirectory, { recursive: true });
 		await page.screenshot({

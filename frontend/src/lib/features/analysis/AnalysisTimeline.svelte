@@ -24,16 +24,19 @@
 	let loadingEvents = $state(false);
 	let error = $state('');
 	let eventError = $state('');
+	let retryToken = $state(0);
 	let bucket = $state('month_year');
 	let selectedEvent = $state('');
 	let EventDetailsComponent = $state(null);
 	const filterQuery = $derived(toAnalysisParams().toString());
+	const timelineRequest = $derived({ filters: filterQuery, retry: retryToken });
 	const selectedYear = $derived(timelineSelection.year);
 	const selectedMonth = $derived(timelineSelection.month);
 	const selectedPrefix = $derived(timelineSelection.datePrefix);
 
 	$effect(() => {
-		const filters = filterQuery;
+		const request = timelineRequest;
+		const filters = request.filters;
 		const controller = new AbortController();
 		timelineSelection.reset();
 		loadingYears = true;
@@ -165,10 +168,8 @@
 
 <section class="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 	<div class="mb-6">
-		<p class="text-[10px] font-semibold uppercase text-indigo-600" style="letter-spacing:0.12em;">
-			Analysis
-		</p>
-		<h1 class="mt-1 text-xl font-semibold text-slate-800">Timeline and date analysis</h1>
+		<p class="workspace-kicker">Analysis</p>
+		<h1 class="editorial-page-title mt-1">Timeline and date analysis</h1>
 		<p class="mt-1 text-xs leading-5 text-slate-500">
 			Explore the active filter scope by event start date, then open any date’s event records.
 		</p>
@@ -178,6 +179,13 @@
 		<div class="rounded-lg border border-red-200 bg-red-50 p-4" role="alert">
 			<p class="text-sm font-semibold text-red-800">Timeline is unavailable</p>
 			<p class="mt-1 text-xs text-red-600">{error}</p>
+			<button
+				type="button"
+				onclick={() => (retryToken += 1)}
+				class="mt-3 min-h-11 rounded-lg border border-red-200 bg-white px-4 text-xs font-semibold text-red-700 transition hover:bg-red-50"
+			>
+				Try again
+			</button>
 		</div>
 	{:else}
 		<div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
@@ -220,13 +228,13 @@
 							<button
 								type="button"
 								onclick={() => (bucket = 'month_year')}
-								class="rounded px-2.5 py-1.5 text-[11px] font-semibold {bucket === 'month_year'
+								class="min-h-11 rounded-lg px-3 text-xs font-semibold {bucket === 'month_year'
 									? 'bg-slate-800 text-white'
 									: 'text-slate-500'}">Chronological</button
 							><button
 								type="button"
 								onclick={() => (bucket = 'month_of_year')}
-								class="rounded px-2.5 py-1.5 text-[11px] font-semibold {bucket === 'month_of_year'
+								class="min-h-11 rounded-lg px-3 text-xs font-semibold {bucket === 'month_of_year'
 									? 'bg-slate-800 text-white'
 									: 'text-slate-500'}">Seasonal</button
 							>

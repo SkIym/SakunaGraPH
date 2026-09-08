@@ -1,6 +1,9 @@
 import { describe, expect, it, vi } from 'vitest';
 import { ASK_MODES } from '../../src/lib/api/ask.js';
-import { createAskState } from '../../src/lib/features/ask/state.svelte.js';
+import {
+	ASK_QUESTION_MAX_LENGTH,
+	createAskState,
+} from '../../src/lib/features/ask/state.svelte.js';
 
 const encoder = new TextEncoder();
 
@@ -18,6 +21,18 @@ function streamResponse(events) {
 }
 
 describe('ask state', () => {
+	it('keeps oversized questions in the composer and does not call the API', async () => {
+		const submit = vi.fn();
+		const ask = createAskState({ submit });
+		ask.input = 'x'.repeat(ASK_QUESTION_MAX_LENGTH + 1);
+
+		await ask.send();
+
+		expect(submit).not.toHaveBeenCalled();
+		expect(ask.input).toHaveLength(ASK_QUESTION_MAX_LENGTH + 1);
+		expect(ask.inputError).toMatch(/under/);
+	});
+
 	it('transitions from user/loading messages to the legacy response shape', async () => {
 		const onUpdated = vi.fn();
 		const submit = vi.fn().mockResolvedValue({
@@ -61,7 +76,21 @@ describe('ask state', () => {
 			role: 'assistant',
 			loading: false,
 			streaming: false,
-			error: 'Could not reach server.',
+			error:
+				'Could not reach the data service. Check your connection, then send the question again.',
+		});
+	});
+
+	it('normalizes malformed successful payloads into a usable empty answer', async () => {
+		const ask = createAskState({ submit: vi.fn().mockResolvedValue(null) });
+
+		await ask.send('Question');
+
+		expect(ask.messages.at(-1)).toMatchObject({
+			loading: false,
+			text: expect.stringMatching(/No answer was returned/),
+			rows: [],
+			citations: [],
 		});
 	});
 
@@ -103,7 +132,7 @@ describe('ask state', () => {
 			citations: [{ id: 'source-1', label: 'Report', uri: 'https://example.test/report' }],
 			retrieval: { mode: 'graphrag', indexVersion: 'v1' },
 		});
-		expect(ask.announcement).toBe('Answer complete.');
+		expect(ask.announcement).toBe('Answer ready.');
 	});
 
 	it('falls back to the legacy endpoint when streaming fails before metadata', async () => {
@@ -167,7 +196,7 @@ describe('ask state', () => {
 			cancelled: true,
 		});
 		expect(ask.sending).toBe(false);
-		expect(ask.announcement).toBe('Request cancelled.');
+		expect(ask.announcement).toBe('Answer stopped.');
 	});
 
 	it('aborts an active request when a replacement question is sent', async () => {

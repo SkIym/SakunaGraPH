@@ -37,7 +37,7 @@
 
 	<div class="flex flex-wrap items-center gap-2">
 		<label
-			class="flex h-9 items-center gap-2 rounded-md border border-slate-200 bg-white px-2.5 text-[11px] text-slate-500"
+			class="flex h-11 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-500"
 		>
 			Rows
 			<select
@@ -55,7 +55,7 @@
 
 		<details class="group relative">
 			<summary
-				class="flex h-9 cursor-pointer list-none items-center gap-2 rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
+				class="flex h-11 cursor-pointer list-none items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
 			>
 				<svg
 					viewBox="0 0 24 24"
@@ -80,14 +80,14 @@
 				</p>
 				{#each columns as column (column.id)}
 					<label
-						class="flex min-h-8 cursor-pointer items-center gap-2 rounded px-2 text-xs text-slate-600 hover:bg-slate-50"
+						class="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-2 text-xs text-slate-600 hover:bg-slate-50"
 					>
 						<input
 							type="checkbox"
 							checked={visibleColumns.has(column.id)}
 							disabled={visibleColumns.size === 1 && visibleColumns.has(column.id)}
 							onchange={() => onToggleColumn(column.id)}
-							class="h-3.5 w-3.5 accent-indigo-600"
+							class="h-4 w-4 accent-[#305bb2]"
 						/>
 						{column.label}
 					</label>

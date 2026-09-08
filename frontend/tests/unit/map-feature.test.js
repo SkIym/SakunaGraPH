@@ -41,4 +41,22 @@ describe('map feature state', () => {
 		expect(query.countFor('major')).toBe(3);
 		expect(query.countFor('incidents')).toBe(7);
 	});
+
+	it('normalizes incomplete count data instead of exposing NaN', async () => {
+		const query = createMapEventQuery({
+			fetchEvents: vi.fn().mockResolvedValue({ events: null, majorCount: 'unknown' }),
+		});
+		const controller = new AbortController();
+
+		await query.load({
+			selected: { type: 'province', id: 'example' },
+			mode: 'major',
+			page: 1,
+			signal: controller.signal,
+		});
+
+		expect(query.results).toEqual([]);
+		expect(query.countFor('major')).toBe(0);
+		expect(query.countFor('incidents')).toBe(0);
+	});
 });

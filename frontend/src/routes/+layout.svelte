@@ -12,6 +12,6 @@
 
 <NavBar />
 
-<div style="padding-top:52px;" data-app-hydrated={hydrated ? 'true' : 'false'}>
+<div class="app-shell-offset" data-app-hydrated={hydrated ? 'true' : 'false'}>
 	{@render children()}
 </div>

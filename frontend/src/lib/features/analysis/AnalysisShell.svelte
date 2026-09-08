@@ -52,10 +52,7 @@
 
 <svelte:window onkeydown={handleKeydown} />
 
-<div
-	class="analysis-workspace relative flex overflow-hidden bg-white"
-	style="height:calc(100vh - 52px);"
->
+<div class="analysis-workspace analysis-viewport relative flex overflow-hidden bg-white">
 	<aside
 		class="hidden h-full w-[304px] shrink-0 border-r border-slate-200 lg:block"
 		aria-label="Analysis filters"
@@ -92,17 +89,17 @@
 		<header
 			class="sticky top-0 z-10 border-b border-slate-200 bg-white/95 px-4 py-3 backdrop-blur-sm sm:px-6 lg:px-8"
 		>
-			<div class="flex min-h-9 min-w-0 items-center gap-3">
+			<div class="flex min-h-11 min-w-0 items-center gap-3">
 				<button
 					type="button"
 					onclick={() => (mobileFiltersOpen = true)}
-					class="flex h-9 shrink-0 items-center gap-1.5 rounded-md border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:bg-slate-50 lg:hidden"
+					class="flex min-h-11 shrink-0 items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-slate-50 lg:hidden"
 					aria-label="Open analysis filters"
 				>
 					Filters
 					{#if analysisFilters.activeCount > 0}
 						<span
-							class="flex h-4 min-w-4 items-center justify-center rounded-full bg-indigo-600 px-1 text-[9px] text-white"
+							class="brand-count flex h-5 min-w-5 items-center justify-center rounded-full px-1 text-[9px] font-semibold"
 						>
 							{analysisFilters.activeCount}
 						</span>
@@ -129,7 +126,7 @@
 						<a
 							href={view.href}
 							aria-current={active ? 'page' : undefined}
-							class="rounded-full px-3 py-1.5 text-[11px] font-semibold transition {active
+							class="inline-flex min-h-11 items-center rounded-full px-3 text-[11px] font-semibold transition {active
 								? 'bg-slate-800 text-white shadow-sm'
 								: 'text-slate-500 hover:bg-white hover:text-slate-700'}"
 						>

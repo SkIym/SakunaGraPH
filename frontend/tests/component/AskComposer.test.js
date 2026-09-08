@@ -19,10 +19,15 @@ describe('AskComposer', () => {
 		const onCancel = vi.fn();
 		render(AskComposer, { input: 'Question', sending: true, onCancel });
 		expect(screen.getByRole('textbox', { name: 'Question' })).toBeEnabled();
-		expect(screen.getByText(/Enter to replace the active request/)).toBeVisible();
-		const cancelButton = screen.getByRole('button', { name: 'Cancel' });
+		expect(screen.getByText(/Enter to replace the current question/)).toBeVisible();
+		const cancelButton = screen.getByRole('button', { name: 'Stop answer' });
 		expect(cancelButton).toBeEnabled();
 		await fireEvent.click(cancelButton);
 		expect(onCancel).toHaveBeenCalledOnce();
+	});
+
+	it('exposes the question length boundary to the browser', () => {
+		render(AskComposer, { input: '', maxLength: 120 });
+		expect(screen.getByRole('textbox', { name: 'Question' })).toHaveAttribute('maxlength', '120');
 	});
 });

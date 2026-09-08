@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 
-	let { value = $bindable('') } = $props();
+	let { value = $bindable(''), maxLength = 50_000 } = $props();
 
 	let editorEl;
 	let view = null;
@@ -57,7 +57,10 @@
 				caretColor: '#a21caf',
 				lineHeight: '1.7',
 			},
-			'.cm-focused': { outline: 'none' },
+			'&.cm-focused': {
+				outline: '3px solid #305bb2',
+				outlineOffset: '-3px',
+			},
 			'.cm-gutters': {
 				background: '#f8fafc',
 				border: 'none',
@@ -88,11 +91,15 @@
 				doc: value,
 				extensions: [
 					basicSetup,
+					EditorState.transactionFilter.of((transaction) =>
+						transaction.newDoc.length > maxLength ? [] : transaction,
+					),
 					StreamLanguage.define(sparql),
 					syntaxHighlighting(sparqlHighlight),
 					uiTheme,
 					EditorView.contentAttributes.of({
 						'aria-label': 'SPARQL query editor',
+						'aria-describedby': 'query-character-limit',
 					}),
 					EditorView.updateListener.of((update) => {
 						if (update.docChanged) {

@@ -48,7 +48,7 @@
 	role="dialog"
 	aria-modal="true"
 	aria-labelledby="query-results-title"
-	class="fixed inset-0 z-50 flex items-center justify-center p-6"
+	class="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6"
 	style="background:rgba(15,23,42,0.4); backdrop-filter:blur(4px);"
 	onclick={onBackdrop}
 	onkeydown={(e) => e.key === 'Escape' && onclose?.()}
@@ -58,7 +58,7 @@
 	<div
 		role="document"
 		class="flex w-full max-w-3xl flex-col overflow-hidden rounded-2xl bg-white shadow-2xl"
-		style="max-height:80vh;"
+		style="max-height:min(80vh, calc(100dvh - 1.5rem));"
 	>
 		<!-- Header -->
 		<div class="flex shrink-0 items-center justify-between border-b border-slate-100 px-5 py-4">
@@ -73,7 +73,7 @@
 			<button
 				onclick={onclose}
 				data-focus-first
-				class="rounded-full p-1.5 text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+				class="flex h-11 w-11 shrink-0 items-center justify-center rounded-full text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
 				aria-label="Close results"
 			>
 				<svg
@@ -110,7 +110,12 @@
 					>
 						<circle cx="11" cy="11" r="8" /><path d="m21 21-4.3-4.3" />
 					</svg>
-					<p class="text-sm font-medium">No results returned</p>
+					<div class="max-w-md px-5 text-center">
+						<p class="text-sm font-semibold text-slate-700">The query returned no rows</p>
+						<p class="mt-1 text-xs leading-5 text-slate-600">
+							Broaden its filters or choose another sample query, then run it again.
+						</p>
+					</div>
 				</div>
 			{:else}
 				<table class="w-full text-sm">
@@ -122,7 +127,7 @@
 							>
 							{#each vars as v}
 								<th
-									class="px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
+									class="max-w-[14rem] break-all px-3 py-2.5 text-left text-xs font-semibold uppercase tracking-wider text-slate-500"
 									>?{v}</th
 								>
 							{/each}
@@ -138,12 +143,15 @@
 									{@const cell = cellDisplay(row, v)}
 									<td class="max-w-[240px] px-3 py-2">
 										{#if cell.isUri}
-											<span
-												class="block truncate font-mono text-xs text-indigo-600"
-												title={cell.full}>{cell.text}</span
+											<span class="brand-link block truncate font-mono text-xs" title={cell.full}
+												>{cell.text}</span
 											>
 										{:else}
-											<span class="text-xs text-slate-700">{cell.text}</span>
+											<span
+												dir="auto"
+												class="block break-words text-xs text-slate-700 [overflow-wrap:anywhere]"
+												>{cell.text}</span
+											>
 										{/if}
 									</td>
 								{/each}
@@ -162,23 +170,24 @@
 				<p class="text-xs text-slate-400">
 					{page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, bindings.length)} of {bindings.length}
 				</p>
-				<div class="flex items-center gap-1">
+				<div class="flex flex-wrap items-center justify-center gap-1">
 					<button
 						onclick={() => (page = Math.max(0, page - 1))}
 						disabled={page === 0}
-						class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+						class="min-h-11 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						Prev
 					</button>
 
 					{#each paginationPages() as p}
 						{#if p === null}
-							<span class="flex h-7 w-5 items-center justify-center text-xs text-slate-400">…</span>
+							<span class="flex h-11 w-5 items-center justify-center text-xs text-slate-500">…</span
+							>
 						{:else}
 							<button
 								onclick={() => (page = p)}
-								class="h-7 w-7 rounded-lg text-xs font-medium transition-colors {page === p
-									? 'bg-indigo-600 text-white shadow-sm'
+								class="h-11 w-11 rounded-lg text-xs font-medium transition-colors {page === p
+									? 'bg-[#305bb2] text-white shadow-sm'
 									: 'border border-slate-200 text-slate-600 hover:bg-white'}"
 							>
 								{p + 1}
@@ -189,7 +198,7 @@
 					<button
 						onclick={() => (page = Math.min(totalPages - 1, page + 1))}
 						disabled={page >= totalPages - 1}
-						class="rounded-lg border border-slate-200 px-3 py-1.5 text-xs font-medium text-slate-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
+						class="min-h-11 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-white disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						Next
 					</button>

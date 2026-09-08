@@ -84,14 +84,14 @@
 	<div class="flex min-w-0 flex-wrap items-center gap-1.5" aria-label="Selected analysis filters">
 		{#each chips as chip (chip.key)}
 			<span
-				class="flex h-7 max-w-full items-center gap-1.5 rounded-md border border-slate-200 bg-slate-50 px-2 text-[11px] text-slate-600"
+				class="flex min-h-11 max-w-full items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 pl-3 text-[11px] text-slate-600"
 			>
 				<span
 					class="h-1.5 w-1.5 shrink-0 rounded-full {chip.kind === 'location'
 						? 'bg-teal-500'
 						: chip.kind === 'disasterType'
 							? 'bg-amber-500'
-							: 'bg-indigo-500'}"
+							: 'bg-[#305bb2]'}"
 				></span>
 				<span class="max-w-48 truncate" title={chip.label}>{chip.label}</span>
 				<button
@@ -99,7 +99,7 @@
 					onclick={() => remove(chip)}
 					aria-label="Remove {chip.label} filter"
 					title="Remove filter"
-					class="flex h-5 w-5 shrink-0 items-center justify-center text-sm leading-none text-slate-400 transition hover:text-slate-700"
+					class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sm leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
 				>
 					&times;
 				</button>
@@ -108,7 +108,7 @@
 		<button
 			type="button"
 			onclick={() => analysisFilters.reset()}
-			class="h-7 px-1.5 text-[11px] font-medium text-indigo-600 transition hover:text-indigo-800"
+			class="brand-link min-h-11 rounded-lg px-2 text-[11px] font-semibold transition"
 		>
 			Clear all
 		</button>

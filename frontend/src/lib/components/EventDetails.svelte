@@ -18,6 +18,22 @@
 		day: 'numeric',
 	});
 
+	function detailsErrorMessage(requestError) {
+		if (requestError?.kind === 'network') {
+			return 'Could not reach the data service. Check your connection and try again.';
+		}
+		if (requestError?.kind === 'timeout') {
+			return 'Event details took too long to load. Try again.';
+		}
+		if (requestError?.status === 404)
+			return 'This event is no longer available in the current graph.';
+		if (requestError?.status === 429)
+			return 'Too many requests reached the data service. Wait a moment and try again.';
+		if (requestError?.status >= 500)
+			return 'Event details are temporarily unavailable. Try again shortly.';
+		return 'Could not load event details. Try again.';
+	}
+
 	$effect(() => {
 		if (event && event !== expandedForEvent) {
 			expandedForEvent = event;
@@ -40,7 +56,7 @@
 			.then((data) => (details = data))
 			.catch((requestError) => {
 				if (requestError.name !== 'AbortError') {
-					error = requestError.message || 'Could not load event details.';
+					error = detailsErrorMessage(requestError);
 				}
 			})
 			.finally(() => {
@@ -91,12 +107,10 @@
 		class="flex shrink-0 items-start justify-between gap-4 border-b border-slate-200 px-5 py-4 sm:px-6"
 	>
 		<div class="min-w-0">
-			<p class="text-[9px] font-semibold uppercase text-indigo-600" style="letter-spacing:0.12em;">
-				Event details
-			</p>
 			<h2
 				id="event-details-title"
-				class="mt-1 line-clamp-2 text-lg font-semibold leading-6 text-slate-800"
+				class="line-clamp-2 break-words text-lg font-semibold leading-6 text-slate-800 [overflow-wrap:anywhere]"
+				dir="auto"
 			>
 				{details?.name ?? (loading ? 'Loading event…' : 'Event details')}
 			</h2>
@@ -115,7 +129,7 @@
 			type="button"
 			onclick={onclose}
 			data-focus-first
-			class="flex h-9 w-9 shrink-0 items-center justify-center rounded-md text-xl text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+			class="flex h-11 w-11 shrink-0 items-center justify-center rounded-md text-xl text-slate-500 transition hover:bg-slate-100 hover:text-slate-700"
 			aria-label="Close event details"
 		>
 			&times;
@@ -197,7 +211,7 @@
 						type="button"
 						onclick={() => (locationsExpanded = !locationsExpanded)}
 						aria-expanded={locationsExpanded}
-						class="flex w-full items-center justify-between gap-3 text-left"
+						class="flex min-h-11 w-full items-center justify-between gap-3 text-left"
 					>
 						<span
 							class="text-[10px] font-semibold uppercase text-slate-400"
@@ -231,7 +245,8 @@
 							<div class="mt-3 flex flex-wrap gap-1.5">
 								{#each details.locations as location (location.uri)}
 									<span
-										class="rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600"
+										class="max-w-full break-words rounded-md border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600 [overflow-wrap:anywhere]"
+										dir="auto"
 										title={location.id}>{location.label}</span
 									>
 								{/each}
@@ -253,7 +268,8 @@
 						<div class="mt-3 flex flex-wrap gap-1.5">
 							{#each details.disasterTypes as disasterType (disasterType.uri)}
 								<span
-									class="rounded-md bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-700"
+									class="max-w-full break-words rounded-md bg-sky-50 px-2 py-1 text-[11px] font-medium text-sky-700 [overflow-wrap:anywhere]"
+									dir="auto"
 									title={disasterType.id}>{disasterType.label}</span
 								>
 							{/each}
@@ -269,19 +285,26 @@
 							class="text-[10px] font-semibold uppercase text-slate-400"
 							style="letter-spacing:0.1em;"
 						>
-							Major event derived from
+							Linked major event
 						</h3>
 						{#if details.majorEvents.length}
 							<div class="mt-3 space-y-2">
 								{#each details.majorEvents as related (related.uri)}
 									<div class="rounded-lg border border-slate-200 p-3">
-										<p class="text-xs font-medium text-slate-700">{related.name}</p>
+										<p
+											dir="auto"
+											class="break-words text-xs font-medium text-slate-700 [overflow-wrap:anywhere]"
+										>
+											{related.name}
+										</p>
 										<p class="mt-1 text-[10px] text-slate-400">{formatDate(related.startDate)}</p>
 									</div>
 								{/each}
 							</div>
 						{:else}
-							<p class="mt-2 text-xs text-slate-400">No related major event was recorded.</p>
+							<p class="mt-2 text-xs text-slate-500">
+								No linked major event is recorded in the current graph.
+							</p>
 						{/if}
 					</section>
 				{:else}
@@ -290,12 +313,12 @@
 							type="button"
 							onclick={() => (incidentsExpanded = !incidentsExpanded)}
 							aria-expanded={incidentsExpanded}
-							class="flex w-full items-center justify-between gap-3 text-left"
+							class="flex min-h-11 w-full items-center justify-between gap-3 text-left"
 						>
 							<span
 								class="text-[10px] font-semibold uppercase text-slate-400"
 								style="letter-spacing:0.1em;"
-								>Derived incidents <span class="normal-case">({details.incidents.length})</span
+								>Linked incidents <span class="normal-case">({details.incidents.length})</span
 								></span
 							>
 							<span
@@ -324,7 +347,10 @@
 								<div class="mt-3 space-y-2">
 									{#each details.incidents as related (related.uri)}
 										<div class="rounded-lg border border-slate-200 p-3">
-											<p class="line-clamp-3 text-xs font-medium leading-5 text-slate-700">
+											<p
+												dir="auto"
+												class="line-clamp-3 break-words text-xs font-medium leading-5 text-slate-700 [overflow-wrap:anywhere]"
+											>
 												{related.name}
 											</p>
 											<p class="mt-1 text-[10px] text-slate-400">{formatDate(related.startDate)}</p>
@@ -332,7 +358,9 @@
 									{/each}
 								</div>
 							{:else}
-								<p class="mt-2 text-xs text-slate-400">No derived incidents were recorded.</p>
+								<p class="mt-2 text-xs text-slate-500">
+									No linked incidents are recorded in the current graph.
+								</p>
 							{/if}
 						{/if}
 					</section>
@@ -343,7 +371,7 @@
 						class="text-[10px] font-semibold uppercase text-slate-400"
 						style="letter-spacing:0.1em;"
 					>
-						Sources
+						Source records
 					</h3>
 					{#if details.sources.length}
 						<div class="mt-3 space-y-3">
@@ -360,7 +388,7 @@
 									{/if}
 									<dl class="mt-3 grid grid-cols-2 gap-x-3 gap-y-2 text-[10px]">
 										<div>
-											<dt class="text-slate-400">Obtained</dt>
+											<dt class="text-slate-400">Record obtained</dt>
 											<dd class="mt-0.5 text-slate-600">{formatDate(source.obtainedDate)}</dd>
 										</div>
 										<div>
@@ -377,7 +405,7 @@
 											href={reportLink}
 											target="_blank"
 											rel="noreferrer"
-											class="mt-3 inline-flex text-[11px] font-semibold text-indigo-600 hover:text-indigo-800"
+											class="touch-target mt-2 inline-flex items-center break-all text-[11px] font-semibold text-indigo-700 hover:text-indigo-900"
 											>Open source report ↗</a
 										>
 									{/if}
@@ -385,7 +413,10 @@
 							{/each}
 						</div>
 					{:else}
-						<p class="mt-2 text-xs text-slate-400">No source record was linked to this event.</p>
+						<p class="mt-2 text-xs leading-5 text-slate-500">
+							No linked source record is available for this event. Treat its details as unverified
+							in this interface.
+						</p>
 					{/if}
 				</section>
 
@@ -394,7 +425,7 @@
 						class="text-[10px] font-semibold uppercase text-slate-400"
 						style="letter-spacing:0.1em;"
 					>
-						Alternate events
+						Alternate event records
 					</h3>
 					{#if details.alternates.length}
 						<div class="mt-3 space-y-2">

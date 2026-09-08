@@ -981,7 +981,7 @@
 	<title>Ontology · SakunaGraPH</title>
 </svelte:head>
 
-<NodeCanvas interactive={false} />
+<NodeCanvas />
 
 <!-- Cursor tooltip for class graph -->
 {#if activeTab === 'graph' && hoveredNode && selectedNode?.id !== hoveredNode?.id}
@@ -994,7 +994,7 @@
 	</div>
 {/if}
 
-<div class="relative" style="height: calc(100vh - 52px); z-index: 1; overflow: hidden;">
+<div class="ontology-workspace relative">
 	<OntologyTabs tabs={TABS} active={activeTab} onChange={(tab) => (activeTab = tab)} />
 
 	<CoreOntologyPanel
@@ -1022,3 +1022,18 @@
 		bind:svgElement={psgcSvgEl}
 	/>
 </div>
+
+<style>
+	.ontology-workspace {
+		z-index: 1;
+		height: calc(100dvh - 52px);
+		min-height: 32rem;
+		overflow: hidden;
+	}
+
+	@media (max-height: 560px) and (orientation: landscape) {
+		.ontology-workspace {
+			min-height: calc(100dvh - 52px);
+		}
+	}
+</style>

@@ -16,7 +16,7 @@
 		{#if messages.length === 0}
 			<div
 				class="flex flex-col items-center justify-center"
-				style="min-height:calc(100vh - 220px);"
+				style="min-height:max(22rem, calc(100dvh - 15rem));"
 			>
 				<div
 					class="mb-2 flex h-12 w-12 items-center justify-center rounded-2xl bg-slate-800 shadow-lg"
@@ -43,65 +43,82 @@
 				>
 					Ask SakunaGraPH
 				</h1>
-				<p class="mb-8 text-sm text-slate-400">Query Philippine disaster data in plain language.</p>
+				<p class="mb-8 text-center text-sm text-slate-600">
+					Ask about events, places, dates, impacts, or sources in the current knowledge graph.
+				</p>
 				<div class="grid w-full max-w-xl grid-cols-1 gap-2 sm:grid-cols-2">
 					{#each suggestions as suggestion}
 						<button
 							type="button"
 							onclick={() => onSend(suggestion)}
-							class="rounded-xl border border-slate-200 bg-white/80 px-4 py-3 text-left text-sm text-slate-600 transition-all hover:border-slate-300 hover:bg-white hover:shadow-sm"
+							class="touch-target rounded-xl border border-slate-200 bg-white/85 px-4 py-3 text-left text-sm text-slate-700 transition-colors hover:border-slate-400 hover:bg-white"
 							style="backdrop-filter:blur(8px);">{suggestion}</button
 						>
 					{/each}
 				</div>
 			</div>
 		{:else}
-			{#each messages as message}
+			{#each messages as message, index}
 				{#if message.role === 'user'}
 					<div class="flex justify-end">
 						<div
-							class="max-w-[75%] rounded-2xl rounded-br-sm bg-slate-800 px-5 py-3 text-sm leading-relaxed text-white shadow-sm"
+							dir="auto"
+							class="max-w-[85%] overflow-wrap-anywhere rounded-2xl rounded-br-sm bg-slate-800 px-5 py-3 text-sm leading-relaxed text-white shadow-sm sm:max-w-[75%]"
 						>
 							{message.text}
 						</div>
 					</div>
 				{:else}
 					<div class="flex justify-start">
-						<div class="w-full max-w-[90%]">
+						<div class="w-full min-w-0 max-w-[95%] sm:max-w-[90%]">
 							<div
-								class="overflow-hidden rounded-2xl rounded-bl-sm border border-slate-200/70 bg-white/92 shadow-sm"
-								style="backdrop-filter:blur(12px);"
+								class="overflow-hidden rounded-2xl rounded-bl-sm border border-slate-200/70 shadow-sm"
+								style="background:var(--color-surface); backdrop-filter:blur(12px);"
 							>
 								{#if message.loading}
 									<div class="flex items-center gap-2 px-5 py-4">
-										<span class="text-xs text-slate-400">Querying knowledge graph…</span>
+										<span class="text-xs text-slate-600">Checking the knowledge graph…</span>
 										<div class="flex gap-1">
 											{#each [0, 150, 300] as delay}
 												<span
-													class="block h-1.5 w-1.5 rounded-full bg-slate-400"
+													class="motion-decorative block h-1.5 w-1.5 rounded-full bg-slate-500"
 													style="animation: ask-dot 1.2s ease-in-out {delay}ms infinite;"
 												></span>
 											{/each}
 										</div>
 									</div>
 								{:else if message.error}
-									<div class="px-5 py-4 text-sm text-red-600">{message.error}</div>
+									<div class="px-5 py-4 text-sm text-red-700" role="alert">
+										<p class="break-words [overflow-wrap:anywhere]">{message.error}</p>
+										{#if messages[index - 1]?.role === 'user'}
+											<button
+												type="button"
+												onclick={() => onSend(messages[index - 1].text)}
+												class="touch-target mt-2 rounded-lg px-2 text-xs font-semibold text-red-800 underline underline-offset-4 hover:bg-red-50"
+											>
+												Try again
+											</button>
+										{/if}
+									</div>
 								{:else}
 									{#if message.text}
 										<div
-											class="whitespace-pre-wrap px-5 pt-4 pb-3 text-sm leading-relaxed text-slate-700"
+											dir="auto"
+											class="overflow-wrap-anywhere whitespace-pre-wrap px-5 pt-4 pb-3 text-sm leading-relaxed text-slate-700"
 										>
 											{message.text}
 										</div>
 									{/if}
 
 									{#if message.streaming}
-										<div class="flex items-center gap-2 px-5 py-3 text-xs text-slate-400">
-											<span>Generating response…</span>
-											<span class="h-1.5 w-1.5 animate-pulse rounded-full bg-slate-400"></span>
+										<div class="flex items-center gap-2 px-5 py-3 text-xs text-slate-600">
+											<span>Writing an answer from the matched records…</span>
+											<span
+												class="motion-decorative h-1.5 w-1.5 animate-pulse rounded-full bg-slate-500"
+											></span>
 										</div>
 									{:else if message.cancelled}
-										<div class="px-5 py-3 text-xs text-slate-400">Response cancelled.</div>
+										<div class="px-5 py-3 text-xs text-slate-600">Answer stopped.</div>
 									{/if}
 
 									<AskAnswerMeta citations={message.citations} retrieval={message.retrieval} />
@@ -109,7 +126,7 @@
 									{#if message.sparql}
 										<details class="border-t border-slate-100">
 											<summary
-												class="flex cursor-pointer list-none items-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold tracking-widest text-slate-400 uppercase transition-colors select-none hover:text-slate-600"
+												class="touch-target flex cursor-pointer list-none items-center gap-1.5 px-5 py-2.5 text-xs font-semibold tracking-widest text-slate-600 uppercase transition-colors select-none hover:text-slate-800"
 											>
 												<svg
 													viewBox="0 0 24 24"
@@ -120,7 +137,7 @@
 													stroke-width="2.5"
 													class="chevron"><path d="m9 18 6-6-6-6" /></svg
 												>
-												SPARQL Query
+												Query used
 											</summary>
 											<pre
 												class="overflow-x-auto px-5 pb-4 font-mono text-[11px] leading-relaxed whitespace-pre text-slate-500">{message.sparql}</pre>
@@ -131,7 +148,7 @@
 										{@const columns = Object.keys(message.rows[0])}
 										<details class="border-t border-slate-100">
 											<summary
-												class="flex cursor-pointer list-none items-center gap-1.5 px-5 py-2.5 text-[11px] font-semibold tracking-widest text-slate-400 uppercase transition-colors select-none hover:text-slate-600"
+												class="touch-target flex cursor-pointer list-none items-center gap-1.5 px-5 py-2.5 text-xs font-semibold tracking-widest text-slate-600 uppercase transition-colors select-none hover:text-slate-800"
 											>
 												<svg
 													viewBox="0 0 24 24"
@@ -172,8 +189,9 @@
 											</div>
 										</details>
 									{:else if message.rows}
-										<div class="border-t border-slate-100 px-5 py-2.5 text-[11px] text-slate-400">
-											No matching records in the knowledge graph.
+										<div class="border-t border-slate-100 px-5 py-2.5 text-xs text-slate-600">
+											No records matched this question. Try a broader place, date range, or disaster
+											type.
 										</div>
 									{/if}
 								{/if}
@@ -207,5 +225,8 @@
 	.chevron {
 		flex-shrink: 0;
 		transition: transform 0.15s ease;
+	}
+	.overflow-wrap-anywhere {
+		overflow-wrap: anywhere;
 	}
 </style>

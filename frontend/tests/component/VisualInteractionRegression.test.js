@@ -46,7 +46,7 @@ describe('visual interaction regressions', () => {
 		render(EventDetails, { event: eventDetails.event });
 
 		const locations = await screen.findByRole('button', { name: /Locations affected/ });
-		const incidents = screen.getByRole('button', { name: /Derived incidents/ });
+		const incidents = screen.getByRole('button', { name: /Linked incidents/ });
 		const locationsChevron = locations.querySelector('[aria-hidden="true"]');
 		const incidentsChevron = incidents.querySelector('[aria-hidden="true"]');
 

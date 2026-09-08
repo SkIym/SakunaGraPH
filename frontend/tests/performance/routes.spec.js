@@ -8,7 +8,8 @@ const budget = JSON.parse(
 ).runtime;
 
 const routes = [
-	['/', { role: 'button', name: 'Run Query' }],
+	['/', { role: 'heading', name: 'Explore Philippine disaster records by place.' }],
+	['/query', { role: 'button', name: 'Run query' }],
 	['/map', { role: 'button', name: /^Select / }],
 	['/ontology', { text: 'Legend' }],
 	['/ask', { role: 'heading', name: 'Ask SakunaGraPH' }],

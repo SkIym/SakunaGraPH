@@ -150,14 +150,14 @@
 				<span aria-hidden="true">/</span>
 				<span class="text-slate-600">Table</span>
 			</nav>
-			<h1 class="text-xl font-semibold text-slate-800">Disaster event records</h1>
+			<h1 class="editorial-page-title">Disaster event records</h1>
 			<p class="mt-1 text-xs leading-5 text-slate-500">
-				Filter, compare, and export deduplicated records from every integrated source.
+				Filter, compare, and export the linked event records available in the current graph.
 			</p>
 		</div>
 		<a
 			href="/analysis"
-			class="text-xs font-semibold text-indigo-600 transition hover:text-indigo-800"
+			class="brand-link inline-flex min-h-11 items-center text-xs font-semibold transition"
 			>Analysis overview</a
 		>
 	</div>
@@ -219,19 +219,20 @@
 						type="button"
 						onclick={() => goToPage(page - 1)}
 						disabled={page === 1}
-						class="h-8 rounded-md border border-slate-200 px-2.5 text-[11px] font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+						class="min-h-11 rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						Previous
 					</button>
 					{#each paginationPages as paginationPage, index (`${paginationPage}-${index}`)}
 						{#if paginationPage === '…'}
-							<span class="flex h-8 w-6 items-center justify-center text-xs text-slate-400">…</span>
+							<span class="flex h-11 w-6 items-center justify-center text-xs text-slate-400">…</span
+							>
 						{:else}
 							<button
 								type="button"
 								onclick={() => goToPage(paginationPage)}
 								aria-current={page === paginationPage ? 'page' : undefined}
-								class="h-8 min-w-8 rounded-md border px-2 text-[11px] font-medium tabular-nums transition
+								class="h-11 min-w-11 rounded-lg border px-2 text-xs font-medium tabular-nums transition
 									{page === paginationPage
 									? 'border-slate-800 bg-slate-800 text-white'
 									: 'border-slate-200 text-slate-600 hover:bg-slate-50'}"
@@ -244,7 +245,7 @@
 						type="button"
 						onclick={() => goToPage(page + 1)}
 						disabled={page === totalPages}
-						class="h-8 rounded-md border border-slate-200 px-2.5 text-[11px] font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+						class="min-h-11 rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
 					>
 						Next
 					</button>

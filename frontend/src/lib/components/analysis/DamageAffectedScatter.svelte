@@ -31,14 +31,14 @@
 				<select
 					bind:value={selectedUnit}
 					aria-label="Damage unit"
-					class="rounded border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600 outline-none focus:border-indigo-400"
+					class="brand-field min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-600 outline-none"
 					>{#each units as unit}<option value={unit}>{unit}</option>{/each}</select
 				>
 			{/if}
 			<select
 				bind:value={affectedMeasure}
 				aria-label="Affected population measure"
-				class="rounded border border-slate-200 bg-white px-2 py-1 text-[11px] text-slate-600 outline-none focus:border-indigo-400"
+				class="brand-field min-h-11 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-600 outline-none"
 				><option value="affectedPersons">Affected persons</option><option value="affectedFamilies"
 					>Affected families</option
 				></select

@@ -95,10 +95,8 @@
 <section class="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
 	<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 		<div>
-			<p class="text-[10px] font-semibold uppercase text-indigo-600" style="letter-spacing:0.12em;">
-				Analysis
-			</p>
-			<h1 class="mt-1 text-xl font-semibold text-slate-800">Metrics dashboard</h1>
+			<p class="workspace-kicker">Analysis</p>
+			<h1 class="editorial-page-title mt-1">Metrics dashboard</h1>
 			<p class="mt-1 text-xs leading-5 text-slate-500">
 				Totals, distributions, and trends for the current filter scope.
 			</p>
@@ -107,14 +105,14 @@
 			<button
 				type="button"
 				onclick={() => (groupBy = 'taxonomy')}
-				class="rounded px-2.5 py-1.5 text-[11px] font-semibold transition {groupBy === 'taxonomy'
+				class="min-h-11 rounded-lg px-3 text-xs font-semibold transition {groupBy === 'taxonomy'
 					? 'bg-slate-800 text-white'
 					: 'text-slate-500 hover:bg-slate-50'}">Taxonomy groups</button
 			>
 			<button
 				type="button"
 				onclick={() => (groupBy = 'type')}
-				class="rounded px-2.5 py-1.5 text-[11px] font-semibold transition {groupBy === 'type'
+				class="min-h-11 rounded-lg px-3 text-xs font-semibold transition {groupBy === 'type'
 					? 'bg-slate-800 text-white'
 					: 'text-slate-500 hover:bg-slate-50'}">Detailed types</button
 			>
@@ -128,7 +126,8 @@
 			<button
 				type="button"
 				onclick={() => (retryToken += 1)}
-				class="mt-3 text-xs font-semibold text-red-700 underline">Try again</button
+				class="mt-3 min-h-11 rounded-lg border border-red-200 bg-white px-4 text-xs font-semibold text-red-700 transition hover:bg-red-50"
+				>Try again</button
 			>
 		</div>
 	{:else if loading}

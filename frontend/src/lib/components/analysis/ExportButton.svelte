@@ -52,7 +52,7 @@
 		disabled={disabled || exporting}
 		aria-busy={exporting}
 		title={error || 'Export all filtered records as CSV'}
-		class="flex h-9 items-center gap-2 rounded-md bg-slate-800 px-3 text-xs font-semibold text-white transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
+		class="flex h-11 items-center gap-2 rounded-lg bg-slate-800 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-300"
 	>
 		{#if exporting}
 			<span

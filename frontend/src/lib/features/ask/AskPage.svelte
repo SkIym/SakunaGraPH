@@ -3,27 +3,40 @@
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import AskComposer from './components/AskComposer.svelte';
 	import AskConversation from './components/AskConversation.svelte';
-	import { ASK_SUGGESTIONS, createAskState } from './state.svelte.js';
+	import { ASK_QUESTION_MAX_LENGTH, ASK_SUGGESTIONS, createAskState } from './state.svelte.js';
 
 	let bottomElement = $state(null);
+	let scrollFrame = null;
 	const ask = createAskState({
 		onUpdated: async () => {
 			await tick();
-			const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-			bottomElement?.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' });
+			if (scrollFrame !== null) return;
+			scrollFrame = window.requestAnimationFrame(() => {
+				scrollFrame = null;
+				const scroller = document.getElementById('messages-scroll');
+				if (!scroller || !bottomElement) return;
+				const distanceFromBottom =
+					scroller.scrollHeight - scroller.scrollTop - scroller.clientHeight;
+				if (distanceFromBottom <= 240) {
+					bottomElement.scrollIntoView({ behavior: 'auto', block: 'end' });
+				}
+			});
 		},
 	});
 
-	onDestroy(() => ask.cancel());
+	onDestroy(() => {
+		ask.cancel();
+		if (scrollFrame !== null) window.cancelAnimationFrame(scrollFrame);
+	});
 </script>
 
 <svelte:head>
 	<title>Ask · SakunaGraPH</title>
 </svelte:head>
 
-<NodeCanvas interactive={false} />
+<NodeCanvas active={ask.sending} />
 
-<div class="relative flex flex-col" style="height:calc(100vh - 52px); z-index:1;">
+<div class="ask-viewport relative flex min-h-0 flex-col" style="z-index:1;">
 	<AskConversation
 		messages={ask.messages}
 		suggestions={ASK_SUGGESTIONS}
@@ -34,6 +47,8 @@
 	<AskComposer
 		bind:input={ask.input}
 		sending={ask.sending}
+		error={ask.inputError}
+		maxLength={ASK_QUESTION_MAX_LENGTH}
 		onSend={ask.send}
 		onCancel={ask.cancel}
 	/>

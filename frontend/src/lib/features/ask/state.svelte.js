@@ -9,10 +9,30 @@ export const ASK_SUGGESTIONS = Object.freeze([
 	'What types of disasters occurred in Mindanao?',
 ]);
 
+export const ASK_QUESTION_MAX_LENGTH = 1_000;
+
 function requestErrorMessage(error) {
-	return error?.kind === 'network'
-		? 'Could not reach server.'
-		: error?.message || 'Request failed.';
+	if (error?.kind === 'network') {
+		return 'Could not reach the data service. Check your connection, then send the question again.';
+	}
+	if (error?.kind === 'timeout') {
+		return 'The answer took too long to complete. Try a narrower question or a shorter date range.';
+	}
+	if (error?.status === 429) {
+		return 'The data service is receiving too many questions. Wait a moment, then try again.';
+	}
+	if (error?.status === 400 || error?.status === 422) {
+		return 'The question could not be processed as written. Rephrase it with a place, date, or disaster type.';
+	}
+	if (error?.name === 'AskStreamUpstreamError' && error?.message) return error.message;
+	if (error?.status >= 500) {
+		const detail = String(error?.message ?? '').trim();
+		if (detail && detail.length <= 240 && !/[<>\r\n]/.test(detail)) {
+			return `${detail} Try again shortly.`;
+		}
+		return 'The data service is temporarily unavailable. Your question is still shown above; try it again shortly.';
+	}
+	return 'Could not complete this answer. Rephrase the question or try again.';
 }
 
 export function createAskState({
@@ -25,12 +45,12 @@ export function createAskState({
 	let input = $state('');
 	let sending = $state(false);
 	let announcement = $state('');
+	let inputError = $state('');
 	let activeRequest = null;
 
 	function updateAssistant(index, values) {
-		messages = messages.map((message, messageIndex) =>
-			messageIndex === index ? { ...message, ...values } : message,
-		);
+		if (!messages[index]) return;
+		messages[index] = { ...messages[index], ...values };
 	}
 
 	function finishCancelled(index) {
@@ -45,15 +65,23 @@ export function createAskState({
 	}
 
 	function applyLegacyResponse(index, response, { fallback = false } = {}) {
+		const answer = String(response?.answer ?? '').trim();
 		updateAssistant(index, {
 			loading: false,
 			streaming: false,
-			text: response.answer,
-			sparql: response.sparql,
-			rows: response.rows ?? [],
-			citations: response.citations ?? [],
-			retrieval: response.retrieval ?? (fallback ? { mode: 'fallback' } : null),
-			requestId: response.requestId ?? null,
+			text:
+				answer ||
+				'No answer was returned. Try asking about a specific place, date range, or disaster type.',
+			sparql: typeof response?.sparql === 'string' ? response.sparql : '',
+			rows: Array.isArray(response?.rows) ? response.rows : [],
+			citations: Array.isArray(response?.citations) ? response.citations : [],
+			retrieval:
+				response?.retrieval && typeof response.retrieval === 'object'
+					? response.retrieval
+					: fallback
+						? { mode: 'fallback' }
+						: null,
+			requestId: response?.requestId ?? null,
 		});
 	}
 
@@ -89,7 +117,9 @@ export function createAskState({
 					updateAssistant(assistantIndex, {
 						loading: false,
 						streaming: false,
-						text: result.answer || 'No answer was returned.',
+						text:
+							result.answer ||
+							'No answer was returned. Try asking about a specific place, date range, or disaster type.',
 						citations: result.citations,
 						retrieval: result.retrieval,
 					});
@@ -107,6 +137,12 @@ export function createAskState({
 	async function send(question = input.trim()) {
 		question = String(question ?? '').trim();
 		if (!question) return;
+		if (question.length > ASK_QUESTION_MAX_LENGTH) {
+			inputError = `Keep the question under ${ASK_QUESTION_MAX_LENGTH.toLocaleString()} characters.`;
+			announcement = inputError;
+			return;
+		}
+		inputError = '';
 
 		if (activeRequest) {
 			const replacedRequest = activeRequest;
@@ -117,7 +153,7 @@ export function createAskState({
 
 		input = '';
 		sending = true;
-		announcement = 'Generating answer.';
+		announcement = 'Checking the knowledge graph.';
 		messages = [...messages, { role: 'user', text: question }];
 		const assistantIndex = messages.length;
 		messages = [...messages, { role: 'assistant', loading: true }];
@@ -133,7 +169,7 @@ export function createAskState({
 				const response = await submit(question, { signal: controller.signal });
 				applyLegacyResponse(assistantIndex, response);
 			}
-			if (activeRequest === request) announcement = 'Answer complete.';
+			if (activeRequest === request) announcement = 'Answer ready.';
 		} catch (requestError) {
 			if (isCancellationError(requestError)) return;
 			updateAssistant(assistantIndex, {
@@ -158,7 +194,7 @@ export function createAskState({
 		request.controller.abort();
 		finishCancelled(request.assistantIndex);
 		sending = false;
-		announcement = 'Request cancelled.';
+		announcement = 'Answer stopped.';
 		void onUpdated();
 	}
 
@@ -171,12 +207,16 @@ export function createAskState({
 		},
 		set input(value) {
 			input = value;
+			if (inputError && String(value).trim().length <= ASK_QUESTION_MAX_LENGTH) inputError = '';
 		},
 		get sending() {
 			return sending;
 		},
 		get announcement() {
 			return announcement;
+		},
+		get inputError() {
+			return inputError;
 		},
 		get mode() {
 			return mode;

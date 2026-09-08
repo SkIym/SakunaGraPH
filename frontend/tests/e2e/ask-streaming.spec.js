@@ -18,15 +18,15 @@ test('streams GraphRAG prose and source provenance through the API proxy', async
 	await composer.press('Enter');
 	await expect(composer).toBeFocused();
 
-	await expect(page.getByText('Generating response…')).toBeVisible();
+	await expect(page.getByText('Writing an answer from the matched records…')).toBeVisible();
 	await expect(page.getByText('One streamed event.')).toBeVisible();
-	await expect(page.getByText('GraphRAG')).toBeVisible();
+	await expect(page.getByText('Graph-grounded retrieval')).toBeVisible();
 	await expect(page.getByText(/Index fixture-v1/)).toBeVisible();
 	await expect(page.getByRole('link', { name: 'NDRRMC Situation Report' })).toHaveAttribute(
 		'href',
 		'https://example.test/reports/1',
 	);
-	await expect(page.getByText('SPARQL Query')).toBeVisible();
+	await expect(page.getByText('Query used')).toBeVisible();
 	await expect(page.getByText(/Results/)).toBeVisible();
 	await expect(composer).toBeFocused();
 });
@@ -36,7 +36,7 @@ test('falls back to legacy ask when the rollout endpoint is unavailable', async 
 	await send(page, 'Use fallback mode');
 
 	await expect(page.getByText('Legacy rollout fallback.')).toBeVisible();
-	await expect(page.getByText('Fallback', { exact: true })).toBeVisible();
+	await expect(page.getByText('Fallback retrieval', { exact: true })).toBeVisible();
 });
 
 test('user cancellation and navigation close upstream streams', async ({ page }) => {
@@ -44,10 +44,10 @@ test('user cancellation and navigation close upstream streams', async ({ page })
 	const initial = await streamStats(page);
 	await send(page, 'Cancel this response');
 	await expect(page.getByText('Partial')).toBeVisible();
-	await page.getByRole('button', { name: 'Cancel' }).click();
+	await page.getByRole('button', { name: 'Stop answer' }).click();
 
-	await expect(page.getByText('Response cancelled.')).toBeVisible();
-	await expect(page.getByRole('status')).toHaveText('Request cancelled.');
+	await expect(page.locator('div').filter({ hasText: /^Answer stopped\.$/ })).toBeVisible();
+	await expect(page.getByRole('status')).toHaveText('Answer stopped.');
 	await expect
 		.poll(async () => (await streamStats(page)).cancelledStreams)
 		.toBeGreaterThan(initial.cancelledStreams);

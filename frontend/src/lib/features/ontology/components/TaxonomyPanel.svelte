@@ -8,6 +8,7 @@
 		colors = {},
 		svgElement = $bindable(null),
 	} = $props();
+	let legendOpen = $state(false);
 
 	const LEGEND = Object.freeze([
 		['natural', 'Natural'],
@@ -36,16 +37,22 @@
 			aria-label="Interactive disaster taxonomy graph"
 		></svg>
 
-		<p class="pointer-events-none absolute top-16 right-5 text-[11px] font-medium text-slate-500">
-			Scroll to zoom · Drag canvas · Click node
+		<p class="ontology-gesture pointer-events-none absolute text-[11px] font-medium text-slate-600">
+			Select · Drag · Zoom
 		</p>
 
 		<div
-			class="absolute bottom-6 left-6 rounded-2xl bg-white/85 px-4 py-4 shadow-2xl"
-			style="backdrop-filter:blur(12px); max-width:300px; min-width: 200px;"
+			class="ontology-legend absolute rounded-2xl bg-white/95 px-4 py-3 shadow-2xl"
+			style="backdrop-filter:blur(12px);"
 		>
-			<p class="mb-3 text-[10px] font-bold tracking-widest text-slate-400 uppercase">Category</p>
-			<div class="flex flex-col gap-1.5">
+			<button
+				type="button"
+				aria-expanded={legendOpen}
+				onclick={() => (legendOpen = !legendOpen)}
+				class="legend-toggle min-h-11 cursor-pointer py-3 text-[11px] font-bold tracking-widest text-slate-600 uppercase"
+				>Category</button
+			>
+			<div class="legend-content mt-2 flex-col gap-1.5" class:mobile-open={legendOpen}>
 				{#each LEGEND as [key, label]}
 					<div class="flex items-center gap-2">
 						<div
@@ -60,8 +67,8 @@
 
 		{#if selectedNode}
 			<div
-				class="absolute right-6 bottom-6 rounded-2xl border border-slate-200/60 bg-white/92 shadow-xl"
-				style="backdrop-filter:blur(18px); width:420px; max-height:72vh; overflow-y:auto;"
+				class="ontology-detail absolute rounded-2xl border border-slate-200/60 bg-white/95 shadow-xl"
+				style="backdrop-filter:blur(18px);"
 			>
 				<div class="px-8 py-7">
 					<p
@@ -81,11 +88,73 @@
 						style="width:40px; background:{colors[selectedNode.group]};"
 					></div>
 					<p class="mt-4 text-[15px] leading-relaxed text-slate-500">{selectedNode.definition}</p>
-					<p class="mt-5 text-[12px] tracking-widest text-slate-300 uppercase">
-						Click node or canvas to deselect
+					<p class="mt-5 text-[12px] tracking-widest text-slate-500 uppercase">
+						Select another type for details · Select the canvas to clear
 					</p>
 				</div>
 			</div>
 		{/if}
 	</div>
 {/if}
+
+<style>
+	.ontology-gesture {
+		top: 4.75rem;
+		right: 1rem;
+	}
+	.ontology-legend {
+		left: 0.75rem;
+		bottom: calc(0.75rem + env(safe-area-inset-bottom));
+		max-width: calc(100vw - 1.5rem);
+	}
+	.legend-content {
+		display: none;
+	}
+	.legend-content.mobile-open {
+		display: flex;
+	}
+	.ontology-detail {
+		left: 0.75rem;
+		right: 0.75rem;
+		bottom: calc(0.75rem + env(safe-area-inset-bottom));
+		max-height: 52dvh;
+		overflow-y: auto;
+	}
+	.ontology-detail > div {
+		padding: 1.25rem;
+	}
+
+	@media (min-width: 768px) {
+		.ontology-gesture {
+			top: 4rem;
+			right: 1.25rem;
+		}
+		.ontology-legend {
+			left: 1.5rem;
+			bottom: 1.5rem;
+			min-width: 12.5rem;
+			max-width: 18.75rem;
+			padding: 1rem;
+		}
+		.legend-toggle {
+			min-height: 0;
+			cursor: default;
+			padding-block: 0 0.75rem;
+			pointer-events: none;
+		}
+		.ontology-legend > .legend-content {
+			display: flex;
+			margin-top: 0;
+		}
+		.ontology-detail {
+			left: auto;
+			right: 1.5rem;
+			bottom: 1.5rem;
+			width: min(26.25rem, calc(100vw - 3rem));
+			max-height: 72dvh;
+		}
+		.ontology-detail > div {
+			padding: 1.75rem 2rem;
+		}
+	}
+</style>

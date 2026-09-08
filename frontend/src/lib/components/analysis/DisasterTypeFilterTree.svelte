@@ -83,7 +83,7 @@
 		>
 		<span class="flex items-center gap-2">
 			{#if analysisFilters.disasterTypes.length > 0}
-				<span class="text-[10px] font-semibold tabular-nums text-indigo-600">
+				<span class="brand-link text-[10px] font-semibold tabular-nums">
 					{analysisFilters.disasterTypes.length} selected
 				</span>
 			{/if}
@@ -104,13 +104,13 @@
 				type="search"
 				bind:value={search}
 				placeholder="Search disaster types"
-				class="block h-9 w-full rounded-md border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+				class="brand-field block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
 			/>
 
 			<div class="mt-3 space-y-0.5">
 				{#if loading}
 					{#each [1, 2, 3, 4] as row}
-						<div class="flex h-8 items-center gap-2 px-1" aria-hidden="true">
+						<div class="flex h-11 items-center gap-2 px-1" aria-hidden="true">
 							<span class="h-2.5 w-2.5 animate-pulse rounded-sm bg-slate-100"></span>
 							<span class="h-3 animate-pulse rounded bg-slate-100" style="width:{45 + row * 9}%"
 							></span>
@@ -123,7 +123,7 @@
 						{@const hasChildren = (row.node.children?.length ?? 0) > 0}
 						{@const open = hasChildren && isOpen(row.node.id)}
 						<div
-							class="flex min-h-8 items-center gap-1 rounded pr-1 hover:bg-slate-50"
+							class="flex min-h-11 items-center gap-1 rounded-lg pr-1 hover:bg-slate-50"
 							style="padding-left:{Math.min(row.depth, 5) * 14}px"
 						>
 							{#if hasChildren}
@@ -132,19 +132,19 @@
 									onclick={() => toggleExpanded(row.node.id)}
 									aria-label="{open ? 'Collapse' : 'Expand'} {row.node.label}"
 									aria-expanded={open}
-									class="flex h-6 w-6 shrink-0 items-center justify-center text-sm text-slate-400 transition hover:text-slate-700"
+									class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-sm text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
 								>
 									<span class="transition-transform {open ? 'rotate-90' : ''}">&rsaquo;</span>
 								</button>
 							{:else}
-								<span class="h-6 w-6 shrink-0"></span>
+								<span class="h-11 w-11 shrink-0"></span>
 							{/if}
 							<input
 								id="disaster-type-{row.node.id}"
 								type="checkbox"
 								checked={analysisFilters.disasterTypes.includes(row.node.id)}
 								onchange={() => analysisFilters.toggleDisasterType(row.node.id)}
-								class="h-3.5 w-3.5 shrink-0 cursor-pointer accent-indigo-600"
+								class="h-4 w-4 shrink-0 cursor-pointer accent-[#305bb2]"
 							/>
 							<span
 								class="h-2 w-2 shrink-0 rounded-sm"

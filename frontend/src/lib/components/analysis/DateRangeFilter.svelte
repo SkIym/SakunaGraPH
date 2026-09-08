@@ -13,7 +13,7 @@
 				value={analysisFilters.startDate}
 				max={analysisFilters.endDate || undefined}
 				oninput={(event) => analysisFilters.setStartDate(event.currentTarget.value)}
-				class="analysis-date-input mt-1.5 block h-9 w-full min-w-0 rounded-md border border-slate-200 bg-white px-1.5 py-0 text-center text-xs leading-normal text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+				class="analysis-date-input brand-field mt-1.5 block h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-1.5 py-0 text-center text-xs leading-normal text-slate-700 outline-none transition"
 			/>
 		</label>
 		<label class="min-w-0 text-[11px] font-medium text-slate-500" for="analysis-end-date">
@@ -24,7 +24,7 @@
 				value={analysisFilters.endDate}
 				min={analysisFilters.startDate || undefined}
 				oninput={(event) => analysisFilters.setEndDate(event.currentTarget.value)}
-				class="analysis-date-input mt-1.5 block h-9 w-full min-w-0 rounded-md border border-slate-200 bg-white px-1.5 py-0 text-center text-xs leading-normal text-slate-700 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-100"
+				class="analysis-date-input brand-field mt-1.5 block h-11 w-full min-w-0 rounded-lg border border-slate-200 bg-white px-1.5 py-0 text-center text-xs leading-normal text-slate-700 outline-none transition"
 			/>
 		</label>
 	</div>

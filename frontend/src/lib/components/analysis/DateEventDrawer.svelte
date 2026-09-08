@@ -28,16 +28,14 @@
 >
 	<header class="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-3.5">
 		<div>
-			<p class="text-[10px] font-semibold uppercase text-indigo-600" style="letter-spacing:0.1em;">
-				Date events
-			</p>
+			<p class="workspace-kicker">Date events</p>
 			<h2 class="mt-1 text-sm font-semibold text-slate-800">{datePrefix}</h2>
 		</div>
 		<button
 			type="button"
 			data-focus-first
 			onclick={onclose}
-			class="rounded p-1 text-lg leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+			class="flex h-11 w-11 items-center justify-center rounded-lg text-lg leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
 			aria-label="Close date events">&times;</button
 		>
 	</header>
@@ -54,7 +52,7 @@
 					<button
 						type="button"
 						onclick={() => onselect(item.event)}
-						class="w-full rounded-lg border border-slate-200 p-3 text-left transition hover:border-indigo-300 hover:bg-indigo-50/40 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+						class="w-full rounded-lg border border-slate-200 p-3 text-left transition hover:border-blue-300 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-[#305bb2]"
 					>
 						<div class="flex items-start justify-between gap-3">
 							<p class="line-clamp-2 text-xs font-semibold leading-5 text-slate-700">

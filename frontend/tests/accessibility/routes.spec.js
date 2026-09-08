@@ -4,6 +4,7 @@ import { gotoReady, mockApi } from '../e2e/fixtures/api-mocks.js';
 
 const routes = [
 	'/',
+	'/query',
 	'/map',
 	'/ontology',
 	'/ask',
@@ -29,8 +30,8 @@ for (const route of routes) {
 }
 
 test('query results trap focus and restore it to the run control', async ({ page }) => {
-	await gotoReady(page, '/');
-	const runButton = page.getByRole('button', { name: 'Run Query' });
+	await gotoReady(page, '/query');
+	const runButton = page.getByRole('button', { name: 'Run query' });
 	await runButton.click();
 	const closeButton = page.getByRole('button', { name: 'Close results' });
 	await expect(closeButton).toBeFocused();

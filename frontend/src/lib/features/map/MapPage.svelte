@@ -1,5 +1,5 @@
 <script>
-	import { onMount, tick } from 'svelte';
+	import { tick } from 'svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
 	import {
@@ -16,6 +16,7 @@
 	let tightViewBox = $state(FULL_MAP_VIEW_BOX);
 	let mapLoading = $state(true);
 	let mapError = $state('');
+	let mapRetryToken = $state(0);
 	let pathGenerator = null;
 
 	// ── UI state ─────────────────────────────────────────────────────────────
@@ -29,13 +30,17 @@
 	const eventQuery = createMapEventQuery();
 	let resultMode = $state('major'); // 'major' | 'incidents'
 	let page = $state(1);
+	let resultRetryToken = $state(0);
 
 	const totalCount = $derived(eventQuery.countFor(resultMode));
 	const totalPages = $derived(Math.max(1, Math.ceil(totalCount / MAP_PAGE_SIZE)));
 
 	// ── Load GeoJSON + build paths ───────────────────────────────────────────
-	onMount(() => {
+	$effect(() => {
+		const _retry = mapRetryToken;
 		const controller = new AbortController();
+		mapLoading = true;
+		mapError = '';
 		void (async () => {
 			try {
 				performance.mark('sakunagraph:map-load-start');
@@ -52,9 +57,9 @@
 					'sakunagraph:map-load-start',
 					'sakunagraph:map-rendered',
 				);
-			} catch (error) {
-				if (error.name === 'AbortError') return;
-				mapError = `Map failed to load: ${error.message}`;
+			} catch (requestError) {
+				if (requestError?.name === 'AbortError') return;
+				mapError = 'The map could not be loaded. Check your connection and try again.';
 				mapLoading = false;
 			}
 		})();
@@ -69,6 +74,7 @@
 		}
 		const _p = page;
 		const _mode = resultMode;
+		const _retry = resultRetryToken;
 		if (_p < 1) return;
 		const controller = new AbortController();
 		expandedRows = new Set();
@@ -113,6 +119,7 @@
 
 	function deselect() {
 		selected = null;
+		resultRetryToken = 0;
 		eventQuery.reset();
 	}
 
@@ -195,7 +202,7 @@
 <!-- ── Cursor-following hover tooltip ────────────────────────────────────── -->
 {#if tooltipItem}
 	<div
-		class="fixed z-50 pointer-events-none rounded-lg bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-white shadow-lg"
+		class="map-hover-tooltip fixed z-50 pointer-events-none rounded-lg bg-slate-800/90 px-3 py-1.5 text-xs font-medium text-white shadow-lg"
 		style="left:{tooltipX +
 			16}px; top:{tooltipY}px; transform:translateY(-50%); backdrop-filter:blur(4px);"
 	>
@@ -204,23 +211,23 @@
 {/if}
 
 <!-- ── Full-screen layout container ─────────────────────────────────────── -->
-<div class="relative" style="height: calc(100vh - 52px); z-index: 1; overflow: hidden;">
+<div class="map-workspace relative" class:has-selection={Boolean(selected)}>
 	<!-- ── View toggle — hidden when a region/province is selected ──────────── -->
 	{#if !selected}
 		<div
-			class="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-1 rounded-full border border-slate-200/80 bg-white/80 p-1 shadow-sm"
+			class="map-view-toggle absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-1 rounded-full border border-slate-200/80 bg-white/90 p-1 shadow-sm"
 			style="backdrop-filter:blur(10px);"
 		>
 			<button
 				onclick={() => switchView('regions')}
-				class="rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-150
+				class="min-h-11 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150
 				{view === 'regions' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
 			>
 				By Region
 			</button>
 			<button
 				onclick={() => switchView('provinces')}
-				class="rounded-full px-4 py-1.5 text-xs font-semibold transition-all duration-150
+				class="min-h-11 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150
 				{view === 'provinces'
 					? 'bg-slate-800 text-white shadow-sm'
 					: 'text-slate-500 hover:text-slate-700'}"
@@ -231,13 +238,10 @@
 	{/if}
 
 	<!-- ── Map panel (left side, shrinks on selection) ─────────────────────── -->
-	<div
-		class="absolute top-0 left-0 h-full transition-all duration-500 ease-out"
-		style="width: {selected ? '42%' : '100%'};"
-	>
+	<div class="map-panel transition-all duration-500 ease-out">
 		{#if selected}
 			<!-- Zoomed detail map fills the whole panel -->
-			<div class="absolute inset-0 p-4">
+			<div class="map-detail-canvas absolute inset-0 p-4">
 				{#if pathData.length > 0}
 					<PhilMap
 						{pathData}
@@ -252,14 +256,12 @@
 
 			<!-- Compact back button + mini thumbnail — upper-left corner -->
 			<div class="absolute top-3 left-3 z-10">
-				<div
-					class="cursor-pointer rounded-xl border border-slate-200/80 bg-white/90 p-2 shadow-md hover:bg-slate-50 transition-colors"
+				<button
+					type="button"
+					class="min-h-11 cursor-pointer rounded-xl border border-slate-200/80 bg-white/95 p-2 text-left shadow-md transition-colors hover:bg-slate-50"
 					style="backdrop-filter:blur(8px);"
-					role="button"
-					tabindex="0"
-					title="Back to full map"
+					aria-label="Back to full map"
 					onclick={deselect}
-					onkeydown={(e) => e.key === 'Enter' && deselect()}
 				>
 					<div class="flex items-center gap-1.5 mb-1.5">
 						<svg
@@ -294,20 +296,30 @@
 							/>
 						{/if}
 					</div>
-				</div>
+				</button>
 			</div>
 		{:else}
 			<!-- Full map — row layout: map on left, label on right -->
-			<div class="flex items-center justify-center h-full gap-10 px-8 pt-12">
+			<div class="map-overview flex h-full items-center justify-center gap-10 px-8 pt-12">
 				{#if mapLoading}
-					<p class="text-slate-400 text-sm">Loading map…</p>
+					<p class="text-slate-600 text-sm">Loading Philippine map…</p>
 				{:else if mapError}
-					<p class="text-red-500 text-sm text-center">{mapError}</p>
+					<div
+						class="max-w-sm rounded-xl border border-red-200 bg-red-50 px-5 py-4 text-center"
+						role="alert"
+					>
+						<p class="break-words text-sm leading-6 text-red-800">{mapError}</p>
+						<button
+							type="button"
+							onclick={() => (mapRetryToken += 1)}
+							class="touch-target mt-2 rounded-lg px-3 text-sm font-semibold text-red-800 underline underline-offset-4 hover:bg-red-100"
+						>
+							Try again
+						</button>
+					</div>
 				{:else}
 					<!-- Map — flex-shrink:0 + fixed aspect-ratio keeps width stable on hover -->
-					<div
-						style="height: calc(100vh - 120px); aspect-ratio: 7/8; flex-shrink: 0; flex-grow: 0; max-width: 58%;"
-					>
+					<div class="map-canvas-shell">
 						<PhilMap
 							{pathData}
 							viewBox={FULL_MAP_VIEW_BOX}
@@ -342,18 +354,18 @@
 						</p>
 					</div> -->
 
-					<div class="pointer-events-none flex-shrink-0" style="width: 300px;">
+					<div class="map-guidance pointer-events-none flex-shrink-0">
 						<p
 							class="font-black text-slate-700 leading-snug"
 							style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.8rem, 3vw, 2.5rem); overflow-wrap:break-word; word-break:break-word;"
 						>
 							{tooltipItem ? getHoverLabel(tooltipItem) : 'Philippines'}
 						</p>
-						<p class="text-[10px] font-medium uppercase tracking-widest text-slate-400 mt-1">
-							{tooltipItem ? (view === 'regions' ? 'Region' : 'Province') : 'Hover to explore'}
+						<p class="mt-1 text-[11px] font-medium uppercase tracking-widest text-slate-500">
+							{tooltipItem ? (view === 'regions' ? 'Region' : 'Province') : 'Choose an area'}
 						</p>
-						<p class="mt-3 text-[14px] text-slate-400 leading-relaxed whitespace-nowrap">
-							Click a {view === 'regions' ? 'region' : 'province'} to explore disaster data.
+						<p class="mt-3 text-[15px] leading-relaxed text-slate-600">
+							Select a {view === 'regions' ? 'region' : 'province'} to explore its disaster records.
 						</p>
 					</div>
 				{/if}
@@ -363,16 +375,16 @@
 
 	<!-- ── Results panel (right side, appears on selection) ────────────────── -->
 	<div
-		class="absolute top-0 right-0 h-full border-l border-slate-200/60 bg-white/80 transition-all duration-500 ease-out overflow-hidden"
-		style="backdrop-filter:blur(12px); width: {selected ? '58%' : '0%'};"
+		class="map-results-panel border-slate-200/60 bg-white/95 transition-all duration-500 ease-out"
+		style="backdrop-filter:blur(12px);"
 	>
 		{#if selected}
 			<!-- Outer flex: two spacers push content to vertical center -->
-			<div class="flex flex-col h-full">
-				<div class="flex-1 min-h-0"></div>
+			<div class="flex h-full flex-col">
+				<div class="results-spacer flex-1 min-h-0"></div>
 
 				<!-- Content block — vertically centered, max 85% of panel height -->
-				<div class="flex flex-col mx-6" style="max-height: 85vh; overflow: hidden;">
+				<div class="results-content mx-4 flex flex-col sm:mx-6">
 					<!-- Header -->
 					<div class="pb-3 flex-shrink-0">
 						<div class="flex items-start justify-between gap-3">
@@ -381,7 +393,7 @@
 									{selected.type === 'region' ? 'Region' : 'Province'}
 								</p>
 								<h2
-									class="font-bold text-slate-800 leading-tight"
+									class="break-words font-bold leading-tight text-slate-800 [overflow-wrap:anywhere]"
 									style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(1.1rem,2.5vw,1.6rem);"
 								>
 									{selected.name}
@@ -403,7 +415,7 @@
 										>
 											<path d="M21 12a9 9 0 1 1-6.219-8.56" />
 										</svg>
-										Querying…
+										Loading records…
 									</div>
 								{:else}
 									<!-- Primary count (active mode) -->
@@ -440,18 +452,18 @@
 
 								<!-- Toggle -->
 								<div
-									class="mt-2.5 flex gap-1 rounded-full border border-slate-200 bg-slate-50 p-0.5 w-fit"
+									class="mt-3 flex w-fit gap-1 rounded-full border border-slate-200 bg-slate-50 p-0.5"
 								>
 									<button
 										onclick={() => switchResultMode('major')}
-										class="rounded-full px-3 py-1 text-[11px] font-semibold transition-all duration-150
+										class="min-h-11 rounded-full px-3 py-2 text-[11px] font-semibold transition-all duration-150
 										{resultMode === 'major'
 											? 'bg-slate-800 text-white shadow-sm'
 											: 'text-slate-500 hover:text-slate-700'}">Major Events</button
 									>
 									<button
 										onclick={() => switchResultMode('incidents')}
-										class="rounded-full px-3 py-1 text-[11px] font-semibold transition-all duration-150
+										class="min-h-11 rounded-full px-3 py-2 text-[11px] font-semibold transition-all duration-150
 										{resultMode === 'incidents'
 											? 'bg-slate-800 text-white shadow-sm'
 											: 'text-slate-500 hover:text-slate-700'}">Incidents</button
@@ -460,8 +472,8 @@
 							</div>
 							<button
 								onclick={deselect}
-								class="mt-1 flex-shrink-0 rounded-lg p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-600 transition-colors"
-								title="Close"
+								class="mt-1 flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-lg text-slate-500 transition-colors hover:bg-slate-100 hover:text-slate-700"
+								aria-label="Close results"
 							>
 								<svg
 									xmlns="http://www.w3.org/2000/svg"
@@ -487,19 +499,30 @@
 					<div class="overflow-y-auto py-4 flex-1 min-h-0">
 						{#if eventQuery.error}
 							<div
-								class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+								class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800"
+								role="alert"
 							>
-								{eventQuery.error}
+								<p class="break-words leading-6 [overflow-wrap:anywhere]">{eventQuery.error}</p>
+								<button
+									type="button"
+									onclick={() => (resultRetryToken += 1)}
+									class="touch-target mt-2 rounded-lg px-2 text-xs font-semibold underline underline-offset-4 hover:bg-red-100"
+								>
+									Try again
+								</button>
 							</div>
 						{:else if eventQuery.results}
 							{@const rows = eventQuery.results ?? []}
 							{#if rows.length === 0}
 								<div class="py-10 text-center text-slate-400 text-sm">
-									No disaster events found for this area.
+									No {resultMode === 'major' ? 'major disaster events' : 'incidents'} are recorded for
+									this area in the current graph.
 								</div>
 							{:else}
-								<div class="overflow-x-auto rounded-xl border border-slate-200/80 shadow-sm">
-									<table class="w-full text-xs">
+								<div
+									class="map-results-table-wrap overflow-x-auto rounded-xl border border-slate-200/80 shadow-sm"
+								>
+									<table class="map-results-table w-full text-xs">
 										<thead>
 											<tr class="bg-slate-50 border-b border-slate-200">
 												{#each DISPLAY_COLS as col}
@@ -561,6 +584,7 @@
 													>
 														<!-- Event name + alternates badge -->
 														<td
+															data-label="Event"
 															class="max-w-[160px] px-3 py-2 align-middle text-slate-600"
 															title={row.eventName ?? ''}
 														>
@@ -598,7 +622,7 @@
 														</td>
 
 														<!-- Disaster type: first + +N more -->
-														<td class="px-3 py-2 align-middle text-slate-600">
+														<td data-label="Type" class="px-3 py-2 align-middle text-slate-600">
 															{#if dtypes.length === 0}
 																<span class="text-slate-300">—</span>
 															{:else}
@@ -629,12 +653,16 @@
 														</td>
 
 														<!-- Date -->
-														<td class="px-3 py-2 align-middle text-slate-600 whitespace-nowrap">
+														<td
+															data-label="Date"
+															class="px-3 py-2 align-middle text-slate-600 whitespace-nowrap"
+														>
 															{colValue(row, 'startDate')}
 														</td>
 
 														<!-- Locations -->
 														<td
+															data-label="Locations"
 															class="px-3 py-2 align-middle text-slate-600"
 															style="max-width:180px;"
 														>
@@ -669,6 +697,7 @@
 																	handleEventRowKeydown(keyboardEvent, sub)}
 															>
 																<td
+																	data-label="Alternate event"
 																	class="max-w-[160px] py-1.5 pr-3 pl-6 align-middle text-slate-500"
 																>
 																	<div class="flex flex-col gap-0.5">
@@ -682,18 +711,23 @@
 																		{/if}
 																	</div>
 																</td>
-																<td class="px-3 py-1.5 align-middle text-xs text-slate-500">
+																<td
+																	data-label="Type"
+																	class="px-3 py-1.5 align-middle text-xs text-slate-500"
+																>
 																	{subTypes.length ? formatDisasterType(subTypes[0]) : '—'}
 																	{#if subTypes.length > 1}
 																		<span class="text-slate-400"> +{subTypes.length - 1}</span>
 																	{/if}
 																</td>
 																<td
+																	data-label="Date"
 																	class="px-3 py-1.5 align-middle text-xs whitespace-nowrap text-slate-500"
 																>
 																	{sub.startDate || '—'}
 																</td>
 																<td
+																	data-label="Locations"
 																	class="px-3 py-1.5 align-middle text-xs text-slate-500"
 																	style="max-width:180px;"
 																>
@@ -724,13 +758,13 @@
 							class="flex-shrink-0 border-t border-slate-100 pt-3 pb-2 flex flex-col items-center gap-2"
 						>
 							<span class="text-xs text-slate-400">Page {page} of {totalPages}</span>
-							<div class="flex items-center gap-1">
+							<div class="pagination-pages flex items-center gap-1">
 								<button
 									onclick={() => {
 										page = Math.max(1, page - 1);
 									}}
 									disabled={page === 1 || eventQuery.loading}
-									class="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+									class="min-h-11 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
 									>← Prev</button
 								>
 
@@ -743,9 +777,9 @@
 												page = p;
 											}}
 											disabled={eventQuery.loading}
-											class="rounded-lg w-7 h-7 text-xs font-medium border transition-colors
+											class="page-number flex h-11 w-11 items-center justify-center rounded-lg border text-xs font-medium transition-colors
 											{page === p
-												? 'bg-slate-800 text-white border-slate-800'
+												? 'current-page bg-slate-800 text-white border-slate-800'
 												: 'border-slate-200 text-slate-600 hover:bg-slate-50'}">{p}</button
 										>
 									{/if}
@@ -756,7 +790,7 @@
 										page = Math.min(totalPages, page + 1);
 									}}
 									disabled={page === totalPages || eventQuery.loading}
-									class="rounded-lg px-2.5 py-1 text-xs font-medium text-slate-600 border border-slate-200 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+									class="min-h-11 rounded-lg border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
 									>Next →</button
 								>
 							</div>
@@ -764,8 +798,225 @@
 					{/if}
 				</div>
 
-				<div class="flex-1 min-h-0"></div>
+				<div class="results-spacer flex-1 min-h-0"></div>
 			</div>
 		{/if}
 	</div>
 </div>
+
+<style>
+	.map-workspace {
+		z-index: 1;
+		min-height: calc(100dvh - 52px);
+		overflow-x: hidden;
+	}
+
+	.map-panel {
+		position: relative;
+		width: 100%;
+		height: calc(100dvh - 52px);
+	}
+
+	.map-workspace.has-selection .map-panel {
+		height: clamp(18rem, 42dvh, 24rem);
+	}
+
+	.map-overview {
+		flex-direction: column;
+		gap: 1rem;
+		padding: 4.75rem 1rem 1.5rem;
+	}
+
+	.map-canvas-shell {
+		height: min(56dvh, 30rem);
+		width: min(100%, 26rem);
+		aspect-ratio: 7 / 8;
+		flex: 0 1 auto;
+	}
+
+	.map-guidance {
+		width: min(100%, 28rem);
+		text-align: center;
+	}
+
+	.map-results-panel {
+		position: relative;
+		width: 100%;
+		min-height: calc(58dvh - 52px);
+		border-top-width: 1px;
+		overflow: visible;
+		padding-bottom: env(safe-area-inset-bottom);
+	}
+
+	.map-workspace:not(.has-selection) .map-results-panel {
+		display: none;
+	}
+
+	.results-content {
+		max-height: none;
+		overflow: visible;
+		padding-block: 1rem;
+	}
+
+	.results-spacer {
+		display: none;
+	}
+
+	@media (max-width: 767px) {
+		.map-hover-tooltip {
+			display: none;
+		}
+
+		.map-view-toggle {
+			top: 0.75rem;
+			width: calc(100% - 2rem);
+			justify-content: stretch;
+		}
+
+		.map-view-toggle button {
+			flex: 1;
+		}
+
+		.map-workspace.has-selection .map-detail-canvas {
+			padding: 2.75rem 1rem 0.5rem;
+		}
+
+		.map-results-table-wrap {
+			overflow: visible;
+			border: 0;
+			box-shadow: none;
+		}
+
+		.map-results-table thead {
+			display: none;
+		}
+
+		.map-results-table,
+		.map-results-table tbody,
+		.map-results-table tr,
+		.map-results-table td {
+			display: block;
+			width: 100%;
+		}
+
+		.map-results-table tbody {
+			display: grid;
+			gap: 0.75rem;
+		}
+
+		.map-results-table tr {
+			border: 1px solid #e2e8f0;
+			border-radius: 0.75rem;
+			background: rgba(255, 255, 255, 0.88);
+			padding: 0.5rem 0.75rem;
+		}
+
+		.map-results-table td {
+			display: grid;
+			grid-template-columns: minmax(5.5rem, 0.38fr) minmax(0, 1fr);
+			gap: 0.75rem;
+			max-width: none !important;
+			padding: 0.45rem 0;
+			white-space: normal;
+		}
+
+		.map-results-table td::before {
+			content: attr(data-label);
+			font-size: 0.6875rem;
+			font-weight: 700;
+			letter-spacing: 0.06em;
+			text-transform: uppercase;
+			color: #64748b;
+		}
+
+		.map-results-table td > :global(*) {
+			min-width: 0;
+		}
+
+		.pagination-pages .page-number,
+		.pagination-pages > span {
+			display: none;
+		}
+
+		.pagination-pages .current-page {
+			display: flex;
+		}
+	}
+
+	@media (min-width: 768px) and (max-width: 1023px) {
+		.map-overview {
+			padding-inline: 2rem;
+		}
+
+		.map-canvas-shell {
+			height: min(58dvh, 34rem);
+			width: min(100%, 30rem);
+		}
+	}
+
+	@media (min-width: 1024px) {
+		.map-workspace {
+			height: calc(100dvh - 52px);
+			min-height: 0;
+			overflow: hidden;
+		}
+
+		.map-panel {
+			position: absolute;
+			top: 0;
+			left: 0;
+			height: 100%;
+			width: 100%;
+		}
+
+		.map-workspace.has-selection .map-panel {
+			height: 100%;
+			width: 42%;
+		}
+
+		.map-overview {
+			flex-direction: row;
+			gap: 2.5rem;
+			padding: 3rem 2rem 0;
+		}
+
+		.map-canvas-shell {
+			height: calc(100dvh - 120px);
+			width: auto;
+			max-width: 58%;
+			flex: 0 0 auto;
+		}
+
+		.map-guidance {
+			width: 18.75rem;
+			text-align: left;
+		}
+
+		.map-results-panel {
+			position: absolute;
+			top: 0;
+			right: 0;
+			height: 100%;
+			width: 0;
+			min-height: 0;
+			border-top-width: 0;
+			border-left-width: 1px;
+			overflow: hidden;
+			padding-bottom: 0;
+		}
+
+		.map-workspace.has-selection .map-results-panel {
+			width: 58%;
+		}
+
+		.results-content {
+			max-height: 85dvh;
+			overflow: hidden;
+			padding-block: 0;
+		}
+
+		.results-spacer {
+			display: block;
+		}
+	}
+</style>

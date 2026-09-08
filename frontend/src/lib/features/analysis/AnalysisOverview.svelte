@@ -42,10 +42,8 @@
 
 <section class="mx-auto w-full max-w-6xl px-4 py-8 sm:px-6 lg:px-10 lg:py-10">
 	<div class="border-b border-slate-200 pb-5">
-		<p class="text-[10px] font-semibold uppercase text-indigo-600" style="letter-spacing:0.12em;">
-			Analysis
-		</p>
-		<h2 class="mt-1 text-xl font-semibold text-slate-800">Current scope</h2>
+		<p class="workspace-kicker">Analysis</p>
+		<h2 class="editorial-page-title mt-1">Current scope</h2>
 	</div>
 
 	<div class="grid border-b border-slate-200 sm:grid-cols-2 xl:grid-cols-5">
@@ -79,7 +77,7 @@
 			</p>
 			<a
 				href="/analysis/events"
-				class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-slate-800 px-3 text-[11px] font-semibold text-white transition hover:bg-slate-700"
+				class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-800 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
 				>Open tabular view</a
 			>
 		</div>
@@ -91,7 +89,7 @@
 			</p>
 			<a
 				href="/analysis/metrics"
-				class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-indigo-600 px-3 text-[11px] font-semibold text-white transition hover:bg-indigo-700"
+				class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-800 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
 				>Open metrics dashboard</a
 			>
 		</div>
@@ -103,7 +101,7 @@
 			</p>
 			<a
 				href="/analysis/timeline"
-				class="mt-4 inline-flex h-8 items-center justify-center rounded-md bg-teal-700 px-3 text-[11px] font-semibold text-white transition hover:bg-teal-800"
+				class="mt-4 inline-flex min-h-11 items-center justify-center rounded-lg bg-slate-800 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700"
 				>Open timeline analysis</a
 			>
 		</div>

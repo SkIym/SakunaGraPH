@@ -18,11 +18,72 @@ test('top-level navigation keeps every route reachable', async ({ page }) => {
 		await page.getByRole('link', { name, exact: true }).click();
 		await expect(page).toHaveURL(new RegExp(`${pathname === '/' ? '/$' : `${pathname}$`}`));
 	}
+
+	await page.getByRole('link', { name: 'Run a SPARQL query' }).click();
+	await expect(page).toHaveURL(/\/query$/);
+});
+
+test('decorative schema background cannot become a blocking polygon layer', async ({ page }) => {
+	await gotoReady(page, '/');
+
+	const background = page.locator('svg.schema-field');
+	await expect(background).toHaveAttribute('aria-hidden', 'true');
+	await expect(background).toHaveAttribute('fill', 'none');
+	await expect(background).toHaveAttribute('pointer-events', 'none');
+	await expect(background).toHaveCSS('pointer-events', 'none');
+	expect(
+		await background
+			.locator('g path')
+			.evaluateAll((paths) => paths.every((path) => path.getAttribute('fill') === 'none')),
+	).toBe(true);
+
+	await page.getByRole('link', { name: 'Explore the map' }).click();
+	await expect(page).toHaveURL(/\/map$/);
+});
+
+test('home and ask stay within a narrow mobile viewport with touch-safe controls', async ({
+	page,
+}) => {
+	await page.setViewportSize({ width: 320, height: 740 });
+	await gotoReady(page, '/');
+	await page.evaluate(() => document.fonts.ready);
+
+	const wordmark = await page.getByRole('link', { name: 'SakunaGraPH home' }).boundingBox();
+	expect(wordmark.x).toBeGreaterThanOrEqual(0);
+	expect(wordmark.x + wordmark.width).toBeLessThanOrEqual(320);
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true,
+	);
+
+	const publicAction = await page.getByRole('link', { name: 'Explore the map' }).boundingBox();
+	const researchAction = await page.getByRole('link', { name: 'Run a SPARQL query' }).boundingBox();
+	expect(researchAction.y).toBeGreaterThan(publicAction.y + publicAction.height);
+	await expect(page.getByRole('heading', { name: 'Data freshness' })).toBeVisible();
+
+	await gotoReady(page, '/ask');
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true,
+	);
+
+	for (const control of await page
+		.getByRole('navigation', { name: 'Primary navigation' })
+		.getByRole('link')
+		.all()) {
+		const box = await control.boundingBox();
+		expect(box.height).toBeGreaterThanOrEqual(44);
+	}
+	const sendButton = await page.getByRole('button', { name: 'Send' }).boundingBox();
+	expect(sendButton.height).toBeGreaterThanOrEqual(44);
 });
 
 test('SPARQL query returns results in an accessible dialog', async ({ page }) => {
-	await gotoReady(page, '/');
-	await page.getByRole('button', { name: 'Run Query' }).click();
+	await gotoReady(page, '/query');
+	const editor = page.locator('.cm-editor');
+	await editor.click();
+	expect(await editor.evaluate((element) => getComputedStyle(element).outlineStyle)).not.toBe(
+		'none',
+	);
+	await page.getByRole('button', { name: 'Run query' }).click();
 
 	const dialog = page.getByRole('dialog');
 	await expect(dialog).toContainText('Query Results');
@@ -44,6 +105,35 @@ test('map loads and supports keyboard selection and event details', async ({ pag
 	await expect(eventRow.locator('td').last()).toHaveCSS('vertical-align', 'middle');
 	await eventRow.click();
 	await expect(page.getByRole('dialog', { name: /Typhoon Salome/ })).toBeVisible();
+});
+
+test('map and ontology adapt to a narrow touch viewport', async ({ page }) => {
+	await page.setViewportSize({ width: 320, height: 740 });
+	await gotoReady(page, '/map');
+
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true,
+	);
+	for (const name of ['By Region', 'By Province']) {
+		const box = await page.getByRole('button', { name }).boundingBox();
+		expect(box.height).toBeGreaterThanOrEqual(44);
+	}
+
+	const area = page.getByRole('button', { name: /^Select / }).first();
+	await area.dispatchEvent('click');
+	await expect(page.getByRole('button', { name: 'View details for Typhoon Salome' })).toBeVisible();
+	const closeBox = await page.getByRole('button', { name: 'Close results' }).boundingBox();
+	expect(closeBox.height).toBeGreaterThanOrEqual(44);
+
+	await gotoReady(page, '/ontology');
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true,
+	);
+	for (const name of ['Core Ontology', 'Disaster Taxonomy', 'PSGC Locations']) {
+		const box = await page.getByRole('button', { name }).boundingBox();
+		expect(box.height).toBeGreaterThanOrEqual(44);
+	}
+	await expect(page.getByRole('button', { name: 'Legend' })).toBeVisible();
 });
 
 test('ontology graph and secondary datasets load', async ({ page }) => {
@@ -84,6 +174,6 @@ test('ask keeps the legacy answer, SPARQL, and rows contract', async ({ page }) 
 	await page.getByRole('button', { name: /How many flood events/ }).click();
 
 	await expect(page.getByText('One matching disaster event was found.')).toBeVisible();
-	await expect(page.getByText('SPARQL Query')).toBeVisible();
+	await expect(page.getByText('Query used')).toBeVisible();
 	await expect(page.getByText(/Results/)).toBeVisible();
 });

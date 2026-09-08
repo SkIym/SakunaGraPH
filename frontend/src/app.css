@@ -1,12 +1,34 @@
 @import 'tailwindcss';
 
 :root {
+	color-scheme: light;
+	--color-brand: #305bb2;
+	--color-brand-hover: #244a93;
+	--color-action: #b91c1c;
+	--color-action-hover: #991b1b;
+	--color-canvas: #ffffff;
+	--color-surface: rgba(255, 255, 255, 0.92);
+	--color-surface-subtle: rgba(248, 250, 252, 0.88);
+	--color-text: #1e293b;
+	--color-text-secondary: #475569;
+	--color-text-muted: #64748b;
+	--color-border: #e2e8f0;
+	--color-focus: #305bb2;
+	--color-danger: #b91c1c;
+	--color-danger-surface: #fef2f2;
+	--app-nav-height: 3.25rem;
+	--radius-control: 0.75rem;
+	--radius-surface: 1rem;
+	--shadow-surface: 0 18px 45px -24px rgba(30, 41, 59, 0.32);
+	--shadow-control: 0 1px 2px rgba(30, 41, 59, 0.08);
+
+	/* Compatibility aliases for existing feature surfaces. */
 	--indigo: #6366f1;
 	--indigo-dark: #4f46e5;
 	--indigo-light: #818cf8;
-	--text: #1e293b;
-	--muted: #64748b;
-	--border: #e2e8f0;
+	--text: var(--color-text);
+	--muted: var(--color-text-muted);
+	--border: var(--color-border);
 }
 
 * {
@@ -17,10 +39,98 @@ html,
 body {
 	height: 100%;
 	margin: 0;
-	font-family: 'Inter', system-ui, sans-serif;
-	background: #ffffff;
-	color: var(--text);
+	font-family:
+		'Inter', system-ui, sans-serif; /* impeccable-disable-line overused-font -- established in DESIGN.md */
+	background: var(--color-canvas);
+	color: var(--color-text);
 	-webkit-font-smoothing: antialiased;
+}
+
+::selection {
+	background: #dbeafe;
+	color: var(--color-text);
+}
+
+:focus-visible {
+	outline: 3px solid var(--color-focus);
+	outline-offset: 3px;
+}
+
+.app-shell-offset {
+	padding-top: var(--app-nav-height);
+}
+
+.page-viewport {
+	min-height: calc(100vh - var(--app-nav-height));
+	min-height: calc(100dvh - var(--app-nav-height));
+}
+
+.ask-viewport {
+	height: calc(100vh - var(--app-nav-height));
+	height: calc(100dvh - var(--app-nav-height));
+}
+
+.analysis-viewport {
+	height: calc(100vh - var(--app-nav-height));
+	height: calc(100dvh - var(--app-nav-height));
+}
+
+.home-wordmark {
+	max-width: 100%;
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(2.35rem, 11vw, 6rem);
+	font-weight: 900;
+	line-height: 1.05;
+	letter-spacing: 0.02em;
+	color: var(--color-text);
+	text-wrap: balance;
+}
+
+.touch-target {
+	min-width: 2.75rem;
+	min-height: 2.75rem;
+}
+
+.workspace-kicker {
+	font-size: 0.6875rem;
+	font-weight: 700;
+	line-height: 1rem;
+	letter-spacing: 0.12em;
+	text-transform: uppercase;
+	color: var(--color-brand);
+}
+
+.editorial-page-title {
+	font-family: 'Playfair Display', Georgia, serif;
+	font-size: clamp(1.5rem, 2.5vw, 2rem);
+	font-weight: 900;
+	line-height: 1.15;
+	letter-spacing: -0.015em;
+	color: var(--color-text);
+}
+
+.brand-link {
+	color: var(--color-brand);
+}
+
+.brand-link:hover {
+	color: var(--color-brand-hover);
+}
+
+.brand-count {
+	background: #eff6ff;
+	color: #1e429f;
+}
+
+.brand-field:focus {
+	border-color: var(--color-brand);
+	box-shadow: 0 0 0 2px #dbeafe;
+}
+
+@media (min-width: 640px) {
+	.home-wordmark {
+		letter-spacing: 0.045em;
+	}
 }
 
 /* CodeMirror container resets */
@@ -49,13 +159,12 @@ body {
 		scroll-behavior: auto;
 	}
 
-	*,
-	*::before,
-	*::after {
-		animation-duration: 0.01ms !important;
-		animation-iteration-count: 1 !important;
-		scroll-behavior: auto !important;
-		transition-duration: 0.01ms !important;
+	.motion-decorative,
+	/* impeccable-disable-next-line bounce-easing -- this selector disables inherited bounce motion */
+	.animate-bounce,
+	.animate-pulse,
+	.animate-spin {
+		animation: none !important;
 	}
 }
 

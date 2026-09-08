@@ -10,6 +10,8 @@ WHERE {
 }
 LIMIT 10`;
 
+export const MAX_QUERY_LENGTH = 50_000;
+
 export const QUERY_PRESETS = Object.freeze([
 	{ label: 'Disaster events', query: DEFAULT_QUERY },
 	{
@@ -70,6 +72,58 @@ export function isWriteOperation(query) {
 	return WRITE_PATTERNS.some((pattern) => pattern.test(query));
 }
 
+function stripSparqlComments(query) {
+	let output = '';
+	let quote = '';
+	let inIri = false;
+	let escaped = false;
+	let comment = false;
+
+	for (const character of query) {
+		if (comment) {
+			if (character === '\n' || character === '\r') {
+				comment = false;
+				output += character;
+			}
+			continue;
+		}
+		if (escaped) {
+			escaped = false;
+			output += character;
+			continue;
+		}
+		if (quote) {
+			if (character === '\\') escaped = true;
+			if (character === quote) quote = '';
+			output += character;
+			continue;
+		}
+		if (inIri) {
+			if (character === '>') inIri = false;
+			output += character;
+			continue;
+		}
+		if (character === '<') inIri = true;
+		else if (character === '"' || character === "'") quote = character;
+		else if (character === '#') {
+			comment = true;
+			continue;
+		}
+		output += character;
+	}
+
+	return output;
+}
+
+export function isSelectQuery(query) {
+	const withoutComments = stripSparqlComments(query);
+	const withoutPrologue = withoutComments.replace(
+		/^\s*(?:(?:PREFIX\s+(?:[A-Za-z][\w-]*)?:\s*<[^>]+>|BASE\s*<[^>]+>)\s*)*/i,
+		'',
+	);
+	return /^SELECT\b/i.test(withoutPrologue);
+}
+
 export function createQueryWorkbench({ execute = runSparql } = {}) {
 	let query = $state(DEFAULT_QUERY);
 	let editorKey = $state(0);
@@ -98,32 +152,57 @@ export function createQueryWorkbench({ execute = runSparql } = {}) {
 	}
 
 	async function run() {
+		if (loading) return;
 		error = '';
 		const trimmed = query.trim();
 		if (!trimmed) {
-			error = 'Please enter a SPARQL query.';
+			error = 'Enter a SPARQL SELECT query before running it.';
 			return;
 		}
 		if (isWriteOperation(trimmed)) {
 			error =
-				'Write operations (INSERT, DELETE, CLEAR, DROP, etc.) are not permitted. This is a read-only interface.';
+				'This workspace is read-only. Remove the write operation and run a SPARQL SELECT query instead.';
+			return;
+		}
+		if (!isSelectQuery(trimmed)) {
+			error = 'Only SPARQL SELECT queries are supported in this read-only workspace.';
+			return;
+		}
+		if (trimmed.length > MAX_QUERY_LENGTH) {
+			error = `The query is too long. Keep it under ${MAX_QUERY_LENGTH.toLocaleString()} characters.`;
 			return;
 		}
 
 		loading = true;
-		activeRequest = new AbortController();
+		const controller = new AbortController();
+		activeRequest = controller;
 		try {
-			results = await execute(trimmed, { signal: activeRequest.signal });
+			results = await execute(trimmed, { signal: controller.signal });
 			resultsOpen = true;
 		} catch (requestError) {
 			if (requestError.name === 'AbortError') return;
-			error =
-				requestError.kind === 'network'
-					? 'Could not reach the server. Please try again.'
-					: requestError.message || 'An error occurred while processing the query.';
+			if (requestError.kind === 'network') {
+				error =
+					'Could not reach the data service. Check your connection, then run the query again.';
+			} else if (requestError.kind === 'timeout') {
+				error =
+					'The query took too long to complete. Narrow its scope or add a LIMIT, then try again.';
+			} else if (requestError.status === 429) {
+				error = 'The data service is receiving too many queries. Wait a moment, then try again.';
+			} else if (requestError.status === 400 || requestError.status === 422) {
+				error =
+					requestError.message || 'The query could not be parsed. Check its syntax and try again.';
+			} else if (requestError.status >= 500) {
+				error =
+					'The query service is temporarily unavailable. Your query is preserved; try again shortly.';
+			} else {
+				error = 'The query could not be completed. Review it and try again.';
+			}
 		} finally {
-			loading = false;
-			activeRequest = null;
+			if (activeRequest === controller) {
+				loading = false;
+				activeRequest = null;
+			}
 		}
 	}
 
@@ -171,6 +250,9 @@ export function createQueryWorkbench({ execute = runSparql } = {}) {
 			resultsOpen = false;
 		},
 		reset() {
+			activeRequest?.abort();
+			activeRequest = null;
+			loading = false;
 			selectedCompetency = '';
 			loadQuery(DEFAULT_QUERY);
 		},

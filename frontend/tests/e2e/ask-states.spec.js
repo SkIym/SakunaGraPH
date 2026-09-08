@@ -13,14 +13,18 @@ async function ask(page, question) {
 
 test('records the current loading and success states', async ({ page }) => {
 	await ask(page, 'Show one event');
-	await expect(page.getByText(/Querying knowledge graph/)).toBeVisible();
+	await expect(page.getByText('Checking the knowledge graph…', { exact: true })).toBeVisible();
 	await expect(page.getByText('One matching disaster event was found.')).toBeVisible();
 });
 
 test('records the current empty state', async ({ page }) => {
 	await ask(page, 'Return an empty result');
 	await expect(page.getByText('No matching events were found.')).toBeVisible();
-	await expect(page.getByText('No matching records in the knowledge graph.')).toBeVisible();
+	await expect(
+		page.getByText(
+			'No records matched this question. Try a broader place, date range, or disaster type.',
+		),
+	).toBeVisible();
 });
 
 test('records the current failure state', async ({ page }) => {
