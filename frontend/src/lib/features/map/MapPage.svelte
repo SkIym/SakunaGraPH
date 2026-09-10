@@ -1,4 +1,5 @@
 <script>
+	import { page as appPage } from '$app/state';
 	import { tick } from 'svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
@@ -20,7 +21,13 @@
 	let pathGenerator = null;
 
 	// ── UI state ─────────────────────────────────────────────────────────────
-	let view = $state('regions'); // 'regions' | 'provinces'
+	const requestedProvinceId = appPage.url.searchParams.get('province')?.trim() ?? '';
+	let initialProvinceApplied = $state(false);
+	let view = $state(
+		appPage.url.searchParams.get('view') === 'provinces' || requestedProvinceId
+			? 'provinces'
+			: 'regions',
+	);
 	let selected = $state(null); // {type, psgc, id, name}
 	let selectedEvent = $state('');
 	let EventDetailsComponent = $state(null);
@@ -64,6 +71,16 @@
 			}
 		})();
 		return () => controller.abort();
+	});
+
+	// A home-preview deep link selects the matching province after its geometry is available.
+	$effect(() => {
+		if (initialProvinceApplied || !requestedProvinceId || pathData.length === 0) return;
+		initialProvinceApplied = true;
+		const province = pathData.find((item) => item.gid === requestedProvinceId);
+		if (!province) return;
+		view = 'provinces';
+		handleMapSelect(province);
 	});
 
 	// ── When selection, mode, or page changes, fetch data ───────────────────
@@ -219,14 +236,18 @@
 			style="backdrop-filter:blur(10px);"
 		>
 			<button
+				type="button"
 				onclick={() => switchView('regions')}
+				aria-pressed={view === 'regions'}
 				class="min-h-11 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150
 				{view === 'regions' ? 'bg-slate-800 text-white shadow-sm' : 'text-slate-500 hover:text-slate-700'}"
 			>
 				By Region
 			</button>
 			<button
+				type="button"
 				onclick={() => switchView('provinces')}
+				aria-pressed={view === 'provinces'}
 				class="min-h-11 rounded-full px-4 py-2 text-xs font-semibold transition-all duration-150
 				{view === 'provinces'
 					? 'bg-slate-800 text-white shadow-sm'

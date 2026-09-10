@@ -41,6 +41,30 @@ test('decorative schema background cannot become a blocking polygon layer', asyn
 	await expect(page).toHaveURL(/\/map$/);
 });
 
+test('home province preview identifies provinces and opens the province map', async ({
+	page,
+	isMobile,
+}) => {
+	await gotoReady(page, '/');
+
+	const preview = page.getByLabel('Province map preview');
+	await expect(preview).toBeVisible();
+	const province = preview.getByRole('button').first();
+	const actionLabel = await province.getAttribute('aria-label');
+	const provinceName = actionLabel?.match(/^Open (.+) in the full map$/)?.[1];
+	if (!provinceName) throw new Error(`Unexpected province action label: ${actionLabel}`);
+
+	if (!isMobile) {
+		await province.hover();
+		await expect(page.getByRole('tooltip')).toHaveText(provinceName);
+	}
+	await province.click();
+
+	await expect(page).toHaveURL(/\/map\?view=provinces&province=\d+$/);
+	await expect(page.getByRole('heading', { name: provinceName, exact: true })).toBeVisible();
+	await expect(page.getByRole('button', { name: 'View details for Typhoon Salome' })).toBeVisible();
+});
+
 test('home and ask stay within a narrow mobile viewport with touch-safe controls', async ({
 	page,
 }) => {

@@ -35,7 +35,7 @@
 
 <main class="relative" style="z-index:1;">
 	<section
-		class="page-viewport mx-auto grid w-full max-w-6xl items-center gap-12 px-5 py-14 lg:grid-cols-[minmax(0,1fr)_minmax(20rem,25rem)] lg:px-8"
+		class="page-viewport mx-auto grid w-full max-w-7xl items-center gap-12 px-5 py-14 lg:grid-cols-[minmax(0,1fr)_minmax(27rem,35rem)] lg:px-8 xl:gap-16"
 	>
 		<div class="min-w-0 max-w-3xl">
 			<a href="/" class="home-brand inline-block" aria-label="SakunaGraPH home">

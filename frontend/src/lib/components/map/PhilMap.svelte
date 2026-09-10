@@ -12,6 +12,8 @@
 		interactive = true,
 		strokeWidth = 0.7,
 		strokeColor = '#374151',
+		ariaLabel = 'Map of Philippine regions and provinces',
+		getAreaLabel = (item) => `Select ${item.name}`,
 		colorMap = {}, // groupKey → default fill color (for region pastels)
 		onselect = () => {},
 		onhover = () => {}, // onhover(item | null, clientX, clientY)
@@ -64,7 +66,7 @@
 	class="w-full h-full"
 	preserveAspectRatio="xMidYMid meet"
 	style="overflow:visible;"
-	aria-label="Map of Philippine regions and provinces"
+	aria-label={ariaLabel}
 >
 	{#each pathData as item (item.gid)}
 		{#if interactive}
@@ -77,7 +79,7 @@
 				class="map-area cursor-pointer outline-none"
 				role="button"
 				tabindex="0"
-				aria-label={`Select ${item.name}`}
+				aria-label={getAreaLabel(item)}
 				aria-pressed={selectedKey() === groupKey(item)}
 				onmouseenter={(e) => handleEnter(item, e)}
 				onmouseleave={handleLeave}

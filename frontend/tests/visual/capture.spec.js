@@ -21,6 +21,9 @@ for (const entry of manifest.routes) {
 	test(`capture ${entry.name}`, async ({ page }, testInfo) => {
 		await gotoReady(page, entry.path);
 		await page.locator('body').waitFor();
+		if (entry.path === '/') {
+			await page.getByLabel('Province map preview').waitFor();
+		}
 		if (entry.path === '/map') {
 			await page.getByLabel('Map of Philippine regions and provinces').waitFor();
 		}

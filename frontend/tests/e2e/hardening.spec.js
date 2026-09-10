@@ -14,9 +14,7 @@ test('homepage survives 200% text scaling and expanded copy without page-level o
 		}
 	});
 
-	await expect(
-		page.getByRole('link', { name: 'Open the interactive Philippine disaster map' }),
-	).toBeVisible();
+	await expect(page.getByLabel('Province map preview')).toBeVisible();
 	const dimensions = await page.evaluate(() => ({
 		clientWidth: document.documentElement.clientWidth,
 		scrollWidth: document.documentElement.scrollWidth,

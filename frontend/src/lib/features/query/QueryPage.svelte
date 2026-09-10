@@ -34,19 +34,16 @@
 <NodeCanvas active={workbench.loading} />
 <svelte:window onkeydown={workbench.handleEditorKeydown} />
 
-<main class="relative mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14" style="z-index:1;">
-	<header class="max-w-3xl">
-		<h1
-			class="font-black leading-tight text-slate-800"
-			style="font-family:'Playfair Display',Georgia,serif; font-size:clamp(2.25rem,6vw,4.5rem);"
-		>
-			SPARQL query workspace
-		</h1>
-		<p class="mt-4 max-w-[68ch] text-base leading-7 text-slate-600">
-			Run read-only SPARQL SELECT queries against the graph currently loaded into SakunaGraPH. This
-			workspace is intended for researchers familiar with RDF and SPARQL.
-		</p>
-		<p class="mt-2 text-sm leading-6 text-slate-600">
+<main class="relative mx-auto w-full max-w-5xl px-4 py-6 sm:px-6 sm:py-8" style="z-index:1;">
+	<header class="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between sm:gap-8">
+		<div class="min-w-0">
+			<h1 class="editorial-page-title">SPARQL query workspace</h1>
+			<p class="mt-2 max-w-[68ch] text-sm leading-6 text-slate-600">
+				Run read-only SPARQL SELECT queries against the graph currently loaded into SakunaGraPH.
+				This workspace is intended for researchers familiar with RDF and SPARQL.
+			</p>
+		</div>
+		<p class="shrink-0 text-sm leading-6 text-slate-600">
 			New to the data? <a
 				href="/map"
 				class="font-semibold text-blue-800 underline decoration-blue-200 underline-offset-4 hover:text-blue-950"
@@ -55,7 +52,7 @@
 		</p>
 	</header>
 
-	<section class="mt-8" aria-labelledby="query-editor-title">
+	<section class="mt-6" aria-labelledby="query-editor-title">
 		<div
 			class="overflow-hidden rounded-2xl border border-slate-200/80"
 			style="background:var(--color-surface); box-shadow:var(--shadow-surface);"
@@ -176,7 +173,7 @@
 		</div>
 	</section>
 
-	<section class="mt-12 border-t border-slate-200 pt-8" aria-labelledby="query-scope-title">
+	<section class="mt-8 border-t border-slate-200 pt-6" aria-labelledby="query-scope-title">
 		<h2 id="query-scope-title" class="text-lg font-bold text-slate-800">Query scope</h2>
 		<p class="mt-2 max-w-[70ch] text-sm leading-6 text-slate-600">
 			Only SELECT queries are supported. Results reflect the graph currently loaded by the
