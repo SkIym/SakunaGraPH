@@ -14,7 +14,7 @@
 				type="button"
 				onclick={() => onselect(Number(item.period))}
 				aria-pressed={selectedYear === Number(item.period)}
-				class="min-h-11 rounded-lg border px-2 py-1.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[#305bb2] {selectedYear ===
+				class="min-h-11 rounded-lg border px-2 py-1.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] {selectedYear ===
 				Number(item.period)
 					? 'border-slate-800 ring-1 ring-slate-800'
 					: 'border-slate-200 hover:border-indigo-300'}"

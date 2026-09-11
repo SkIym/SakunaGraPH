@@ -27,7 +27,7 @@
 
 		// SPARQL-tuned syntax colours
 		const sparqlHighlight = HighlightStyle.define([
-			{ tag: t.keyword, color: '#a21caf', fontWeight: '600' }, // SELECT, WHERE, PREFIX …
+			{ tag: t.keyword, color: 'var(--color-brand)', fontWeight: '600' }, // SELECT, WHERE, PREFIX …
 			{ tag: t.variableName, color: '#6b7280' }, // ?event, ?type …
 			{ tag: t.atom, color: '#6b7280' }, // :DisasterEvent, IRIs
 			{ tag: t.name, color: '#6b7280' }, // FILTER, REGEX, builtins
@@ -54,11 +54,11 @@
 				padding: '14px 16px',
 				minHeight: '260px',
 				fontFamily: '"JetBrains Mono","Fira Code","Courier New",monospace',
-				caretColor: '#a21caf',
+				caretColor: 'var(--color-brand)',
 				lineHeight: '1.7',
 			},
 			'&.cm-focused': {
-				outline: '3px solid #305bb2',
+				outline: '3px solid var(--color-focus)',
 				outlineOffset: '-3px',
 			},
 			'.cm-gutters': {
@@ -69,14 +69,16 @@
 				fontSize: '12px',
 				paddingRight: '6px',
 			},
-			'.cm-activeLineGutter': { background: '#f0f4ff' },
-			'.cm-activeLine': { background: '#f8f9ff' },
-			'.cm-selectionBackground, ::selection': { background: '#fce7f3 !important' },
-			'.cm-cursor': { borderLeftColor: '#a21caf' },
+			'.cm-activeLineGutter': { background: 'var(--color-brand-soft)' },
+			'.cm-activeLine': { background: '#f7f9ff' },
+			'.cm-selectionBackground, ::selection': {
+				background: 'var(--color-accent-soft) !important',
+			},
+			'.cm-cursor': { borderLeftColor: 'var(--color-brand)' },
 			'.cm-matchingBracket': {
-				background: '#fce7f3',
+				background: 'var(--color-accent-soft)',
 				borderRadius: '2px',
-				outline: '1px solid #fbcfe8',
+				outline: '1px solid var(--color-accent)',
 			},
 			'.cm-tooltip': {
 				border: '1px solid #e2e8f0',

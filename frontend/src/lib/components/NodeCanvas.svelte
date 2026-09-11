@@ -84,7 +84,7 @@
 	.schema-cluster,
 	.schema-spine {
 		fill: none;
-		stroke: var(--color-brand, #305bb2);
+		stroke: var(--color-brand, #0038a8);
 		stroke-linecap: round;
 		stroke-linejoin: round;
 		stroke-width: 1;
@@ -109,14 +109,14 @@
 	.schema-cluster circle:nth-of-type(4),
 	.schema-spine circle:nth-of-type(2),
 	.schema-spine circle:nth-of-type(4) {
-		fill: var(--color-brand, #305bb2);
+		fill: var(--color-brand, #0038a8);
 		fill-opacity: 0.24;
 	}
 
 	.query-trace {
 		fill: none;
 		opacity: 0;
-		stroke: var(--color-brand, #305bb2);
+		stroke: var(--color-brand, #0038a8);
 		stroke-dasharray: 18 82;
 		stroke-linecap: round;
 		stroke-width: 2;

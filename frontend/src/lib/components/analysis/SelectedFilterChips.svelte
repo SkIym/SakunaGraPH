@@ -91,7 +91,7 @@
 						? 'bg-teal-500'
 						: chip.kind === 'disasterType'
 							? 'bg-amber-500'
-							: 'bg-[#305bb2]'}"
+							: 'bg-[var(--color-brand)]'}"
 				></span>
 				<span class="max-w-48 truncate" title={chip.label}>{chip.label}</span>
 				<button

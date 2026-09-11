@@ -31,7 +31,7 @@
 			type="button"
 			onclick={() => onselect(month)}
 			aria-pressed={selectedMonth === month}
-			class="min-h-11 rounded-lg border px-2 py-1.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[#305bb2] {selectedMonth ===
+			class="min-h-11 rounded-lg border px-2 py-1.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] {selectedMonth ===
 			month
 				? 'border-slate-800 ring-1 ring-slate-800'
 				: 'border-slate-200 hover:border-sky-300'}"

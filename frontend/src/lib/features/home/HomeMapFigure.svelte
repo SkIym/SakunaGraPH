@@ -1,10 +1,14 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { getAnalysisRegionRankings } from '$lib/api/analysis.js';
 	import PhilMap from '$lib/components/map/PhilMap.svelte';
 	import { formatProvName } from '$lib/mapData.js';
 	import { FULL_MAP_VIEW_BOX, loadMapGeometry } from '$lib/features/map/geometry.js';
+	import { buildHomeRecordMarkers } from './mapMarkers.js';
 
 	let pathData = $state([]);
+	let pathGenerator = $state(null);
+	let regionRankings = $state([]);
 	let mapLoading = $state(true);
 	let mapError = $state('');
 	let tooltipItem = $state(null);
@@ -12,7 +16,18 @@
 	let tooltipY = $state(0);
 
 	const provinceColors = $derived(
-		Object.fromEntries(pathData.map((item) => [item.gid, '#dbeafe'])),
+		Object.fromEntries(pathData.map((item) => [item.gid, 'var(--color-brand-medium)'])),
+	);
+	const recordMarkers = $derived(
+		buildHomeRecordMarkers({ rankings: regionRankings, pathData, pathGenerator }),
+	);
+	const recordMarkerSummary = $derived(
+		recordMarkers
+			.map(
+				(marker) =>
+					`${marker.label}: ${marker.count.toLocaleString()} linked ${marker.count === 1 ? 'record' : 'records'}`,
+			)
+			.join('; '),
 	);
 
 	$effect(() => {
@@ -23,6 +38,7 @@
 		void loadMapGeometry({ signal: controller.signal })
 			.then((geometry) => {
 				pathData = geometry.pathData;
+				pathGenerator = geometry.pathGenerator;
 				mapLoading = false;
 			})
 			.catch((requestError) => {
@@ -31,6 +47,18 @@
 				mapLoading = false;
 			});
 
+		return () => controller.abort();
+	});
+
+	$effect(() => {
+		const controller = new AbortController();
+		void getAnalysisRegionRankings({}, { signal: controller.signal })
+			.then((response) => {
+				regionRankings = Array.isArray(response?.items) ? response.items : [];
+			})
+			.catch(() => {
+				if (!controller.signal.aborted) regionRankings = [];
+			});
 		return () => controller.abort();
 	});
 
@@ -71,7 +99,7 @@
 					<p class="text-sm font-semibold text-slate-800">{mapError}</p>
 					<a
 						href="/map?view=provinces"
-						class="touch-target mt-2 inline-flex items-center text-sm font-semibold text-blue-800 underline decoration-blue-200 underline-offset-4 hover:text-blue-950"
+						class="brand-link touch-target mt-2 inline-flex items-center text-sm font-semibold underline decoration-[var(--color-brand-medium)] underline-offset-4"
 						>Open the full map</a
 					>
 				</div>
@@ -85,7 +113,8 @@
 					selected={null}
 					interactive={true}
 					strokeWidth={0.85}
-					strokeColor="#305bb2"
+					strokeColor="var(--color-brand)"
+					hoverFill="var(--color-accent)"
 					colorMap={provinceColors}
 					ariaLabel="Province map preview"
 					getAreaLabel={provinceActionLabel}
@@ -96,12 +125,60 @@
 						tooltipY = y;
 					}}
 				/>
+				{#if recordMarkers.length > 0}
+					<svg
+						viewBox={FULL_MAP_VIEW_BOX}
+						class="pointer-events-none absolute inset-0 h-full w-full"
+						preserveAspectRatio="xMidYMid meet"
+						role="img"
+						aria-label="Regions with the highest linked disaster-record counts"
+					>
+						<title>{recordMarkerSummary}</title>
+						{#each recordMarkers as marker (marker.id)}
+							<circle
+								cx={marker.x}
+								cy={marker.y}
+								r={marker.radius}
+								fill="var(--color-action)"
+								stroke="white"
+								stroke-width="2"
+								vector-effect="non-scaling-stroke"
+							>
+								<title>{marker.label}: {marker.count.toLocaleString()} linked records</title>
+							</circle>
+						{/each}
+					</svg>
+				{/if}
 			</div>
 		{/if}
 	</div>
-	<figcaption id="home-map-instructions" class="sr-only">
-		Interactive map of Philippine provinces. Hover to identify a province, or activate one to open
-		its disaster records in the full map.
+	<figcaption
+		id="home-map-instructions"
+		class="mt-2 flex flex-wrap items-center justify-center gap-x-4 gap-y-2 text-[0.6875rem] font-medium text-slate-600"
+	>
+		<span class="inline-flex items-center gap-1.5">
+			<span class="h-0 w-4 border-t-2 border-[var(--color-brand)]" aria-hidden="true"></span>
+			Province boundaries
+		</span>
+		<span class="inline-flex items-center gap-1.5">
+			<span
+				class="h-2.5 w-2.5 rounded-sm bg-[var(--color-accent)] ring-1 ring-slate-800/40"
+				aria-hidden="true"
+			></span>
+			Hover or focus
+		</span>
+		{#if recordMarkers.length > 0}
+			<span class="inline-flex items-center gap-1.5" title={recordMarkerSummary}>
+				<span
+					class="h-2.5 w-2.5 rounded-full bg-[var(--color-action)] ring-2 ring-white"
+					aria-hidden="true"
+				></span>
+				Highest record-count regions
+			</span>
+		{/if}
+		<span class="sr-only">
+			Activate a province to open its disaster records in the full map. {recordMarkerSummary}
+		</span>
 	</figcaption>
 </figure>
 

@@ -187,7 +187,7 @@
 							<button
 								onclick={() => (page = p)}
 								class="h-11 w-11 rounded-lg text-xs font-medium transition-colors {page === p
-									? 'bg-[#305bb2] text-white shadow-sm'
+									? 'bg-[var(--color-brand)] text-white shadow-sm'
 									: 'border border-slate-200 text-slate-600 hover:bg-white'}"
 							>
 								{p + 1}

@@ -144,7 +144,7 @@
 								type="checkbox"
 								checked={analysisFilters.disasterTypes.includes(row.node.id)}
 								onchange={() => analysisFilters.toggleDisasterType(row.node.id)}
-								class="h-4 w-4 shrink-0 cursor-pointer accent-[#305bb2]"
+								class="h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-brand)]"
 							/>
 							<span
 								class="h-2 w-2 shrink-0 rounded-sm"

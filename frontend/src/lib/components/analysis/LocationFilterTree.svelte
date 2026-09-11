@@ -160,7 +160,7 @@
 									type="checkbox"
 									checked={analysisFilters.locationIds.includes(region.id)}
 									onchange={() => analysisFilters.toggleLocation(region.id)}
-									class="h-4 w-4 shrink-0 cursor-pointer accent-[#305bb2]"
+									class="h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-brand)]"
 								/>
 								<label
 									for="location-{region.id}"
@@ -200,7 +200,7 @@
 													type="checkbox"
 													checked={analysisFilters.locationIds.includes(province.id)}
 													onchange={() => analysisFilters.toggleLocation(province.id)}
-													class="h-4 w-4 shrink-0 cursor-pointer accent-[#305bb2]"
+													class="h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-brand)]"
 												/>
 												<label
 													for="location-{province.id}"
@@ -223,7 +223,7 @@
 																type="checkbox"
 																checked={analysisFilters.locationIds.includes(locality.id)}
 																onchange={() => analysisFilters.toggleLocation(locality.id)}
-																class="h-4 w-4 shrink-0 cursor-pointer accent-[#305bb2]"
+																class="h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-brand)]"
 															/>
 															<span
 																title={locality.label}
@@ -247,7 +247,7 @@
 												type="checkbox"
 												checked={analysisFilters.locationIds.includes(locality.id)}
 												onchange={() => analysisFilters.toggleLocation(locality.id)}
-												class="h-4 w-4 shrink-0 cursor-pointer accent-[#305bb2]"
+												class="h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-brand)]"
 											/>
 											<span
 												title={locality.label}

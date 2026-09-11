@@ -2,21 +2,30 @@
 
 :root {
 	color-scheme: light;
-	--color-brand: #305bb2;
-	--color-brand-hover: #244a93;
-	--color-action: #b91c1c;
-	--color-action-hover: #991b1b;
+	--color-flag-blue: #0038a8;
+	--color-flag-red: #ce1126;
+	--color-flag-yellow: #fcd116;
+	--color-brand: var(--color-flag-blue);
+	--color-brand-hover: #002b82;
+	--color-brand-soft: #edf2ff;
+	--color-brand-medium: #d7e3fb;
+	--color-action: var(--color-flag-red);
+	--color-action-hover: #a50e1f;
+	--color-accent: var(--color-flag-yellow);
+	--color-accent-soft: #fff8cf;
+	--color-accent-ink: #1e293b;
 	--color-canvas: #ffffff;
 	--color-surface: rgba(255, 255, 255, 0.92);
 	--color-surface-subtle: rgba(248, 250, 252, 0.88);
-	--color-research-surface: #eef3f8;
+	--color-research-surface: #f1f4fa;
 	--color-text: #1e293b;
 	--color-text-secondary: #475569;
 	--color-text-muted: #64748b;
 	--color-border: #e2e8f0;
-	--color-focus: #305bb2;
-	--color-danger: #b91c1c;
-	--color-danger-surface: #fef2f2;
+	--color-focus: var(--color-flag-blue);
+	--color-danger: var(--color-flag-red);
+	--color-danger-border: #f3a6af;
+	--color-danger-surface: #fff1f2;
 	--app-nav-height: 3.25rem;
 	--radius-control: 0.75rem;
 	--radius-surface: 1rem;
@@ -24,9 +33,9 @@
 	--shadow-control: 0 1px 2px rgba(30, 41, 59, 0.08);
 
 	/* Compatibility aliases for existing feature surfaces. */
-	--indigo: #6366f1;
-	--indigo-dark: #4f46e5;
-	--indigo-light: #818cf8;
+	--indigo: var(--color-brand);
+	--indigo-dark: var(--color-brand-hover);
+	--indigo-light: #4169c1;
 	--text: var(--color-text);
 	--muted: var(--color-text-muted);
 	--border: var(--color-border);
@@ -45,11 +54,18 @@ body {
 	background: var(--color-canvas);
 	color: var(--color-text);
 	-webkit-font-smoothing: antialiased;
+	scrollbar-color: var(--color-brand) var(--color-surface-subtle);
 }
 
 ::selection {
-	background: #dbeafe;
-	color: var(--color-text);
+	background: var(--color-accent-soft);
+	color: var(--color-accent-ink);
+}
+
+input,
+select,
+textarea {
+	accent-color: var(--color-brand);
 }
 
 :focus-visible {
@@ -119,13 +135,13 @@ body {
 }
 
 .brand-count {
-	background: #eff6ff;
-	color: #1e429f;
+	background: var(--color-brand-soft);
+	color: var(--color-brand);
 }
 
 .brand-field:focus {
 	border-color: var(--color-brand);
-	box-shadow: 0 0 0 2px #dbeafe;
+	box-shadow: 0 0 0 2px var(--color-brand-medium);
 }
 
 @media (min-width: 640px) {

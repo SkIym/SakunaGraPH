@@ -52,7 +52,7 @@
 					<button
 						type="button"
 						onclick={() => onselect(item.event)}
-						class="w-full rounded-lg border border-slate-200 p-3 text-left transition hover:border-blue-300 hover:bg-blue-50/40 focus:outline-none focus:ring-2 focus:ring-[#305bb2]"
+						class="w-full rounded-lg border border-slate-200 p-3 text-left transition hover:border-[var(--color-brand-medium)] hover:bg-[var(--color-brand-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)]"
 					>
 						<div class="flex items-start justify-between gap-3">
 							<p class="line-clamp-2 text-xs font-semibold leading-5 text-slate-700">

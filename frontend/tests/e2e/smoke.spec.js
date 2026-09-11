@@ -49,6 +49,12 @@ test('home province preview identifies provinces and opens the province map', as
 
 	const preview = page.getByLabel('Province map preview');
 	await expect(preview).toBeVisible();
+	const rankingOverlay = page.getByRole('img', {
+		name: 'Regions with the highest linked disaster-record counts',
+	});
+	await expect(rankingOverlay).toBeVisible();
+	await expect(rankingOverlay.locator('circle')).toHaveAttribute('fill', 'var(--color-action)');
+	await expect(page.getByText('Highest record-count regions')).toBeVisible();
 	const province = preview.getByRole('button').first();
 	const actionLabel = await province.getAttribute('aria-label');
 	const provinceName = actionLabel?.match(/^Open (.+) in the full map$/)?.[1];
@@ -57,6 +63,7 @@ test('home province preview identifies provinces and opens the province map', as
 	if (!isMobile) {
 		await province.hover();
 		await expect(page.getByRole('tooltip')).toHaveText(provinceName);
+		await expect(province).toHaveAttribute('fill', 'var(--color-accent)');
 	}
 	await province.click();
 

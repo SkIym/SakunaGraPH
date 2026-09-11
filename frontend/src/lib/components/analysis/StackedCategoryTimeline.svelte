@@ -41,7 +41,7 @@
 				<button
 					type="button"
 					onclick={() => onselect(item.period)}
-					class="group relative flex h-full min-w-0 flex-1 flex-col-reverse justify-start overflow-hidden rounded-t-sm bg-slate-100 text-left transition hover:ring-2 hover:ring-[#305bb2] focus:outline-none focus:ring-2 focus:ring-[#305bb2]"
+					class="group relative flex h-full min-w-0 flex-1 flex-col-reverse justify-start overflow-hidden rounded-t-sm bg-slate-100 text-left transition hover:ring-2 hover:ring-[var(--color-focus)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)]"
 					title={`${item.period}: ${total.toLocaleString()} category assignments`}
 				>
 					{#each item.categories as category (category.id)}

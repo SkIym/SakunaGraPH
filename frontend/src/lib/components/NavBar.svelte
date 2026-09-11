@@ -25,14 +25,14 @@
 			<a
 				href={link.href}
 				aria-current={active ? 'page' : undefined}
-				class="touch-target relative flex items-center rounded-lg px-2.5 text-xs whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-700 focus-visible:ring-offset-2 sm:px-4 sm:text-sm
+				class="touch-target relative flex items-center rounded-lg px-2.5 text-xs whitespace-nowrap transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-focus)] focus-visible:ring-offset-2 sm:px-4 sm:text-sm
 				{active ? 'text-slate-800' : 'text-slate-600 hover:text-slate-800 hover:bg-slate-100/70'}"
 			>
 				{link.label}
 				{#if active}
 					<span
 						aria-hidden="true"
-						class="absolute top-full left-1/2 mt-0.5 h-1 w-1 -translate-x-1/2 rounded-full bg-slate-800"
+						class="absolute bottom-0.5 left-1/2 h-1.5 w-1.5 -translate-x-1/2 rounded-full bg-[var(--color-accent)]"
 					></span>
 				{/if}
 			</a>

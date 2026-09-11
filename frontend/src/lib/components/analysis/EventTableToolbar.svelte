@@ -87,7 +87,7 @@
 							checked={visibleColumns.has(column.id)}
 							disabled={visibleColumns.size === 1 && visibleColumns.has(column.id)}
 							onchange={() => onToggleColumn(column.id)}
-							class="h-4 w-4 accent-[#305bb2]"
+							class="h-4 w-4 accent-[var(--color-brand)]"
 						/>
 						{column.label}
 					</label>

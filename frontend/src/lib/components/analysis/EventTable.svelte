@@ -86,7 +86,9 @@
 							>
 								{column.label}
 								<span
-									class="text-[10px] {sortBy === column.id ? 'text-[#305bb2]' : 'text-slate-300'}"
+									class="text-[10px] {sortBy === column.id
+										? 'text-[var(--color-brand)]'
+										: 'text-slate-300'}"
 									aria-hidden="true"
 								>
 									{sortBy === column.id ? (sortDir === 'asc' ? '↑' : '↓') : '↕'}
@@ -126,7 +128,7 @@
 								onSelect(item);
 							}
 						}}
-						class="cursor-pointer align-middle transition hover:bg-blue-50/50 focus:bg-blue-50/50 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[#305bb2] {row %
+						class="cursor-pointer align-middle transition hover:bg-[var(--color-brand-soft)] focus:bg-[var(--color-brand-soft)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--color-focus)] {row %
 						2
 							? 'bg-slate-50/20'
 							: ''}"

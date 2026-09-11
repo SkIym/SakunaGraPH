@@ -46,7 +46,7 @@
 		<p class="shrink-0 text-sm leading-6 text-slate-600">
 			New to the data? <a
 				href="/map"
-				class="font-semibold text-blue-800 underline decoration-blue-200 underline-offset-4 hover:text-blue-950"
+				class="brand-link font-semibold underline decoration-[var(--color-brand-medium)] underline-offset-4"
 				>Explore the map instead</a
 			>.
 		</p>
@@ -75,7 +75,7 @@
 						id="query-example"
 						bind:value={workbench.selectedCompetency}
 						onchange={workbench.selectCompetency}
-						class="min-h-11 w-full cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm text-slate-700 transition-colors focus:border-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-100"
+						class="min-h-11 w-full cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm text-slate-700 transition-colors focus:border-[var(--color-focus)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-medium)]"
 					>
 						<option value="">Write your own query</option>
 						{#each COMPETENCY_QUESTIONS as question, index}
@@ -115,7 +115,7 @@
 				<div
 					role="alert"
 					aria-live="assertive"
-					class="mx-4 mb-3 break-words rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-800 [overflow-wrap:anywhere]"
+					class="mx-4 mb-3 break-words rounded-xl border border-[var(--color-danger-border)] bg-[var(--color-danger-surface)] px-4 py-3 text-sm leading-6 text-[var(--color-danger)] [overflow-wrap:anywhere]"
 				>
 					{workbench.error}
 				</div>
@@ -165,7 +165,7 @@
 				<button
 					type="button"
 					onclick={() => workbench.loadPreset(preset)}
-					class="touch-target rounded-full border border-slate-300 bg-white px-3 py-1.5 font-mono text-xs text-slate-700 transition-colors hover:border-blue-700 hover:text-blue-800"
+					class="touch-target rounded-full border border-slate-300 bg-white px-3 py-1.5 font-mono text-xs text-slate-700 transition-colors hover:border-[var(--color-brand)] hover:text-[var(--color-brand)]"
 				>
 					{preset.label}
 				</button>

@@ -18,7 +18,7 @@
 				type="button"
 				onclick={() => onselect(day)}
 				aria-pressed={selectedDay === day}
-				class="min-h-11 rounded-lg border text-center text-[9px] font-semibold transition focus:outline-none focus:ring-2 focus:ring-[#305bb2] {selectedDay ===
+				class="min-h-11 rounded-lg border text-center text-[9px] font-semibold transition focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] {selectedDay ===
 				day
 					? 'border-slate-800 ring-1 ring-slate-800'
 					: 'border-slate-200 hover:border-teal-300'}"
