@@ -64,6 +64,27 @@ describe('visual interaction regressions', () => {
 		expect(incidentsChevron).toHaveClass('rotate-180');
 	});
 
+	it('renders sparse event details without assuming optional evidence arrays exist', async () => {
+		getDisasterDetails.mockResolvedValue({
+			event: 'https://sakuna.ph/test/sparse-event',
+			name: 'Sparse incident record',
+			eventType: 'Incident',
+			sources: [
+				{
+					uri: 'https://sakuna.ph/test/source-1',
+					reportName: 'DROMIC situation report',
+				},
+			],
+		});
+
+		render(EventDetails, { event: 'https://sakuna.ph/test/sparse-event' });
+
+		expect(await screen.findByRole('heading', { name: 'Sparse incident record' })).toBeVisible();
+		expect(screen.getByText('DROMIC situation report')).toBeVisible();
+		expect(screen.getByText('No remarks were recorded for this event.')).toBeVisible();
+		expect(screen.getByText('No disaster type was recorded.')).toBeVisible();
+	});
+
 	it('removes the default SVG outline while preserving a map-specific focus style', async () => {
 		const onselect = vi.fn();
 		render(PhilMap, {
