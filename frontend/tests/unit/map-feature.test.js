@@ -59,4 +59,22 @@ describe('map feature state', () => {
 		expect(query.countFor('major')).toBe(0);
 		expect(query.countFor('incidents')).toBe(0);
 	});
+
+	it('requests NCR locality records with the selected city scope and PSGC code', async () => {
+		const fetchEvents = vi.fn().mockResolvedValue({ events: [], majorCount: 0, incidentCount: 0 });
+		const query = createMapEventQuery({ fetchEvents });
+		const controller = new AbortController();
+
+		await query.load({
+			selected: { type: 'city', id: '1380600000', name: 'City of Manila' },
+			mode: 'major',
+			page: 1,
+			signal: controller.signal,
+		});
+
+		expect(fetchEvents).toHaveBeenCalledWith(
+			{ scope: 'city', id: '1380600000', mode: 'major', page: '1' },
+			{ signal: controller.signal },
+		);
+	});
 });

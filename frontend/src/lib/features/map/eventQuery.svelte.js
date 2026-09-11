@@ -22,7 +22,9 @@ export function createMapEventQuery({ fetchEvents = getMapEvents } = {}) {
 		const request = ++requestVersion;
 		loading = true;
 		error = '';
-		const scope = selected.type === 'region' ? 'region' : 'province';
+		const scope = ['region', 'province', 'city', 'municipality'].includes(selected.type)
+			? selected.type
+			: 'province';
 		const id = selected.type === 'region' ? selected.psgc : selected.id;
 
 		try {

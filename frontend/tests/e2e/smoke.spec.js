@@ -138,6 +138,34 @@ test('map loads and supports keyboard selection and event details', async ({ pag
 	await expect(page.getByRole('dialog', { name: /Typhoon Salome/ })).toBeVisible();
 });
 
+test('province map expands NCR and queries a selected city', async ({ page }) => {
+	await gotoReady(page, '/map?view=provinces');
+	const map = page.getByLabel('Map of Philippine regions and provinces');
+	const ncr = map.getByRole('button', { name: 'Open National Capital Region city map' });
+	await ncr.focus();
+	await ncr.press('Enter');
+
+	const magnifier = page.getByLabel('National Capital Region city selector');
+	await expect(magnifier).toBeVisible();
+	await expect(ncr).toHaveAttribute('aria-expanded', 'true');
+	await expect(magnifier.getByRole('button', { name: /^Select (City|Municipality) / })).toHaveCount(
+		17,
+	);
+
+	const requestPromise = page.waitForRequest((request) => {
+		const url = new URL(request.url());
+		return url.pathname === '/api/map/events' && url.searchParams.get('scope') === 'city';
+	});
+	const manila = magnifier.getByRole('button', { name: 'Select City City of Manila' });
+	await manila.focus();
+	await manila.press('Enter');
+	const requestUrl = new URL((await requestPromise).url());
+
+	expect(requestUrl.searchParams.get('id')).toBe('1380600000');
+	await expect(page.getByText('City', { exact: true }).first()).toBeVisible();
+	await expect(page.getByRole('heading', { name: 'City of Manila' })).toBeVisible();
+});
+
 test('map and ontology adapt to a narrow touch viewport', async ({ page }) => {
 	await page.setViewportSize({ width: 320, height: 740 });
 	await gotoReady(page, '/map');

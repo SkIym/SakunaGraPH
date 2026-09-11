@@ -24,6 +24,7 @@
 		"test:deployment": "node scripts/check-compose-deployment.js",
 		"budget": "node scripts/check-performance-budgets.js",
 		"baseline:update": "playwright test tests/visual",
+		"data:ncr": "node scripts/build-ncr-geometry.mjs",
 		"quality": "npm run check && npm run lint && npm run format:check && npm run test && npm run build"
 	},
 	"devDependencies": {

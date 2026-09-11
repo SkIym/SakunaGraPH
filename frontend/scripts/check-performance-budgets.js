@@ -77,8 +77,12 @@ assertBudget(
 	budget.build.largestCssGzipBytes,
 );
 
-const mapBytes = statSync(resolve(root, 'static/data/regions.geojson')).size;
-assertBudget('Map GeoJSON', mapBytes, budget.assets.mapGeoJsonBytes);
+const mapAssets = ['regions.geojson', 'ncr-cities.geojson'];
+const mapBytes = mapAssets.reduce(
+	(total, asset) => total + statSync(resolve(root, `static/data/${asset}`)).size,
+	0,
+);
+assertBudget('Combined map GeoJSON', mapBytes, budget.assets.mapGeoJsonBytes);
 for (const image of ['elle-208.jpg', 'elle-416.jpg', 'abram-208.jpg', 'abram-416.jpg']) {
 	assertBudget(
 		`Team image ${image}`,
@@ -89,5 +93,5 @@ for (const image of ['elle-208.jpg', 'elle-416.jpg', 'abram-208.jpg', 'abram-416
 
 console.table(routeResults.map(({ route, gzip }) => ({ route, gzipBytes: gzip })));
 console.log(
-	`Budgets passed: lazy JS ${largestLazy.gzip} B gzip, CSS ${largestCss.gzip} B gzip, map ${mapBytes} B.`,
+	`Budgets passed: lazy JS ${largestLazy.gzip} B gzip, CSS ${largestCss.gzip} B gzip, combined map ${mapBytes} B.`,
 );

@@ -10,10 +10,17 @@
 		formatDisasterType,
 	} from '$lib/mapData.js';
 	import { createMapEventQuery, MAP_PAGE_SIZE } from './eventQuery.svelte.js';
-	import { detailViewBoxFor, FULL_MAP_VIEW_BOX, loadMapGeometry } from './geometry.js';
+	import {
+		detailViewBoxFor,
+		FULL_MAP_VIEW_BOX,
+		loadMapGeometry,
+		NCR_REGION_PSGC,
+	} from './geometry.js';
 
 	// ── Map data (loaded once) ───────────────────────────────────────────────
 	let pathData = $state([]);
+	let ncrCityPathData = $state([]);
+	let ncrViewBox = $state(FULL_MAP_VIEW_BOX);
 	let tightViewBox = $state(FULL_MAP_VIEW_BOX);
 	let mapLoading = $state(true);
 	let mapError = $state('');
@@ -31,7 +38,20 @@
 	let selected = $state(null); // {type, psgc, id, name}
 	let selectedEvent = $state('');
 	let EventDetailsComponent = $state(null);
-	const detailViewBox = $derived(detailViewBoxFor({ selected, view, pathData, pathGenerator }));
+	const selectedIsNcrLocality = $derived(['city', 'municipality'].includes(selected?.type));
+	const detailPathData = $derived(selectedIsNcrLocality ? ncrCityPathData : pathData);
+	const detailMapView = $derived(selectedIsNcrLocality ? 'cities' : view);
+	const overviewSelection = $derived(
+		selectedIsNcrLocality ? { id: NCR_REGION_PSGC, psgc: NCR_REGION_PSGC } : selected,
+	);
+	const detailViewBox = $derived(
+		detailViewBoxFor({
+			selected,
+			view: detailMapView,
+			pathData: detailPathData,
+			pathGenerator,
+		}),
+	);
 
 	// ── Results state ────────────────────────────────────────────────────────
 	const eventQuery = createMapEventQuery();
@@ -53,6 +73,8 @@
 				performance.mark('sakunagraph:map-load-start');
 				const geometry = await loadMapGeometry({ signal: controller.signal });
 				pathData = geometry.pathData;
+				ncrCityPathData = geometry.ncrCityPathData;
+				ncrViewBox = geometry.ncrViewBox;
 				pathGenerator = geometry.pathGenerator;
 				tightViewBox = geometry.tightViewBox;
 				mapLoading = false;
@@ -77,7 +99,11 @@
 	$effect(() => {
 		if (initialProvinceApplied || !requestedProvinceId || pathData.length === 0) return;
 		initialProvinceApplied = true;
-		const province = pathData.find((item) => item.gid === requestedProvinceId);
+		const province = pathData.find(
+			(item) =>
+				item.gid === requestedProvinceId ||
+				(requestedProvinceId.startsWith('13') && item.gid === NCR_REGION_PSGC),
+		);
 		if (!province) return;
 		view = 'provinces';
 		handleMapSelect(province);
@@ -102,7 +128,13 @@
 
 	// ── Map interaction handlers ─────────────────────────────────────────────
 	function handleMapSelect(item) {
+		if (view === 'provinces' && item.areaType === 'ncr') {
+			openNcrMagnifier(true);
+			return;
+		}
+
 		tooltipItem = null;
+		closeNcrMagnifier();
 		resultMode = 'major';
 		page = 1;
 		eventQuery.clearResults();
@@ -111,6 +143,13 @@
 			const psgc = item.regionPsgc;
 			const name = REGION_LABELS[psgc] ?? `Region ${psgc}`;
 			selected = { type: 'region', psgc, name, id: psgc };
+		} else if (['city', 'municipality'].includes(item.areaType)) {
+			selected = {
+				type: item.areaType,
+				psgc: NCR_REGION_PSGC,
+				id: item.gid,
+				name: item.name,
+			};
 		} else {
 			selected = {
 				type: 'province',
@@ -138,6 +177,7 @@
 
 	function deselect() {
 		selected = null;
+		closeNcrMagnifier();
 		resultRetryToken = 0;
 		eventQuery.reset();
 	}
@@ -152,11 +192,84 @@
 	let tooltipItem = $state(null);
 	let tooltipX = $state(0);
 	let tooltipY = $state(0);
+	let ncrMagnifierOpen = $state(false);
+	let ncrMagnifierPinned = $state(false);
+	let ncrMagnifierHovered = false;
+	let ncrCloseTimer = null;
+
+	function areaTypeLabel(item) {
+		if (item?.areaType === 'ncr') return 'NCR city detail';
+		if (item?.areaType === 'city') return 'City';
+		if (item?.areaType === 'municipality') return 'Municipality';
+		return view === 'regions' ? 'Region' : 'Province';
+	}
+
+	function selectedTypeLabel() {
+		if (selected?.type === 'city') return 'City';
+		if (selected?.type === 'municipality') return 'Municipality';
+		return selected?.type === 'region' ? 'Region' : 'Province';
+	}
+
+	function clearNcrCloseTimer() {
+		if (ncrCloseTimer === null) return;
+		clearTimeout(ncrCloseTimer);
+		ncrCloseTimer = null;
+	}
+
+	function openNcrMagnifier(pinned = false) {
+		clearNcrCloseTimer();
+		ncrMagnifierOpen = true;
+		if (pinned) ncrMagnifierPinned = true;
+	}
+
+	function scheduleNcrMagnifierClose() {
+		clearNcrCloseTimer();
+		if (ncrMagnifierPinned) return;
+		ncrCloseTimer = setTimeout(() => {
+			if (!ncrMagnifierHovered) ncrMagnifierOpen = false;
+			ncrCloseTimer = null;
+		}, 180);
+	}
+
+	function closeNcrMagnifier() {
+		clearNcrCloseTimer();
+		ncrMagnifierOpen = false;
+		ncrMagnifierPinned = false;
+		ncrMagnifierHovered = false;
+	}
+
+	function handleMapHover(item, x, y) {
+		tooltipItem = item;
+		tooltipX = x;
+		tooltipY = y;
+		if (view === 'provinces' && item?.areaType === 'ncr') {
+			openNcrMagnifier();
+		} else if (!item) {
+			scheduleNcrMagnifierClose();
+		}
+	}
+
+	function handleNcrMagnifierEnter() {
+		ncrMagnifierHovered = true;
+		clearNcrCloseTimer();
+	}
+
+	function handleNcrMagnifierLeave() {
+		ncrMagnifierHovered = false;
+		scheduleNcrMagnifierClose();
+	}
+
+	function mapAreaLabel(item) {
+		if (view === 'provinces' && item.areaType === 'ncr') {
+			return 'Open National Capital Region city map';
+		}
+		return `Select ${getHoverLabel(item)}`;
+	}
 
 	function getHoverLabel(item) {
 		if (!item) return '';
 		if (view === 'regions') return REGION_LABELS[item.regionPsgc] ?? formatProvName(item.name);
-		return formatProvName(item.name);
+		return item.areaType === 'ncr' ? 'National Capital Region (NCR)' : formatProvName(item.name);
 	}
 
 	// ── Pagination helpers ───────────────────────────────────────────────────
@@ -212,7 +325,7 @@
 	<title>Map · SakunaGraPH</title>
 	<meta
 		name="description"
-		content="Explore Philippine disaster records by region or province and inspect the linked events, dates, sources, and locations."
+		content="Explore Philippine disaster records by region, province, or NCR city and inspect the linked events, dates, sources, and locations."
 	/>
 </svelte:head>
 
@@ -223,13 +336,13 @@
 {/if}
 
 <!-- ── Cursor-following hover tooltip ────────────────────────────────────── -->
-{#if tooltipItem}
+{#if tooltipItem && !(tooltipItem.areaType === 'ncr' && ncrMagnifierOpen)}
 	<div
 		role="tooltip"
 		class="map-hover-tooltip pointer-events-none fixed z-50 rounded-lg px-3 py-2 text-xs font-medium"
 		style="left:{tooltipX + 16}px; top:{tooltipY}px; transform:translateY(-50%);"
 	>
-		<span class="tooltip-type">{view === 'regions' ? 'Region' : 'Province'}</span>
+		<span class="tooltip-type">{areaTypeLabel(tooltipItem)}</span>
 		{getHoverLabel(tooltipItem)}
 	</div>
 {/if}
@@ -274,11 +387,11 @@
 		{#if selected}
 			<!-- Zoomed detail map fills the whole panel -->
 			<div class="map-detail-canvas absolute inset-0 p-4">
-				{#if pathData.length > 0}
+				{#if detailPathData.length > 0}
 					<PhilMap
-						{pathData}
+						pathData={detailPathData}
 						viewBox={detailViewBox ?? FULL_MAP_VIEW_BOX}
-						{view}
+						view={detailMapView}
 						{selected}
 						interactive={false}
 						strokeWidth={1.4}
@@ -318,7 +431,7 @@
 								{pathData}
 								viewBox={tightViewBox}
 								{view}
-								{selected}
+								selected={overviewSelection}
 								colorMap={mapColorMap}
 								interactive={false}
 								strokeWidth={0.15}
@@ -362,14 +475,67 @@
 							strokeWidth={mapStrokeWidth}
 							strokeColor={mapStrokeColor}
 							colorMap={mapColorMap}
+							getAreaLabel={mapAreaLabel}
+							getAreaExpanded={(item) => (item.areaType === 'ncr' ? ncrMagnifierOpen : undefined)}
+							getAreaControls={(item) =>
+								item.areaType === 'ncr' ? 'ncr-city-magnifier' : undefined}
+							getAreaHitStrokeWidth={(item) => (item.areaType === 'ncr' ? 12 : 0)}
 							onselect={handleMapSelect}
-							onhover={(item, x, y) => {
-								tooltipItem = item;
-								tooltipX = x;
-								tooltipY = y;
-							}}
+							onhover={handleMapHover}
 						/>
 					</div>
+
+					{#if view === 'provinces' && ncrMagnifierOpen && ncrCityPathData.length > 0}
+						<aside
+							id="ncr-city-magnifier"
+							class="ncr-magnifier"
+							class:is-pinned={ncrMagnifierPinned}
+							aria-label="National Capital Region city selector"
+							onmouseenter={handleNcrMagnifierEnter}
+							onmouseleave={handleNcrMagnifierLeave}
+							onfocusin={handleNcrMagnifierEnter}
+							onfocusout={handleNcrMagnifierLeave}
+						>
+							<header class="ncr-magnifier-header">
+								<div>
+									<h2>Metro Manila</h2>
+									<p>16 cities · Pateros</p>
+								</div>
+								<button
+									type="button"
+									class="ncr-close touch-target"
+									onclick={closeNcrMagnifier}
+									aria-label="Close NCR city map"
+								>
+									<svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+										<path d="m7 7 10 10M17 7 7 17" />
+									</svg>
+								</button>
+							</header>
+							<div class="ncr-map-canvas">
+								<PhilMap
+									pathData={ncrCityPathData}
+									viewBox={ncrViewBox}
+									view="cities"
+									selected={null}
+									interactive={true}
+									strokeWidth={0.8}
+									strokeColor="var(--color-brand)"
+									hoverFill="var(--color-accent-soft)"
+									ariaLabel="Map of National Capital Region cities and Pateros"
+									getAreaLabel={(item) => `Select ${areaTypeLabel(item)} ${item.name}`}
+									getAreaHitStrokeWidth={() => 5}
+									onselect={handleMapSelect}
+									onhover={handleMapHover}
+								/>
+							</div>
+							<p class="ncr-magnifier-instruction">
+								{ncrMagnifierPinned
+									? 'Choose a city or Pateros to inspect its records.'
+									: 'Select NCR to keep this city map open.'}
+							</p>
+						</aside>
+					{/if}
 
 					<div class="map-guidance pointer-events-none flex-shrink-0">
 						<div class="map-section-marker">
@@ -380,14 +546,16 @@
 						<p class="map-page-title">Disaster map</p>
 						<div class="current-geography">
 							<p class="current-geography-label">
-								{tooltipItem ? (view === 'regions' ? 'Region' : 'Province') : 'National view'}
+								{tooltipItem ? areaTypeLabel(tooltipItem) : 'National view'}
 							</p>
 							<p class="current-geography-name">
 								{tooltipItem ? getHoverLabel(tooltipItem) : 'Philippines'}
 							</p>
 						</div>
 						<p class="map-guidance-copy">
-							Select a {view === 'regions' ? 'region' : 'province'} to explore its disaster records.
+							{view === 'regions'
+								? 'Select a region to explore its disaster records.'
+								: 'Select a province. NCR opens a detailed city map.'}
 						</p>
 						<div class="map-legend" role="group" aria-label="Map interaction legend">
 							<span><i class="legend-outline" aria-hidden="true"></i>Boundary</span>
@@ -416,7 +584,7 @@
 						<div class="flex items-start justify-between gap-3">
 							<div class="min-w-0">
 								<p class="selection-kicker">
-									{selected.type === 'region' ? 'Region' : 'Province'}
+									{selectedTypeLabel()}
 								</p>
 								<h2 class="selection-title">
 									{selected.name}
@@ -1160,6 +1328,116 @@
 		pointer-events: none;
 	}
 
+	.ncr-magnifier {
+		position: absolute;
+		left: max(1.5rem, calc((100vw - 78rem) / 2 + 2.5rem));
+		bottom: 2.25rem;
+		z-index: 12;
+		display: grid;
+		grid-template-rows: auto minmax(0, 1fr) auto;
+		width: min(24rem, calc(100% - 3rem));
+		height: min(24rem, calc(100dvh - 16rem));
+		min-height: 18rem;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-surface);
+		background: var(--color-canvas);
+		box-shadow: var(--shadow-surface);
+		animation: ncr-magnifier-in 220ms cubic-bezier(0.16, 1, 0.3, 1) both;
+	}
+
+	.ncr-magnifier::before {
+		position: absolute;
+		inset: 0 auto auto 0;
+		width: 6rem;
+		height: 3px;
+		background: var(--color-accent);
+		content: '';
+	}
+
+	.ncr-magnifier-header {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 1.05rem 0.75rem 0.75rem 1rem;
+	}
+
+	.ncr-magnifier-header p,
+	.ncr-magnifier-header h2,
+	.ncr-magnifier-instruction {
+		margin: 0;
+	}
+
+	.ncr-magnifier-header p {
+		margin-top: 0.25rem;
+		font-size: 0.75rem;
+		font-weight: 500;
+		line-height: 1.4;
+		color: var(--color-text-secondary);
+	}
+
+	.ncr-magnifier-header h2 {
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: 1.45rem;
+		font-weight: 700;
+		line-height: 1.05;
+		letter-spacing: -0.025em;
+		color: var(--color-text);
+	}
+
+	.ncr-close {
+		display: inline-grid;
+		place-items: center;
+		flex: none;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: transparent;
+		color: var(--color-text-muted);
+		transition:
+			background-color 160ms ease,
+			color 160ms ease;
+	}
+
+	.ncr-close:hover {
+		background: var(--color-brand-soft);
+		color: var(--color-brand-hover);
+	}
+
+	.ncr-close svg {
+		width: 1rem;
+		height: 1rem;
+	}
+
+	.ncr-close path {
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+	}
+
+	.ncr-map-canvas {
+		min-height: 0;
+		margin: 0 0.75rem;
+		border-block: 1px solid var(--color-border);
+		background: var(--color-brand-soft);
+		padding: 0.5rem;
+	}
+
+	.ncr-magnifier-instruction {
+		padding: 0.75rem 1rem 0.85rem;
+		font-size: 0.6875rem;
+		line-height: 1.5;
+		color: var(--color-text-secondary);
+	}
+
+	@keyframes ncr-magnifier-in {
+		from {
+			opacity: 0;
+			clip-path: inset(0 0 16% 0 round var(--radius-surface));
+			transform: translateY(0.75rem);
+		}
+	}
+
 	.map-guidance {
 		order: -1;
 		width: min(100%, 31rem);
@@ -1790,6 +2068,15 @@
 			width: min(100%, 22rem);
 		}
 
+		.ncr-magnifier {
+			position: fixed;
+			inset: auto 0.75rem max(0.75rem, env(safe-area-inset-bottom));
+			z-index: 25;
+			width: auto;
+			height: min(31rem, calc(100dvh - var(--app-nav-height) - 1.5rem));
+			min-height: 24rem;
+		}
+
 		.map-workspace.has-selection .map-panel {
 			height: clamp(17rem, 38dvh, 21rem);
 		}
@@ -1890,6 +2177,10 @@
 			animation: none;
 		}
 
+		.ncr-magnifier {
+			animation: none;
+		}
+
 		.map-skip-link,
 		.map-view-button,
 		.result-mode-button,
@@ -1922,6 +2213,12 @@
 		.legend-current,
 		.empty-symbol {
 			border: 1px solid CanvasText;
+		}
+
+		.ncr-magnifier,
+		.ncr-map-canvas {
+			border-color: CanvasText;
+			background: Canvas;
 		}
 	}
 </style>

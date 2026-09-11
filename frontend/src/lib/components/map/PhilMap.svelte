@@ -7,7 +7,7 @@
 	let {
 		pathData = [], // [{d, gid, name, regionPsgc, feature}]
 		viewBox = '0 0 700 800',
-		view = 'regions', // 'regions' | 'provinces'
+		view = 'regions', // 'regions' | 'provinces' | 'cities'
 		selected = null, // {psgc?, id?, name}
 		interactive = true,
 		strokeWidth = 0.7,
@@ -16,6 +16,9 @@
 		selectedFill = 'var(--color-accent)',
 		ariaLabel = 'Map of Philippine regions and provinces',
 		getAreaLabel = (item) => `Select ${item.name}`,
+		getAreaExpanded = () => undefined,
+		getAreaControls = () => undefined,
+		getAreaHitStrokeWidth = () => 0,
 		colorMap = {}, // groupKey → default fill color (for region pastels)
 		onselect = () => {},
 		onhover = () => {}, // onhover(item | null, clientX, clientY)
@@ -115,6 +118,21 @@
 	<g class="map-geometry-layer">
 		{#each pathData as item (item.gid)}
 			{#if interactive}
+				{#if getAreaHitStrokeWidth(item) > 0}
+					<path
+						d={item.d}
+						class="map-hit-area"
+						fill="transparent"
+						stroke="transparent"
+						stroke-width={getAreaHitStrokeWidth(item)}
+						vector-effect="non-scaling-stroke"
+						pointer-events="stroke"
+						aria-hidden="true"
+						onmouseenter={(event) => handleEnter(item, event)}
+						onmouseleave={handleLeave}
+						onclick={() => handleClick(item)}
+					/>
+				{/if}
 				<path
 					d={item.d}
 					fill={getFill(item)}
@@ -131,6 +149,9 @@
 					tabindex="0"
 					aria-label={getAreaLabel(item)}
 					aria-pressed={isSelected(item)}
+					aria-expanded={getAreaExpanded(item)}
+					aria-controls={getAreaControls(item)}
+					data-area-id={groupKey(item)}
 					onmouseenter={(e) => handleEnter(item, e)}
 					onmouseleave={handleLeave}
 					onfocus={(event) => handleFocus(item, event)}
@@ -174,6 +195,10 @@
 			opacity 220ms ease,
 			filter 220ms ease,
 			transform 140ms ease;
+	}
+
+	.map-hit-area {
+		cursor: pointer;
 	}
 
 	.map-area.is-muted,

@@ -11,35 +11,36 @@ the committed inventory without requiring a local Python environment.
 The common analysis filter parameters are `event_type`, `start_date`, `end_date`, repeated
 `location_ids`, repeated `disaster_types`, and `q`.
 
-| Method and path                              | Additional input                                    | Successful response / download                                                 |
-| -------------------------------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------ |
-| `POST /api/sparql`                           | JSON `query`                                        | SPARQL `head`, `results`, or `boolean`                                         |
-| `POST /api/ask`                              | JSON `query`                                        | `sparql`, `answer`, `rows`                                                     |
-| `POST /api/ask/preview`                      | JSON `query`                                        | `sparql` (protected, not yet used by the page)                                 |
-| `POST /api/ask/stream`                       | JSON `query`                                        | SSE stream (protected, feature-flag candidate)                                 |
-| `GET /api/map/events`                        | `scope`, `id`, `mode`, `page`                       | `events`, `majorCount`, `incidentCount`                                        |
-| `GET /api/disasters/details`                 | `uri`                                               | Event overview, remarks, locations, types, related events, alternates, sources |
-| `GET /api/ontology/graph`                    | None                                                | `nodes`, `links`                                                               |
-| `GET /api/ontology/taxonomy`                 | None                                                | Recursive taxonomy node                                                        |
-| `GET /api/ontology/psgc`                     | None                                                | `nodes`, `links`                                                               |
-| `GET /api/analysis/filter-options`           | None                                                | `locations`, `disasterTypes`                                                   |
-| `GET /api/analysis/events`                   | Common + `page`, `page_size`, `sort_by`, `sort_dir` | `items`, pagination, sort fields                                               |
-| `GET /api/analysis/events/export.csv`        | Common + `sort_by`, `sort_dir`                      | CSV blob; filename from `Content-Disposition` or `sakunagraph-events.csv`      |
-| `GET /api/analysis/summary`                  | Common                                              | Counts and damage totals                                                       |
-| `GET /api/analysis/disaster-counts`          | Common + `group_by`                                 | `group_by`, `items`                                                            |
-| `GET /api/analysis/victim-trends`            | Common + `disaster_type`                            | `items`                                                                        |
-| `GET /api/analysis/region-rankings`          | Common + `disaster_type`                            | `items`                                                                        |
-| `GET /api/analysis/disaster-rankings`        | Common + `location_id`                              | `items`                                                                        |
-| `GET /api/analysis/damage-histogram`         | Common + `bins`, `unit`                             | `bins`                                                                         |
-| `GET /api/analysis/damage-vs-affected`       | Common                                              | `items`                                                                        |
-| `GET /api/analysis/calendar/years`           | Common + `include_impacts`                          | `items`                                                                        |
-| `GET /api/analysis/calendar/months`          | Common + `year`, `include_impacts`                  | `items`                                                                        |
-| `GET /api/analysis/calendar/days`            | Common + `year`, `month`, `include_impacts`         | `items`                                                                        |
-| `GET /api/analysis/timeline/category-stacks` | Common + `bucket`                                   | `bucket`, `items`                                                              |
-| `GET /api/analysis/timeline/date-events`     | Common + `date_prefix`                              | `date_prefix`, `items`                                                         |
+| Method and path                              | Additional input                                                                | Successful response / download                                                 |
+| -------------------------------------------- | ------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `POST /api/sparql`                           | JSON `query`                                                                    | SPARQL `head`, `results`, or `boolean`                                         |
+| `POST /api/ask`                              | JSON `query`                                                                    | `sparql`, `answer`, `rows`                                                     |
+| `POST /api/ask/preview`                      | JSON `query`                                                                    | `sparql` (protected, not yet used by the page)                                 |
+| `POST /api/ask/stream`                       | JSON `query`                                                                    | SSE stream (protected, feature-flag candidate)                                 |
+| `GET /api/map/events`                        | `scope` (`region`, `province`, `city`, or `municipality`), `id`, `mode`, `page` | `events`, `majorCount`, `incidentCount`                                        |
+| `GET /api/disasters/details`                 | `uri`                                                                           | Event overview, remarks, locations, types, related events, alternates, sources |
+| `GET /api/ontology/graph`                    | None                                                                            | `nodes`, `links`                                                               |
+| `GET /api/ontology/taxonomy`                 | None                                                                            | Recursive taxonomy node                                                        |
+| `GET /api/ontology/psgc`                     | None                                                                            | `nodes`, `links`                                                               |
+| `GET /api/analysis/filter-options`           | None                                                                            | `locations`, `disasterTypes`                                                   |
+| `GET /api/analysis/events`                   | Common + `page`, `page_size`, `sort_by`, `sort_dir`                             | `items`, pagination, sort fields                                               |
+| `GET /api/analysis/events/export.csv`        | Common + `sort_by`, `sort_dir`                                                  | CSV blob; filename from `Content-Disposition` or `sakunagraph-events.csv`      |
+| `GET /api/analysis/summary`                  | Common                                                                          | Counts and damage totals                                                       |
+| `GET /api/analysis/disaster-counts`          | Common + `group_by`                                                             | `group_by`, `items`                                                            |
+| `GET /api/analysis/victim-trends`            | Common + `disaster_type`                                                        | `items`                                                                        |
+| `GET /api/analysis/region-rankings`          | Common + `disaster_type`                                                        | `items`                                                                        |
+| `GET /api/analysis/disaster-rankings`        | Common + `location_id`                                                          | `items`                                                                        |
+| `GET /api/analysis/damage-histogram`         | Common + `bins`, `unit`                                                         | `bins`                                                                         |
+| `GET /api/analysis/damage-vs-affected`       | Common                                                                          | `items`                                                                        |
+| `GET /api/analysis/calendar/years`           | Common + `include_impacts`                                                      | `items`                                                                        |
+| `GET /api/analysis/calendar/months`          | Common + `year`, `include_impacts`                                              | `items`                                                                        |
+| `GET /api/analysis/calendar/days`            | Common + `year`, `month`, `include_impacts`                                     | `items`                                                                        |
+| `GET /api/analysis/timeline/category-stacks` | Common + `bucket`                                                               | `bucket`, `items`                                                              |
+| `GET /api/analysis/timeline/date-events`     | Common + `date_prefix`                                                          | `date_prefix`, `items`                                                         |
 
-The map also downloads the versioned same-origin static asset `/data/regions.geojson`; it is not an
-API operation and remains the active geographic source.
+The map also downloads the versioned same-origin static assets `/data/regions.geojson` and
+`/data/ncr-cities.geojson`; they are not API operations. The latter supplies one NCR overview plus
+city and municipality boundaries used with the locality-level map scopes.
 
 ## Shared client boundary
 

@@ -55,6 +55,17 @@ test('event details trap focus and restore it to the selected record', async ({ 
 	await expect(eventRow).toBeFocused();
 });
 
+test('expanded NCR city map has no detectable WCAG A/AA violations', async ({ page }) => {
+	await gotoReady(page, '/map?view=provinces');
+	const ncr = page.getByRole('button', { name: 'Open National Capital Region city map' });
+	await ncr.focus();
+	await ncr.press('Enter');
+	await expect(page.getByLabel('National Capital Region city selector')).toBeVisible();
+
+	const results = await new AxeBuilder({ page }).withTags(['wcag2a', 'wcag2aa']).analyze();
+	expect(results.violations).toEqual([]);
+});
+
 test('mobile filters trap focus and restore it to the opener', async ({ page }) => {
 	await page.setViewportSize({ width: 390, height: 844 });
 	await gotoReady(page, '/analysis/events');

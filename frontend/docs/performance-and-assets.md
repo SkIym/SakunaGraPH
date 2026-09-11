@@ -3,7 +3,7 @@
 ## Enforced budgets
 
 `performance-budgets.json` is the single source of truth. `npm run build` checks compressed initial
-JavaScript for every route, the largest lazy chunk, CSS, the map payload, and team images.
+JavaScript for every route, the largest lazy chunk, CSS, the combined map payload, and team images.
 `npm run test:performance` runs the production adapter and enforces hydration, first contentful
 paint, browser transfer, and map parse/projection/render limits. Raise a budget only with a measured
 reason in the same change.
@@ -26,21 +26,25 @@ baseline must be captured before changing topology, coordinate precision, or fil
 
 ## Asset lineage and update policy
 
-| Asset                         | Repository lineage                                                                                                                                                                                 | Current identity                                                                                                  | Delivery policy                                                                                                             |
-| ----------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
-| `static/data/regions.geojson` | Added in `0dc30d5` as merged province geometry with PSGC region/province properties. The original upstream URL/license was not recorded; do not claim a more specific provenance without evidence. | 1,737,986 bytes; SHA-256 `17ECDE6704279A1314E998223F89704A17EBE69C738083193086893128EF9E24`; version `2026-06-23` | Revalidated updateable static data. The version query changes for every content release and is intentionally not immutable. |
-| `static/Elle.jpg`             | Project team headshot committed by the project authors; source for the responsive derivatives.                                                                                                     | 1352 x 1413; 289,110 bytes                                                                                        | Source asset only. The page serves 208 px (11,857 bytes) or 416 px (37,364 bytes) JPEG derivatives through `srcset`.        |
-| `static/Abram.jpg`            | Project team headshot committed by the project authors; source for the responsive derivatives.                                                                                                     | 768 x 921; 19,019 bytes                                                                                           | Source asset only. The page serves 208 px (5,301 bytes) or 416 px (13,024 bytes) JPEG derivatives through `srcset`.         |
+| Asset                            | Repository lineage                                                                                                                                                                                                                                                              | Current identity                                                                                                                      | Delivery policy                                                                                                               |
+| -------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| `static/data/regions.geojson`    | Added in `0dc30d5` as merged province geometry with PSGC region/province properties. The original upstream URL/license was not recorded; do not claim a more specific provenance without evidence.                                                                              | 1,737,986 bytes; SHA-256 `17ECDE6704279A1314E998223F89704A17EBE69C738083193086893128EF9E24`; version `2026-06-23`                     | Revalidated updateable static data. The version query changes for every content release and is intentionally not immutable.   |
+| `static/data/ncr-cities.geojson` | Generated from the 2023 `faeldon/philippines-json-maps` country and four NCR district ADM3 files (MIT). `npm run data:ncr` downloads the five recorded URLs, keeps NCR's overview, combines 16 cities and Pateros, normalizes PSGC codes, and rewinds polygon rings for d3-geo. | 55,404 bytes; SHA-256 `1339553C9440225C5A13787CC17590AD7D6BE9D7C066665D8893859427FDD82B`; snapshot `2023-12-31`; version `2026-09-11` | Revalidated updateable static data loaded with the province map. Source URLs and snapshot metadata are embedded in the asset. |
+| `static/Elle.jpg`                | Project team headshot committed by the project authors; source for the responsive derivatives.                                                                                                                                                                                  | 1352 x 1413; 289,110 bytes                                                                                                            | Source asset only. The page serves 208 px (11,857 bytes) or 416 px (37,364 bytes) JPEG derivatives through `srcset`.          |
+| `static/Abram.jpg`               | Project team headshot committed by the project authors; source for the responsive derivatives.                                                                                                                                                                                  | 768 x 921; 19,019 bytes                                                                                                               | Source asset only. The page serves 208 px (5,301 bytes) or 416 px (13,024 bytes) JPEG derivatives through `srcset`.           |
 
 SvelteKit's adapter-node handler serves content-hashed `/_app/immutable/*` files with a one-year
-immutable cache header; the production performance test verifies this contract. The GeoJSON is
-kept revalidatable because its public filename is stable. To update it:
+immutable cache header; the production performance test verifies this contract. Both GeoJSON files
+are kept revalidatable because their public filenames are stable. To update them:
 
 1. Record the upstream source, license, acquisition date, and transformation command here.
-2. Preserve `adm1_psgc`, `adm2_psgc`, and `adm2_en`, then run unit, browser-performance, map E2E,
+2. Preserve `adm1_psgc`, `adm2_psgc`, and `adm2_en` for the national asset. For NCR, run
+   `npm run data:ncr` and retain one region overview plus all 17 locality features and their
+   `psgc`, `name`, and `areaType` properties. Then run unit, browser-performance, map E2E,
    accessibility, and visual checks.
-3. Change `MAP_ASSET_VERSION` in `src/lib/features/map/geometry.js`, update byte count and SHA-256
-   above, and keep the payload within budget (or justify a reviewed budget change).
+3. Change `MAP_ASSET_VERSION` or `NCR_MAP_ASSET_VERSION` in
+   `src/lib/features/map/geometry.js`, update byte count and SHA-256 above, and keep the combined
+   payload within budget (or justify a reviewed budget change).
 4. Purge the old query-version URL at any CDN only after the new asset is deployed.
 
 The headshot derivatives are JPEG quality 82, generated with high-quality bicubic resampling. They

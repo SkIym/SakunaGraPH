@@ -88,4 +88,7 @@ test('production caching distinguishes hashed assets from updateable map data', 
 	const mapResponse = await page.request.get('/data/regions.geojson?v=2026-06-23');
 	expect(mapResponse.ok()).toBe(true);
 	expect(mapResponse.headers()['cache-control'] ?? '').not.toContain('immutable');
+	const ncrResponse = await page.request.get('/data/ncr-cities.geojson?v=2026-09-11');
+	expect(ncrResponse.ok()).toBe(true);
+	expect(ncrResponse.headers()['cache-control'] ?? '').not.toContain('immutable');
 });

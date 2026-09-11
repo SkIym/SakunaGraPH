@@ -1981,7 +1981,7 @@
 						"name": "scope",
 						"required": true,
 						"schema": {
-							"enum": ["region", "province"],
+							"enum": ["region", "province", "city", "municipality"],
 							"title": "Scope",
 							"type": "string"
 						}
@@ -2722,20 +2722,447 @@
 			"title": "AnalysisVictimTrendsResponse",
 			"type": "object"
 		},
+		"AskAnswerContext": {
+			"additionalProperties": false,
+			"description": "Compact, validated payload used to produce a grounded Ask answer.",
+			"properties": {
+				"approximate": {
+					"default": false,
+					"title": "Approximate",
+					"type": "boolean"
+				},
+				"columns": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Columns",
+					"type": "array"
+				},
+				"evidence": {
+					"items": {
+						"$ref": "#/components/schemas/AskEvidence"
+					},
+					"title": "Evidence",
+					"type": "array"
+				},
+				"interpretation": {
+					"$ref": "#/components/schemas/ResolvedAskPlan"
+				},
+				"query": {
+					"$ref": "#/components/schemas/QueryArtifact"
+				},
+				"query_status": {
+					"const": "validated",
+					"default": "validated",
+					"title": "Query Status",
+					"type": "string"
+				},
+				"question": {
+					"minLength": 1,
+					"title": "Question",
+					"type": "string"
+				},
+				"row_count": {
+					"default": 0,
+					"minimum": 0.0,
+					"title": "Row Count",
+					"type": "integer"
+				},
+				"rows": {
+					"items": {
+						"$ref": "#/components/schemas/AskAnswerRow"
+					},
+					"title": "Rows",
+					"type": "array"
+				},
+				"truncated": {
+					"default": false,
+					"title": "Truncated",
+					"type": "boolean"
+				},
+				"warnings": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Warnings",
+					"type": "array"
+				}
+			},
+			"required": ["question", "interpretation", "query"],
+			"title": "AskAnswerContext",
+			"type": "object"
+		},
+		"AskAnswerRow": {
+			"additionalProperties": false,
+			"properties": {
+				"evidence_ids": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Evidence Ids",
+					"type": "array"
+				},
+				"index": {
+					"minimum": 0.0,
+					"title": "Index",
+					"type": "integer"
+				},
+				"values": {
+					"additionalProperties": {
+						"$ref": "#/components/schemas/AskResultTerm"
+					},
+					"title": "Values",
+					"type": "object"
+				}
+			},
+			"required": ["index"],
+			"title": "AskAnswerRow",
+			"type": "object"
+		},
+		"AskEvidence": {
+			"additionalProperties": false,
+			"description": "A returned result row and the provenance needed to trace its claims.",
+			"properties": {
+				"id": {
+					"pattern": "^E[1-9][0-9]*$",
+					"title": "Id",
+					"type": "string"
+				},
+				"kind": {
+					"enum": ["result_set", "result", "aggregate", "event", "disaster_type", "source"],
+					"title": "Kind",
+					"type": "string"
+				},
+				"label": {
+					"minLength": 1,
+					"title": "Label",
+					"type": "string"
+				},
+				"provenance": {
+					"$ref": "#/components/schemas/AskProvenance"
+				},
+				"row_index": {
+					"anyOf": [
+						{
+							"minimum": 0.0,
+							"type": "integer"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Row Index"
+				},
+				"unit": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Unit"
+				},
+				"uri": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Uri"
+				},
+				"values": {
+					"additionalProperties": {
+						"type": "string"
+					},
+					"title": "Values",
+					"type": "object"
+				}
+			},
+			"required": ["id", "kind", "label", "provenance"],
+			"title": "AskEvidence",
+			"type": "object"
+		},
+		"AskPlan": {
+			"additionalProperties": false,
+			"description": "Validated, query-language-free interpretation of an Ask question.",
+			"properties": {
+				"disaster_type_mentions": {
+					"items": {
+						"maxLength": 200,
+						"minLength": 1,
+						"type": "string"
+					},
+					"maxItems": 20,
+					"title": "Disaster Type Mentions",
+					"type": "array"
+				},
+				"end_date": {
+					"anyOf": [
+						{
+							"format": "date",
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "End Date"
+				},
+				"event_mentions": {
+					"items": {
+						"maxLength": 200,
+						"minLength": 1,
+						"type": "string"
+					},
+					"maxItems": 20,
+					"title": "Event Mentions",
+					"type": "array"
+				},
+				"event_type": {
+					"default": "all",
+					"enum": ["major", "incidents", "all"],
+					"title": "Event Type",
+					"type": "string"
+				},
+				"group_by": {
+					"anyOf": [
+						{
+							"enum": ["year", "month", "region", "location", "disaster_type", "source"],
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Group By"
+				},
+				"intent": {
+					"enum": [
+						"list_events",
+						"list_disaster_types",
+						"event_count",
+						"impact_summary",
+						"victim_trend",
+						"region_ranking",
+						"disaster_ranking",
+						"event_details",
+						"source_lookup",
+						"open_graph_query"
+					],
+					"title": "Intent",
+					"type": "string"
+				},
+				"limit": {
+					"default": 25,
+					"maximum": 100.0,
+					"minimum": 1.0,
+					"title": "Limit",
+					"type": "integer"
+				},
+				"location_mentions": {
+					"items": {
+						"maxLength": 200,
+						"minLength": 1,
+						"type": "string"
+					},
+					"maxItems": 20,
+					"title": "Location Mentions",
+					"type": "array"
+				},
+				"metric": {
+					"anyOf": [
+						{
+							"enum": [
+								"events",
+								"dead",
+								"injured",
+								"missing",
+								"affected_persons",
+								"affected_families",
+								"damage"
+							],
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Metric"
+				},
+				"organization_mentions": {
+					"items": {
+						"maxLength": 200,
+						"minLength": 1,
+						"type": "string"
+					},
+					"maxItems": 20,
+					"title": "Organization Mentions",
+					"type": "array"
+				},
+				"sort_direction": {
+					"default": "desc",
+					"enum": ["asc", "desc"],
+					"title": "Sort Direction",
+					"type": "string"
+				},
+				"start_date": {
+					"anyOf": [
+						{
+							"format": "date",
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Start Date"
+				}
+			},
+			"required": ["intent"],
+			"title": "AskPlan",
+			"type": "object"
+		},
 		"AskPreviewResponse": {
 			"properties": {
+				"ambiguities": {
+					"anyOf": [
+						{
+							"items": {
+								"$ref": "#/components/schemas/EntityAmbiguity"
+							},
+							"type": "array"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Ambiguities"
+				},
+				"interpretation": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/ResolvedAskPlan"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"query_artifact": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/QueryArtifact"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
 				"sparql": {
 					"title": "Sparql",
 					"type": "string"
+				},
+				"status": {
+					"$ref": "#/components/schemas/AskStatus",
+					"default": "query_ready"
+				},
+				"warnings": {
+					"anyOf": [
+						{
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Warnings"
 				}
 			},
 			"required": ["sparql"],
 			"title": "AskPreviewResponse",
 			"type": "object"
 		},
+		"AskProvenance": {
+			"additionalProperties": false,
+			"properties": {
+				"query_hash": {
+					"maxLength": 64,
+					"minLength": 64,
+					"title": "Query Hash",
+					"type": "string"
+				},
+				"query_origin": {
+					"enum": ["service", "compiler", "model_fallback"],
+					"title": "Query Origin",
+					"type": "string"
+				},
+				"report_links": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Report Links",
+					"type": "array"
+				},
+				"service_route": {
+					"anyOf": [
+						{
+							"enum": [
+								"analysis_events",
+								"analysis_event_count",
+								"analysis_summary",
+								"analysis_victim_trends",
+								"analysis_region_rankings",
+								"analysis_disaster_rankings",
+								"event_details",
+								"event_sources"
+							],
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Service Route"
+				},
+				"source_iris": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Source Iris",
+					"type": "array"
+				},
+				"source_labels": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Source Labels",
+					"type": "array"
+				},
+				"source_record_iris": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Source Record Iris",
+					"type": "array"
+				}
+			},
+			"required": ["query_origin", "query_hash"],
+			"title": "AskProvenance",
+			"type": "object"
+		},
 		"AskRequest": {
 			"properties": {
 				"query": {
+					"maxLength": 2000,
+					"minLength": 1,
 					"title": "Query",
 					"type": "string"
 				}
@@ -2746,9 +3173,71 @@
 		},
 		"AskResponse": {
 			"properties": {
+				"ambiguities": {
+					"anyOf": [
+						{
+							"items": {
+								"$ref": "#/components/schemas/EntityAmbiguity"
+							},
+							"type": "array"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Ambiguities"
+				},
 				"answer": {
 					"title": "Answer",
 					"type": "string"
+				},
+				"answer_context": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/AskAnswerContext"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"approximate": {
+					"anyOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Approximate"
+				},
+				"evidence": {
+					"items": {
+						"$ref": "#/components/schemas/AskEvidence"
+					},
+					"title": "Evidence",
+					"type": "array"
+				},
+				"interpretation": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/ResolvedAskPlan"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"query_artifact": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/QueryArtifact"
+						},
+						{
+							"type": "null"
+						}
+					]
 				},
 				"rows": {
 					"items": {
@@ -2763,10 +3252,139 @@
 				"sparql": {
 					"title": "Sparql",
 					"type": "string"
+				},
+				"status": {
+					"$ref": "#/components/schemas/AskStatus",
+					"default": "answered"
+				},
+				"truncated": {
+					"anyOf": [
+						{
+							"type": "boolean"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Truncated"
+				},
+				"warnings": {
+					"anyOf": [
+						{
+							"items": {
+								"type": "string"
+							},
+							"type": "array"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Warnings"
 				}
 			},
 			"required": ["sparql", "answer", "rows"],
 			"title": "AskResponse",
+			"type": "object"
+		},
+		"AskResultTerm": {
+			"additionalProperties": false,
+			"description": "One validated RDF result term with its display and quantity metadata.",
+			"properties": {
+				"datatype": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Datatype"
+				},
+				"display": {
+					"title": "Display",
+					"type": "string"
+				},
+				"language": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Language"
+				},
+				"term_type": {
+					"default": "literal",
+					"title": "Term Type",
+					"type": "string"
+				},
+				"unit": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Unit"
+				},
+				"value": {
+					"title": "Value",
+					"type": "string"
+				}
+			},
+			"required": ["value", "display"],
+			"title": "AskResultTerm",
+			"type": "object"
+		},
+		"AskStatus": {
+			"enum": [
+				"query_ready",
+				"answered",
+				"no_data",
+				"generation_failed",
+				"validation_failed",
+				"execution_failed",
+				"needs_disambiguation"
+			],
+			"title": "AskStatus",
+			"type": "string"
+		},
+		"EntityAmbiguity": {
+			"additionalProperties": false,
+			"properties": {
+				"candidates": {
+					"items": {
+						"$ref": "#/components/schemas/ResolvedEntity"
+					},
+					"maxItems": 10,
+					"minItems": 2,
+					"title": "Candidates",
+					"type": "array"
+				},
+				"entity_type": {
+					"enum": ["location", "disaster_type", "event", "organization", "source", "casualty_type"],
+					"title": "Entity Type",
+					"type": "string"
+				},
+				"mention": {
+					"minLength": 1,
+					"title": "Mention",
+					"type": "string"
+				},
+				"reason": {
+					"minLength": 1,
+					"title": "Reason",
+					"type": "string"
+				}
+			},
+			"required": ["mention", "entity_type", "reason", "candidates"],
+			"title": "EntityAmbiguity",
 			"type": "object"
 		},
 		"EventDetailDisasterType": {
@@ -3453,6 +4071,198 @@
 			},
 			"required": ["id", "label", "fullName", "island", "population", "psgcCode"],
 			"title": "PsgcRegion",
+			"type": "object"
+		},
+		"QueryArtifact": {
+			"additionalProperties": false,
+			"properties": {
+				"expected_columns": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Expected Columns",
+					"type": "array"
+				},
+				"expected_entities": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Expected Entities",
+					"type": "array"
+				},
+				"expected_group_by": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Expected Group By"
+				},
+				"expected_metric": {
+					"anyOf": [
+						{
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Expected Metric"
+				},
+				"origin": {
+					"enum": ["service", "compiler", "model_fallback"],
+					"title": "Origin",
+					"type": "string"
+				},
+				"projected_columns": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Projected Columns",
+					"type": "array"
+				},
+				"service_route": {
+					"anyOf": [
+						{
+							"enum": [
+								"analysis_events",
+								"analysis_event_count",
+								"analysis_summary",
+								"analysis_victim_trends",
+								"analysis_region_rankings",
+								"analysis_disaster_rankings",
+								"event_details",
+								"event_sources"
+							],
+							"type": "string"
+						},
+						{
+							"type": "null"
+						}
+					],
+					"title": "Service Route"
+				},
+				"sparql": {
+					"title": "Sparql",
+					"type": "string"
+				},
+				"warnings": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Warnings",
+					"type": "array"
+				}
+			},
+			"required": ["sparql", "origin"],
+			"title": "QueryArtifact",
+			"type": "object"
+		},
+		"ResolvedAskPlan": {
+			"additionalProperties": false,
+			"properties": {
+				"ambiguities": {
+					"items": {
+						"$ref": "#/components/schemas/EntityAmbiguity"
+					},
+					"title": "Ambiguities",
+					"type": "array"
+				},
+				"casualty_types": {
+					"items": {
+						"$ref": "#/components/schemas/ResolvedEntity"
+					},
+					"title": "Casualty Types",
+					"type": "array"
+				},
+				"disaster_types": {
+					"items": {
+						"$ref": "#/components/schemas/ResolvedEntity"
+					},
+					"title": "Disaster Types",
+					"type": "array"
+				},
+				"events": {
+					"items": {
+						"$ref": "#/components/schemas/ResolvedEntity"
+					},
+					"title": "Events",
+					"type": "array"
+				},
+				"locations": {
+					"items": {
+						"$ref": "#/components/schemas/ResolvedEntity"
+					},
+					"title": "Locations",
+					"type": "array"
+				},
+				"organizations": {
+					"items": {
+						"$ref": "#/components/schemas/ResolvedEntity"
+					},
+					"title": "Organizations",
+					"type": "array"
+				},
+				"plan": {
+					"$ref": "#/components/schemas/AskPlan"
+				},
+				"warnings": {
+					"items": {
+						"type": "string"
+					},
+					"title": "Warnings",
+					"type": "array"
+				}
+			},
+			"required": ["plan"],
+			"title": "ResolvedAskPlan",
+			"type": "object"
+		},
+		"ResolvedEntity": {
+			"additionalProperties": false,
+			"properties": {
+				"confidence": {
+					"maximum": 1.0,
+					"minimum": 0.0,
+					"title": "Confidence",
+					"type": "number"
+				},
+				"entity_type": {
+					"enum": ["location", "disaster_type", "event", "organization", "source", "casualty_type"],
+					"title": "Entity Type",
+					"type": "string"
+				},
+				"id": {
+					"minLength": 1,
+					"title": "Id",
+					"type": "string"
+				},
+				"iri": {
+					"minLength": 1,
+					"title": "Iri",
+					"type": "string"
+				},
+				"label": {
+					"minLength": 1,
+					"title": "Label",
+					"type": "string"
+				},
+				"match_type": {
+					"enum": ["exact", "alias", "hierarchy", "fuzzy"],
+					"title": "Match Type",
+					"type": "string"
+				},
+				"mention": {
+					"minLength": 1,
+					"title": "Mention",
+					"type": "string"
+				}
+			},
+			"required": ["iri", "id", "label", "entity_type", "mention", "match_type", "confidence"],
+			"title": "ResolvedEntity",
 			"type": "object"
 		},
 		"SparqlHead": {

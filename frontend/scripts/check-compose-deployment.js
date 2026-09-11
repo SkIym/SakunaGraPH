@@ -104,15 +104,21 @@ async function checkApiProxy() {
 }
 
 async function checkGeoJson() {
-	const response = await get('/data/regions.geojson?v=deployment-test');
-	assert(response.ok, `GeoJSON returned ${response.status}.`);
-	const body = await response.json();
-	assert(body.type === 'FeatureCollection', 'GeoJSON was not a FeatureCollection.');
+	const regionsResponse = await get('/data/regions.geojson?v=deployment-test');
+	assert(regionsResponse.ok, `Region GeoJSON returned ${regionsResponse.status}.`);
+	const body = await regionsResponse.json();
+	assert(body.type === 'FeatureCollection', 'Region GeoJSON was not a FeatureCollection.');
 	assert(
 		Array.isArray(body.features) && body.features.length > 0,
-		'GeoJSON contained no features.',
+		'Region GeoJSON contained no features.',
 	);
-	console.log(`✓ static GeoJSON (${body.features.length} features)`);
+	const ncrResponse = await get('/data/ncr-cities.geojson?v=deployment-test');
+	assert(ncrResponse.ok, `NCR GeoJSON returned ${ncrResponse.status}.`);
+	const ncr = await ncrResponse.json();
+	assert(ncr.type === 'FeatureCollection', 'NCR GeoJSON was not a FeatureCollection.');
+	assert(ncr.overview?.properties?.psgc === '1300000000', 'NCR overview was missing.');
+	assert(ncr.features?.length === 17, 'NCR GeoJSON must contain 17 localities.');
+	console.log(`✓ static GeoJSON (${body.features.length} provinces, 17 NCR localities)`);
 }
 
 async function readWithTimeout(reader, timeoutMs) {
