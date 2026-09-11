@@ -11,150 +11,309 @@
 	let legendOpen = $state(false);
 
 	const LEGEND = Object.freeze([
-		['natural', 'Natural'],
-		['biological', '· Biological'],
-		['climatological', '· Climatological'],
-		['extraterrestrial', '· Extraterrestrial'],
-		['geophysical', '· Geophysical'],
-		['hydrological', '· Hydrological'],
-		['meteorological', '· Meteorological'],
-		['tech', 'Technological'],
-		['armedconflict', '· Armed Conflict'],
-		['industrial', '· Industrial'],
-		['miscellaneous', '· Miscellaneous'],
-		['transport', '· Transport'],
+		['natural', 'Natural', true],
+		['biological', 'Biological'],
+		['climatological', 'Climatological'],
+		['extraterrestrial', 'Extraterrestrial'],
+		['geophysical', 'Geophysical'],
+		['hydrological', 'Hydrological'],
+		['meteorological', 'Meteorological'],
+		['tech', 'Technological', true],
+		['armedconflict', 'Armed conflict'],
+		['industrial', 'Industrial'],
+		['miscellaneous', 'Miscellaneous'],
+		['transport', 'Transport'],
 	]);
 </script>
 
 {#if active}
-	<div class="absolute inset-0">
+	<div class="ontology-panel">
 		{#if loading}<OntologyLoading label="Building taxonomy tree…" />{/if}
 
 		<svg
 			bind:this={svgElement}
-			class="h-full w-full"
+			class="graph-canvas"
 			style="cursor:default;"
 			aria-label="Interactive disaster taxonomy graph"
 		></svg>
 
-		<p class="ontology-gesture pointer-events-none absolute text-[11px] font-medium text-slate-600">
-			Select · Drag · Zoom
-		</p>
-
-		<div
-			class="ontology-legend absolute rounded-2xl bg-white/95 px-4 py-3 shadow-2xl"
-			style="backdrop-filter:blur(12px);"
-		>
+		<aside class="ontology-legend">
 			<button
 				type="button"
 				aria-expanded={legendOpen}
 				onclick={() => (legendOpen = !legendOpen)}
-				class="legend-toggle min-h-11 cursor-pointer py-3 text-[11px] font-bold tracking-widest text-slate-600 uppercase"
-				>Category</button
+				class="legend-toggle touch-target"
 			>
-			<div class="legend-content mt-2 flex-col gap-1.5" class:mobile-open={legendOpen}>
-				{#each LEGEND as [key, label]}
-					<div class="flex items-center gap-2">
-						<div
-							class="h-2.5 w-2.5 flex-shrink-0 rounded-full"
-							style="background:{colors[key]};"
-						></div>
-						<span class="text-[12px] text-slate-600">{label}</span>
+				<span>Category</span>
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class:open={legendOpen}>
+					<path d="m6 9 6 6 6-6" />
+				</svg>
+			</button>
+			<div class="legend-content" class:open={legendOpen}>
+				{#each LEGEND as [key, label, parent]}
+					<div class="legend-row" class:legend-parent={parent}>
+						<i style="background:{colors[key]};"></i>
+						<span>{label}</span>
 					</div>
 				{/each}
+				<p class="legend-note">Branches move from broad origins to specific hazard types.</p>
 			</div>
-		</div>
+		</aside>
 
 		{#if selectedNode}
-			<div
-				class="ontology-detail absolute rounded-2xl border border-slate-200/60 bg-white/95 shadow-xl"
-				style="backdrop-filter:blur(18px);"
-			>
-				<div class="px-8 py-7">
-					<p
-						class="mb-2 text-[13px] font-bold tracking-widest uppercase"
-						style="color:{colors[selectedNode.group]};"
-					>
+			<aside class="ontology-detail" aria-live="polite">
+				<div class="detail-body">
+					<p class="selection-label"><span aria-hidden="true"></span> Selected type</p>
+					<p class="detail-group" style="color:{colors[selectedNode.group]};">
 						{selectedNode.group}
 					</p>
-					<h2
-						class="leading-tight font-black text-slate-800"
-						style="font-family:'Playfair Display', Georgia,serif; font-weight:900; font-size:1.8rem;"
-					>
-						{selectedNode.label}
-					</h2>
-					<div
-						class="mt-3 h-0.5 rounded-full"
-						style="width:40px; background:{colors[selectedNode.group]};"
-					></div>
-					<p class="mt-4 text-[15px] leading-relaxed text-slate-500">{selectedNode.definition}</p>
-					<p class="mt-5 text-[12px] tracking-widest text-slate-500 uppercase">
-						Select another type for details · Select the canvas to clear
-					</p>
+					<h2>{selectedNode.label}</h2>
+					<p class="detail-definition">{selectedNode.definition}</p>
+					<p class="detail-hint">Select another type, or select the canvas to clear.</p>
 				</div>
-			</div>
+			</aside>
 		{/if}
 	</div>
 {/if}
 
 <style>
-	.ontology-gesture {
-		top: 4.75rem;
-		right: 1rem;
-	}
-	.ontology-legend {
-		left: 0.75rem;
-		bottom: calc(0.75rem + env(safe-area-inset-bottom));
-		max-width: calc(100vw - 1.5rem);
-	}
-	.legend-content {
-		display: none;
-	}
-	.legend-content.mobile-open {
-		display: flex;
-	}
-	.ontology-detail {
-		left: 0.75rem;
-		right: 0.75rem;
-		bottom: calc(0.75rem + env(safe-area-inset-bottom));
-		max-height: 52dvh;
-		overflow-y: auto;
-	}
-	.ontology-detail > div {
-		padding: 1.25rem;
+	.ontology-panel {
+		position: absolute;
+		inset: 0;
 	}
 
-	@media (min-width: 768px) {
-		.ontology-gesture {
-			top: 4rem;
-			right: 1.25rem;
+	.graph-canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.ontology-legend,
+	.ontology-detail {
+		position: absolute;
+		z-index: 20;
+		border: 1px solid var(--color-border);
+		background: var(--color-canvas);
+	}
+
+	.ontology-legend {
+		left: 1rem;
+		bottom: 1rem;
+		max-width: calc(100% - 2rem);
+		border-radius: var(--radius-control);
+		box-shadow: var(--shadow-control);
+	}
+
+	.legend-toggle {
+		display: flex;
+		width: 100%;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0.6rem 0.8rem;
+		font: inherit;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+	}
+
+	.legend-toggle svg {
+		width: 1rem;
+		height: 1rem;
+		color: var(--color-brand);
+		transition: transform 180ms ease;
+	}
+
+	.legend-toggle svg.open {
+		transform: rotate(180deg);
+	}
+
+	.legend-toggle path {
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.legend-content {
+		display: none;
+		width: 13rem;
+		max-height: min(25rem, 62dvh);
+		overflow-y: auto;
+		border-top: 1px solid var(--color-border);
+		padding: 0.75rem 0.85rem 0.85rem;
+	}
+
+	.legend-content.open {
+		display: grid;
+		gap: 0.4rem;
+	}
+
+	.legend-row {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		padding-left: 0.65rem;
+		font-size: 0.6875rem;
+		line-height: 1.35;
+		color: var(--color-text-secondary);
+	}
+
+	.legend-row i {
+		width: 0.5rem;
+		height: 0.5rem;
+		flex: none;
+		border-radius: 50%;
+	}
+
+	.legend-row.legend-parent {
+		margin-top: 0.25rem;
+		border-top: 1px solid var(--color-border);
+		padding: 0.55rem 0 0;
+		font-weight: 700;
+		color: var(--color-text);
+	}
+
+	.legend-row.legend-parent:first-child {
+		margin-top: 0;
+		border-top: 0;
+		padding-top: 0;
+	}
+
+	.legend-note {
+		margin: 0.45rem 0 0;
+		border-top: 1px solid var(--color-border);
+		padding-top: 0.65rem;
+		font-size: 0.625rem;
+		line-height: 1.45;
+		color: var(--color-text-muted);
+	}
+
+	.ontology-detail {
+		right: 1rem;
+		bottom: 1rem;
+		width: min(25rem, calc(100% - 2rem));
+		max-height: calc(100% - 2rem);
+		overflow-y: auto;
+		border-radius: var(--radius-surface);
+		box-shadow: var(--shadow-surface);
+	}
+
+	.ontology-detail::before {
+		position: absolute;
+		inset: 0 auto auto 0;
+		width: 5rem;
+		height: 3px;
+		background: var(--color-accent);
+		content: '';
+	}
+
+	.detail-body {
+		padding: 1.5rem;
+	}
+
+	.selection-label,
+	.detail-group,
+	.detail-definition,
+	.detail-hint {
+		margin: 0;
+	}
+
+	.selection-label {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+	}
+
+	.selection-label span {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: var(--color-accent);
+		box-shadow: 0 0 0 1px #caa600;
+	}
+
+	.detail-group {
+		margin-top: 1rem;
+		font-size: 0.6875rem;
+		font-weight: 750;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.ontology-detail h2 {
+		margin: 0.25rem 0 0;
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: 1.9rem;
+		font-weight: 900;
+		line-height: 1.05;
+		letter-spacing: -0.025em;
+		color: var(--color-text);
+		text-wrap: balance;
+	}
+
+	.detail-definition {
+		margin-top: 0.9rem;
+		font-size: 0.875rem;
+		line-height: 1.65;
+		color: var(--color-text-secondary);
+	}
+
+	.detail-hint {
+		margin-top: 1.1rem;
+		border-top: 1px solid var(--color-border);
+		padding-top: 0.8rem;
+		font-size: 0.625rem;
+		line-height: 1.45;
+		color: var(--color-text-muted);
+	}
+
+	@media (hover: hover) {
+		.legend-toggle:hover {
+			background: var(--color-brand-soft);
+			color: var(--color-brand-hover);
 		}
+	}
+
+	@media (max-width: 639px) {
 		.ontology-legend {
-			left: 1.5rem;
-			bottom: 1.5rem;
-			min-width: 12.5rem;
-			max-width: 18.75rem;
-			padding: 1rem;
+			left: 0.75rem;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
 		}
-		.legend-toggle {
-			min-height: 0;
-			cursor: default;
-			padding-block: 0 0.75rem;
-			pointer-events: none;
-		}
-		.ontology-legend > .legend-content {
-			display: flex;
-			margin-top: 0;
-		}
+
 		.ontology-detail {
-			left: auto;
-			right: 1.5rem;
-			bottom: 1.5rem;
-			width: min(26.25rem, calc(100vw - 3rem));
-			max-height: 72dvh;
+			right: 0.75rem;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
+			width: calc(100% - 1.5rem);
+			max-height: 58%;
 		}
-		.ontology-detail > div {
-			padding: 1.75rem 2rem;
+
+		.detail-body {
+			padding: 1.25rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.legend-toggle svg {
+			transition: none;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.ontology-legend,
+		.ontology-detail {
+			border-color: CanvasText;
 		}
 	}
 </style>

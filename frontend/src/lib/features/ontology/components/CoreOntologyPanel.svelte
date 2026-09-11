@@ -12,170 +12,370 @@
 	let legendOpen = $state(false);
 </script>
 
-<div class="absolute inset-0" class:hidden={!active}>
+<div class="ontology-panel" class:hidden={!active}>
 	{#if loading}<OntologyLoading label="Rendering ontology graph…" />{/if}
 
 	<svg
 		bind:this={svgElement}
-		class="h-full w-full"
+		class="graph-canvas"
 		style="cursor:default;"
 		aria-label="Interactive core ontology class graph"
 	></svg>
 
-	<p class="ontology-gesture pointer-events-none absolute text-[11px] font-medium text-slate-600">
-		Select · Drag · Zoom
-	</p>
-
-	<div
-		class="ontology-legend absolute rounded-2xl bg-white/95 px-4 py-3 shadow-2xl"
-		style="backdrop-filter:blur(12px);"
-	>
+	<aside class="ontology-legend">
 		<button
 			type="button"
 			aria-expanded={legendOpen}
 			onclick={() => (legendOpen = !legendOpen)}
-			class="legend-toggle min-h-11 cursor-pointer py-3 text-[11px] font-bold tracking-widest text-slate-600 uppercase"
-			>Legend</button
+			class="legend-toggle touch-target"
 		>
-		<div class="legend-content mt-2 flex-col gap-2" class:mobile-open={legendOpen}>
+			<span>Legend</span>
+			<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class:open={legendOpen}>
+				<path d="m6 9 6 6 6-6" />
+			</svg>
+		</button>
+		<div class="legend-content" class:open={legendOpen}>
 			{#each Object.entries(groupLabels) as [group, label]}
-				<div class="flex items-center gap-2.5">
-					<div
-						class="h-3.5 w-3.5 flex-shrink-0 rounded-full"
-						style="background:{groupColors[group]}33; border:2.5px solid {groupColors[group]};"
-					></div>
-					<span class="text-xs font-medium text-slate-600">{label}</span>
+				<div class="legend-row">
+					<i
+						class="legend-node"
+						style="background:{groupColors[group]}22; border-color:{groupColors[group]};"
+					></i>
+					<span>{label}</span>
 				</div>
 			{/each}
-			<div class="mt-2 flex flex-col gap-1.5 border-t border-slate-100 pt-2">
-				<div class="flex items-center gap-2.5">
-					<div class="h-px w-7 flex-shrink-0 bg-slate-300"></div>
-					<span class="text-xs text-slate-400">subClassOf</span>
+			<div class="relation-legend">
+				<div class="legend-row">
+					<i class="legend-line"></i>
+					<span>subClassOf</span>
 				</div>
-				<div class="flex items-center gap-2.5">
-					<svg width="28" height="7" style="flex-shrink:0;" aria-hidden="true">
-						<line
-							x1="0"
-							y1="3.5"
-							x2="28"
-							y2="3.5"
-							stroke="#93c5fd"
-							stroke-width="1.8"
-							stroke-dasharray="5 3"
-						></line>
+				<div class="legend-row">
+					<svg width="28" height="7" aria-hidden="true">
+						<line x1="0" y1="3.5" x2="28" y2="3.5"></line>
 					</svg>
-					<span class="text-xs text-slate-400">object property</span>
+					<span>object property</span>
 				</div>
 			</div>
-			<p class="mt-3 text-[11px] text-slate-500">Zoom · Drag canvas · Drag nodes</p>
+			<p class="legend-note">Drag nodes to inspect dense relationships.</p>
 		</div>
-	</div>
+	</aside>
 
 	{#if selectedNode}
-		<div
-			class="ontology-detail absolute rounded-2xl border border-slate-200/60 bg-white/95 shadow-xl"
-			style="backdrop-filter:blur(18px);"
-		>
-			<div class="px-8 py-7">
-				<p
-					class="mb-2 text-[13px] font-bold tracking-widest uppercase"
-					style="color:{groupColors[selectedNode.group]};"
-				>
+		<aside class="ontology-detail" aria-live="polite">
+			<div class="detail-body">
+				<p class="selection-label"><span aria-hidden="true"></span> Selected node</p>
+				<p class="detail-group" style="color:{groupColors[selectedNode.group]};">
 					{groupLabels[selectedNode.group]}
 				</p>
-				<h2
-					class="leading-tight font-black text-slate-800"
-					style="font-family:'Playfair Display', Georgia,serif; font-weight:900; font-size:1.8rem;"
-				>
-					{selectedNode.label}
-				</h2>
-				<div
-					class="mt-3 h-0.5 rounded-full"
-					style="width:40px; background:{groupColors[selectedNode.group]};"
-				></div>
-				<p class="mt-4 text-[15px] leading-relaxed text-slate-500">{selectedNode.definition}</p>
+				<h2>{selectedNode.label}</h2>
+				<p class="detail-definition">{selectedNode.definition}</p>
 				{#if selectedNode.dataProperties?.length}
-					<div class="mt-5 border-t border-slate-100 pt-4">
-						<p class="mb-2 text-[10px] font-bold tracking-widest text-slate-400 uppercase">
-							Data Properties
-						</p>
-						<div class="flex flex-col gap-1.5">
+					<div class="property-list">
+						<h3>Data properties</h3>
+						<dl>
 							{#each selectedNode.dataProperties as property}
-								<div class="flex items-center justify-between gap-3">
-									<span class="text-[13px] text-slate-600">{property.label || property.range}</span>
-									<span
-										class="flex-shrink-0 rounded-md bg-slate-50 px-2 py-0.5 font-mono text-[11px] text-slate-400"
-										>{property.range}</span
-									>
+								<div>
+									<dt>{property.label || property.range}</dt>
+									<dd>{property.range}</dd>
 								</div>
 							{/each}
-						</div>
+						</dl>
 					</div>
 				{/if}
-				<p class="mt-5 text-[12px] tracking-widest text-slate-500 uppercase">
-					Select another node for details · Select the canvas to clear
-				</p>
+				<p class="detail-hint">Select another node, or select the canvas to clear.</p>
 			</div>
-		</div>
+		</aside>
 	{/if}
 </div>
 
 <style>
-	.ontology-gesture {
-		top: 4.75rem;
-		right: 1rem;
-	}
-	.ontology-legend {
-		left: 0.75rem;
-		bottom: calc(0.75rem + env(safe-area-inset-bottom));
-		max-width: calc(100vw - 1.5rem);
-	}
-	.legend-content {
-		display: none;
-	}
-	.legend-content.mobile-open {
-		display: flex;
-	}
-	.ontology-detail {
-		left: 0.75rem;
-		right: 0.75rem;
-		bottom: calc(0.75rem + env(safe-area-inset-bottom));
-		max-height: 52dvh;
-		overflow-y: auto;
-	}
-	.ontology-detail > div {
-		padding: 1.25rem;
+	.ontology-panel {
+		position: absolute;
+		inset: 0;
 	}
 
-	@media (min-width: 768px) {
-		.ontology-gesture {
-			top: 4rem;
-			right: 1.25rem;
+	.hidden {
+		display: none;
+	}
+
+	.graph-canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.ontology-legend,
+	.ontology-detail {
+		position: absolute;
+		z-index: 20;
+		border: 1px solid var(--color-border);
+		background: var(--color-canvas);
+		box-shadow: var(--shadow-control);
+	}
+
+	.ontology-legend {
+		left: 1rem;
+		bottom: 1rem;
+		max-width: calc(100% - 2rem);
+		border-radius: var(--radius-control);
+	}
+
+	.legend-toggle {
+		display: flex;
+		width: 100%;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0.6rem 0.8rem;
+		font: inherit;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+	}
+
+	.legend-toggle svg {
+		width: 1rem;
+		height: 1rem;
+		color: var(--color-brand);
+		transition: transform 180ms ease;
+	}
+
+	.legend-toggle svg.open {
+		transform: rotate(180deg);
+	}
+
+	.legend-toggle path {
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.legend-content {
+		display: none;
+		width: 13rem;
+		max-height: min(24rem, 60dvh);
+		overflow-y: auto;
+		border-top: 1px solid var(--color-border);
+		padding: 0.75rem 0.85rem 0.85rem;
+	}
+
+	.legend-content.open {
+		display: grid;
+		gap: 0.45rem;
+	}
+
+	.legend-row {
+		display: flex;
+		align-items: center;
+		gap: 0.6rem;
+		font-size: 0.6875rem;
+		line-height: 1.35;
+		color: var(--color-text-secondary);
+	}
+
+	.legend-node {
+		width: 0.75rem;
+		height: 0.75rem;
+		flex: none;
+		border: 2px solid;
+		border-radius: 50%;
+	}
+
+	.relation-legend {
+		display: grid;
+		gap: 0.45rem;
+		margin-top: 0.35rem;
+		border-top: 1px solid var(--color-border);
+		padding-top: 0.65rem;
+	}
+
+	.legend-line {
+		width: 1.75rem;
+		height: 1px;
+		flex: none;
+		background: #cbd5e1;
+	}
+
+	.relation-legend line {
+		stroke: var(--color-brand-medium);
+		stroke-width: 1.8;
+		stroke-dasharray: 5 3;
+	}
+
+	.legend-note {
+		margin: 0.35rem 0 0;
+		font-size: 0.625rem;
+		line-height: 1.45;
+		color: var(--color-text-muted);
+	}
+
+	.ontology-detail {
+		right: 1rem;
+		bottom: 1rem;
+		width: min(25rem, calc(100% - 2rem));
+		max-height: calc(100% - 2rem);
+		overflow-y: auto;
+		border-radius: var(--radius-surface);
+		box-shadow: var(--shadow-surface);
+	}
+
+	.ontology-detail::before {
+		position: absolute;
+		inset: 0 auto auto 0;
+		width: 5rem;
+		height: 3px;
+		background: var(--color-accent);
+		content: '';
+	}
+
+	.detail-body {
+		padding: 1.5rem;
+	}
+
+	.selection-label,
+	.detail-group,
+	.detail-hint,
+	.detail-definition {
+		margin: 0;
+	}
+
+	.selection-label {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+	}
+
+	.selection-label span {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: var(--color-accent);
+		box-shadow: 0 0 0 1px #caa600;
+	}
+
+	.detail-group {
+		margin-top: 1rem;
+		font-size: 0.6875rem;
+		font-weight: 750;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.ontology-detail h2 {
+		margin: 0.25rem 0 0;
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: 1.9rem;
+		font-weight: 900;
+		line-height: 1.05;
+		letter-spacing: -0.025em;
+		color: var(--color-text);
+		text-wrap: balance;
+	}
+
+	.detail-definition {
+		margin-top: 0.9rem;
+		font-size: 0.875rem;
+		line-height: 1.65;
+		color: var(--color-text-secondary);
+	}
+
+	.property-list {
+		margin-top: 1rem;
+		border-top: 1px solid var(--color-border);
+		padding-top: 1rem;
+	}
+
+	.property-list h3 {
+		margin: 0 0 0.5rem;
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.property-list dl {
+		display: grid;
+		gap: 0.4rem;
+		margin: 0;
+	}
+
+	.property-list dl > div {
+		display: flex;
+		align-items: baseline;
+		justify-content: space-between;
+		gap: 1rem;
+	}
+
+	.property-list dt {
+		font-size: 0.75rem;
+		color: var(--color-text-secondary);
+	}
+
+	.property-list dd {
+		margin: 0;
+		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+		font-size: 0.625rem;
+		color: var(--color-text-muted);
+	}
+
+	.detail-hint {
+		margin-top: 1.1rem;
+		border-top: 1px solid var(--color-border);
+		padding-top: 0.8rem;
+		font-size: 0.625rem;
+		line-height: 1.45;
+		color: var(--color-text-muted);
+	}
+
+	@media (hover: hover) {
+		.legend-toggle:hover {
+			background: var(--color-brand-soft);
+			color: var(--color-brand-hover);
 		}
+	}
+
+	@media (max-width: 639px) {
 		.ontology-legend {
-			left: 1.5rem;
-			bottom: 1.5rem;
-			padding: 1rem 1.25rem;
+			left: 0.75rem;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
 		}
-		.legend-toggle {
-			min-height: 0;
-			cursor: default;
-			padding-block: 0 0.75rem;
-			pointer-events: none;
-		}
-		.ontology-legend > .legend-content {
-			display: flex;
-			margin-top: 0;
-		}
+
 		.ontology-detail {
-			left: auto;
-			right: 1.5rem;
-			bottom: 1.5rem;
-			width: min(26.25rem, calc(100vw - 3rem));
-			max-height: 72dvh;
+			right: 0.75rem;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
+			width: calc(100% - 1.5rem);
+			max-height: 58%;
 		}
-		.ontology-detail > div {
-			padding: 1.75rem 2rem;
+
+		.detail-body {
+			padding: 1.25rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.legend-toggle svg {
+			transition: none;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.ontology-legend,
+		.ontology-detail,
+		.legend-node {
+			border-color: CanvasText;
 		}
 	}
 </style>

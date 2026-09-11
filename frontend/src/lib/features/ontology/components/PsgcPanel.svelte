@@ -9,205 +9,417 @@
 		svgElement = $bindable(null),
 	} = $props();
 	let legendOpen = $state(false);
+
+	function cityClassification(value) {
+		if (value === 'HUC') return 'Highly Urbanized City';
+		if (value === 'ICC') return 'Independent Component City';
+		return value;
+	}
 </script>
 
 {#if active}
-	<div class="absolute inset-0">
+	<div class="ontology-panel">
 		{#if loading}<OntologyLoading label="Loading PSGC graph…" />{/if}
 
 		<svg
 			bind:this={svgElement}
-			class="h-full w-full"
+			class="graph-canvas"
 			style="cursor:default;"
 			aria-label="Interactive PSGC location graph"
 		></svg>
 
-		<p class="ontology-gesture pointer-events-none absolute text-[11px] font-medium text-slate-600">
-			Select · Drag · Zoom
-		</p>
-
-		<div
-			class="ontology-legend absolute rounded-2xl bg-white/95 px-4 py-3 shadow-2xl"
-			style="backdrop-filter:blur(12px);"
-		>
+		<aside class="ontology-legend">
 			<button
 				type="button"
 				aria-expanded={legendOpen}
 				onclick={() => (legendOpen = !legendOpen)}
-				class="legend-toggle min-h-11 cursor-pointer py-3 text-[11px] font-bold tracking-widest text-slate-600 uppercase"
-				>Island Group</button
+				class="legend-toggle touch-target"
 			>
-			<div class="legend-content mt-2 flex-col gap-2" class:mobile-open={legendOpen}>
+				<span>Island Group</span>
+				<svg aria-hidden="true" viewBox="0 0 24 24" fill="none" class:open={legendOpen}>
+					<path d="m6 9 6 6 6-6" />
+				</svg>
+			</button>
+			<div class="legend-content" class:open={legendOpen}>
 				{#each Object.entries(islandColors) as [island, color]}
-					<div class="flex items-center gap-2.5">
-						<div
-							class="h-3.5 w-3.5 flex-shrink-0 rounded-full"
-							style="background:{color}30; border:2.5px solid {color};"
-						></div>
-						<span class="text-xs font-medium text-slate-600">{island}</span>
+					<div class="legend-row">
+						<i class="island-node" style="background:{color}22; border-color:{color};"></i>
+						<span>{island}</span>
 					</div>
 				{/each}
-				<div class="mt-3 flex flex-col gap-1.5 border-t border-slate-100 pt-3">
-					<div class="flex items-center gap-2.5">
-						<div
-							class="h-5 w-5 flex-shrink-0 rounded-full border-2 border-slate-400 bg-slate-100"
-						></div>
-						<span class="text-xs text-slate-400">Region</span>
+				<div class="level-legend">
+					<div class="legend-row">
+						<i class="region-node"></i>
+						<span>Region</span>
 					</div>
-					<div class="flex items-center gap-2.5">
-						<div
-							class="h-3 w-3 flex-shrink-0 rounded-full border border-slate-400 bg-slate-100"
-						></div>
-						<span class="text-xs text-slate-400">Province</span>
+					<div class="legend-row">
+						<i class="province-node"></i>
+						<span>Province</span>
 					</div>
-					<div class="flex items-center gap-2.5">
-						<div
-							class="h-2.5 w-2.5 flex-shrink-0 rounded-full"
-							style="background:transparent; border: 1.2px dashed #94a3b8;"
-						></div>
-						<span class="text-xs text-slate-500 italic">Independent city (HUC / ICC)</span>
+					<div class="legend-row">
+						<i class="city-node"></i>
+						<span>Independent city</span>
 					</div>
 				</div>
-				<p class="mt-3 text-[11px] text-slate-500">HUCs link directly to region</p>
+				<p class="legend-note">HUC and ICC records link directly to their region.</p>
 			</div>
-		</div>
+		</aside>
 
 		{#if selectedNode}
-			<div
-				class="ontology-detail absolute rounded-2xl border border-slate-200/60 bg-white/95 shadow-xl"
-				style="backdrop-filter:blur(18px);"
-			>
-				<div class="flex flex-col gap-3 px-8 py-7">
-					<p
-						class="text-[13px] font-bold tracking-widest uppercase"
-						style="color:{islandColors[selectedNode.island]};"
-					>
+			<aside class="ontology-detail" aria-live="polite">
+				<div class="detail-body">
+					<p class="selection-label"><span aria-hidden="true"></span> Selected place</p>
+					<p class="detail-group" style="color:{islandColors[selectedNode.island]};">
 						{selectedNode.cityType ?? selectedNode.level} · {selectedNode.regionLabel ??
 							selectedNode.island}
 					</p>
-					<h2
-						class="leading-tight font-black text-slate-800"
-						style="font-family:'Playfair Display', Georgia,serif; font-weight:900; font-size:1.8rem;"
-					>
-						{selectedNode.fullName ?? selectedNode.label}
-					</h2>
-					<div
-						class="h-0.5 rounded-full"
-						style="width:40px; background:{islandColors[selectedNode.island]};"
-					></div>
-					<div class="mt-1 flex flex-col gap-3">
+					<h2>{selectedNode.fullName ?? selectedNode.label}</h2>
+					<dl class="place-facts">
 						<div>
-							<p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">PSGC Code</p>
-							<p class="font-mono text-[14px] text-slate-600">{selectedNode.psgcCode}</p>
+							<dt>PSGC code</dt>
+							<dd class="mono">{selectedNode.psgcCode ?? selectedNode.id}</dd>
 						</div>
 						<div>
-							<p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-								Geographic Level
-							</p>
-							<p class="text-[14px] text-slate-600">{selectedNode.level}</p>
+							<dt>Geographic level</dt>
+							<dd>{selectedNode.level ?? 'Not recorded'}</dd>
 						</div>
 						{#if selectedNode.cityType}
 							<div>
-								<p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-									City Classification
-								</p>
-								<p class="text-[14px] text-slate-600">
-									{selectedNode.cityType === 'HUC'
-										? 'Highly Urbanized City'
-										: selectedNode.cityType === 'ICC'
-											? 'Independent Component City'
-											: selectedNode.cityType}
-								</p>
+								<dt>City classification</dt>
+								<dd>{cityClassification(selectedNode.cityType)}</dd>
 							</div>
 						{/if}
 						{#if selectedNode.incomeClass}
 							<div>
-								<p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-									Income Classification
-								</p>
-								<p class="text-[14px] text-slate-600">{selectedNode.incomeClass} class</p>
+								<dt>Income classification</dt>
+								<dd>{selectedNode.incomeClass} class</dd>
 							</div>
 						{/if}
 						<div>
-							<p class="text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-								Population (2020)
-							</p>
-							<p class="text-[14px] text-slate-600">{selectedNode.population.toLocaleString()}</p>
+							<dt>Population (2020)</dt>
+							<dd class="mono">{selectedNode.population?.toLocaleString?.() ?? 'Not recorded'}</dd>
 						</div>
-					</div>
+					</dl>
 					{#if selectedNode.note}
-						<div class="border-t border-slate-100 pt-2">
-							<p class="mb-0.5 text-[10px] font-bold tracking-wider text-slate-400 uppercase">
-								Note
-							</p>
-							<p class="text-[14px] leading-snug text-slate-500 italic">{selectedNode.note}</p>
+						<div class="place-note">
+							<h3>Note</h3>
+							<p>{selectedNode.note}</p>
 						</div>
 					{/if}
-					<p class="mt-1 text-[12px] tracking-widest text-slate-500 uppercase">
-						Select another place for details · Select the canvas to clear
-					</p>
+					<p class="detail-hint">Select another place, or select the canvas to clear.</p>
 				</div>
-			</div>
+			</aside>
 		{/if}
 	</div>
 {/if}
 
 <style>
-	.ontology-gesture {
-		top: 4.75rem;
-		right: 1rem;
-	}
-	.ontology-legend {
-		left: 0.75rem;
-		bottom: calc(0.75rem + env(safe-area-inset-bottom));
-		max-width: calc(100vw - 1.5rem);
-	}
-	.legend-content {
-		display: none;
-	}
-	.legend-content.mobile-open {
-		display: flex;
-	}
-	.ontology-detail {
-		left: 0.75rem;
-		right: 0.75rem;
-		bottom: calc(0.75rem + env(safe-area-inset-bottom));
-		max-height: 52dvh;
-		overflow-y: auto;
-	}
-	.ontology-detail > div {
-		padding: 1.25rem;
+	.ontology-panel {
+		position: absolute;
+		inset: 0;
 	}
 
-	@media (min-width: 768px) {
-		.ontology-gesture {
-			top: 4rem;
-			right: 1.25rem;
+	.graph-canvas {
+		display: block;
+		width: 100%;
+		height: 100%;
+	}
+
+	.ontology-legend,
+	.ontology-detail {
+		position: absolute;
+		z-index: 20;
+		border: 1px solid var(--color-border);
+		background: var(--color-canvas);
+	}
+
+	.ontology-legend {
+		left: 1rem;
+		bottom: 1rem;
+		max-width: calc(100% - 2rem);
+		border-radius: var(--radius-control);
+		box-shadow: var(--shadow-control);
+	}
+
+	.legend-toggle {
+		display: flex;
+		width: 100%;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0.6rem 0.8rem;
+		font: inherit;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+	}
+
+	.legend-toggle svg {
+		width: 1rem;
+		height: 1rem;
+		color: var(--color-brand);
+		transition: transform 180ms ease;
+	}
+
+	.legend-toggle svg.open {
+		transform: rotate(180deg);
+	}
+
+	.legend-toggle path {
+		stroke: currentColor;
+		stroke-width: 1.8;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.legend-content {
+		display: none;
+		width: 14rem;
+		max-height: min(25rem, 62dvh);
+		overflow-y: auto;
+		border-top: 1px solid var(--color-border);
+		padding: 0.75rem 0.85rem 0.85rem;
+	}
+
+	.legend-content.open {
+		display: grid;
+		gap: 0.5rem;
+	}
+
+	.legend-row {
+		display: flex;
+		align-items: center;
+		gap: 0.65rem;
+		font-size: 0.6875rem;
+		line-height: 1.35;
+		color: var(--color-text-secondary);
+	}
+
+	.legend-row i {
+		display: block;
+		flex: none;
+		border-color: var(--color-text-muted);
+	}
+
+	.island-node {
+		width: 0.8rem;
+		height: 0.8rem;
+		border: 2px solid;
+		border-radius: 50%;
+	}
+
+	.level-legend {
+		display: grid;
+		gap: 0.5rem;
+		margin-top: 0.35rem;
+		border-top: 1px solid var(--color-border);
+		padding-top: 0.7rem;
+	}
+
+	.region-node {
+		width: 1rem;
+		height: 1rem;
+		border: 2px solid;
+		border-radius: 50%;
+		background: var(--color-surface-subtle);
+	}
+
+	.province-node {
+		width: 0.7rem;
+		height: 0.7rem;
+		border: 1px solid;
+		border-radius: 50%;
+		background: var(--color-surface-subtle);
+	}
+
+	.city-node {
+		width: 0.6rem;
+		height: 0.6rem;
+		border: 1px dashed;
+		border-radius: 50%;
+	}
+
+	.legend-note {
+		margin: 0.4rem 0 0;
+		font-size: 0.625rem;
+		line-height: 1.45;
+		color: var(--color-text-muted);
+	}
+
+	.ontology-detail {
+		right: 1rem;
+		bottom: 1rem;
+		width: min(25rem, calc(100% - 2rem));
+		max-height: calc(100% - 2rem);
+		overflow-y: auto;
+		border-radius: var(--radius-surface);
+		box-shadow: var(--shadow-surface);
+	}
+
+	.ontology-detail::before {
+		position: absolute;
+		inset: 0 auto auto 0;
+		width: 5rem;
+		height: 3px;
+		background: var(--color-accent);
+		content: '';
+	}
+
+	.detail-body {
+		padding: 1.5rem;
+	}
+
+	.selection-label,
+	.detail-group,
+	.detail-hint {
+		margin: 0;
+	}
+
+	.selection-label {
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		font-size: 0.625rem;
+		font-weight: 700;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
+	}
+
+	.selection-label span {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: var(--color-accent);
+		box-shadow: 0 0 0 1px #caa600;
+	}
+
+	.detail-group {
+		margin-top: 1rem;
+		font-size: 0.6875rem;
+		font-weight: 750;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.ontology-detail h2 {
+		margin: 0.25rem 0 0;
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: 1.9rem;
+		font-weight: 900;
+		line-height: 1.05;
+		letter-spacing: -0.025em;
+		color: var(--color-text);
+		text-wrap: balance;
+	}
+
+	.place-facts {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 0;
+		margin: 1.1rem 0 0;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.place-facts > div {
+		border-bottom: 1px solid var(--color-border);
+		padding: 0.75rem 0;
+	}
+
+	.place-facts > div:nth-child(even) {
+		border-left: 1px solid var(--color-border);
+		padding-left: 0.85rem;
+	}
+
+	.place-facts dt,
+	.place-note h3 {
+		font-size: 0.625rem;
+		font-weight: 700;
+		line-height: 1.35;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-text-muted);
+	}
+
+	.place-facts dd {
+		margin: 0.25rem 0 0;
+		font-size: 0.75rem;
+		line-height: 1.45;
+		color: var(--color-text-secondary);
+	}
+
+	.place-facts dd.mono {
+		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+		font-size: 0.6875rem;
+	}
+
+	.place-note {
+		margin-top: 0.9rem;
+		border-left: 2px solid var(--color-brand-medium);
+		padding-left: 0.75rem;
+	}
+
+	.place-note h3,
+	.place-note p {
+		margin: 0;
+	}
+
+	.place-note p {
+		margin-top: 0.25rem;
+		font-size: 0.75rem;
+		line-height: 1.55;
+		color: var(--color-text-secondary);
+	}
+
+	.detail-hint {
+		margin-top: 1.1rem;
+		font-size: 0.625rem;
+		line-height: 1.45;
+		color: var(--color-text-muted);
+	}
+
+	@media (hover: hover) {
+		.legend-toggle:hover {
+			background: var(--color-brand-soft);
+			color: var(--color-brand-hover);
 		}
+	}
+
+	@media (max-width: 639px) {
 		.ontology-legend {
-			left: 1.5rem;
-			bottom: 1.5rem;
-			padding: 1rem 1.25rem;
+			left: 0.75rem;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
 		}
-		.legend-toggle {
-			min-height: 0;
-			cursor: default;
-			padding-block: 0 0.75rem;
-			pointer-events: none;
-		}
-		.ontology-legend > .legend-content {
-			display: flex;
-			margin-top: 0;
-		}
+
 		.ontology-detail {
-			left: auto;
-			right: 1.5rem;
-			bottom: 1.5rem;
-			width: min(26.25rem, calc(100vw - 3rem));
-			max-height: 72dvh;
+			right: 0.75rem;
+			bottom: max(0.75rem, env(safe-area-inset-bottom));
+			width: calc(100% - 1.5rem);
+			max-height: 62%;
 		}
-		.ontology-detail > div {
-			padding: 1.75rem 2rem;
+
+		.detail-body {
+			padding: 1.25rem;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.legend-toggle svg {
+			transition: none;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.ontology-legend,
+		.ontology-detail,
+		.legend-row i {
+			border-color: CanvasText;
 		}
 	}
 </style>

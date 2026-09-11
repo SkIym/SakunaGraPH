@@ -10,10 +10,34 @@
 	// ── Tab state ─────────────────────────────────────────────────────────────
 	let activeTab = $state('graph');
 	const TABS = [
-		{ id: 'graph', label: 'Core Ontology' },
-		{ id: 'taxonomy', label: 'Disaster Taxonomy' },
-		{ id: 'psgc', label: 'PSGC Locations' },
+		{
+			id: 'graph',
+			label: 'Core Ontology',
+			kicker: 'OWL class network',
+			title: 'Core disaster ontology',
+			description: 'Trace classes, inheritance, and object properties across the knowledge graph.',
+		},
+		{
+			id: 'taxonomy',
+			label: 'Disaster Taxonomy',
+			kicker: 'Classification tree',
+			title: 'Disaster type taxonomy',
+			description:
+				'Follow the hierarchy from broad origins to the hazard types used in event records.',
+		},
+		{
+			id: 'psgc',
+			label: 'PSGC Locations',
+			kicker: 'Geographic registry',
+			title: 'Philippine location graph',
+			description:
+				'Inspect PSGC regions, provinces, and independent cities as linked geographic entities.',
+		},
 	];
+	const activeView = $derived(TABS.find((tab) => tab.id === activeTab) ?? TABS[0]);
+	const activeViewNumber = $derived(
+		String(TABS.findIndex((tab) => tab.id === activeTab) + 1).padStart(2, '0'),
+	);
 
 	// ══════════════════════════════════════════════════════════════════════════
 	// CLASS GRAPH
@@ -29,13 +53,13 @@
 	let graphReady = false;
 
 	const GROUP_COLOR = {
-		core: '#ef4444',
-		impact: '#f97316',
-		response: '#22c55e',
-		preparedness: '#3b82f6',
-		location: '#14b8a6',
-		type: '#a855f7',
-		source: '#94a3b8',
+		core: '#0038a8',
+		impact: '#b46518',
+		response: '#2f7d56',
+		preparedness: '#4e6fae',
+		location: '#0f766e',
+		type: '#6d5c9b',
+		source: '#64748b',
 	};
 	const GROUP_LABEL = {
 		core: 'Core Event',
@@ -696,10 +720,10 @@
 	let psgcSim = null;
 
 	const ISLAND_COLOR = {
-		Luzon: '#3b82f6',
-		NCR: '#8b5cf6',
-		Visayas: '#22c55e',
-		Mindanao: '#f97316',
+		Luzon: '#0038a8',
+		NCR: '#6d5c9b',
+		Visayas: '#2f7d56',
+		Mindanao: '#b46518',
 	};
 
 	$effect(() => {
@@ -985,55 +1009,411 @@
 
 <!-- Cursor tooltip for class graph -->
 {#if activeTab === 'graph' && hoveredNode && selectedNode?.id !== hoveredNode?.id}
-	<div
-		class="fixed z-50 pointer-events-none rounded-xl bg-slate-800/95 px-3 py-2 shadow-xl max-w-xs"
-		style="left:{tooltipX + 14}px; top:{tooltipY - 10}px; backdrop-filter:blur(6px);"
-	>
-		<p class="text-[11px] font-bold text-white">{hoveredNode.label}</p>
-		<p class="mt-0.5 text-[10px] leading-snug text-slate-300">{hoveredNode.definition}</p>
+	<div class="ontology-tooltip" style="left:{tooltipX + 14}px; top:{tooltipY - 10}px;">
+		<p>{hoveredNode.label}</p>
+		<small>{hoveredNode.definition}</small>
 	</div>
 {/if}
 
-<div class="ontology-workspace relative">
-	<OntologyTabs tabs={TABS} active={activeTab} onChange={(tab) => (activeTab = tab)} />
+<main class="ontology-page">
+	<header class="ontology-intro">
+		<div class="intro-copy">
+			<p class="workspace-kicker">Schema atlas · OWL 2</p>
+			<h1>See how disaster knowledge connects.</h1>
+			<p class="intro-summary">
+				Explore classes, hazard categories, and Philippine places—and the links that make every
+				record explainable.
+			</p>
+		</div>
 
-	<CoreOntologyPanel
-		active={activeTab === 'graph'}
-		{loading}
-		{selectedNode}
-		groupColors={GROUP_COLOR}
-		groupLabels={GROUP_LABEL}
-		bind:svgElement={svgEl}
-	/>
+		<aside class="atlas-note" aria-label="About the ontology explorer">
+			<span aria-hidden="true">03</span>
+			<div>
+				<p>Connected lenses</p>
+				<small>Class model, disaster taxonomy, and PSGC geography in one research view.</small>
+			</div>
+		</aside>
+	</header>
 
-	<TaxonomyPanel
-		active={activeTab === 'taxonomy'}
-		loading={taxLoading}
-		selectedNode={taxSelected}
-		colors={TAX_COLOR}
-		bind:svgElement={taxSvgEl}
-	/>
+	<section class="ontology-workbench" aria-labelledby="ontology-view-title">
+		<header class="workbench-header">
+			<div class="view-copy">
+				<p><span>{activeViewNumber}</span> {activeView.kicker}</p>
+				<h2 id="ontology-view-title">{activeView.title}</h2>
+				<p>{activeView.description}</p>
+			</div>
 
-	<PsgcPanel
-		active={activeTab === 'psgc'}
-		loading={psgcLoading}
-		selectedNode={psgcSelected}
-		islandColors={ISLAND_COLOR}
-		bind:svgElement={psgcSvgEl}
-	/>
-</div>
+			<div class="workbench-controls">
+				<OntologyTabs tabs={TABS} active={activeTab} onChange={(tab) => (activeTab = tab)} />
+				<p class="interaction-guide">
+					<span>
+						<svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
+							<path d="m7 3 10 8-5 1.5L10 18Z" />
+						</svg>
+						Select a node
+					</span>
+					<i aria-hidden="true"></i>
+					<span>Drag or scroll to navigate</span>
+				</p>
+			</div>
+		</header>
+
+		<div class="graph-stage">
+			<CoreOntologyPanel
+				active={activeTab === 'graph'}
+				{loading}
+				{selectedNode}
+				groupColors={GROUP_COLOR}
+				groupLabels={GROUP_LABEL}
+				bind:svgElement={svgEl}
+			/>
+
+			<TaxonomyPanel
+				active={activeTab === 'taxonomy'}
+				loading={taxLoading}
+				selectedNode={taxSelected}
+				colors={TAX_COLOR}
+				bind:svgElement={taxSvgEl}
+			/>
+
+			<PsgcPanel
+				active={activeTab === 'psgc'}
+				loading={psgcLoading}
+				selectedNode={psgcSelected}
+				islandColors={ISLAND_COLOR}
+				bind:svgElement={psgcSvgEl}
+			/>
+		</div>
+	</section>
+</main>
 
 <style>
-	.ontology-workspace {
+	.ontology-page {
+		position: relative;
 		z-index: 1;
-		height: calc(100dvh - 52px);
-		min-height: 32rem;
+		width: min(100%, 90rem);
+		min-height: calc(100dvh - var(--app-nav-height));
+		margin: 0 auto;
+		padding: clamp(1.5rem, 3.5vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 3rem;
+	}
+
+	.ontology-intro {
+		display: grid;
+		grid-template-columns: minmax(0, 1.45fr) minmax(16rem, 0.55fr);
+		align-items: end;
+		gap: clamp(2rem, 6vw, 7rem);
+		padding: 0.5rem clamp(0rem, 2vw, 1.5rem) clamp(2rem, 4vw, 3.5rem);
+	}
+
+	.intro-copy {
+		max-width: 52rem;
+	}
+
+	.intro-copy h1 {
+		max-width: 56rem;
+		margin: 0.65rem 0 0;
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: clamp(2.5rem, 4.3vw, 4rem);
+		font-weight: 900;
+		line-height: 0.98;
+		letter-spacing: -0.045em;
+		color: var(--color-text);
+		text-wrap: balance;
+	}
+
+	.intro-summary {
+		max-width: 44rem;
+		margin: 1.25rem 0 0;
+		font-size: clamp(0.875rem, 1.4vw, 1rem);
+		line-height: 1.7;
+		color: var(--color-text-secondary);
+		text-wrap: pretty;
+	}
+
+	.atlas-note {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		gap: 1rem;
+		border-top: 1px solid var(--color-border);
+		padding-top: 1rem;
+	}
+
+	.atlas-note > span {
+		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+		font-size: 1.5rem;
+		font-weight: 600;
+		line-height: 1;
+		color: var(--color-brand);
+	}
+
+	.atlas-note p,
+	.atlas-note small {
+		margin: 0;
+	}
+
+	.atlas-note p {
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1.3;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-text);
+	}
+
+	.atlas-note small {
+		display: block;
+		margin-top: 0.35rem;
+		font-size: 0.75rem;
+		line-height: 1.55;
+		color: var(--color-text-muted);
+	}
+
+	.ontology-workbench {
 		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-surface);
+		background: var(--color-canvas);
+		box-shadow: var(--shadow-surface);
+	}
+
+	.workbench-header {
+		display: grid;
+		grid-template-columns: minmax(17rem, 0.8fr) minmax(28rem, 1.2fr);
+		align-items: end;
+		gap: 2rem;
+		border-bottom: 1px solid var(--color-border);
+		background: var(--color-canvas);
+		padding: 1.25rem 1.5rem 1.35rem;
+	}
+
+	.view-copy > p:first-child {
+		margin: 0;
+		font-size: 0.6875rem;
+		font-weight: 700;
+		line-height: 1rem;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+		color: var(--color-brand);
+	}
+
+	.view-copy > p:first-child span {
+		margin-right: 0.45rem;
+		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+	}
+
+	.view-copy h2 {
+		margin: 0.25rem 0 0;
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: clamp(1.45rem, 2.2vw, 2rem);
+		font-weight: 900;
+		line-height: 1.1;
+		letter-spacing: -0.025em;
+		color: var(--color-text);
+	}
+
+	.view-copy > p:last-child {
+		max-width: 34rem;
+		margin: 0.55rem 0 0;
+		font-size: 0.75rem;
+		line-height: 1.55;
+		color: var(--color-text-muted);
+		text-wrap: pretty;
+	}
+
+	.workbench-controls {
+		display: grid;
+		gap: 0.75rem;
+		justify-items: end;
+	}
+
+	.interaction-guide {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		margin: 0;
+		font-size: 0.6875rem;
+		line-height: 1.4;
+		color: var(--color-text-muted);
+	}
+
+	.interaction-guide span {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.35rem;
+	}
+
+	.interaction-guide svg {
+		width: 0.9rem;
+		height: 0.9rem;
+		color: var(--color-brand);
+	}
+
+	.interaction-guide path {
+		stroke: currentColor;
+		stroke-width: 1.7;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+	}
+
+	.interaction-guide i {
+		width: 1px;
+		height: 0.75rem;
+		background: var(--color-border);
+	}
+
+	.graph-stage {
+		position: relative;
+		height: clamp(34rem, 64dvh, 48rem);
+		min-height: 34rem;
+		overflow: hidden;
+		background-color: #fcfdff;
+		background-image:
+			linear-gradient(var(--color-brand-soft) 1px, transparent 1px),
+			linear-gradient(90deg, var(--color-brand-soft) 1px, transparent 1px);
+		background-size: 2.5rem 2.5rem;
+	}
+
+	.graph-stage :global(g[role='button']:focus) {
+		outline: none !important;
+		outline-offset: 0 !important;
+		box-shadow: none !important;
+	}
+
+	.graph-stage :global(g[role='button']:focus > circle:first-of-type) {
+		stroke: var(--color-focus) !important;
+		stroke-width: 3.5px !important;
+	}
+
+	.graph-stage :global(g[role='button'][aria-pressed='true'] > circle:first-of-type) {
+		fill: var(--color-accent-soft) !important;
+		stroke: var(--color-brand) !important;
+		stroke-width: 3px !important;
+	}
+
+	.ontology-tooltip {
+		position: fixed;
+		z-index: 50;
+		max-width: 19rem;
+		pointer-events: none;
+		border: 1px solid #334155;
+		border-radius: var(--radius-control);
+		background: #1e293b;
+		padding: 0.65rem 0.8rem;
+		box-shadow: var(--shadow-control);
+		color: white;
+	}
+
+	.ontology-tooltip p,
+	.ontology-tooltip small {
+		margin: 0;
+	}
+
+	.ontology-tooltip p {
+		font-size: 0.75rem;
+		font-weight: 700;
+	}
+
+	.ontology-tooltip small {
+		display: block;
+		margin-top: 0.2rem;
+		font-size: 0.6875rem;
+		line-height: 1.45;
+		color: #cbd5e1;
+	}
+
+	@media (max-width: 900px) {
+		.ontology-intro {
+			grid-template-columns: 1fr;
+			gap: 1.5rem;
+		}
+
+		.atlas-note {
+			max-width: 34rem;
+		}
+
+		.workbench-header {
+			grid-template-columns: 1fr;
+			gap: 1.25rem;
+		}
+
+		.workbench-controls {
+			justify-items: stretch;
+		}
+
+		.interaction-guide {
+			justify-content: flex-end;
+		}
+	}
+
+	@media (max-width: 639px) {
+		.ontology-page {
+			padding: 1.25rem 0.75rem 1.5rem;
+		}
+
+		.ontology-intro {
+			padding: 0.25rem 0.5rem 2rem;
+		}
+
+		.intro-copy h1 {
+			font-size: clamp(2.35rem, 11vw, 3rem);
+			line-height: 1;
+		}
+
+		.intro-summary {
+			margin-top: 1rem;
+		}
+
+		.atlas-note {
+			display: none;
+		}
+
+		.workbench-header {
+			gap: 1rem;
+			padding: 1rem 0.875rem;
+		}
+
+		.view-copy {
+			padding-inline: 0.125rem;
+		}
+
+		.view-copy > p:last-child {
+			display: none;
+		}
+
+		.interaction-guide {
+			justify-content: flex-start;
+			padding-inline: 0.125rem;
+		}
+
+		.interaction-guide span:last-child,
+		.interaction-guide i {
+			display: none;
+		}
+
+		.graph-stage {
+			height: max(34rem, 68dvh);
+			background-size: 2rem 2rem;
+		}
 	}
 
 	@media (max-height: 560px) and (orientation: landscape) {
-		.ontology-workspace {
-			min-height: calc(100dvh - 52px);
+		.graph-stage {
+			height: 30rem;
+			min-height: 30rem;
+		}
+	}
+
+	@media (forced-colors: active) {
+		.ontology-workbench,
+		.graph-stage {
+			border-color: CanvasText;
+			background: Canvas;
+		}
+
+		.graph-stage :global(g[role='button']:focus > circle:first-of-type),
+		.graph-stage :global(g[role='button'][aria-pressed='true'] > circle:first-of-type) {
+			fill: Highlight !important;
+			stroke: HighlightText !important;
 		}
 	}
 </style>
