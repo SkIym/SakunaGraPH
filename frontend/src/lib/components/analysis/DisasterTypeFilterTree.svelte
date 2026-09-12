@@ -40,18 +40,18 @@
 	);
 
 	const groupColors = {
-		natural: '#0f766e',
-		biological: '#16a34a',
-		climatological: '#d97706',
-		extraterrestrial: '#6366f1',
-		geophysical: '#b45309',
-		hydrological: '#0284c7',
-		meteorological: '#2563eb',
-		tech: '#dc2626',
-		armedconflict: '#7c3aed',
-		industrial: '#ea580c',
+		natural: '#2a6171',
+		biological: '#4d715b',
+		climatological: '#b58b00',
+		extraterrestrial: '#64748b',
+		geophysical: '#806148',
+		hydrological: '#4b72c2',
+		meteorological: '#0038a8',
+		tech: '#ce1126',
+		armedconflict: '#684f75',
+		industrial: '#9b5e2c',
 		miscellaneous: '#64748b',
-		transport: '#ca8a04',
+		transport: '#9c7d00',
 	};
 
 	function isOpen(id) {
@@ -76,7 +76,7 @@
 		onclick={() => (sectionOpen = !sectionOpen)}
 		aria-expanded={sectionOpen}
 		aria-controls="analysis-disaster-content"
-		class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition hover:bg-slate-50/70"
+		class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition hover:bg-[var(--color-brand-soft)]"
 	>
 		<span id="analysis-disaster-heading" class="text-xs font-semibold text-slate-700"
 			>Disaster type</span
@@ -104,7 +104,7 @@
 				type="search"
 				bind:value={search}
 				placeholder="Search disaster types"
-				class="brand-field block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
+				class="brand-field block h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
 			/>
 
 			<div class="mt-3 space-y-0.5">
@@ -123,7 +123,7 @@
 						{@const hasChildren = (row.node.children?.length ?? 0) > 0}
 						{@const open = hasChildren && isOpen(row.node.id)}
 						<div
-							class="flex min-h-11 items-center gap-1 rounded-lg pr-1 hover:bg-slate-50"
+							class="flex min-h-11 items-center gap-1 rounded-lg pr-1 hover:bg-[var(--color-brand-soft)]"
 							style="padding-left:{Math.min(row.depth, 5) * 14}px"
 						>
 							{#if hasChildren}

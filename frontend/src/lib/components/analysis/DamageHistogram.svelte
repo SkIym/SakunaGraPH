@@ -35,7 +35,7 @@
 			{#each activeBins as bin, index (`${bin.lowerBound}-${index}`)}
 				<div class="group relative flex min-w-0 flex-1 items-end" style="height:100%;">
 					<div
-						class="w-full rounded-t bg-orange-400 transition group-hover:bg-orange-500"
+						class="damage-bar w-full rounded-t transition"
 						style="height:{Math.max(2, (bin.count / maximum) * 100)}%"
 					>
 						<title
@@ -57,3 +57,14 @@
 		No reported damage amounts in this scope.
 	</p>
 {/if}
+
+<style>
+	.damage-bar {
+		border-top: 1px solid #d2aa00;
+		background: var(--color-accent);
+	}
+
+	.group:hover .damage-bar {
+		background: #e2bc0d;
+	}
+</style>

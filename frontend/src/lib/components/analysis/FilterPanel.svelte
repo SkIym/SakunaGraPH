@@ -14,10 +14,13 @@
 	} = $props();
 </script>
 
-<div class="flex h-full min-h-0 flex-col bg-white">
-	<div class="flex h-14 shrink-0 items-center justify-between border-b border-slate-200 px-4">
+<div class="filter-panel">
+	<header class="filter-panel-header">
 		<div class="flex min-w-0 items-center gap-2">
-			<h2 class="text-sm font-semibold text-slate-800">Filters</h2>
+			<div>
+				<p>Analysis scope</p>
+				<h2>Refine records</h2>
+			</div>
 			{#if analysisFilters.activeCount > 0}
 				<span
 					class="brand-count flex h-5 min-w-5 items-center justify-center rounded-full px-1.5 text-[10px] font-semibold tabular-nums"
@@ -38,30 +41,20 @@
 				&times;
 			</button>
 		{/if}
-	</div>
+	</header>
 
 	<div class="min-h-0 flex-1 overflow-y-auto overscroll-contain">
-		<section
-			aria-labelledby="analysis-event-type-heading"
-			class="border-b border-slate-200 px-4 py-4"
-		>
+		<section aria-labelledby="analysis-event-type-heading" class="filter-section">
 			<h2 id="analysis-event-type-heading" class="text-xs font-semibold text-slate-700">
 				Event type
 			</h2>
-			<div
-				class="mt-3 grid min-h-11 grid-cols-3 overflow-hidden rounded-lg border border-slate-200"
-				role="group"
-				aria-label="Event type"
-			>
+			<div class="filter-mode-grid" role="group" aria-label="Event type">
 				{#each EVENT_TYPE_OPTIONS as option}
 					<button
 						type="button"
 						onclick={() => analysisFilters.setEventType(option.value)}
 						aria-pressed={analysisFilters.eventType === option.value}
-						class="border-r border-slate-200 px-2 text-[11px] font-medium transition last:border-r-0
-						{analysisFilters.eventType === option.value
-							? 'bg-slate-800 text-white'
-							: 'bg-white text-slate-500 hover:bg-slate-50 hover:text-slate-700'}"
+						class:active={analysisFilters.eventType === option.value}
 					>
 						{option.label}
 					</button>
@@ -69,7 +62,7 @@
 			</div>
 		</section>
 
-		<section aria-labelledby="analysis-search-heading" class="border-b border-slate-200 px-4 py-4">
+		<section aria-labelledby="analysis-search-heading" class="filter-section">
 			<h2 id="analysis-search-heading" class="text-xs font-semibold text-slate-700">
 				Event search
 			</h2>
@@ -80,7 +73,7 @@
 				value={analysisFilters.q}
 				oninput={(event) => analysisFilters.setQuery(event.currentTarget.value)}
 				placeholder="Search event names"
-				class="brand-field mt-3 block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
+				class="analysis-filter-input"
 			/>
 		</section>
 
@@ -103,9 +96,7 @@
 		<DisasterTypeFilterTree root={options?.disasterTypes} {loading} />
 	</div>
 
-	<div
-		class="flex h-12 shrink-0 items-center justify-between border-t border-slate-200 bg-white px-4"
-	>
+	<footer class="filter-panel-footer">
 		<span class="text-[10px] text-slate-400">
 			{analysisFilters.activeCount === 0 ? 'All records' : `${analysisFilters.activeCount} active`}
 		</span>
@@ -117,5 +108,124 @@
 		>
 			Clear all
 		</button>
-	</div>
+	</footer>
 </div>
+
+<style>
+	.filter-panel {
+		display: flex;
+		height: 100%;
+		min-height: 0;
+		flex-direction: column;
+		background: var(--color-canvas);
+	}
+
+	.filter-panel-header {
+		display: flex;
+		min-height: 4.5rem;
+		flex: none;
+		align-items: center;
+		justify-content: space-between;
+		border-bottom: 1px solid var(--color-border);
+		padding: 0.8rem 1rem;
+	}
+
+	.filter-panel-header p {
+		margin: 0;
+		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+		font-size: 0.5625rem;
+		font-weight: 600;
+		line-height: 1.3;
+		letter-spacing: 0.09em;
+		text-transform: uppercase;
+		color: var(--color-brand);
+	}
+
+	.filter-panel-header h2 {
+		margin: 0.15rem 0 0;
+		font-family: 'Playfair Display', Georgia, serif;
+		font-size: 1.1rem;
+		font-weight: 700;
+		line-height: 1.2;
+		color: var(--color-text);
+	}
+
+	.filter-section {
+		border-bottom: 1px solid var(--color-border);
+		padding: 1rem;
+	}
+
+	.filter-mode-grid {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		min-height: 2.75rem;
+		margin-top: 0.75rem;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-control);
+	}
+
+	.filter-mode-grid button {
+		border: 0;
+		border-right: 1px solid var(--color-border);
+		background: var(--color-canvas);
+		padding: 0 0.5rem;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		transition:
+			background-color 180ms ease,
+			color 180ms ease;
+	}
+
+	.filter-mode-grid button:last-child {
+		border-right: 0;
+	}
+
+	.filter-mode-grid button:hover {
+		background: var(--color-brand-soft);
+		color: var(--color-brand-hover);
+	}
+
+	.filter-mode-grid button.active {
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
+	}
+
+	.analysis-filter-input {
+		display: block;
+		width: 100%;
+		height: 2.75rem;
+		margin-top: 0.75rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0 0.75rem;
+		font-size: 0.75rem;
+		color: var(--color-text);
+		outline: none;
+		transition:
+			border-color 180ms ease,
+			box-shadow 180ms ease;
+	}
+
+	.analysis-filter-input:focus {
+		border-color: var(--color-brand);
+		box-shadow: 0 0 0 2px var(--color-brand-medium);
+	}
+
+	.analysis-filter-input::placeholder {
+		color: var(--color-text-muted);
+	}
+
+	.filter-panel-footer {
+		display: flex;
+		min-height: 3.25rem;
+		flex: none;
+		align-items: center;
+		justify-content: space-between;
+		border-top: 1px solid var(--color-border);
+		background: var(--color-canvas);
+		padding: 0 1rem;
+	}
+</style>

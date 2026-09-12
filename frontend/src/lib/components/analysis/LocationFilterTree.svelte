@@ -89,7 +89,7 @@
 		onclick={() => (sectionOpen = !sectionOpen)}
 		aria-expanded={sectionOpen}
 		aria-controls="analysis-location-content"
-		class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition hover:bg-slate-50/70"
+		class="flex w-full items-center justify-between gap-3 px-4 py-4 text-left transition hover:bg-[var(--color-brand-soft)]"
 	>
 		<span id="analysis-location-heading" class="text-xs font-semibold text-slate-700">Location</span
 		>
@@ -116,7 +116,7 @@
 				type="search"
 				bind:value={search}
 				placeholder="Search locations"
-				class="brand-field block h-11 w-full rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
+				class="brand-field block h-11 w-full rounded-xl border border-slate-200 bg-white px-3 text-xs text-slate-700 outline-none transition placeholder:text-slate-400"
 			/>
 
 			<div class="mt-3 space-y-0.5">
@@ -138,7 +138,7 @@
 						{@const regionOpen = hasChildren && isOpen(region.id)}
 						<div>
 							<div
-								class="group flex min-h-11 items-center gap-1 rounded-lg px-0.5 hover:bg-slate-50"
+								class="group flex min-h-11 items-center gap-1 rounded-lg px-0.5 hover:bg-[var(--color-brand-soft)]"
 							>
 								{#if hasChildren}
 									<button
@@ -178,7 +178,7 @@
 										{@const provinceOpen = localities.length > 0 && isOpen(province.id)}
 										<div>
 											<div
-												class="flex min-h-11 items-center gap-1 rounded-lg px-0.5 hover:bg-slate-50"
+												class="flex min-h-11 items-center gap-1 rounded-lg px-0.5 hover:bg-[var(--color-brand-soft)]"
 											>
 												{#if localities.length > 0}
 													<button
@@ -216,7 +216,7 @@
 													{#each localities as locality (locality.id)}
 														<label
 															for="location-{locality.id}"
-															class="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-1.5 hover:bg-slate-50"
+															class="flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-1.5 hover:bg-[var(--color-brand-soft)]"
 														>
 															<input
 																id="location-{locality.id}"
@@ -240,7 +240,7 @@
 									{#each directLocalities as locality (locality.id)}
 										<label
 											for="location-{locality.id}"
-											class="ml-7 flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-1.5 hover:bg-slate-50"
+											class="ml-7 flex min-h-11 cursor-pointer items-center gap-2 rounded-lg px-1.5 hover:bg-[var(--color-brand-soft)]"
 										>
 											<input
 												id="location-{locality.id}"

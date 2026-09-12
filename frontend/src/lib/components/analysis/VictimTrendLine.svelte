@@ -4,9 +4,9 @@
 	const HEIGHT = 220;
 	const PAD = { left: 42, right: 16, top: 16, bottom: 34 };
 	const series = [
-		{ key: 'dead', label: 'Deaths', color: '#e11d48' },
-		{ key: 'injured', label: 'Injured', color: '#f59e0b' },
-		{ key: 'missing', label: 'Missing', color: '#8b5cf6' },
+		{ key: 'dead', label: 'Deaths', color: '#ce1126' },
+		{ key: 'injured', label: 'Injured', color: '#b58b00' },
+		{ key: 'missing', label: 'Missing', color: '#0038a8' },
 	];
 	const maximum = $derived(
 		Math.max(1, ...items.flatMap((item) => series.map((line) => item[line.key] ?? 0))),

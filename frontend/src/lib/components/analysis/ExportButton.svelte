@@ -52,7 +52,7 @@
 		disabled={disabled || exporting}
 		aria-busy={exporting}
 		title={error || 'Export all filtered records as CSV'}
-		class="flex h-11 items-center gap-2 rounded-lg bg-slate-800 px-4 text-xs font-semibold text-white shadow-sm transition hover:bg-slate-700 disabled:cursor-not-allowed disabled:bg-slate-200 disabled:text-slate-700"
+		class="export-button"
 	>
 		{#if exporting}
 			<span
@@ -77,3 +77,37 @@
 		{/if}
 	</button>
 </div>
+
+<style>
+	.export-button {
+		display: flex;
+		height: 2.75rem;
+		align-items: center;
+		gap: 0.5rem;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: var(--color-text);
+		padding: 0 1rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-canvas);
+		box-shadow: var(--shadow-control);
+		transition:
+			background-color 180ms ease,
+			transform 120ms ease;
+	}
+
+	.export-button:hover:not(:disabled) {
+		background: #0f1a2b;
+	}
+
+	.export-button:active:not(:disabled) {
+		transform: translateY(1px);
+	}
+
+	.export-button:disabled {
+		cursor: not-allowed;
+		background: var(--color-border);
+		color: var(--color-text-secondary);
+	}
+</style>

@@ -92,105 +92,115 @@
 	<title>Metrics dashboard · SakunaGraPH</title>
 </svelte:head>
 
-<section class="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-	<div class="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+<section class="analysis-page analysis-page-wide">
+	<header class="analysis-page-header">
 		<div>
-			<p class="workspace-kicker">Analysis</p>
-			<h1 class="editorial-page-title mt-1">Metrics dashboard</h1>
-			<p class="mt-1 text-xs leading-5 text-slate-500">
+			<p class="workspace-kicker">Analysis / Metrics</p>
+			<h1>Metrics dashboard</h1>
+			<p class="analysis-page-copy">
 				Totals, distributions, and trends for the current filter scope.
 			</p>
 		</div>
-		<div class="inline-flex rounded-md border border-slate-200 bg-white p-0.5 shadow-sm">
+		<div class="analysis-segmented" role="group" aria-label="Disaster count grouping">
 			<button
 				type="button"
 				onclick={() => (groupBy = 'taxonomy')}
-				class="min-h-11 rounded-lg px-3 text-xs font-semibold transition {groupBy === 'taxonomy'
-					? 'bg-slate-800 text-white'
-					: 'text-slate-500 hover:bg-slate-50'}">Taxonomy groups</button
+				aria-pressed={groupBy === 'taxonomy'}>Taxonomy groups</button
 			>
-			<button
-				type="button"
-				onclick={() => (groupBy = 'type')}
-				class="min-h-11 rounded-lg px-3 text-xs font-semibold transition {groupBy === 'type'
-					? 'bg-slate-800 text-white'
-					: 'text-slate-500 hover:bg-slate-50'}">Detailed types</button
+			<button type="button" onclick={() => (groupBy = 'type')} aria-pressed={groupBy === 'type'}
+				>Detailed types</button
 			>
 		</div>
-	</div>
+	</header>
 
 	{#if error}
-		<div class="rounded-lg border border-red-200 bg-red-50 p-4" role="alert">
-			<p class="text-sm font-semibold text-red-800">Metrics are unavailable</p>
-			<p class="mt-1 text-xs text-red-600">{error}</p>
-			<button
-				type="button"
-				onclick={() => (retryToken += 1)}
-				class="mt-3 min-h-11 rounded-lg border border-red-200 bg-white px-4 text-xs font-semibold text-red-700 transition hover:bg-red-50"
-				>Try again</button
-			>
+		<div class="analysis-error-panel" role="alert">
+			<h2>Metrics are unavailable</h2>
+			<p>{error}</p>
+			<button type="button" onclick={() => (retryToken += 1)}>Try again</button>
 		</div>
 	{:else if loading}
-		<div class="grid gap-4 lg:grid-cols-2">
-			{#each [1, 2, 3, 4, 5]}<div
-					class="h-72 animate-pulse rounded-xl border border-slate-200 bg-slate-50"
-				></div>{/each}
+		<div class="analysis-loading-grid" aria-label="Loading metrics">
+			{#each [1, 2, 3, 4, 5]}<div class="analysis-loading-panel animate-pulse"></div>{/each}
 		</div>
 	{:else if dashboard}
-		<MetricCards summary={dashboard.summary} />
-		<div class="mt-5 grid gap-5 xl:grid-cols-2">
-			<article
-				class="deferred-visualization rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-			>
-				<h2 class="text-sm font-semibold text-slate-800">Event distribution</h2>
-				<p class="mt-1 text-xs text-slate-500">
-					Counts by {dashboard.disasterCounts.group_by === 'taxonomy'
-						? 'taxonomy group'
-						: 'detailed disaster type'}.
-				</p>
-				<div class="mt-4"><DisasterTypeDonut items={dashboard.disasterCounts.items} /></div>
-			</article>
-			<article
-				class="deferred-visualization rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-			>
-				<h2 class="text-sm font-semibold text-slate-800">Victim trend</h2>
-				<p class="mt-1 text-xs text-slate-500">
-					Annual reported deaths, injuries, and missing persons.
-				</p>
-				<div class="mt-4"><VictimTrendLine items={dashboard.victimTrends.items} /></div>
-			</article>
-			<article
-				class="deferred-visualization rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-			>
-				<h2 class="text-sm font-semibold text-slate-800">Regions with most events</h2>
-				<p class="mt-1 text-xs text-slate-500">
-					Deduplicated events ranked by affected PSGC region.
-				</p>
-				<div class="mt-5"><RegionRankingBar items={dashboard.regionRankings.items} /></div>
-			</article>
-			<article
-				class="deferred-visualization rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-			>
-				<h2 class="text-sm font-semibold text-slate-800">Disaster types by reported deaths</h2>
-				<p class="mt-1 text-xs text-slate-500">
-					Casualty totals are not normalized across sources.
-				</p>
-				<div class="mt-5"><DisasterRankingBar items={dashboard.disasterRankings.items} /></div>
-			</article>
-			<article
-				class="deferred-visualization rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-			>
-				<h2 class="text-sm font-semibold text-slate-800">Damage distribution</h2>
-				<p class="mt-1 text-xs text-slate-500">Reported damage values stay separated by unit.</p>
-				<div class="mt-5"><DamageHistogram bins={dashboard.damageHistogram.bins} /></div>
-			</article>
-			<article
-				class="deferred-visualization rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5"
-			>
-				<h2 class="text-sm font-semibold text-slate-800">Damage vs. affected population</h2>
-				<p class="mt-1 text-xs text-slate-500">Each point is a reported event damage amount.</p>
-				<div class="mt-5"><DamageAffectedScatter items={dashboard.damageAffected.items} /></div>
-			</article>
+		<div class="analysis-surface metrics-board">
+			<MetricCards summary={dashboard.summary} />
+			<div class="analysis-chart-grid">
+				<article class="analysis-chart-panel deferred-visualization">
+					<h2 class="text-sm font-semibold text-slate-800">Event distribution</h2>
+					<p>
+						Counts by {dashboard.disasterCounts.group_by === 'taxonomy'
+							? 'taxonomy group'
+							: 'detailed disaster type'}.
+					</p>
+					<div class="analysis-chart-body">
+						<DisasterTypeDonut items={dashboard.disasterCounts.items} />
+					</div>
+				</article>
+				<article class="analysis-chart-panel deferred-visualization">
+					<h2 class="text-sm font-semibold text-slate-800">Victim trend</h2>
+					<p>Annual reported deaths, injuries, and missing persons.</p>
+					<div class="analysis-chart-body">
+						<VictimTrendLine items={dashboard.victimTrends.items} />
+					</div>
+				</article>
+				<article class="analysis-chart-panel deferred-visualization">
+					<h2 class="text-sm font-semibold text-slate-800">Regions with most events</h2>
+					<p>Deduplicated events ranked by affected PSGC region.</p>
+					<div class="analysis-chart-body">
+						<RegionRankingBar items={dashboard.regionRankings.items} />
+					</div>
+				</article>
+				<article class="analysis-chart-panel deferred-visualization">
+					<h2 class="text-sm font-semibold text-slate-800">Disaster types by reported deaths</h2>
+					<p>Casualty totals are not normalized across sources.</p>
+					<div class="analysis-chart-body">
+						<DisasterRankingBar items={dashboard.disasterRankings.items} />
+					</div>
+				</article>
+				<article class="analysis-chart-panel deferred-visualization">
+					<h2 class="text-sm font-semibold text-slate-800">Damage distribution</h2>
+					<p>Reported damage values stay separated by unit.</p>
+					<div class="analysis-chart-body">
+						<DamageHistogram bins={dashboard.damageHistogram.bins} />
+					</div>
+				</article>
+				<article class="analysis-chart-panel deferred-visualization">
+					<h2 class="text-sm font-semibold text-slate-800">Damage vs. affected population</h2>
+					<p>Each point is a reported event damage amount.</p>
+					<div class="analysis-chart-body">
+						<DamageAffectedScatter items={dashboard.damageAffected.items} />
+					</div>
+				</article>
+			</div>
 		</div>
 	{/if}
 </section>
+
+<style>
+	.metrics-board {
+		overflow: hidden;
+	}
+
+	.analysis-loading-grid {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 1px;
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-surface);
+		background: var(--color-border);
+	}
+
+	.analysis-loading-panel {
+		height: 18rem;
+		background: var(--color-surface-subtle);
+	}
+
+	@media (max-width: 47.999rem) {
+		.analysis-loading-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

@@ -74,8 +74,8 @@
 					cx={x(point.damage)}
 					cy={y(point[affectedMeasure] ?? 0)}
 					r="4"
-					fill="#6366f1"
-					fill-opacity="0.65"
+					fill="var(--color-brand)"
+					fill-opacity="0.72"
 					stroke="white"
 					stroke-width="1"
 					><title

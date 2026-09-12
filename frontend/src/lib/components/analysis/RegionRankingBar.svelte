@@ -13,9 +13,9 @@
 						class="font-semibold tabular-nums text-slate-700">{item.count.toLocaleString()}</span
 					>
 				</div>
-				<div class="h-2 overflow-hidden rounded-full bg-slate-100">
+				<div class="h-2 overflow-hidden rounded-sm bg-[var(--color-brand-soft)]">
 					<div
-						class="h-full rounded-full bg-teal-500"
+						class="h-full rounded-sm bg-[var(--color-brand)]"
 						style="width:{Math.max(3, (item.count / maximum) * 100)}%"
 					></div>
 				</div>

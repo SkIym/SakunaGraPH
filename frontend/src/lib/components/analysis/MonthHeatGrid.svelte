@@ -19,7 +19,9 @@
 	);
 	const maximum = $derived(Math.max(1, ...Object.values(counts)));
 	function shade(count) {
-		return count ? `rgba(14, 165, 233, ${0.16 + (count / maximum) * 0.72})` : '#f8fafc';
+		return count
+			? `rgba(0, 56, 168, ${0.08 + (count / maximum) * 0.38})`
+			: 'var(--color-surface-subtle)';
 	}
 </script>
 
@@ -31,14 +33,26 @@
 			type="button"
 			onclick={() => onselect(month)}
 			aria-pressed={selectedMonth === month}
-			class="min-h-11 rounded-lg border px-2 py-1.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] {selectedMonth ===
+			class="heat-cell min-h-11 border px-2 py-1.5 text-left transition focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)] {selectedMonth ===
 			month
-				? 'border-slate-800 ring-1 ring-slate-800'
-				: 'border-slate-200 hover:border-sky-300'}"
-			style="background:{shade(count)}; color:#172033"
+				? 'is-selected border-[var(--color-brand)] ring-1 ring-[var(--color-brand)]'
+				: 'border-[var(--color-border)] hover:border-[var(--color-brand)]'}"
+			style="background:{selectedMonth === month
+				? 'var(--color-accent)'
+				: shade(count)}; color:var(--color-text)"
 		>
 			<span class="block text-[11px] font-semibold">{label}</span>
 			<span class="mt-0.5 block text-[9px]">{count.toLocaleString()}</span>
 		</button>
 	{/each}
 </div>
+
+<style>
+	.heat-cell {
+		border-radius: 0.25rem;
+	}
+
+	.heat-cell.is-selected {
+		box-shadow: inset 3px 0 0 var(--color-brand);
+	}
+</style>

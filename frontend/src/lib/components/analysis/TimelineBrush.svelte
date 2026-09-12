@@ -8,22 +8,56 @@
 </script>
 
 {#if periods.length > 1}
-	<div class="flex items-center gap-3 rounded-md bg-slate-50 px-3 py-2">
-		<span
-			class="shrink-0 text-[10px] font-semibold uppercase text-slate-400"
-			style="letter-spacing:0.08em;">Window</span
-		>
+	<div class="timeline-brush">
+		<span>Window</span>
 		<input
 			type="range"
 			min="0"
 			max={periods.length - 1}
 			value={selectedIndex}
 			oninput={update}
-			class="h-1 flex-1 accent-indigo-600"
+			class="h-1 flex-1"
 			aria-label="Timeline window end"
 		/>
-		<span class="w-14 text-right text-[10px] font-medium text-slate-500"
-			>{periods[selectedIndex]}</span
-		>
+		<output>{periods[selectedIndex]}</output>
 	</div>
 {/if}
+
+<style>
+	.timeline-brush {
+		display: flex;
+		align-items: center;
+		gap: 0.75rem;
+		border: 1px solid var(--color-border);
+		border-inline-start: 3px solid var(--color-brand);
+		background: var(--color-surface-subtle);
+		padding: 0.6rem 0.75rem;
+	}
+
+	.timeline-brush > span,
+	output {
+		color: var(--color-text-muted);
+		font-family: var(--font-mono);
+		font-size: 0.625rem;
+	}
+
+	.timeline-brush > span {
+		font-weight: 700;
+		text-transform: uppercase;
+		letter-spacing: 0.08em;
+	}
+
+	input {
+		accent-color: var(--color-brand);
+	}
+
+	input:focus-visible {
+		outline: 2px solid var(--color-focus);
+		outline-offset: 4px;
+	}
+
+	output {
+		width: 4rem;
+		text-align: right;
+	}
+</style>

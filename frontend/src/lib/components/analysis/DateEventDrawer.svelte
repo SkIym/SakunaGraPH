@@ -21,62 +21,225 @@
 	}
 </script>
 
-<aside
-	use:manageDrawerFocus
-	class="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm"
-	aria-label="Events for selected date"
->
-	<header class="flex items-start justify-between gap-3 border-b border-slate-100 px-4 py-3.5">
+<aside use:manageDrawerFocus class="date-event-drawer" aria-label="Events for selected date">
+	<header>
 		<div>
 			<p class="workspace-kicker">Date events</p>
-			<h2 class="mt-1 text-sm font-semibold text-slate-800">{datePrefix}</h2>
+			<h2>{datePrefix}</h2>
 		</div>
 		<button
 			type="button"
 			data-focus-first
 			onclick={onclose}
-			class="flex h-11 w-11 items-center justify-center rounded-lg text-lg leading-none text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
+			class="drawer-close"
 			aria-label="Close date events">&times;</button
 		>
 	</header>
-	<div class="max-h-[470px] overflow-y-auto p-3">
+	<div class="drawer-body">
 		{#if loading}
-			<div class="space-y-2">
-				{#each [1, 2, 3]}<div class="h-16 animate-pulse rounded-lg bg-slate-50"></div>{/each}
+			<div class="drawer-loading">
+				{#each [1, 2, 3]}<div></div>{/each}
 			</div>
 		{:else if error}
-			<p class="rounded-md bg-red-50 p-3 text-xs text-red-600">{error}</p>
+			<p class="drawer-error">{error}</p>
 		{:else if items.length}
-			<div class="space-y-2">
+			<div class="date-event-list">
 				{#each items as item (item.event)}
-					<button
-						type="button"
-						onclick={() => onselect(item.event)}
-						class="w-full rounded-lg border border-slate-200 p-3 text-left transition hover:border-[var(--color-brand-medium)] hover:bg-[var(--color-brand-soft)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)]"
-					>
-						<div class="flex items-start justify-between gap-3">
-							<p class="line-clamp-2 text-xs font-semibold leading-5 text-slate-700">
+					<button type="button" onclick={() => onselect(item.event)} class="date-event-item">
+						<div class="date-event-heading">
+							<p>
 								{item.eventName}
 							</p>
 							<span
-								class="shrink-0 rounded px-1.5 py-0.5 text-[9px] font-semibold {item.eventType ===
-								'MajorEvent'
-									? 'bg-indigo-50 text-indigo-700'
-									: 'bg-amber-50 text-amber-700'}"
-								>{item.eventType === 'MajorEvent' ? 'Major' : 'Incident'}</span
+								class:event-major={item.eventType === 'MajorEvent'}
+								class:event-incident={item.eventType !== 'MajorEvent'}
+								class="event-kind">{item.eventType === 'MajorEvent' ? 'Major' : 'Incident'}</span
 							>
 						</div>
-						<p class="mt-1 text-[10px] text-slate-400">{formatDate(item.startDate)}</p>
-						{#if item.disasterTypes.length}<p class="mt-2 truncate text-[10px] text-slate-500">
+						<p class="event-date">{formatDate(item.startDate)}</p>
+						{#if item.disasterTypes.length}
+							<p class="event-types">
 								{item.disasterTypes.map((type) => type.label).join(', ')}
-							</p>{/if}
+							</p>
+						{/if}
 					</button>
 				{/each}
 			</div>
 		{:else}
-			<p class="py-8 text-center text-xs text-slate-400">
-				No events start in this selected period.
-			</p>
+			<p class="drawer-empty">No events start in this selected period.</p>
 		{/if}
 	</div>
 </aside>
+
+<style>
+	.date-event-drawer {
+		overflow: hidden;
+		border: 1px solid var(--color-border);
+		border-block-start: 3px solid var(--color-brand);
+		background: var(--color-surface);
+		box-shadow: 0 12px 24px rgba(23, 32, 51, 0.08);
+	}
+
+	header {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem;
+		border-block-end: 1px solid var(--color-border);
+		padding: 1rem;
+	}
+
+	h2 {
+		margin-block-start: 0.3rem;
+		color: var(--color-text);
+		font-family: var(--font-mono);
+		font-size: 0.8rem;
+		font-weight: 700;
+	}
+
+	.drawer-close {
+		display: grid;
+		width: 2.75rem;
+		height: 2.75rem;
+		flex: 0 0 auto;
+		place-items: center;
+		border: 1px solid transparent;
+		color: var(--color-text-muted);
+		font-size: 1.2rem;
+		line-height: 1;
+		transition:
+			background-color 160ms ease,
+			border-color 160ms ease,
+			color 160ms ease;
+	}
+
+	.drawer-close:hover {
+		border-color: var(--color-border);
+		background: var(--color-surface-subtle);
+		color: var(--color-text);
+	}
+
+	.drawer-close:focus-visible,
+	.date-event-item:focus-visible {
+		outline: 2px solid var(--color-focus);
+		outline-offset: 2px;
+	}
+
+	.drawer-body {
+		max-height: 29.375rem;
+		overflow-y: auto;
+	}
+
+	.drawer-loading {
+		display: grid;
+		gap: 1px;
+		background: var(--color-border);
+	}
+
+	.drawer-loading div {
+		height: 5rem;
+		animation: pulse 1.4s ease-in-out infinite;
+		background: var(--color-surface-subtle);
+	}
+
+	.drawer-error {
+		margin: 1rem;
+		border-inline-start: 3px solid var(--color-danger);
+		background: var(--color-danger-surface);
+		padding: 0.75rem;
+		color: var(--color-danger);
+		font-size: 0.75rem;
+	}
+
+	.date-event-list {
+		display: grid;
+	}
+
+	.date-event-item {
+		width: 100%;
+		border-block-end: 1px solid var(--color-border);
+		padding: 1rem;
+		background: transparent;
+		text-align: left;
+		transition: background-color 160ms ease;
+	}
+
+	.date-event-item:hover {
+		background: var(--color-brand-soft);
+	}
+
+	.date-event-heading {
+		display: flex;
+		align-items: flex-start;
+		justify-content: space-between;
+		gap: 0.75rem;
+	}
+
+	.date-event-heading p {
+		display: -webkit-box;
+		overflow: hidden;
+		color: var(--color-text);
+		font-size: 0.75rem;
+		font-weight: 700;
+		line-height: 1.5;
+		-webkit-box-orient: vertical;
+		-webkit-line-clamp: 2;
+		line-clamp: 2;
+	}
+
+	.event-kind {
+		flex: 0 0 auto;
+		border-inline-start: 2px solid;
+		padding: 0.2rem 0.4rem;
+		font-family: var(--font-mono);
+		font-size: 0.56rem;
+		font-weight: 700;
+	}
+
+	.event-major {
+		border-color: var(--color-brand);
+		background: var(--color-brand-soft);
+		color: var(--color-brand);
+	}
+
+	.event-incident {
+		border-color: #d6a900;
+		background: var(--color-accent-soft);
+		color: #705900;
+	}
+
+	.event-date {
+		margin-block-start: 0.35rem;
+		color: var(--color-text-muted);
+		font-family: var(--font-mono);
+		font-size: 0.61rem;
+	}
+
+	.event-types {
+		overflow: hidden;
+		margin-block-start: 0.55rem;
+		color: var(--color-text-secondary);
+		font-size: 0.625rem;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.drawer-empty {
+		padding: 2.5rem 1rem;
+		color: var(--color-text-muted);
+		font-size: 0.75rem;
+		text-align: center;
+	}
+
+	@keyframes pulse {
+		50% {
+			opacity: 0.5;
+		}
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.drawer-loading div {
+			animation: none;
+		}
+	}
+</style>

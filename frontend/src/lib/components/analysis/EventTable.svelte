@@ -69,12 +69,12 @@
 <div class="overflow-x-auto">
 	<table class="w-full min-w-[980px] border-collapse text-left text-xs">
 		<thead>
-			<tr class="border-b border-slate-200 bg-slate-50/80">
+			<tr class="border-b border-slate-200 bg-[var(--color-surface-subtle)]">
 				{#each visible as column (column.id)}
 					<th
 						scope="col"
 						aria-sort={ariaSort(column)}
-						class="whitespace-nowrap px-3 py-3 text-[10px] font-semibold uppercase text-slate-500 first:pl-5 last:pr-5"
+						class="whitespace-nowrap px-3 py-3 font-mono text-[9px] font-semibold uppercase text-slate-500 first:pl-5 last:pr-5"
 						style="letter-spacing:0.08em;"
 					>
 						{#if column.sortable}
@@ -130,7 +130,7 @@
 						}}
 						class="cursor-pointer align-middle transition hover:bg-[var(--color-brand-soft)] focus:bg-[var(--color-brand-soft)] focus:outline-none focus:ring-2 focus:ring-inset focus:ring-[var(--color-focus)] {row %
 						2
-							? 'bg-slate-50/20'
+							? 'bg-[var(--color-surface-subtle)]'
 							: ''}"
 					>
 						{#each visible as column (column.id)}
@@ -148,7 +148,7 @@
 										</p>
 										{#if item.alternates?.length}
 											<span
-												class="mt-1.5 inline-flex rounded bg-violet-50 px-1.5 py-0.5 text-[9px] font-semibold text-violet-600"
+												class="mt-1.5 inline-flex rounded bg-[var(--color-brand-soft)] px-1.5 py-0.5 text-[9px] font-semibold text-[var(--color-brand)]"
 											>
 												{item.alternates.length} alternate{item.alternates.length === 1 ? '' : 's'}
 											</span>
@@ -158,8 +158,8 @@
 									<span
 										class="inline-flex rounded px-2 py-1 text-[10px] font-semibold {item.eventType ===
 										'MajorEvent'
-											? 'bg-indigo-50 text-indigo-700'
-											: 'bg-amber-50 text-amber-700'}"
+											? 'bg-[var(--color-brand-soft)] text-[var(--color-brand-hover)]'
+											: 'bg-[var(--color-accent-soft)] text-[var(--color-accent-ink)]'}"
 									>
 										{item.eventType === 'MajorEvent' ? 'Major event' : 'Incident'}
 									</span>
@@ -192,7 +192,7 @@
 										<div class="flex max-w-52 flex-wrap gap-1">
 											{#each item.disasterTypes as disasterType (disasterType.id)}
 												<span
-													class="rounded bg-sky-50 px-1.5 py-0.5 text-[10px] text-sky-700"
+													class="rounded bg-[var(--color-brand-soft)] px-1.5 py-0.5 text-[10px] text-[var(--color-brand-hover)]"
 													title={disasterType.id}>{disasterType.label}</span
 												>
 											{/each}

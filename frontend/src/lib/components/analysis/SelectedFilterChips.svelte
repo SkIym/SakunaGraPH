@@ -83,16 +83,8 @@
 {#if chips.length > 0}
 	<div class="flex min-w-0 flex-wrap items-center gap-1.5" aria-label="Selected analysis filters">
 		{#each chips as chip (chip.key)}
-			<span
-				class="flex min-h-11 max-w-full items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 pl-3 text-[11px] text-slate-600"
-			>
-				<span
-					class="h-1.5 w-1.5 shrink-0 rounded-full {chip.kind === 'location'
-						? 'bg-teal-500'
-						: chip.kind === 'disasterType'
-							? 'bg-amber-500'
-							: 'bg-[var(--color-brand)]'}"
-				></span>
+			<span class="selected-filter-chip">
+				<span class="filter-chip-mark" aria-hidden="true"></span>
 				<span class="max-w-48 truncate" title={chip.label}>{chip.label}</span>
 				<button
 					type="button"
@@ -114,3 +106,26 @@
 		</button>
 	</div>
 {/if}
+
+<style>
+	.selected-filter-chip {
+		display: flex;
+		min-height: 2.75rem;
+		max-width: 100%;
+		align-items: center;
+		gap: 0.5rem;
+		border: 1px solid #ead26a;
+		border-radius: var(--radius-control);
+		background: var(--color-accent-soft);
+		padding-left: 0.75rem;
+		font-size: 0.6875rem;
+		color: var(--color-text-secondary);
+	}
+
+	.filter-chip-mark {
+		width: 2px;
+		height: 1rem;
+		flex: none;
+		background: var(--color-brand);
+	}
+</style>

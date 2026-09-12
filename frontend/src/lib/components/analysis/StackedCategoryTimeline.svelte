@@ -3,7 +3,7 @@
 
 	let { items = [], onselect = () => {} } = $props();
 	let windowEnd = $state('');
-	const COLORS = ['#6366f1', '#0ea5e9', '#14b8a6', '#f59e0b', '#f97316', '#ec4899', '#64748b'];
+	const COLORS = ['#0038a8', '#3768bd', '#6b8fd0', '#d6a900', '#59786d', '#6b7280', '#ce1126'];
 	const periods = $derived(items.map((item) => item.period));
 	const activeEnd = $derived(periods.includes(windowEnd) ? windowEnd : (periods.at(-1) ?? ''));
 	const endIndex = $derived(Math.max(0, periods.indexOf(activeEnd)));
@@ -33,39 +33,39 @@
 </script>
 
 {#if items.length}
-	<div class="space-y-3">
+	<div class="stacked-timeline">
 		<TimelineBrush {periods} value={activeEnd} onchange={(period) => (windowEnd = period)} />
-		<div class="flex h-56 items-end gap-1.5 border-b border-slate-200 px-1 pb-5">
+		<div class="timeline-bars">
 			{#each visibleItems as item (item.period)}
 				{@const total = item.categories.reduce((sum, category) => sum + category.count, 0)}
-				<button
-					type="button"
-					onclick={() => onselect(item.period)}
-					class="group relative flex h-full min-w-0 flex-1 flex-col-reverse justify-start overflow-hidden rounded-t-sm bg-slate-100 text-left transition hover:ring-2 hover:ring-[var(--color-focus)] focus:outline-none focus:ring-2 focus:ring-[var(--color-focus)]"
-					title={`${item.period}: ${total.toLocaleString()} category assignments`}
-				>
-					{#each item.categories as category (category.id)}
-						<span
-							class="w-full"
-							style="height:{(category.count / maximum) * 100}%; background:{colorFor(category.id)}"
-						></span>
-					{/each}
-					<span
-						class="absolute bottom-[-19px] left-1/2 -translate-x-1/2 whitespace-nowrap text-[8px] font-medium text-slate-400"
-						>{formatPeriod(item.period)}</span
+				<div class="period-column">
+					<button
+						type="button"
+						onclick={() => onselect(item.period)}
+						class="period-bar"
+						aria-label={`${item.period}: ${total.toLocaleString()} category assignments`}
+						title={`${item.period}: ${total.toLocaleString()} category assignments`}
 					>
-				</button>
+						{#each item.categories as category (category.id)}
+							<span
+								style="height:{(category.count / maximum) * 100}%; background:{colorFor(
+									category.id,
+								)}"
+							></span>
+						{/each}
+					</button>
+					<span class="period-label">{formatPeriod(item.period)}</span>
+				</div>
 			{/each}
 		</div>
-		<div class="flex flex-wrap gap-x-3 gap-y-1.5">
+		<div class="timeline-legend">
 			{#each categoryIds as categoryId}
 				{@const category = items
 					.flatMap((item) => item.categories)
 					.find((item) => item.id === categoryId)}
-				{#if category}<span class="flex items-center gap-1.5 text-[10px] text-slate-500"
-						><i class="h-2 w-2 rounded-full" style="background:{colorFor(categoryId)}"
-						></i>{category.label}</span
-					>{/if}
+				{#if category}
+					<span><i style="background:{colorFor(categoryId)}"></i>{category.label}</span>
+				{/if}
 			{/each}
 		</div>
 	</div>
@@ -74,3 +74,95 @@
 		No category timeline data in this scope.
 	</p>
 {/if}
+
+<style>
+	.stacked-timeline {
+		display: grid;
+		gap: 0.9rem;
+	}
+
+	.timeline-bars {
+		display: flex;
+		align-items: stretch;
+		gap: 0.35rem;
+		height: 14rem;
+		border-block-end: 1px solid var(--color-border);
+		padding: 0 0.25rem 1.55rem;
+	}
+
+	.period-column {
+		display: grid;
+		min-width: 0;
+		max-width: 3.75rem;
+		flex: 1;
+		grid-template-rows: minmax(0, 1fr) auto;
+		gap: 0.35rem;
+	}
+
+	.period-bar {
+		display: flex;
+		min-width: 0;
+		height: 100%;
+		flex-direction: column-reverse;
+		justify-content: flex-start;
+		overflow: hidden;
+		border: 1px solid rgba(0, 56, 168, 0.16);
+		border-block-end: 0;
+		background: var(--color-brand-soft);
+		text-align: left;
+		transition:
+			border-color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.period-bar:hover {
+		border-color: var(--color-brand);
+		transform: translateY(-2px);
+	}
+
+	.period-bar:focus-visible {
+		outline: 2px solid var(--color-focus);
+		outline-offset: 2px;
+	}
+
+	.period-bar span {
+		display: block;
+		width: 100%;
+	}
+
+	.period-label {
+		overflow: hidden;
+		color: var(--color-text-muted);
+		font-family: var(--font-mono);
+		font-size: 0.5rem;
+		text-align: center;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	.timeline-legend {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.45rem 1rem;
+	}
+
+	.timeline-legend span {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.4rem;
+		color: var(--color-text-muted);
+		font-size: 0.625rem;
+	}
+
+	.timeline-legend i {
+		display: block;
+		width: 0.55rem;
+		height: 0.55rem;
+	}
+
+	@media (prefers-reduced-motion: reduce) {
+		.period-bar {
+			transition: none;
+		}
+	}
+</style>

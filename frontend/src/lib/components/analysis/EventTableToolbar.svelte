@@ -17,11 +17,9 @@
 	const lastRecord = $derived(Math.min(page * pageSize, total));
 </script>
 
-<div
-	class="flex flex-col gap-3 border-b border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5"
->
+<div class="event-table-toolbar">
 	<div class="min-w-0">
-		<p class="text-xs font-medium tabular-nums text-slate-700">
+		<p class="record-range">
 			{#if loading && total === 0}
 				Loading records…
 			{:else if total === 0}
@@ -36,9 +34,7 @@
 	</div>
 
 	<div class="flex flex-wrap items-center gap-2">
-		<label
-			class="flex h-11 items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs text-slate-500"
-		>
+		<label class="toolbar-select">
 			Rows
 			<select
 				value={pageSize}
@@ -54,9 +50,7 @@
 		</label>
 
 		<details class="group relative">
-			<summary
-				class="flex h-11 cursor-pointer list-none items-center gap-2 rounded-lg border border-slate-200 bg-white px-3 text-xs font-semibold text-slate-600 shadow-sm transition hover:bg-slate-50 [&::-webkit-details-marker]:hidden"
-			>
+			<summary class="toolbar-button [&::-webkit-details-marker]:hidden">
 				<svg
 					viewBox="0 0 24 24"
 					class="h-3.5 w-3.5"
@@ -69,9 +63,7 @@
 				</svg>
 				Columns
 			</summary>
-			<div
-				class="absolute right-0 z-20 mt-1.5 w-52 rounded-md border border-slate-200 bg-white p-2 shadow-lg"
-			>
+			<div class="column-menu">
 				<p
 					class="px-2 pb-1.5 text-[9px] font-semibold uppercase text-slate-400"
 					style="letter-spacing:0.1em;"
@@ -98,3 +90,72 @@
 		<ExportButton params={exportParams} disabled={loading || total === 0} />
 	</div>
 </div>
+
+<style>
+	.event-table-toolbar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		border-bottom: 1px solid var(--color-border);
+		padding: 0.9rem 1.25rem;
+		background: var(--color-surface-subtle);
+	}
+
+	.record-range {
+		margin: 0;
+		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+		font-size: 0.6875rem;
+		font-weight: 600;
+		font-variant-numeric: tabular-nums;
+		color: var(--color-text);
+	}
+
+	.toolbar-select,
+	.toolbar-button {
+		display: flex;
+		height: 2.75rem;
+		align-items: center;
+		gap: 0.5rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0 0.75rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		transition:
+			border-color 160ms ease,
+			background-color 160ms ease;
+	}
+
+	.toolbar-button {
+		cursor: pointer;
+		list-style: none;
+	}
+
+	.toolbar-button:hover {
+		border-color: var(--color-brand-medium);
+		background: var(--color-brand-soft);
+	}
+
+	.column-menu {
+		position: absolute;
+		right: 0;
+		z-index: 20;
+		width: 13rem;
+		margin-top: 0.4rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0.5rem;
+		box-shadow: var(--shadow-surface);
+	}
+
+	@media (max-width: 47.999rem) {
+		.event-table-toolbar {
+			align-items: flex-start;
+			flex-direction: column;
+		}
+	}
+</style>

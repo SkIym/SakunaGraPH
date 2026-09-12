@@ -139,30 +139,19 @@
 	<title>Event records · SakunaGraPH</title>
 </svelte:head>
 
-<section class="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-	<div class="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+<section class="analysis-page analysis-page-wide">
+	<header class="analysis-page-header">
 		<div>
-			<nav
-				class="mb-2 flex items-center gap-1.5 text-[10px] text-slate-400"
-				aria-label="Breadcrumb"
-			>
-				<a href="/analysis" class="transition hover:text-slate-600">Analysis</a>
-				<span aria-hidden="true">/</span>
-				<span class="text-slate-600">Table</span>
-			</nav>
-			<h1 class="editorial-page-title">Disaster event records</h1>
-			<p class="mt-1 text-xs leading-5 text-slate-500">
+			<p class="workspace-kicker">Analysis / Table</p>
+			<h1>Disaster event records</h1>
+			<p class="analysis-page-copy">
 				Filter, compare, and export the linked event records available in the current graph.
 			</p>
 		</div>
-		<a
-			href="/analysis"
-			class="brand-link inline-flex min-h-11 items-center text-xs font-semibold transition"
-			>Analysis overview</a
-		>
-	</div>
+		<a href="/analysis" class="analysis-back-link">← Analysis overview</a>
+	</header>
 
-	<div class="overflow-visible rounded-lg border border-slate-200 bg-white shadow-sm">
+	<div class="analysis-surface">
 		<EventTableToolbar
 			{total}
 			{page}
@@ -208,9 +197,7 @@
 		{/if}
 
 		{#if !error && !loading && totalPages > 1}
-			<div
-				class="flex flex-col gap-3 border-t border-slate-200 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-5"
-			>
+			<div class="analysis-pagination">
 				<p class="text-[10px] tabular-nums text-slate-400">
 					Page {page.toLocaleString()} of {totalPages.toLocaleString()}
 				</p>
@@ -219,7 +206,7 @@
 						type="button"
 						onclick={() => goToPage(page - 1)}
 						disabled={page === 1}
-						class="min-h-11 rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+						class="pagination-step"
 					>
 						Previous
 					</button>
@@ -232,10 +219,8 @@
 								type="button"
 								onclick={() => goToPage(paginationPage)}
 								aria-current={page === paginationPage ? 'page' : undefined}
-								class="h-11 min-w-11 rounded-lg border px-2 text-xs font-medium tabular-nums transition
-									{page === paginationPage
-									? 'border-slate-800 bg-slate-800 text-white'
-									: 'border-slate-200 text-slate-600 hover:bg-slate-50'}"
+								class="pagination-page"
+								class:current={page === paginationPage}
 							>
 								{paginationPage}
 							</button>
@@ -245,7 +230,7 @@
 						type="button"
 						onclick={() => goToPage(page + 1)}
 						disabled={page === totalPages}
-						class="min-h-11 rounded-lg border border-slate-200 px-3 text-xs font-medium text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+						class="pagination-step"
 					>
 						Next
 					</button>
@@ -258,3 +243,65 @@
 {#if selectedEvent && EventDetailsComponent}
 	<EventDetailsComponent event={selectedEvent} onclose={() => (selectedEvent = '')} />
 {/if}
+
+<style>
+	.analysis-pagination {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 1rem;
+		padding: 0.8rem 1.25rem;
+		border-top: 1px solid var(--color-border);
+	}
+
+	.pagination-step,
+	.pagination-page {
+		min-height: 2.75rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding-inline: 0.75rem;
+		font-size: 0.75rem;
+		font-weight: 600;
+		color: var(--color-text-secondary);
+		transition:
+			background-color 160ms ease,
+			border-color 160ms ease,
+			transform 120ms ease;
+	}
+
+	.pagination-page {
+		min-width: 2.75rem;
+		padding-inline: 0.5rem;
+		font-variant-numeric: tabular-nums;
+	}
+
+	.pagination-step:hover:not(:disabled),
+	.pagination-page:hover {
+		border-color: var(--color-brand-medium);
+		background: var(--color-brand-soft);
+	}
+
+	.pagination-step:active:not(:disabled),
+	.pagination-page:active {
+		transform: translateY(1px);
+	}
+
+	.pagination-page.current {
+		border-color: #e2b800;
+		background: var(--color-accent);
+		color: var(--color-accent-ink);
+	}
+
+	.pagination-step:disabled {
+		cursor: not-allowed;
+		opacity: 0.45;
+	}
+
+	@media (max-width: 40rem) {
+		.analysis-pagination {
+			align-items: start;
+			flex-direction: column;
+		}
+	}
+</style>

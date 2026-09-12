@@ -4,13 +4,13 @@
 	let { items = [] } = $props();
 	let hovered = $state(null);
 	const COLORS = [
-		'#6366f1',
-		'#0ea5e9',
-		'#14b8a6',
-		'#f59e0b',
-		'#f97316',
-		'#ef4444',
-		'#a855f7',
+		'#0038a8',
+		'#4b72c2',
+		'#87a2d8',
+		'#fcd116',
+		'#b58b00',
+		'#ce1126',
+		'#2a6171',
 		'#64748b',
 	];
 	const total = $derived(items.reduce((sum, item) => sum + item.count, 0));
@@ -66,15 +66,18 @@
 						<title>{slice.label}: {slice.count.toLocaleString()} events</title>
 					</path>
 				{/each}
-				<circle cx="120" cy="120" r="55" fill="white"></circle>
+				<circle cx="120" cy="120" r="55" fill="var(--color-canvas)"></circle>
 				<text
 					x="120"
 					y="114"
 					text-anchor="middle"
 					class="fill-slate-400 text-[10px] font-semibold uppercase">Events</text
 				>
-				<text x="120" y="136" text-anchor="middle" class="fill-slate-800 text-xl font-semibold"
-					>{total.toLocaleString()}</text
+				<text
+					x="120"
+					y="136"
+					text-anchor="middle"
+					class="fill-slate-800 font-mono text-xl font-semibold">{total.toLocaleString()}</text
 				>
 			</svg>
 			<div class="min-w-0 space-y-1.5 sm:max-h-48 sm:overflow-y-auto sm:pr-1">

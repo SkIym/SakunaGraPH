@@ -13,9 +13,9 @@
 						class="font-semibold tabular-nums text-slate-700">{item.dead.toLocaleString()}</span
 					>
 				</div>
-				<div class="h-2 overflow-hidden rounded-full bg-slate-100">
+				<div class="h-2 overflow-hidden rounded-sm bg-[var(--color-danger-surface)]">
 					<div
-						class="h-full rounded-full bg-rose-500"
+						class="h-full rounded-sm bg-[var(--color-danger)]"
 						style="width:{Math.max(3, (item.dead / maximum) * 100)}%"
 					></div>
 				</div>

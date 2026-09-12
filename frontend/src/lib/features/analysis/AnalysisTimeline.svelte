@@ -166,33 +166,30 @@
 
 <svelte:head><title>Timeline analysis · SakunaGraPH</title></svelte:head>
 
-<section class="mx-auto w-full max-w-[1500px] px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
-	<div class="mb-6">
-		<p class="workspace-kicker">Analysis</p>
-		<h1 class="editorial-page-title mt-1">Timeline and date analysis</h1>
-		<p class="mt-1 text-xs leading-5 text-slate-500">
-			Explore the active filter scope by event start date, then open any date’s event records.
-		</p>
-	</div>
+<section class="analysis-page analysis-page-wide">
+	<header class="analysis-page-header">
+		<div>
+			<p class="workspace-kicker">Analysis / Timeline</p>
+			<h1>Timeline and date analysis</h1>
+			<p class="analysis-page-copy">
+				Explore the active filter scope by event start date, then open any date’s event records.
+			</p>
+		</div>
+		<a href="/analysis" class="analysis-back-link">← Analysis overview</a>
+	</header>
 
 	{#if error}
-		<div class="rounded-lg border border-red-200 bg-red-50 p-4" role="alert">
-			<p class="text-sm font-semibold text-red-800">Timeline is unavailable</p>
-			<p class="mt-1 text-xs text-red-600">{error}</p>
-			<button
-				type="button"
-				onclick={() => (retryToken += 1)}
-				class="mt-3 min-h-11 rounded-lg border border-red-200 bg-white px-4 text-xs font-semibold text-red-700 transition hover:bg-red-50"
-			>
-				Try again
-			</button>
+		<div class="analysis-error-panel" role="alert">
+			<h2>Timeline is unavailable</h2>
+			<p>{error}</p>
+			<button type="button" onclick={() => (retryToken += 1)}>Try again</button>
 		</div>
 	{:else}
-		<div class="grid gap-5 xl:grid-cols-[minmax(0,1fr)_360px]">
-			<div class="space-y-5">
-				<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
-					<h2 class="text-sm font-semibold text-slate-800">Calendar drill-down</h2>
-					<p class="mt-1 text-xs text-slate-500">
+		<div class="timeline-layout">
+			<div class="analysis-surface timeline-board">
+				<article class="analysis-chart-panel">
+					<h2>Calendar drill-down</h2>
+					<p>
 						Darker cells contain more deduplicated event records. Selecting a cell opens its event
 						set.
 					</p>
@@ -216,27 +213,21 @@
 						</p>{/if}
 				</article>
 
-				<article class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm sm:p-5">
+				<article class="analysis-chart-panel">
 					<div class="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
 						<div>
-							<h2 class="text-sm font-semibold text-slate-800">Category timeline</h2>
-							<p class="mt-1 text-xs text-slate-500">
-								Monthly event assignments grouped by disaster taxonomy.
-							</p>
+							<h2>Category timeline</h2>
+							<p>Monthly event assignments grouped by disaster taxonomy.</p>
 						</div>
-						<div class="inline-flex rounded-md border border-slate-200 bg-white p-0.5">
+						<div class="analysis-segmented" role="group" aria-label="Timeline grouping">
 							<button
 								type="button"
 								onclick={() => (bucket = 'month_year')}
-								class="min-h-11 rounded-lg px-3 text-xs font-semibold {bucket === 'month_year'
-									? 'bg-slate-800 text-white'
-									: 'text-slate-500'}">Chronological</button
+								aria-pressed={bucket === 'month_year'}>Chronological</button
 							><button
 								type="button"
 								onclick={() => (bucket = 'month_of_year')}
-								class="min-h-11 rounded-lg px-3 text-xs font-semibold {bucket === 'month_of_year'
-									? 'bg-slate-800 text-white'
-									: 'text-slate-500'}">Seasonal</button
+								aria-pressed={bucket === 'month_of_year'}>Seasonal</button
 							>
 						</div>
 					</div>
@@ -257,13 +248,9 @@
 						onselect={openEventDetails}
 					/>
 				{:else}
-					<div
-						class="rounded-xl border border-dashed border-slate-300 bg-slate-50/60 p-6 text-center"
-					>
-						<p class="text-sm font-semibold text-slate-600">Select a calendar cell</p>
-						<p class="mt-1 text-xs leading-5 text-slate-400">
-							The matching event records will appear here.
-						</p>
+					<div class="analysis-empty-panel">
+						<strong>Select a calendar cell</strong>
+						<p>The matching event records will appear here.</p>
 					</div>
 				{/if}
 			</div>
@@ -275,3 +262,25 @@
 		event={selectedEvent}
 		onclose={() => (selectedEvent = '')}
 	/>{/if}
+
+<style>
+	.timeline-layout {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr) minmax(19rem, 23rem);
+		align-items: start;
+		gap: 1.5rem;
+	}
+
+	.timeline-board {
+		display: grid;
+		gap: 1px;
+		overflow: hidden;
+		background: var(--color-border);
+	}
+
+	@media (max-width: 74rem) {
+		.timeline-layout {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>
