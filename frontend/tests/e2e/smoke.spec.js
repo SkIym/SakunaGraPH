@@ -41,6 +41,16 @@ test('decorative schema background cannot become a blocking polygon layer', asyn
 	await expect(page).toHaveURL(/\/map$/);
 });
 
+test('home credits the project advisers and their laboratory', async ({ page }) => {
+	await gotoReady(page, '/');
+
+	const footer = page.locator('footer');
+	await expect(footer).toContainText('UP Diliman Web Science Laboratory');
+	await expect(footer).toContainText('Assoc. Prof. Rommel Feria');
+	await expect(footer).toContainText('Prof. Ligaya Leah Figueroa');
+	await expect(footer).toContainText('Asst. Prof Rowena Solamo');
+});
+
 test('home province preview identifies provinces and opens the province map', async ({
 	page,
 	isMobile,

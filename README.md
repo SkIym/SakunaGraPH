@@ -16,16 +16,11 @@ gates, cross-source entity resolution, GraphDB-backed APIs, and a public explora
 > SakunaGraPH is a research and data-exploration system. It is not a live emergency warning
 > service and should not be used for operational disaster response.
 
-[Explore the hosted application](https://sakunagraph.upcsweb.dev) ·
 [Download the v1.0 knowledge graph and ontology](https://github.com/SkIym/SakunaGraPH/releases/tag/sakunagraphv.1.0) ·
 [Read the architecture](ARCHITECTURE.md) ·
 [Run the two-minute RDF demo](#two-minute-rdf-demo)
 
 ![SakunaGraPH home page showing an interactive map of Philippine disaster records](frontend/tests/visual-baselines/home-desktop-chromium.jpg)
-
-| Ask the graph | Inspect the semantic model |
-| --- | --- |
-| ![Natural-language question interface](frontend/tests/visual-baselines/ask-desktop-chromium.jpg) | ![Interactive ontology explorer](frontend/tests/visual-baselines/ontology-desktop-chromium.jpg) |
 
 ## Why this project exists
 

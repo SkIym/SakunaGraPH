@@ -287,11 +287,15 @@
 		<div
 			class="mx-auto flex max-w-[75rem] flex-col gap-8 sm:flex-row sm:items-end sm:justify-between"
 		>
-			<div>
+			<div class="min-w-0">
 				<p class="footer-wordmark">Sakuna<span>GraPH</span></p>
 				<p class="mt-2 max-w-[62ch] text-sm leading-6 text-slate-600">
 					Built by Judelle Clareese E. Gaza and Abram Josh C. Marcelo at the UP Diliman Web Science
 					Laboratory.
+				</p>
+				<p class="mt-2 max-w-[62ch] text-sm leading-6 text-slate-600">
+					Advisers: Assoc. Prof. Rommel Feria,
+					Prof. Ligaya Leah Figueroa, and Asst. Prof Rowena Solamo.
 				</p>
 			</div>
 			<div class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium">
