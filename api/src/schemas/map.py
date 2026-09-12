@@ -3,7 +3,7 @@ from typing import Literal
 from pydantic import BaseModel, Field
 
 EventMode = Literal["major", "incidents"]
-EventScope = Literal["region", "province"]
+EventScope = Literal["region", "province", "city", "municipality"]
 EventType = Literal["MajorEvent", "Incident"]
 
 

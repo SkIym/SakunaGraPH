@@ -78,6 +78,9 @@ The principal endpoint groups are:
 FastAPI generates the complete interactive contract at `/docs` and the OpenAPI
 document at `/openapi.json`.
 
+The map endpoint accepts `region`, `province`, `city`, and `municipality` scopes. Its `id` is the
+10-digit PSGC code for the selected geography, including NCR cities and Pateros.
+
 ## GraphRAG / Ask deep dive
 
 The Ask feature treats LLM output as a proposal that must pass deterministic
