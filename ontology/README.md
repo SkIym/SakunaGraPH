@@ -6,6 +6,9 @@ geographic hierarchy, and source provenance. The model extends the
 [beAWARE ontology](https://github.com/beAWARE-project/ontology) and is used by
 the ETL pipeline to populate the knowledge graph.
 
+The published knowledge graph and ontology baseline is available in the
+[`sakunagraphv.1.0` release](https://github.com/SkIym/SakunaGraPH/releases/tag/sakunagraphv.1.0).
+
 ## Folder layout
 
 | Path | Purpose |
@@ -92,12 +95,30 @@ semantic classifier.
 
 Use `shapes/shapes.ttl` to validate event and impact data, and
 `shapes/psgc/shapes.ttl` to validate PSGC data. The pipeline defaults are
-defined in `etl/validate/validate.py` and `etl/pipeline/run_psgc.py`.
+implemented by `sakunagraph_etl.quality.shacl` and the package-owned source
+jobs under `sakunagraph_etl.sources`.
 
 The documented competency questions are in
 [`validation/competency_questions.md`](validation/competency_questions.md).
 OOPS! results and ontology metrics are retained in `validation/` as reference
 artifacts.
+
+From the repository root, the infrastructure-free portfolio demo parses the
+ontology and shape graphs, verifies the five-source synthetic RDF fixtures,
+and executes a SPARQL query:
+
+```bash
+python scripts/portfolio_demo.py
+```
+
+RDFLib 7.6.0 is the only dependency needed for that smoke demo.
+
+## License and external terms
+
+Original SakunaGraPH ontology content is available under the repository's MIT
+license. Imported ontologies and vocabularies remain under their respective
+owners' terms. Source data and derived RDF may have separate access,
+attribution, and redistribution requirements; see [`DATA_SOURCES.md`](../DATA_SOURCES.md).
 
 ## Notes
 

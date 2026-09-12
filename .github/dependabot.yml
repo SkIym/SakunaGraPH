@@ -1,0 +1,39 @@
+version: 2
+updates:
+  - package-ecosystem: pip
+    directory: /sakunagraph_etl
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Asia/Manila
+    groups:
+      etl-python:
+        patterns: ["*"]
+
+  - package-ecosystem: docker
+    directory: /sakunagraph_etl
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Asia/Manila
+
+  - package-ecosystem: docker
+    directory: /sakunagraph_etl/deploy/docker
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Asia/Manila
+
+  - package-ecosystem: terraform
+    directory: /sakunagraph_etl/deploy/terraform
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Asia/Manila
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      timezone: Asia/Manila

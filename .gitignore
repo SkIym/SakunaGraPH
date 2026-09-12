@@ -12,6 +12,8 @@ data/*
 logs/*
 ontology/catalog-v001.xml
 .DS_Store
+tmp/
+.impeccable/
 data/
 !frontend/static/data/
 !frontend/static/data/**
