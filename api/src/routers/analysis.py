@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from datetime import date
 
 from fastapi import APIRouter, HTTPException, Query, Response
@@ -22,6 +24,7 @@ from src.schemas.analysis import (
     AnalysisVictimTrendsResponse,
 )
 from src.services.analysis import (
+    AnalysisFilters,
     get_calendar_days,
     get_calendar_months,
     get_calendar_years,
@@ -42,6 +45,51 @@ from src.services.analysis import (
 from src.services.common import ServiceError
 
 router = APIRouter(prefix="/analysis", tags=["analysis"])
+
+_FILENAME_TOKEN_RE = re.compile(r"[^a-z0-9]+")
+
+
+def _filename_token(value: str, *, limit: int = 32) -> str:
+    ascii_value = (
+        unicodedata.normalize("NFKD", value).encode("ascii", "ignore").decode()
+    )
+    token = _FILENAME_TOKEN_RE.sub("-", ascii_value.lower()).strip("-")
+    return token[:limit].rstrip("-") or "filter"
+
+
+def _filename_values(label: str, values: tuple[str, ...]) -> str:
+    tokens = [_filename_token(value) for value in values[:2]]
+    if len(values) > 2:
+        tokens.append(f"plus-{len(values) - 2}")
+    return f"{label}-{'-'.join(tokens)}"
+
+
+def _analysis_export_filename(filters: AnalysisFilters) -> str:
+    segments = ["sakunagraph-events"]
+
+    if filters.event_type != "all":
+        segments.append(f"type-{filters.event_type}")
+
+    if filters.start_date and filters.end_date:
+        segments.append(
+            f"dates-{filters.start_date.isoformat()}-to-{filters.end_date.isoformat()}"
+        )
+    elif filters.start_date:
+        segments.append(f"dates-from-{filters.start_date.isoformat()}")
+    elif filters.end_date:
+        segments.append(f"dates-through-{filters.end_date.isoformat()}")
+
+    if filters.location_ids:
+        segments.append(_filename_values("locations", filters.location_ids))
+    if filters.disaster_types:
+        segments.append(_filename_values("disasters", filters.disaster_types))
+    if filters.q:
+        segments.append(f"search-{_filename_token(filters.q, limit=40)}")
+
+    if len(segments) == 1:
+        segments.append("all-records")
+
+    return f"{'_'.join(segments)}.csv"
 
 
 def _to_http_error(exc: ServiceError) -> HTTPException:
@@ -113,7 +161,9 @@ async def export_events(
             content=content,
             media_type="text/csv",
             headers={
-                "Content-Disposition": 'attachment; filename="sakunagraph-events.csv"'
+                "Content-Disposition": (
+                    f'attachment; filename="{_analysis_export_filename(filters)}"'
+                )
             },
         )
     except ServiceError as exc:

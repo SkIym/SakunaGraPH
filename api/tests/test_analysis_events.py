@@ -213,7 +213,38 @@ class AnalysisEventRouterTests(unittest.TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.headers["content-type"], "text/csv; charset=utf-8")
-        self.assertIn("attachment", response.headers["content-disposition"])
+        self.assertEqual(
+            response.headers["content-disposition"],
+            'attachment; filename="sakunagraph-events_all-records.csv"',
+        )
+
+    def test_export_filename_describes_active_filters(self) -> None:
+        with patch(
+            "src.routers.analysis.get_analysis_events_export",
+            new=AsyncMock(return_value="event,eventName\r\n"),
+        ):
+            response = self.client.get(
+                "/api/analysis/events/export.csv",
+                params=[
+                    ("event_type", "major"),
+                    ("start_date", "2023-01-01"),
+                    ("end_date", "2023-12-31"),
+                    ("location_ids", "1300000000"),
+                    ("location_ids", "1400000000"),
+                    ("disaster_types", "TropicalCyclone"),
+                    ("q", "Typhoon Salomé / NCR"),
+                    ("sort_by", "eventName"),
+                    ("sort_dir", "asc"),
+                ],
+            )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["content-disposition"],
+            "attachment; filename=\"sakunagraph-events_type-major_"
+            "dates-2023-01-01-to-2023-12-31_locations-1300000000-1400000000_"
+            "disasters-tropicalcyclone_search-typhoon-salome-ncr.csv\"",
+        )
 
     def test_invalid_filter_returns_422_without_querying_graphdb(self) -> None:
         response = self.client.get(
