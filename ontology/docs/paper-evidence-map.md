@@ -275,6 +275,8 @@ event classification.
 - [Normative ontology requirements](requirements.md)
 - [Ontology decision records](modeling-decisions/README.md)
 - [Decision-resolution log](modeling-decisions/open-questions.md)
+- [Namespace and versioning policy](versioning-policy.md)
+- [Import snapshot manifest](../imports/README.md)
 - [Current ontology](../sakunagraph.ttl)
 - [Disaster taxonomy](../disaster_type_scheme.ttl)
 - [Competency questions](../validation/competency_questions.md)

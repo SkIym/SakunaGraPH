@@ -86,6 +86,11 @@ contracts, and deployment.
 - Update competency questions and affected mappings.
 - Check whether existing RDF or queries require migration.
 - Do not silently change the meaning of an existing IRI.
+- Classify the change as PATCH, MINOR, or MAJOR under
+  `ontology/docs/versioning-policy.md`.
+- Update `ontology/imports/README.md` and the offline catalog when an import changes.
+- Do not add `owl:versionIRI`. Add `owl:versionInfo` only when the release version and semantic diff
+  are approved.
 
 ### ETL and resolution changes
 
@@ -136,7 +141,9 @@ logs, generated RDF, secrets, and local model artifacts must remain ignored. Con
 Use small, descriptive commits. Conventional prefixes such as `feat:`, `fix:`, `docs:`, `test:`,
 and `refactor:` are encouraged because the existing history already follows that style.
 
-The repository's first knowledge graph and ontology release is tagged `sakunagraphv.1.0`. Future
-release notes should state which artifacts are included, their checksums, source coverage and access
-dates, ontology version, validation status, evaluation results, and any redistribution restrictions.
-
+The repository's first knowledge graph and ontology release is tagged `sakunagraphv.1.0` and remains
+a historical combined-release identifier. Future ontology-only tags use
+`ontology-vMAJOR.MINOR.PATCH`; knowledge-graph snapshots record their date and ontology version
+separately. Follow `ontology/docs/versioning-policy.md` for immutable artifact names and OWL
+metadata. Release notes must state included artifacts, checksums, source coverage/access dates,
+ontology version, validation status, evaluation results, and redistribution restrictions.

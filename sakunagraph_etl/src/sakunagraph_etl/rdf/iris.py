@@ -14,7 +14,7 @@ from sakunagraph_etl.uuid_namespaces import (
     NDRRMC_EVENT_NS,
     SKG_EVENT_NS,
 )
-CANONICAL_BASE = "https://sakuna.graph/common/"
+CANONICAL_BASE = "https://sakuna.ph/cluster/"
 
 
 def mint_canonical_iri(member_uris: frozenset[str]) -> URIRef:

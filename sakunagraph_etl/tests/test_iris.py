@@ -15,10 +15,13 @@ class IriTests(unittest.TestCase):
     def test_canonical_iri_is_independent_of_member_order(self) -> None:
         members = frozenset({"https://sakuna.ph/a", "https://sakuna.ph/b"})
 
+        canonical_iri = mint_canonical_iri(members)
+
         self.assertEqual(
-            mint_canonical_iri(members),
+            canonical_iri,
             mint_canonical_iri(frozenset(reversed(sorted(members)))),
         )
+        self.assertTrue(str(canonical_iri).startswith("https://sakuna.ph/cluster/"))
 
     def test_sub_iri_keeps_event_scope(self) -> None:
         event = URIRef("https://sakuna.ph/dromic/event")

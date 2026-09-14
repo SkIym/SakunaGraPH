@@ -1,0 +1,224 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://sakuna.ph/schema/ontology-release-manifest",
+  "title": "SakunaGraPH ontology release manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schemaVersion",
+    "ontology",
+    "release",
+    "artifacts",
+    "imports",
+    "runtime",
+    "compatibility",
+    "validation"
+  ],
+  "properties": {
+    "schemaVersion": {
+      "const": "1.0"
+    },
+    "ontology": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["iri", "versionInfo", "artifact", "sha256"],
+      "properties": {
+        "iri": {
+          "const": "https://sakuna.ph/"
+        },
+        "versionInfo": {
+          "type": "string",
+          "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "artifact": {
+          "type": "string",
+          "pattern": "^sakunagraph-ontology-[0-9]+\\.[0-9]+\\.[0-9]+\\.ttl$"
+        },
+        "sha256": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["tag", "commit", "releasedAt", "previousTag"],
+      "properties": {
+        "tag": {
+          "type": "string",
+          "pattern": "^ontology-v[0-9]+\\.[0-9]+\\.[0-9]+$"
+        },
+        "commit": {
+          "type": "string",
+          "pattern": "^[0-9a-f]{40}$"
+        },
+        "releasedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "previousTag": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["role", "filename", "sha256"],
+        "properties": {
+          "role": {
+            "enum": [
+              "ontology",
+              "taxonomy",
+              "shapes",
+              "psgc-shapes",
+              "import-catalog",
+              "third-party-notices",
+              "checksums",
+              "migration-guide"
+            ]
+          },
+          "filename": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          }
+        }
+      }
+    },
+    "imports": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "iri",
+          "versionSignal",
+          "localArtifact",
+          "sha256",
+          "license",
+          "source"
+        ],
+        "properties": {
+          "iri": {
+            "type": "string",
+            "format": "uri"
+          },
+          "versionSignal": {
+            "type": "string",
+            "minLength": 1
+          },
+          "localArtifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "sha256": {
+            "$ref": "#/$defs/sha256"
+          },
+          "license": {
+            "type": "string",
+            "minLength": 1
+          },
+          "source": {
+            "type": "string",
+            "format": "uri"
+          }
+        }
+      }
+    },
+    "runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["graphDatabase", "graphDatabaseVersion", "reasoningProfile"],
+      "properties": {
+        "graphDatabase": {
+          "const": "GraphDB"
+        },
+        "graphDatabaseVersion": {
+          "const": "11.1.3"
+        },
+        "reasoningProfile": {
+          "const": "OWL2-RL"
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["changeLevel", "backwardCompatible", "previousTag", "notes"],
+      "properties": {
+        "changeLevel": {
+          "enum": ["MAJOR", "MINOR", "PATCH"]
+        },
+        "backwardCompatible": {
+          "type": "boolean"
+        },
+        "previousTag": {
+          "type": "string",
+          "minLength": 1
+        },
+        "notes": {
+          "type": "string",
+          "minLength": 1
+        },
+        "migrationArtifacts": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "rdfParsePassed",
+        "offlineImportClosurePassed",
+        "owl2RlPassed",
+        "shaclPassed",
+        "competencyQueriesPassed",
+        "evidence"
+      ],
+      "properties": {
+        "rdfParsePassed": {
+          "const": true
+        },
+        "offlineImportClosurePassed": {
+          "const": true
+        },
+        "owl2RlPassed": {
+          "const": true
+        },
+        "shaclPassed": {
+          "const": true
+        },
+        "competencyQueriesPassed": {
+          "const": true
+        },
+        "evidence": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}

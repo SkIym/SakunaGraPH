@@ -227,6 +227,7 @@ SakunaGraPH/
 - [Five-minute portfolio walkthrough](docs/portfolio-walkthrough.md)
 - [Data sources and licensing boundaries](DATA_SOURCES.md)
 - [Ontology guide](ontology/README.md)
+- [Ontology namespace and versioning policy](ontology/docs/versioning-policy.md)
 - [Production ETL guide](sakunagraph_etl/README.md)
 - [API and Ask pipeline](api/README.md)
 - [Application deployment](deploy/README.md)

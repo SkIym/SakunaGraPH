@@ -5,6 +5,9 @@ Describe the information need, failure, or user outcome addressed by this change
 ## Semantic and operational impact
 
 - Ontology terms or SHACL shapes changed:
+- Ontology version impact (`none`, `PATCH`, `MINOR`, or `MAJOR`):
+- Public IRIs added, deprecated, replaced, or removed:
+- Import snapshot/catalog changed:
 - Source mappings or provenance changed:
 - Public API or UI contract changed:
 - Migration, publication, or rollback considerations:
@@ -13,6 +16,8 @@ Describe the information need, failure, or user outcome addressed by this change
 
 - [ ] Relevant unit and integration tests pass.
 - [ ] RDF or ontology changes include a reviewed semantic diff.
+- [ ] Ontology changes follow `ontology/docs/versioning-policy.md` and include migrations when required.
+- [ ] Import changes include provenance, checksums, license review, and offline catalog updates.
 - [ ] Public documentation and contracts are updated.
 - [ ] New data is synthetic or has documented redistribution permission.
 - [ ] No credentials, personal data, restricted reports, or runtime artifacts are included.

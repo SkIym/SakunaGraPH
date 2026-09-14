@@ -16,12 +16,20 @@ The published knowledge graph and ontology baseline is available in the
 | `sakunagraph.ttl` | Main SakunaGraPH OWL ontology in Turtle format. |
 | `disaster_type_scheme.ttl` | SKOS disaster-type classification aligned with EM-DAT. |
 | `imports/beAWARE_ontology.owl` | Local copy of the imported beAWARE ontology. |
+| `imports/geosparql-1.1.ttl` | Pinned GeoSPARQL 1.1 ontology snapshot. |
+| `imports/skos-2009.rdf` | Pinned W3C SKOS Recommendation namespace document. |
+| `imports/prov-o-20130430.owl` | Pinned W3C PROV-O Recommendation snapshot. |
 | `imports/catalog-v001.xml` | XML catalog that resolves local ontology imports. |
+| `imports/README.md` | Import snapshot checksums, provenance, licenses, and offline status. |
+| `imports/THIRD_PARTY_NOTICES.md` | Upstream attribution and redistribution notices. |
 | `shapes/shapes.ttl` | SHACL shapes for SakunaGraPH event and impact RDF. |
 | `shapes/psgc/shapes.ttl` | SHACL shapes for Philippine Standard Geographic Code (PSGC) RDF. |
 | `docs/requirements.md` | Normative ontology requirements OR-01 through OR-08. |
 | `docs/paper-evidence-map.md` | Traceability from the project paper to ontology terms, CQs, shapes, tests, and gaps. |
 | `docs/modeling-decisions/` | Paper-backed and maintainer-approved ontology decision records. |
+| `docs/versioning-policy.md` | Stable namespace, SemVer, migration, import, and release policy. |
+| `release/manifest.schema.json` | Required structure for checksum-bearing ontology release manifests. |
+| `release/README.md` | Release identity and manifest preparation guide. |
 | `validation/competency_questions.md` | SPARQL competency questions for evaluating the graph. |
 | `validation/neontometrics-2.csv` | Ontology metrics export. |
 | `validation/pitfall-scanner-results-2.xml` | OOPS! Pitfall Scanner validation output. |
@@ -48,6 +56,28 @@ The ontology models:
 ```
 Base IRI: https://sakuna.ph/
 ```
+
+The historical ontology IRI and public term namespace are `https://sakuna.ph/`. As of 2026-09-14,
+the maintainer plans to acquire but does not yet own that domain. Existing IRIs remain historical
+public identifiers, but the repository does not claim that they are currently dereferenceable or
+under project control. Version numbers do not appear in class, property, concept, or data-resource
+IRIs.
+
+Cluster identifiers use `https://sakuna.ph/cluster/{uuid}` so all project-owned identifiers remain
+under one namespace. ODR-0016 changes the cluster membership graph without reminting cluster IRIs.
+
+## Versioning
+
+The historical combined knowledge-graph/ontology release remains tagged `sakunagraphv.1.0`.
+Future ontology releases use three-part semantic versions and are versioned separately from ETL,
+API, frontend, and data snapshots. The next approved ontology release candidate is 2.0.0, using the
+tag `ontology-v2.0.0`. Releases omit `owl:versionIRI` and use `owl:versionInfo`, the immutable Git
+tag, and the checksum manifest as their release identity. The current working ontology is not
+stamped yet because namespace control and release validation remain unresolved.
+
+See the [namespace and versioning policy](docs/versioning-policy.md) before changing public IRIs,
+OWL axioms, SHACL publication behavior, imports, or release metadata. The
+[import snapshot manifest](imports/README.md) records the current offline-resolution status.
 
 ## Imported vocabularies
 

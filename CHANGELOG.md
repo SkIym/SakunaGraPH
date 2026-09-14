@@ -17,6 +17,15 @@ set being published.
 - Five-minute portfolio walkthrough and a CI job that executes the public smoke demo.
 - GitHub Actions workflows for ETL quality, dependency and infrastructure checks, API contracts,
   frontend quality, accessibility, browser tests, performance, and deployment verification.
+- Ontology namespace and semantic-versioning policy, including `owl:versionInfo`, immutable
+  tag/manifest identity, deprecation windows, release artifact names, and data-snapshot separation.
+- Ontology import snapshot manifest with pinned checksums and provenance records.
+- Complete offline ontology import closure for beAWARE, GeoSPARQL 1.1, SKOS, and PROV-O, including
+  third-party notices, catalog mappings, checksums, and a regression test.
+- A single `sakuna.ph` project namespace, including deterministic cluster IRIs under
+  `https://sakuna.ph/cluster/`.
+- A release-manifest schema for the selected `owl:versionInfo` plus immutable tag/checksum release
+  strategy.
 
 ### Clarified
 

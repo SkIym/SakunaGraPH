@@ -15,7 +15,7 @@ NDRRMC_EVENT_NS = uuid.UUID("a3f2c1d4-7e8b-4f09-b5a6-2c3d4e5f6a7b")
 DROMIC_EVENT_NS = uuid.UUID("f7c14e82-3b9d-4a56-8e01-d2f5a7c93b1e")
 
 # for common events
-CANONICAL_BASE = "https://sakuna.graph/common/"
+CANONICAL_BASE = "https://sakuna.ph/common/"
  
 def mint_canonical_iri(member_uris: frozenset[str]) -> URIRef:
     """

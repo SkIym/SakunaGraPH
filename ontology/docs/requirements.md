@@ -563,7 +563,9 @@ Any pull request that changes one of OR-01-OR-08 MUST:
 3. add or update a competency query, SHACL fixture, or reasoner test;
 4. state whether the change preserves the paper-era semantics or is a post-paper extension;
 5. assess ETL mappings, API schema/query catalogs, and release compatibility; and
-6. record unresolved domain decisions instead of silently choosing a meaning.
+6. classify the ontology version impact under
+   [the namespace and versioning policy](versioning-policy.md); and
+7. record unresolved domain decisions instead of silently choosing a meaning.
 
 ## Step 1 completion criteria
 
