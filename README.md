@@ -223,6 +223,7 @@ SakunaGraPH/
 ## Documentation
 
 - [System architecture](ARCHITECTURE.md)
+- [Portfolio engineering roadmap: items 2–8](docs/portfolio-roadmap/README.md)
 - [Five-minute portfolio walkthrough](docs/portfolio-walkthrough.md)
 - [Data sources and licensing boundaries](DATA_SOURCES.md)
 - [Ontology guide](ontology/README.md)

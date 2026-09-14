@@ -294,8 +294,8 @@
 					Laboratory.
 				</p>
 				<p class="mt-2 max-w-[62ch] text-sm leading-6 text-slate-600">
-					Advisers: Assoc. Prof. Rommel Feria,
-					Prof. Ligaya Leah Figueroa, and Asst. Prof Rowena Solamo.
+					Advisers: Assoc. Prof. Rommel Feria, Prof. Ligaya Leah Figueroa, and Asst. Prof Rowena
+					Solamo.
 				</p>
 			</div>
 			<div class="flex flex-wrap gap-x-5 gap-y-2 text-sm font-medium">

@@ -19,11 +19,20 @@ The published knowledge graph and ontology baseline is available in the
 | `imports/catalog-v001.xml` | XML catalog that resolves local ontology imports. |
 | `shapes/shapes.ttl` | SHACL shapes for SakunaGraPH event and impact RDF. |
 | `shapes/psgc/shapes.ttl` | SHACL shapes for Philippine Standard Geographic Code (PSGC) RDF. |
+| `docs/requirements.md` | Normative ontology requirements OR-01 through OR-08. |
+| `docs/paper-evidence-map.md` | Traceability from the project paper to ontology terms, CQs, shapes, tests, and gaps. |
+| `docs/modeling-decisions/` | Paper-backed and maintainer-approved ontology decision records. |
 | `validation/competency_questions.md` | SPARQL competency questions for evaluating the graph. |
 | `validation/neontometrics-2.csv` | Ontology metrics export. |
 | `validation/pitfall-scanner-results-2.xml` | OOPS! Pitfall Scanner validation output. |
 
 ## Scope
+
+The [ontology requirements](docs/requirements.md) define the current engineering contract, while
+the [paper evidence map](docs/paper-evidence-map.md) separates paper-era findings from later
+repository evidence and open verification gaps. The
+[ontology decision records](docs/modeling-decisions/README.md) preserve the rationale for the
+modeling patterns, accepted maintainer choices, deferred scope, and implementation gaps.
 
 The ontology models:
 
