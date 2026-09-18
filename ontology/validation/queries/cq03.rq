@@ -1,0 +1,14 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?ancestor ?ancestorLabel (COUNT(DISTINCT ?event) AS ?eventCount)
+WHERE {
+    :Mudslide skos:broader* ?ancestor .
+    OPTIONAL { ?ancestor skos:prefLabel ?ancestorLabel }
+    OPTIONAL {
+        ?disasterType skos:broader* ?ancestor .
+        ?event a :DisasterEvent ; :hasDisasterType ?disasterType .
+    }
+}
+GROUP BY ?ancestor ?ancestorLabel
+ORDER BY DESC(?eventCount) ?ancestor

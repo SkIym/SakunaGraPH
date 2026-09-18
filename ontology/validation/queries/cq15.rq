@@ -1,0 +1,17 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+
+SELECT ?event ?eventName ?source ?contribution ?type ?organization
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasAssistance ?assistance ;
+        prov:wasDerivedFrom+/prov:wasAttributedTo ?source .
+    ?assistance :hasLocation ?location .
+    ?location :isPartOf* :0203100000 .
+    OPTIONAL { ?assistance :itemTypeOrNeeds ?type }
+    OPTIONAL { ?assistance :contributingOrg ?organization }
+    OPTIONAL { ?assistance :contributionAmount [ qudt:numericValue ?contribution ] }
+    OPTIONAL { ?event :eventName ?eventName }
+}
+ORDER BY ?event ?source

@@ -1,0 +1,17 @@
+PREFIX : <https://sakuna.ph/>
+
+SELECT ?event ?eventName
+    (SUM(?displacedFamilies) AS ?totalFamilies)
+    (SUM(?displacedPersons) AS ?totalPersons)
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasLocation ?location ;
+        :hasAffectedPopulation ?population .
+    ?location :isPartOf* :0600000000 .
+    ?population :hasLocation ?location ;
+        :displacedPersons ?displacedPersons ;
+        :displacedFamilies ?displacedFamilies .
+    OPTIONAL { ?event :eventName ?eventName }
+}
+GROUP BY ?event ?eventName
+ORDER BY DESC(?totalPersons) DESC(?totalFamilies) ?event

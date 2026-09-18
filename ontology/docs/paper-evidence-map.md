@@ -137,9 +137,9 @@ impact resources.
 
 ### Gap
 
-CQ6-CQ14 are documented but not yet executed as an immutable end-to-end regression suite. A
-cross-source fixture must also prove that inferred location ancestors do not multiply aggregate
-values.
+CQ6-CQ14 now execute against the immutable competency fixture in the offline and GraphDB lanes. A
+future mixed-source aggregation fixture must still prove that inferred location ancestors do not
+multiply values across independently reported source aggregates.
 
 ## OR-05 trace: provenance and alternate records
 
@@ -265,7 +265,7 @@ event classification.
 | Rescue scope          | Full rescue team/mission structures excluded, page 8         | ODR-0011: rescue remains report-level only                                                      | Do not imply mission execution or command modeling                                                                            |
 | Missing location      | Philippines used for absent/ambiguous locations, page 10     | ODR-0012 confirms the generic `:Philippines` fallback                                           | Do not interpret the fallback alone as proof of nationwide impact                                                             |
 | Runtime reasoning     | Paper describes OWL-DL reasoning, page 12                    | ODR-0015: GraphDB 11.1.3 with OWL2-RL                                                          | Portability requirements are deferred; pin runtime metadata in semantic reports                                               |
-| Functional validation | All 20 CQs reported successful, pages 12-20                  | Queries retained in `ontology/validation/competency_questions.md`                              | Add immutable fixtures and expected-result regression                                                                        |
+| Functional validation | All 20 CQs reported successful, pages 12-20                  | CQ01-CQ20, an immutable synthetic fixture, exact expected CSVs, and RDFLib/GraphDB execution contracts in `ontology/validation/` | Preserve the paper result as historical evidence; require a GraphDB report for current release acceptance                    |
 | CQ categories         | Paper says five but names six, page 18                       | Repository headings name six                                                                   | Use six consistently                                                                                                         |
 | Semantic constraints  | Protégé/OOPS!/NEOntometrics described, pages 12 and 15-18    | ODR-0017 assigns semantics/inference to OWL; ODR-0018 assigns source-aware quality gates to SHACL | Audit OWL restrictions and implement versioned SHACL profiles/severities                                                    |
 
@@ -280,6 +280,8 @@ event classification.
 - [Current ontology](../sakunagraph.ttl)
 - [Disaster taxonomy](../disaster_type_scheme.ttl)
 - [Competency questions](../validation/competency_questions.md)
+- [Executable competency manifest](../validation/competency-manifest.json)
+- [Semantic-validation workflow](../validation/README.md)
 - [Disaster SHACL shapes](../shapes/shapes.ttl)
 - [PSGC SHACL shapes](../shapes/psgc/shapes.ttl)
 - [NEOntometrics export](../validation/neontometrics-2.csv)

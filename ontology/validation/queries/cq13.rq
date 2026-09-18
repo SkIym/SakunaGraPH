@@ -1,0 +1,21 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX ofn: <http://www.ontotext.com/sparql/functions/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?event ?eventName ?port ?locationLabel ?duration
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?disasterType ;
+        :hasAirportDisruption ?disruption .
+    ?disasterType skos:broader* :Geophysical .
+    ?disruption :hasLocation ?location .
+    ?location rdfs:label ?locationLabel .
+    OPTIONAL { ?disruption :portOrTerminalName ?port }
+    OPTIONAL { ?disruption :cancellationDateTime ?cancelled }
+    OPTIONAL { ?disruption :resumptionDateTime ?resumed }
+    OPTIONAL { ?event :eventName ?eventName }
+    BIND(xsd:decimal(ofn:asHours(?resumed - ?cancelled)) AS ?duration)
+}
+ORDER BY ?event ?port

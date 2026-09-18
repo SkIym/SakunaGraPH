@@ -1,0 +1,23 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?event ?eventName
+    (SUM(?agricultureDamage) AS ?agricultureDamage)
+    (SUM(?productionLossCost) AS ?productionLossCost)
+    (SUM(?productionLossVolume) AS ?productionLossVolume)
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?disasterType ;
+        :hasAgricultureDamage ?damage ;
+        :hasLocation ?location .
+    ?disasterType skos:broader* :TropicalCyclone .
+    ?location :isPartOf* :0500000000 .
+    ?damage :hasLocation ?location .
+    OPTIONAL { ?damage :productionLossCost [ qudt:numericValue ?productionLossCost ] }
+    OPTIONAL { ?damage :agriDamageAmount [ qudt:numericValue ?agricultureDamage ] }
+    OPTIONAL { ?damage :productionLossVolume ?productionLossVolume }
+    OPTIONAL { ?event :eventName ?eventName }
+}
+GROUP BY ?event ?eventName
+ORDER BY ?event

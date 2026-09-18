@@ -1,0 +1,5 @@
+eventType,region,eventCount
+<https://sakuna.ph/ArmedConflict>,"""Central Luzon""","""1""^^<http://www.w3.org/2001/XMLSchema#integer>"
+<https://sakuna.ph/FireMiscellaneous>,"""Central Luzon""","""1""^^<http://www.w3.org/2001/XMLSchema#integer>"
+<https://sakuna.ph/ForestFire>,"""CALABARZON""","""1""^^<http://www.w3.org/2001/XMLSchema#integer>"
+<https://sakuna.ph/Road>,"""CALABARZON""","""1""^^<http://www.w3.org/2001/XMLSchema#integer>"

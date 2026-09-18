@@ -1,0 +1,3 @@
+event,eventName,startDate,location,locLabel,regionLabel,disasterType
+<https://sakuna.ph/fixture/event/flash-flood-western>,"""Western Visayas Flash Flood""","""2022-06-01""^^<http://www.w3.org/2001/XMLSchema#date>",<https://sakuna.ph/fixture/location/iloilo-city>,"""Iloilo City""","""Western Visayas""",<https://sakuna.ph/FlashFlood>
+<https://sakuna.ph/fixture/event/riverine-flood-caraga>,"""Caraga Riverine Flood""","""2022-01-15""^^<http://www.w3.org/2001/XMLSchema#date>",<https://sakuna.ph/fixture/location/cabadbaran>,"""Cabadbaran""","""Caraga""",<https://sakuna.ph/RiverineFlood>

@@ -30,7 +30,10 @@ The published knowledge graph and ontology baseline is available in the
 | `docs/versioning-policy.md` | Stable namespace, SemVer, migration, import, and release policy. |
 | `release/manifest.schema.json` | Required structure for checksum-bearing ontology release manifests. |
 | `release/README.md` | Release identity and manifest preparation guide. |
-| `validation/competency_questions.md` | SPARQL competency questions for evaluating the graph. |
+| `validation/README.md` | Reproducible competency-suite workflow and GraphDB evidence boundary. |
+| `validation/competency-manifest.json` | Machine-readable metadata for all 20 competency questions. |
+| `validation/queries/`, `validation/expected/`, `validation/fixtures/` | Executable SPARQL, normalized expected rows, and the immutable synthetic graph. |
+| `validation/competency_questions.md` | Human-readable competency-question index and transcription notes. |
 | `validation/neontometrics-2.csv` | Ontology metrics export. |
 | `validation/pitfall-scanner-results-2.xml` | OOPS! Pitfall Scanner validation output. |
 
@@ -137,10 +140,16 @@ Use `shapes/shapes.ttl` to validate event and impact data, and
 implemented by `sakunagraph_etl.quality.shacl` and the package-owned source
 jobs under `sakunagraph_etl.sources`.
 
-The documented competency questions are in
-[`validation/competency_questions.md`](validation/competency_questions.md).
-OOPS! results and ontology metrics are retained in `validation/` as reference
-artifacts.
+All 20 competency questions are executable against a frozen synthetic graph. Run the offline
+preflight from the repository root:
+
+```bash
+python scripts/validate_semantics.py --competency
+```
+
+See [`validation/README.md`](validation/README.md) for the GraphDB 11.1.3/OWL2-RL acceptance lane,
+the machine-readable report option, and the distinction between the paper baseline and current
+test evidence. OOPS! results and ontology metrics remain in `validation/` as reference artifacts.
 
 From the repository root, the infrastructure-free portfolio demo parses the
 ontology and shape graphs, verifies the five-source synthetic RDF fixtures,

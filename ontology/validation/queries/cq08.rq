@@ -1,0 +1,17 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?source (SUM(?evacuationCount) AS ?total)
+WHERE {
+    ?event a :DisasterEvent ;
+        :startDate ?startDate ;
+        :hasDisasterType ?disasterType ;
+        :hasPreemptiveEvacuation ?evacuation ;
+        prov:wasDerivedFrom+/prov:wasAttributedTo ?source .
+    ?disasterType <http://www.w3.org/2004/02/skos/core#broader>* :TropicalCyclone .
+    ?evacuation :hasLocation ?location ; :evacuationCenters ?evacuationCount .
+    ?location :isPartOf* :0400000000 .
+    FILTER(YEAR(?startDate) = 2021)
+}
+GROUP BY ?source
+ORDER BY DESC(?total) ?source

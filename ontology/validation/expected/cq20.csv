@@ -1,0 +1,2 @@
+event1,eventName1,source1,startDate1,event2,eventName2,source2,startDate2
+<https://sakuna.ph/fixture/event/typhoon-alpha>,"""Typhoon Alpha""",<https://sakuna.ph/org/NDRRMC>,"""2023-10-02""^^<http://www.w3.org/2001/XMLSchema#date>",<https://sakuna.ph/fixture/event/typhoon-alpha-emdat>,"""Typhoon Alpha EM-DAT Record""",<https://sakuna.ph/org/CRED>,"""2023-10-02""^^<http://www.w3.org/2001/XMLSchema#date>"

@@ -1,495 +1,70 @@
-# Competency Questions
-
-### Namespace Prefix
-These are the prefixes for the namespaces needed to run SPARQL queries against the knowledge graph.
-
-```
-PREFIX :     <https://sakuna.ph/>
-PREFIX org:     <https://sakuna.ph/org/>
-PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
-PREFIX prov: <http://www.w3.org/ns/prov#>
-PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX owl:  <http://www.w3.org/2002/07/owl#>
-PREFIX qudt: <http://qudt.org/schema/qudt/>
-PREFIX cur:  <http://qudt.org/vocab/currency/>
-
-```
-
----
-
-### Disaster Event & Type Classification
-
-**CQ1.** What major events are classified under the Tropical Cyclone type (a narrower type of Storm → Meteorological → Natural), and which of them also have related incidents explicitly recorded?
-
-```
-SELECT DISTINCT ?event ?eventName ?startDate ?hasRelatedIncident
-    (IF (EXISTS { ?event :hasRelatedIncident ?any }, "Yes", "No") AS ?hasRelatedIncident)
-WHERE {
-    ?event  a                   :MajorEvent ;
-            :hasDisasterType    :TropicalCyclone ;
-            :startDate          ?startDate .
-
-    OPTIONAL { ?event :eventName  ?eventName }
-    OPTIONAL { ?event :hasRelatedIncident ?incident }
-}
-ORDER BY DESC(?startDate)
-
-
-```
-
-**CQ2.** Which disaster events (major or incident) are typed as Flash Flood or Riverine Flood (both narrower types of Flood → Hydrological), and what locations, from which regions, of the Philippines did they affect?
-
-```
-SELECT ?event ?eventName ?startDate ?location ?locLabel ?regionLabel ?disasterType
-WHERE {
-    VALUES ?disasterType { :FlashFlood :RiverineFlood }
-    ?event  a                :DisasterEvent ;
-            :hasDisasterType ?disasterType ;
-            :startDate       ?startDate ;
-            :hasLocation ?location .
-
-    ?location rdfs:label ?locLabel .
-
-    OPTIONAL { ?event :eventName ?eventName }
-    
-    ?location :isPartOf* ?region .
-    ?region a :Region ;
-            rdfs:label ?regionLabel .
-
-}
-ORDER BY DESC(?startDate)
-
-```
-
-**CQ3.** What is the full type hierarchy path from Mudslide up to its top-level parent, and how many disaster events are recorded under each level of that hierarchy?
-
-```
-SELECT ?ancestor ?ancestorLabel (COUNT(DISTINCT ?event) AS ?eventCount) 
-WHERE {
-  	:Mudslide skos:broader* ?ancestor .
-  	OPTIONAL { 	?ancestor skos:prefLabel ?ancestorLabel }
-  	OPTIONAL { 	?dt skos:broader* ?ancestor .
-             	?event a 	:DisasterEvent ; 
-        				:hasDisasterType ?dt }
-} 
-GROUP BY ?ancestor ?ancestorLabel ORDER BY DESC(?eventCount)
-```
-
-**CQ4.** Which disaster events are classified as Volcanic Activity subtypes (e.g., Ashfall, Lahar, Lava Flow, Pyroclastic Flow), and what provinces in Region V , Region III, Region VI were affected?
-
-```
-SELECT DISTINCT ?eventName ?startDate ?subtypeLabel ?provinceName ?regionName
-WHERE {
-  VALUES ?targetRegion { :0500000000 :0300000000 :0600000000}
-
-    ?event a :DisasterEvent ;
-                :hasDisasterType ?subtype ;
-                :startDate ?startDate ; 
-                :hasLocation ?location .
-
-    ?subtype skos:broader* :VolcanicActivity .
-
-    ?location :isPartOf* ?targetRegion .
-
-    ?location :isPartOf* ?province .
-    ?province a :Province ;
-                rdfs:label ?provinceName .
-
-    ?province :isPartOf+ ?region .
-    ?region a :Region ;
-            rdfs:label ?regionName .
-
-    OPTIONAL { ?event    :eventName  ?eventName     }
-    OPTIONAL { ?subtype  skos:prefLabel  ?subtypeLabel  }
-
-}
-ORDER BY ?subtype ?provinceName
-```
-
-**CQ5.** How many fire, transport, and armed conflict events or incidents were recorded in 2022 in Central Luzon and CALABARZON ?
-
-```
-SELECT ?eventType ?region (COUNT(DISTINCT ?event) AS ?eventCount)
-WHERE {
-    VALUES ?dtypes {:FireIndustrial :FireMiscellaneous :Wildfire :Transport :ArmedConflict }
-    VALUES ?targetRegions {:0300000000 :0400000000}
-    ?event 	a	:DisasterEvent ;
-            :startDate 	?startDate ;
-            :hasLocation ?location ;
-            :hasDisasterType ?eventType .
-    
-    ?location 	:isPartOf* ?targetRegions .
-    ?targetRegions rdfs:label ?region .
-    
-    ?eventType skos:broader* ?dtypes .
-    
-    FILTER (YEAR(?startDate) = 2022) 
-} 
-GROUP BY ?eventType ?region
-ORDER BY DESC(?eventCount)
-```
-
-### Impact: Casualties & Population
-
-**CQ6.** For disaster events affecting Western Visayas, what is the total number of displaced families and persons recorded across all events?
-
-```
-SELECT ?event ?eventName (SUM(?dfamilies) AS ?totalFamilies) (SUM(?dpersons) AS ?totalPersons) 
-WHERE {
-    ?event 	a	:DisasterEvent ;
-            :startDate 	?startDate ;
-            :hasLocation ?location ;
-    		:hasAffectedPopulation ?ap .
-    
-    ?location 	:isPartOf* :0600000000 .
-    ?ap			:hasLocation 	?location ;
-    			:displacedPersons ?dpersons ;
-    			:displacedFamilies ?dfamilies ; 
-    
-    OPTIONAL { ?event :eventName ?eventName }
-
-
-} 
-GROUP BY ?eventName ?event
-ORDER BY DESC(?totalPersons) DESC(?totalFamilies)
-```
-
-**CQ7.** What casualty counts (dead, missing, injured) were recorded for Ground Movement events, broken down by province in the Cordillera Administrative Region (CAR)?
-
-```
-SELECT DISTINCT ?provName ?casualtyType (SUM(?casualtyCount) AS ?total) 
-WHERE {
-    ?event 	a	:DisasterEvent ;
-            :hasLocation ?location ;
-    		:hasDisasterType ?dtype ;
-    		:hasCasualties ?cas .
-    
-    ?dtype		skos:broader* :GroundMovement .
-    ?location 	:isPartOf* ?prov .
-    ?prov		a		:Province ;
-    			rdfs:label 	?provName ;
-            	:isPartOf+  :1400000000 .
-            
-    ?cas		:hasLocation 	?location ;
-                :casualtyCount ?casualtyCount ;
-                :isOfCasualtyType  ?casualtyType .
- 
-} 
-GROUP BY ?provName ?casualtyType
-ORDER BY DESC(?total)
-```
-
-**CQ8.** How many evacuation centers were recorded for Tropical Cyclone events that affected Region IV-A (CALABARZON) in 2021, and from which sources are these attributed?
-
-```
-SELECT ?source (SUM(?evacCount) AS ?total) 
-WHERE {
-    ?event 	a	:DisasterEvent ;
-    		:hasDisasterType ?dtype ;
-    		:hasPreemptiveEvacuation ?pevac ;
-    		prov:wasDerivedFrom+/prov:wasAttributedTo ?source .
-    
-    ?dtype		skos:broader* :TropicalCyclone .
-    ?location 	:isPartOf* 	:0400000000 .
-    ?pevac		:hasLocation 	?location ;
-                :evacuationCenters ?evacCount .
-    
- 
-} 
-GROUP BY ?source
-ORDER BY DESC(?total)
-```
-
-### Impact: Damage
-
-**CQ9.** # What is the recorded total infrastructure damage cost in M PHP for Flood events in Region XIII (Caraga)?
-
-
-```
-SELECT ?event ?eventName 
-	(
-    SUM(
-        COALESCE(?comVal, 0) + 
-        COALESCE(?croVal, 0) + 
-        COALESCE(?infVal, 0) +
-        COALESCE(?socVal, 0)
-    ) AS ?total)
-WHERE {
-    ?event  a                       :DisasterEvent ;
-            :hasDisasterType        ?dtype ;
-            :hasInfrastructureDamage ?infra ;
-            :hasLocation            ?location .
-
-    ?dtype      skos:broader*   :Flood .
-    ?location :isPartOf*   :1600000000 .
-    ?infra  :hasLocation        ?location .
-    
-    ?location rdfs:label ?locationLabel
-
-    OPTIONAL { ?infra :commercialDamageAmount    [ qudt:numericValue ?comVal ] }
-    OPTIONAL { ?infra :crossSectoralDamageAmount [ qudt:numericValue ?croVal ] }
-    OPTIONAL { ?infra :infraDamageAmount         [ qudt:numericValue ?infVal ] }
-    OPTIONAL { ?infra :socialDamageAmount        [ qudt:numericValue ?socVal ] }
-    OPTIONAL { ?event :eventName ?eventName }
-
-}
-GROUP BY ?event ?eventName
-ORDER BY DESC(?total)
-```
-
-**CQ10.**  How many recorded houses were totally versus partially damaged by Meteorological events in provinces of Region VIII (Eastern Visayas)?
-
-```
-SELECT ?provName
-	(SUM(?partially) AS ?totalPartially)	
-	(SUM(?totally) AS ?totalTotally)
-WHERE {
-    ?event  a                       :DisasterEvent ;
-            :hasDisasterType        ?dtype ;
-            :hasHousingDamage 		?hou ;
-            :hasLocation            ?location .
-
-    ?dtype      skos:broader*   :Meteorological .
-    ?location 	:isPartOf* ?prov .
-    ?prov		a		:Province ;
-    			rdfs:label 	?provName ;
-            	:isPartOf+  :0800000000 .
-    
-    ?hou  		:hasLocation    ?location .
-    
-    ?location rdfs:label ?locationLabel
-
-    OPTIONAL { ?hou :partiallyDamagedHouses ?partially }
-    OPTIONAL { ?hou :totallyDamagedHouses ?totally }
-    OPTIONAL { ?event :eventName ?eventName }
-
-}
-GROUP BY ?provName
-```
-
-**CQ11.** For Tropical Cyclone events affecting Region V (Bicol Region), what agriculture damage was recorded? Give either the total amount damage to agriculture or the production loss volume (in metric tons) and total production loss cost.
-
-```
-SELECT ?event ?eventName
-	(SUM(?admg) AS ?admg)	
-	(SUM(?plc) AS ?plc)
-	(SUM(?plv) AS ?plv)
-WHERE {
-    ?event  a                       :DisasterEvent ;
-            :hasDisasterType        ?dtype ;
-            :hasAgricultureDamage 	?agri ;
-            :hasLocation            ?location .
-
-    ?dtype      skos:broader*   :TropicalCyclone .
-    ?location 	:isPartOf* :0500000000 .
-    ?agri  		:hasLocation    ?location .
-
-    OPTIONAL { ?agri :productionLossCost 	[ qudt:numericValue ?plc] }
-    OPTIONAL { ?agri :agriDamageAmount 		[ qudt:numericValue ?admg] }
-    OPTIONAL { ?agri :productionLossVolume 	?plv }
-    OPTIONAL { ?event :eventName ?eventName }
-
-}
-GROUP BY ?event ?eventName
-```
-
-### Impact: Service Disruptions
-
-**CQ12.** Which Tropical Cyclone events caused seaport disruptions, what ports or terminals in which location were affected, and what was the latest port status recorded?
-
-```
-SELECT ?event ?eventName ?port ?locationLabel ?status
-WHERE {
-    ?event  a                       :DisasterEvent ;
-            :hasDisasterType        ?dtype ;
-            :hasSeaportDisruption 	?sd .
-
-    ?dtype      skos:broader*   :TropicalCyclone .
-    ?sd  		:hasLocation    ?location .
-    ?location   rdfs:label 		?locationLabel
-
-    OPTIONAL { ?sd :portOrTerminalName 	?port }
-    OPTIONAL { ?sd :portStatus 			?status }
-    OPTIONAL { ?event :eventName ?eventName }
-
-}
-```
-
-**CQ13.** For Geophysical events, which airports in which locations experienced disruptions, and how long in hours were the flights cancelled for?
-
-```
-PREFIX ofn: <http://www.ontotext.com/sparql/functions/>
-SELECT ?event ?eventName ?port ?locationLabel ?duration
-WHERE {
-    ?event  a                       :DisasterEvent ;
-            :hasDisasterType        ?dtype ;
-            :hasAirportDisruption 	?ad .
-
-    ?dtype      skos:broader*   :Geophysical .
-    ?ad  		:hasLocation    ?location .
-    ?location   rdfs:label 		?locationLabel
-
-    OPTIONAL { ?ad :portOrTerminalName 	?port }
-    OPTIONAL { ?ad :cancellationDateTime 	?cdt }
-    OPTIONAL { ?ad :resumptionDateTime 	?rdt }
-    OPTIONAL { ?event :eventName ?eventName }
-    BIND ( ofn:asHours(?rdt - ?cdt)  AS ?duration)
-
-}
-
-```
-
-**CQ14.** Which disaster events caused class suspensions in the National Capital Region (NCR), and at what grade levels were suspensions imposed?
-
-```
-SELECT ?event ?eventName ?label ?fromLevel ?toLevel
-WHERE {
-    ?event 	a	:DisasterEvent ;
-                :hasClassSuspension	?cls .
-
-    ?cls :hasLocation ?location .
-    ?location :isPartOf* :1300000000 .
-    ?location rdfs:label ?label .
-
-    OPTIONAL { ?event  :eventName     ?eventName }
-    OPTIONAL { ?cls :fromClassLevel   ?fromLevel }
-    OPTIONAL { ?cls :toClassLevel     ?toLevel   }
-    }
-```
-
-### Response & Preparedness
-
-**CQ15.** What assistance was provided in response to disaster events in Isabela, broken down by source, and which organizations contributed?
-
-```
-SELECT ?event ?eventName ?src ?ic ?contribution ?type ?org
-WHERE {
-    ?event  a                       :DisasterEvent ;
-            :hasAssistance 			?ass ;
-    		prov:wasDerivedFrom+/prov:wasAttributedTo ?src .
-
-    ?ass  		:hasLocation    ?location .
-    ?location   :isPartOf*		:0203100000 .
-
-    OPTIONAL { ?ass :itemTypeOrNeeds ?type }
-    OPTIONAL { ?ass :contributingOrg 	?org }
-    OPTIONAL { ?ass :contributionAmount [ qudt:numericValue ?contribution ] }
-    OPTIONAL { ?event :eventName ?eventName }
-
-}    
-```
-
-**CQ16.** Which disaster events triggered a Declaration of Calamity in provinces of Region XII (SOCCSKSARGEN), in which specific locations, and on what date was it resolved?
-
-```
-SELECT ?provName 
-(GROUP_CONCAT(
-        CONCAT(
-            COALESCE(STR(?eventName), "no name"), " - ", 
-            COALESCE(STR(?date), "unknown"), " - ",
-            STR(?locationLabel)
-        ); separator="\n") AS ?event_list)
-WHERE {
-    ?event  a                           :DisasterEvent ;
-            :hasLocation                ?location ;
-            :hasDeclarationOfCalamity   ?dec .
-    ?dec        :hasLocation    ?location .
-    ?prov       a               :Province ;
-                rdfs:label      ?provName ;
-                :isPartOf+      :1200000000 .
-    ?location   :isPartOf*      ?prov ;
-    			rdfs:label		?locationLabel .
-    
-    OPTIONAL { ?dec :declarationType    ?type }
-    OPTIONAL { ?dec :resolutionDate     ?date }
-    OPTIONAL { ?event :eventName        ?eventName }
-}
-GROUP BY ?provName
-```
-
-**CQ17.** Which disaster events in Mindanao have rescue operations recorded? Include rescue units deployed and equipment used.
-
-```
-SELECT DISTINCT ?event ?eventName ?unit ?equip
-WHERE {
-    ?event  a                           :DisasterEvent ;
-            :hasRescue                	?res .
-    
-    ?res        :hasLocation    ?location .
-    ?location   :isPartOf*      :Mindanao ;
-    
-    OPTIONAL { ?event :eventName ?eventName }    
-    OPTIONAL { ?res :rescueUnit ?unit }   
-    OPTIONAL { ?res :rescueEquipment ?equip }
-
-}
-
-```
-
-**CQ18.** Which 4th income class municipalities in Region 9 experienced at least one disaster event, and did any of those events have preemptive evacuation recorded?
-
-```
-SELECT  
-    (CONCAT(?munName, ", ", ?provName) AS ?loc)
-    (IF (MAX(IF (EXISTS { ?event :hasPreemptiveEvacuation ?pre . }, 1, 0)) > 0, "Yes", "No") AS ?didpreempt)
-WHERE {
-    ?event  a               :DisasterEvent ;
-            :hasLocation    ?mun .
-
-    ?mun    a                       :Municipality ;
-            rdfs:label              ?munName ;
-            :isPartOf*             :0900000000 ;
-            :incomeClassification   ?class ;
-            :isPartOf               ?parent .
-   
-    ?parent a           :Province ;
-            rdfs:label  ?provName .
-    
-    FILTER(?class = "4th")  
-}
-GROUP BY ?mun ?munName ?provName
-```
-
-### Provenance
-
-**CQ19.** How many technological fire disaster incidents were recorded in DROMIC reports compared to EM-DAT (CRED) entries for the enitre Philippines?
-
-```
-SELECT  ?targetOrgs (COUNT(?event) AS ?number)
-WHERE {
-	VALUES ?targetTypes { :FireMiscellaneous :FireIndustrial }
-    VALUES	?targetOrgs { org:DROMIC org:CRED }
-    ?event  a	:DisasterEvent ;
-			:hasDisasterType ?targetTypes ;
-			prov:wasDerivedFrom+/prov:wasAttributedTo ?targetOrgs .
-}
-GROUP BY ?targetOrgs
-```
-
-**CQ20.** Which disaster events were reported in more than one source? What are their event names and start dates?
-
-```
-SELECT ?e1 ?eventName1 ?s1 ?d1 ?e2 ?eventName2 ?s2 ?d2
-WHERE {
-
-  ?e1 a :DisasterEvent .
-  ?e2 a :DisasterEvent .
-  ?e1 prov:alternateOf ?e2 .
-  
-  ?e1 prov:wasDerivedFrom+/prov:wasAttributedTo ?s1 .
-  ?e2 prov:wasDerivedFrom+/prov:wasAttributedTo ?s2 . 
-    
-  ?s1 a prov:Organization .
-  ?s2 a prov:Organization .
-    
-  ?e1 :startDate ?d1 .
-  ?e2 :startDate ?d2 .
-
-  OPTIONAL { ?e1 :eventName ?eventName1 }
-  OPTIONAL { ?e2 :eventName ?eventName2 }
-  
-    
-  FILTER(STR(?e1) < STR(?e2))
-}
-```
+# Executable competency questions
+
+The 20 competency questions reported in the project paper are now executable. Their normative
+catalog is [`competency-manifest.json`](competency-manifest.json), their SPARQL lives under
+[`queries/`](queries/), and exact normalized results live under [`expected/`](expected/). All cases
+use the immutable synthetic graph [`fixtures/competency-v1.ttl`](fixtures/competency-v1.ttl).
+
+The paper reported that all 20 questions succeeded for its study snapshot (pages 12-20). That is a
+historical claim. The executable suite is separately dated repository evidence for the current
+ontology and fixture.
+
+## Categories and traceability
+
+| Questions | Paper category | Requirement IDs |
+| --- | --- | --- |
+| CQ01-CQ05 | Event and type classification | OR-02, OR-03, OR-08 |
+| CQ06-CQ08 | Casualties and population | OR-02, OR-04, OR-05, OR-07, OR-08 |
+| CQ09-CQ11 | Damage | OR-02, OR-04, OR-06, OR-08 |
+| CQ12-CQ14 | Service disruptions | OR-02, OR-04, OR-07, OR-08 |
+| CQ15-CQ18 | Response and preparedness | OR-02, OR-05, OR-06, OR-07 |
+| CQ19-CQ20 | Provenance | OR-03, OR-05, OR-08 |
+
+The paper text called these "five categories" but listed six. The repository consistently uses all
+six. Per-question pages, requirement links, result columns, ordering behavior, and required
+inference are recorded in the machine-readable manifest rather than repeated here.
+
+## Query index
+
+| ID | Information need | SPARQL | Expected result |
+| --- | --- | --- | --- |
+| CQ01 | Tropical Cyclone major events and related incidents | [query](queries/cq01.rq) | [CSV](expected/cq01.csv) |
+| CQ02 | Flash/Riverine Flood events, affected locations, and PSGC regions | [query](queries/cq02.rq) | [CSV](expected/cq02.csv) |
+| CQ03 | Mudslide's complete broader hierarchy and event counts at each level | [query](queries/cq03.rq) | [CSV](expected/cq03.csv) |
+| CQ04 | Volcanic Activity subtypes and affected provinces in Regions V, III, and VI | [query](queries/cq04.rq) | [CSV](expected/cq04.csv) |
+| CQ05 | Fire, transport, and armed-conflict events in Central Luzon/CALABARZON during 2022 | [query](queries/cq05.rq) | [CSV](expected/cq05.csv) |
+| CQ06 | Displaced families and persons reported for events affecting Western Visayas | [query](queries/cq06.rq) | [CSV](expected/cq06.csv) |
+| CQ07 | Dead, missing, and injured counts for Ground Movement events in CAR provinces | [query](queries/cq07.rq) | [CSV](expected/cq07.csv) |
+| CQ08 | Evacuation centers and their sources for 2021 CALABARZON Tropical Cyclones | [query](queries/cq08.rq) | [CSV](expected/cq08.csv) |
+| CQ09 | Infrastructure-damage cost in millions of PHP for Caraga Flood events | [query](queries/cq09.rq) | [CSV](expected/cq09.csv) |
+| CQ10 | Totally versus partially damaged houses from Meteorological events in Eastern Visayas | [query](queries/cq10.rq) | [CSV](expected/cq10.csv) |
+| CQ11 | Agriculture damage, production-loss cost, and loss volume for Bicol Tropical Cyclones | [query](queries/cq11.rq) | [CSV](expected/cq11.csv) |
+| CQ12 | Seaport disruptions and latest reported port status from Tropical Cyclones | [query](queries/cq12.rq) | [CSV](expected/cq12.csv) |
+| CQ13 | Airports disrupted by Geophysical events and cancellation duration in hours | [query](queries/cq13.rq) | [CSV](expected/cq13.csv) |
+| CQ14 | NCR class suspensions and affected grade levels | [query](queries/cq14.rq) | [CSV](expected/cq14.csv) |
+| CQ15 | Assistance in Isabela by source and contributing organization | [query](queries/cq15.rq) | [CSV](expected/cq15.csv) |
+| CQ16 | Declarations of calamity in SOCCSKSARGEN provinces and their resolution dates | [query](queries/cq16.rq) | [CSV](expected/cq16.csv) |
+| CQ17 | Mindanao rescue reports, deployed units, and equipment | [query](queries/cq17.rq) | [CSV](expected/cq17.csv) |
+| CQ18 | Fourth-income-class Region IX municipalities and preemptive evacuations | [query](queries/cq18.rq) | [CSV](expected/cq18.csv) |
+| CQ19 | DROMIC versus EM-DAT technological fire-record counts | [query](queries/cq19.rq) | [CSV](expected/cq19.csv) |
+| CQ20 | Pairwise alternate event records reported by multiple sources | [query](queries/cq20.rq) | [CSV](expected/cq20.csv) |
+
+## Transcription corrections
+
+The original Markdown transcription of the paper was not a directly runnable test suite. The split
+query files preserve each information need while making these explicit corrections:
+
+- CQ01 removes a duplicate projected variable and uses a grouped optional incident assertion that
+  both RDFLib and GraphDB execute.
+- CQ06 removes a dangling semicolon that made its graph pattern invalid.
+- CQ08 adds the 2021 filter stated by the question.
+- CQ13 retains GraphDB's `ofn:asHours` function; the local preflight registers an equivalent
+  duration-to-decimal-hours function solely for fixture execution.
+- CQ15 removes the projected `?ic` variable, which was never bound and was not part of the
+  information need.
+- CQ16 normalizes the resolution timestamp to its calendar date so the two engines do not differ
+  only on `Z` versus `+00:00` lexical rendering.
+- Every query has a deterministic tie-breaker where result order is part of its contract.
+
+See [`README.md`](README.md) for the offline and GraphDB commands and the evidence boundary between
+their results.

@@ -1,0 +1,4 @@
+eventName,startDate,subtypeLabel,provinceName,regionName
+"""Bicol Ashfall""","""2020-01-12""^^<http://www.w3.org/2001/XMLSchema#date>","""Ashfall""@en","""Albay""","""Bicol Region"""
+"""Central Luzon Lahar""","""2021-07-30""^^<http://www.w3.org/2001/XMLSchema#date>","""Lahar""@en","""Nueva Ecija""","""Central Luzon"""
+"""Western Visayas Lava Flow""","""2019-04-05""^^<http://www.w3.org/2001/XMLSchema#date>","""Lava Flow""@en","""Iloilo""","""Western Visayas"""

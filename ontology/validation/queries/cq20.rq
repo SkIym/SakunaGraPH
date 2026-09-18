@@ -1,0 +1,19 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?event1 ?eventName1 ?source1 ?startDate1 ?event2 ?eventName2 ?source2 ?startDate2
+WHERE {
+    ?event1 a :DisasterEvent ;
+        prov:alternateOf ?event2 ;
+        prov:wasDerivedFrom+/prov:wasAttributedTo ?source1 ;
+        :startDate ?startDate1 .
+    ?event2 a :DisasterEvent ;
+        prov:wasDerivedFrom+/prov:wasAttributedTo ?source2 ;
+        :startDate ?startDate2 .
+    ?source1 a prov:Organization .
+    ?source2 a prov:Organization .
+    OPTIONAL { ?event1 :eventName ?eventName1 }
+    OPTIONAL { ?event2 :eventName ?eventName2 }
+    FILTER(STR(?event1) < STR(?event2))
+}
+ORDER BY ?event1 ?event2

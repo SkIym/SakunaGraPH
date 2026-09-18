@@ -20,6 +20,7 @@ ONTOLOGY = ROOT / "ontology" / "sakunagraph.ttl"
 TAXONOMY = ROOT / "ontology" / "disaster_type_scheme.ttl"
 SHAPES_ROOT = ROOT / "ontology" / "shapes"
 BASELINES = ROOT / "sakunagraph_etl" / "tests" / "baselines.json"
+COMPETENCY_MANIFEST = ROOT / "ontology" / "validation" / "competency-manifest.json"
 GOLDEN_ROOT = BASELINES.parent
 
 
@@ -68,9 +69,11 @@ def load_verified_fixtures() -> tuple[Graph, list[str]]:
 
 
 def competency_question_count() -> int:
-    path = ROOT / "ontology" / "validation" / "competency_questions.md"
-    lines = path.read_text(encoding="utf-8").splitlines()
-    return sum(1 for line in lines if line.startswith("**CQ"))
+    manifest = json.loads(COMPETENCY_MANIFEST.read_text(encoding="utf-8"))
+    queries = manifest.get("queries")
+    if not isinstance(queries, list):
+        raise RuntimeError("Competency manifest has no query catalog")
+    return len(queries)
 
 
 def source_name(event: URIRef) -> str:

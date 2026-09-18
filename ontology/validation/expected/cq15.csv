@@ -1,0 +1,2 @@
+event,eventName,source,contribution,type,organization
+<https://sakuna.ph/fixture/event/isabela-assistance>,"""Isabela Assistance Event""",<https://sakuna.ph/org/NDRRMC>,"""1000.0""^^<http://www.w3.org/2001/XMLSchema#decimal>","""Food packs""",<https://sakuna.ph/org/DSWD>

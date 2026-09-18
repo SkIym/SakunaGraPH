@@ -1,0 +1,19 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?eventType ?region (COUNT(DISTINCT ?event) AS ?eventCount)
+WHERE {
+    VALUES ?targetType { :FireIndustrial :FireMiscellaneous :Wildfire :Transport :ArmedConflict }
+    VALUES ?targetRegion { :0300000000 :0400000000 }
+    ?event a :DisasterEvent ;
+        :startDate ?startDate ;
+        :hasLocation ?location ;
+        :hasDisasterType ?eventType .
+    ?location :isPartOf* ?targetRegion .
+    ?targetRegion rdfs:label ?region .
+    ?eventType skos:broader* ?targetType .
+    FILTER(YEAR(?startDate) = 2022)
+}
+GROUP BY ?eventType ?region
+ORDER BY DESC(?eventCount) ?eventType ?region

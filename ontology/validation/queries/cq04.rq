@@ -1,0 +1,19 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT DISTINCT ?eventName ?startDate ?subtypeLabel ?provinceName ?regionName
+WHERE {
+    VALUES ?targetRegion { :0500000000 :0300000000 :0600000000 }
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?subtype ;
+        :startDate ?startDate ;
+        :hasLocation ?location .
+    ?subtype skos:broader* :VolcanicActivity .
+    ?location :isPartOf* ?targetRegion ; :isPartOf* ?province .
+    ?province a :Province ; rdfs:label ?provinceName ; :isPartOf+ ?region .
+    ?region a :Region ; rdfs:label ?regionName .
+    OPTIONAL { ?event :eventName ?eventName }
+    OPTIONAL { ?subtype skos:prefLabel ?subtypeLabel }
+}
+ORDER BY ?subtype ?provinceName ?eventName

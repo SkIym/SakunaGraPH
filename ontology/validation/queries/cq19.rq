@@ -1,0 +1,14 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX org: <https://sakuna.ph/org/>
+PREFIX prov: <http://www.w3.org/ns/prov#>
+
+SELECT ?source (COUNT(DISTINCT ?event) AS ?number)
+WHERE {
+    VALUES ?targetType { :FireMiscellaneous :FireIndustrial }
+    VALUES ?source { org:DROMIC org:CRED }
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?targetType ;
+        prov:wasDerivedFrom+/prov:wasAttributedTo ?source .
+}
+GROUP BY ?source
+ORDER BY ?source

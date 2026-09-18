@@ -1,0 +1,13 @@
+PREFIX : <https://sakuna.ph/>
+
+SELECT DISTINCT ?event ?eventName ?startDate
+    (IF(COUNT(?incident) > 0, "Yes", "No") AS ?hasRelatedIncident)
+WHERE {
+    ?event a :MajorEvent ;
+        :hasDisasterType :TropicalCyclone ;
+        :startDate ?startDate .
+    OPTIONAL { ?event :eventName ?eventName }
+    OPTIONAL { ?event :hasRelatedIncident ?incident }
+}
+GROUP BY ?event ?eventName ?startDate
+ORDER BY DESC(?startDate) ?event

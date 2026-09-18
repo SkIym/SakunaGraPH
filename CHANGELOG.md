@@ -26,6 +26,8 @@ set being published.
   `https://sakuna.ph/cluster/`.
 - A release-manifest schema for the selected `owl:versionInfo` plus immutable tag/checksum release
   strategy.
+- Executable CQ01-CQ20 semantic regressions with a checksum-pinned synthetic fixture, normalized
+  expected results, RDFLib/OWL-RL preflight, and a read-only GraphDB 11.1.3 acceptance lane.
 
 ### Clarified
 

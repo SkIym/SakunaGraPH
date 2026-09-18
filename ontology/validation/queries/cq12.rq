@@ -1,0 +1,17 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?event ?eventName ?port ?locationLabel ?status
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?disasterType ;
+        :hasSeaportDisruption ?disruption .
+    ?disasterType skos:broader* :TropicalCyclone .
+    ?disruption :hasLocation ?location .
+    ?location rdfs:label ?locationLabel .
+    OPTIONAL { ?disruption :portOrTerminalName ?port }
+    OPTIONAL { ?disruption :portStatus ?status }
+    OPTIONAL { ?event :eventName ?eventName }
+}
+ORDER BY ?event ?port

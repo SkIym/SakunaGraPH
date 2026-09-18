@@ -28,6 +28,11 @@ The fixture catalog in `sakunagraph_etl/tests/baselines.json` records a SHA-256 
 deterministic IRI, triple count, representative triple, and builder for every source. Run
 `python scripts/portfolio_demo.py` after installing RDFLib to verify them.
 
+`ontology/validation/fixtures/competency-v1.ttl` is a separate, wholly synthetic semantic-query
+fixture. Its invented events, locations, reports, and values do not reproduce source records. Its
+normalized checksum and exact CQ01-CQ20 expectations are recorded in
+`ontology/validation/competency-manifest.json`.
+
 ## Derived RDF and releases
 
 Whether derived RDF may be redistributed depends on the source and the content retained. A change

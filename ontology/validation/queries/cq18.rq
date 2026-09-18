@@ -1,0 +1,17 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT (CONCAT(?munName, ", ", ?provName) AS ?location)
+    (IF(COUNT(?preemptiveEvacuation) > 0, "Yes", "No") AS ?hasPreemptiveEvacuation)
+WHERE {
+    ?event a :DisasterEvent ; :hasLocation ?municipality .
+    ?municipality a :Municipality ;
+        rdfs:label ?munName ;
+        :isPartOf* :0900000000 ;
+        :incomeClassification "4th" ;
+        :isPartOf ?parent .
+    ?parent a :Province ; rdfs:label ?provName .
+    OPTIONAL { ?event :hasPreemptiveEvacuation ?preemptiveEvacuation }
+}
+GROUP BY ?municipality ?munName ?provName
+ORDER BY ?location

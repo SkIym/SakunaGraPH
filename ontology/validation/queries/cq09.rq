@@ -1,0 +1,23 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX qudt: <http://qudt.org/schema/qudt/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?event ?eventName
+    (SUM(COALESCE(?commercial, 0) + COALESCE(?crossSectoral, 0) +
+         COALESCE(?infrastructure, 0) + COALESCE(?social, 0)) AS ?total)
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?disasterType ;
+        :hasInfrastructureDamage ?damage ;
+        :hasLocation ?location .
+    ?disasterType skos:broader* :Flood .
+    ?location :isPartOf* :1600000000 .
+    ?damage :hasLocation ?location .
+    OPTIONAL { ?damage :commercialDamageAmount [ qudt:numericValue ?commercial ] }
+    OPTIONAL { ?damage :crossSectoralDamageAmount [ qudt:numericValue ?crossSectoral ] }
+    OPTIONAL { ?damage :infraDamageAmount [ qudt:numericValue ?infrastructure ] }
+    OPTIONAL { ?damage :socialDamageAmount [ qudt:numericValue ?social ] }
+    OPTIONAL { ?event :eventName ?eventName }
+}
+GROUP BY ?event ?eventName
+ORDER BY DESC(?total) ?event

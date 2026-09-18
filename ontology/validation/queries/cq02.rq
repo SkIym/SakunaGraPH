@@ -1,0 +1,16 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?event ?eventName ?startDate ?location ?locLabel ?regionLabel ?disasterType
+WHERE {
+    VALUES ?disasterType { :FlashFlood :RiverineFlood }
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?disasterType ;
+        :startDate ?startDate ;
+        :hasLocation ?location .
+    ?location rdfs:label ?locLabel ;
+        :isPartOf* ?region .
+    ?region a :Region ; rdfs:label ?regionLabel .
+    OPTIONAL { ?event :eventName ?eventName }
+}
+ORDER BY DESC(?startDate) ?event

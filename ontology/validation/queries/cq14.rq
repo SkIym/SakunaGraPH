@@ -1,0 +1,13 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?event ?eventName ?label ?fromLevel ?toLevel
+WHERE {
+    ?event a :DisasterEvent ; :hasClassSuspension ?suspension .
+    ?suspension :hasLocation ?location .
+    ?location :isPartOf* :1300000000 ; rdfs:label ?label .
+    OPTIONAL { ?event :eventName ?eventName }
+    OPTIONAL { ?suspension :fromClassLevel ?fromLevel }
+    OPTIONAL { ?suspension :toClassLevel ?toLevel }
+}
+ORDER BY ?event ?label

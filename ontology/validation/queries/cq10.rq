@@ -1,0 +1,21 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?provName
+    (SUM(?partially) AS ?totalPartially)
+    (SUM(?totally) AS ?totalTotally)
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasDisasterType ?disasterType ;
+        :hasHousingDamage ?damage ;
+        :hasLocation ?location .
+    ?disasterType skos:broader* :Meteorological .
+    ?location :isPartOf* ?province .
+    ?province a :Province ; rdfs:label ?provName ; :isPartOf+ :0800000000 .
+    ?damage :hasLocation ?location .
+    OPTIONAL { ?damage :partiallyDamagedHouses ?partially }
+    OPTIONAL { ?damage :totallyDamagedHouses ?totally }
+}
+GROUP BY ?provName
+ORDER BY ?provName

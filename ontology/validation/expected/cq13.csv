@@ -1,0 +1,2 @@
+event,eventName,port,locationLabel,duration
+<https://sakuna.ph/fixture/event/ground-movement-car>,"""CAR Ground Movement""","""Loakan Airport""","""Baguio""","""6.0""^^<http://www.w3.org/2001/XMLSchema#decimal>"

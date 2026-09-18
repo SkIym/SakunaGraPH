@@ -1,0 +1,12 @@
+PREFIX : <https://sakuna.ph/>
+
+SELECT DISTINCT ?event ?eventName ?unit ?equipment
+WHERE {
+    ?event a :DisasterEvent ; :hasRescue ?rescue .
+    ?rescue :hasLocation ?location .
+    ?location :isPartOf* :Mindanao .
+    OPTIONAL { ?event :eventName ?eventName }
+    OPTIONAL { ?rescue :rescueUnit ?unit }
+    OPTIONAL { ?rescue :rescueEquipment ?equipment }
+}
+ORDER BY ?event ?unit ?equipment

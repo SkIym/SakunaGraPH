@@ -1,0 +1,19 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+
+SELECT ?provName ?casualtyType (SUM(?casualtyCount) AS ?total)
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasLocation ?location ;
+        :hasDisasterType ?disasterType ;
+        :hasCasualties ?casualties .
+    ?disasterType skos:broader* :GroundMovement .
+    ?location :isPartOf* ?province .
+    ?province a :Province ; rdfs:label ?provName ; :isPartOf+ :1400000000 .
+    ?casualties :hasLocation ?location ;
+        :casualtyCount ?casualtyCount ;
+        :isOfCasualtyType ?casualtyType .
+}
+GROUP BY ?provName ?casualtyType
+ORDER BY DESC(?total) ?casualtyType

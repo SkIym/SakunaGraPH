@@ -98,6 +98,8 @@ empty string MUST NOT be emitted as factual values.
   `sgsh:ResponseShape`, and `sgsh:SourceShape`.
 - Current checks: `scripts/portfolio_demo.py` validates all five golden source fixture digests,
   parses their combined RDF, and executes a smoke query.
+- Semantic regression: `scripts/validate_semantics.py --competency` executes CQ01-CQ20 against a
+  checksum-pinned synthetic graph in the offline preflight and GraphDB acceptance lanes.
 
 ### Acceptance condition
 
@@ -112,9 +114,9 @@ For one legally redistributable fixture from each of NDRRMC, DROMIC, GDA, EM-DAT
 
 ### Remaining evidence gap
 
-The golden fixtures prove deterministic RDF but do not yet execute every requirement-level
-assertion above in one named OR-01 test. The versioned source-profile and severity system required
-by ODR-0018 is also not yet complete. Add both when the semantic validation runner is implemented.
+The competency runner covers integrated query behavior but does not execute every source-job and
+publication assertion above in one named OR-01 test. The versioned source-profile and severity
+system required by ODR-0018 is also not yet complete.
 
 ## OR-02: PSGC-grounded location and hierarchy
 
@@ -165,6 +167,8 @@ regime.
   `api/tests/test_ask_query_compiler.py`,
   `api/tests/test_analysis_events.py`, and
   `api/tests/test_analysis_metrics.py` assert hierarchy traversal in generated SPARQL.
+- Semantic regression: CQ02, CQ04, and the other location-filtered cases run against the frozen
+  PSGC hierarchy slice; the GraphDB lane verifies direct transitive `:isPartOf` entailment.
 
 ### Acceptance condition
 
@@ -219,6 +223,8 @@ declared disjoint.
   `api/tests/test_ask_query_compiler.py`,
   `api/tests/test_analysis_metrics.py`, and
   `frontend/tests/component/VisualInteractionRegression.test.js` exercise both event types.
+- Semantic regression: CQ01, CQ05, CQ19, and CQ20 run against distinct major-event and incident
+  fixture resources; the GraphDB lane verifies their inferred shared `:DisasterEvent` type.
 
 ### Acceptance condition
 
@@ -234,8 +240,8 @@ A fixture containing one major event and one related incident MUST:
 ### Remaining evidence gap
 
 The current SHACL shapes validate class-specific properties but do not themselves enforce the OWL
-disjointness rule. The future semantic runner must execute the intended reasoner and include a
-negative dual-type fixture.
+disjointness rule. Step 4 verifies positive subclass inference; a later reasoner-quality step must
+still add a negative dual-type inconsistency fixture.
 
 ## OR-04: Source-preserving impact granularity
 
@@ -283,6 +289,8 @@ aggregate category values rather than individually identified damaged assets.
   `sakunagraph_etl/tests/test_impact.py` checks impact extraction behavior, while
   `api/tests/test_analysis_metrics.py` and `api/tests/test_analysis_events.py` exercise graph
   aggregation/query construction.
+- Semantic regression: CQ06-CQ14 run with exact expected values over separate population,
+  casualty, damage, and disruption resources in the checksum-pinned fixture.
 
 ### Acceptance condition
 
@@ -294,8 +302,9 @@ An impact resource with only `:hasLocation` and no reported detail MUST fail
 
 ### Remaining evidence gap
 
-Current tests do not execute CQ6-CQ14 as a frozen end-to-end semantic regression suite, and there is
-no requirement-level test demonstrating that cross-source aggregation avoids double counting.
+CQ06-CQ14 now execute as a frozen semantic regression suite. There is still no mixed-source
+requirement fixture demonstrating that aggregation avoids double counting independently reported
+values.
 
 ## OR-05: Provenance and alternate source records
 
@@ -341,6 +350,8 @@ through a canonical alignment using `prov:alternateOf` rather than destructively
   `api/tests/test_analysis_events.py`,
   `api/tests/test_analysis_metrics.py`, and
   `api/tests/test_ask_query_compiler.py` assert `prov:alternateOf` traversal in query construction.
+- Semantic regression: CQ08, CQ15, CQ19, and CQ20 assert source attribution and pairwise
+  `prov:alternateOf` discovery over retained source event IRIs.
 
 ### Acceptance condition
 
@@ -401,6 +412,8 @@ documented conversion.
   `sgsh:CurrencyUnitShape` target QUDT resources.
 - Current tests: `api/tests/test_analysis_metrics.py` validates accepted QUDT unit identifiers in
   the analysis API.
+- Semantic regression: the CQ09, CQ11, and CQ15 fixture values retain `qudt:numericValue` and
+  `qudt:unit`; their query aggregates have exact normalized numeric expectations.
 
 ### Acceptance condition
 
@@ -461,6 +474,8 @@ and stakeholder requirement supports them.
   disruption shapes.
 - Current tests: `sakunagraph_etl/tests/test_impact.py` covers selected DROMIC assistance and
   preemptive-evacuation extraction.
+- Semantic regression: CQ08 and CQ12-CQ18 cover evacuation, three disruption/response patterns,
+  assistance, a calamity declaration, and report-level rescue data.
 
 ### Acceptance condition
 
@@ -471,9 +486,9 @@ location and no reported detail MUST fail the shared detail constraint.
 
 ### Remaining evidence gap
 
-The 20 competency questions are not yet automated as a frozen semantic suite. Full rescue
-mission/team workflows remain intentionally unsupported and must not be implied by the presence of
-the smaller `:Rescue` reporting class.
+The competency suite now covers the report-level response and preparedness information needs.
+SHACL conformance of positive/negative fixtures remains Step 5 work. Full rescue mission/team
+workflows remain intentionally unsupported and must not be implied by the smaller `:Rescue` class.
 
 ## OR-08: IRDR/EM-DAT-aligned SKOS disaster taxonomy
 
@@ -517,6 +532,8 @@ queries.
   `api/tests/test_ask_entity_resolver.py`,
   `api/tests/test_ask_query_compiler.py`, and
   `frontend/tests/unit/map-data.test.js`.
+- Semantic regression: CQ01-CQ05 execute taxonomy traversal and type-filtered event assertions
+  against the current SKOS scheme and frozen fixture.
 
 ### Acceptance condition
 

@@ -1,0 +1,20 @@
+PREFIX : <https://sakuna.ph/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?provName
+    (GROUP_CONCAT(CONCAT(
+        COALESCE(STR(?eventName), "no name"), " - ",
+        COALESCE(SUBSTR(STR(?date), 1, 10), "unknown"), " - ", STR(?locationLabel)
+    ); separator="\n") AS ?eventList)
+WHERE {
+    ?event a :DisasterEvent ;
+        :hasLocation ?location ;
+        :hasDeclarationOfCalamity ?declaration .
+    ?declaration :hasLocation ?location .
+    ?province a :Province ; rdfs:label ?provName ; :isPartOf+ :1200000000 .
+    ?location :isPartOf* ?province ; rdfs:label ?locationLabel .
+    OPTIONAL { ?declaration :resolutionDate ?date }
+    OPTIONAL { ?event :eventName ?eventName }
+}
+GROUP BY ?provName
+ORDER BY ?provName

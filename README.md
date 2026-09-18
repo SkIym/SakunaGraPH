@@ -66,7 +66,7 @@ These counts describe repository artifacts, not claims of complete real-world co
 | OWL datatype properties | 111 |
 | SKOS disaster concepts | 98 |
 | SHACL node / property shapes | 49 / 242 |
-| Documented competency questions | 20 |
+| Executable competency questions | 20 |
 | Immutable five-source smoke graph | 79 triples |
 
 The retained full-data migration baseline records 30,955 EM-DAT triples, 16,088 PSGC triples,
@@ -133,9 +133,12 @@ source RDF, and runs a SPARQL query over the resulting in-memory graph.
 Verified source fixtures : 5 (dromic, emdat, gda, ndrrmc, psgc)
 Combined fixture triples : 79
 Named OWL classes        : 50
+OWL object properties    : 60
+OWL datatype properties  : 111
 SKOS disaster concepts   : 98
 SHACL node shapes        : 49
 SHACL property shapes    : 242
+Competency questions     : 20
 
 PASS: semantic artifacts parsed, fixture evidence verified, and SPARQL executed.
 ```
@@ -186,8 +189,9 @@ deployment contract.
 - Which provinces in Eastern Visayas reported totally versus partially damaged houses?
 - Which organizations contributed assistance, and to which locations?
 
-Twenty formal competency questions and their SPARQL are maintained in
-[`ontology/validation/competency_questions.md`](ontology/validation/competency_questions.md).
+Twenty formal competency questions run as exact-result regressions over a frozen synthetic graph.
+See the [semantic-validation workflow](ontology/validation/README.md) for the offline command and
+the GraphDB 11.1.3/OWL2-RL release-acceptance lane.
 
 ## Quality and safety model
 

@@ -1,0 +1,3 @@
+provName,casualtyType,total
+"""Benguet""",<https://sakuna.ph/Injured>,"""5""^^<http://www.w3.org/2001/XMLSchema#integer>"
+"""Benguet""",<https://sakuna.ph/Dead>,"""2""^^<http://www.w3.org/2001/XMLSchema#integer>"

@@ -1,0 +1,318 @@
+@prefix : <https://sakuna.ph/> .
+@prefix evt: <https://sakuna.ph/fixture/event/> .
+@prefix fix: <https://sakuna.ph/fixture/> .
+@prefix impact: <https://sakuna.ph/fixture/impact/> .
+@prefix loc: <https://sakuna.ph/fixture/location/> .
+@prefix org: <https://sakuna.ph/org/> .
+@prefix prep: <https://sakuna.ph/fixture/preparedness/> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix report: <https://sakuna.ph/fixture/report/> .
+@prefix response: <https://sakuna.ph/fixture/response/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# This graph is synthetic and redistributable. It is deliberately small but covers every
+# competency-question category. Production records must never be substituted for this fixture.
+
+fix:competency-v1 a prov:Collection ;
+    rdfs:label "SakunaGraPH competency fixture v1" .
+
+# GraphDB inference probes. Only the premises are asserted; the semantic runner checks the
+# inferred DisasterEvent type, event location property chain, and transitive location ancestor.
+evt:inference-probe a :MajorEvent ;
+    :hasImpact impact:inference-probe .
+
+impact:inference-probe a :Impact ;
+    :hasLocation loc:inference-probe .
+
+loc:inference-probe a :Municipality ;
+    rdfs:label "Inference Probe Municipality" ;
+    :isPartOf loc:inference-probe-province .
+
+loc:inference-probe-province a :Province ;
+    rdfs:label "Inference Probe Province" ;
+    :isPartOf loc:inference-probe-region .
+
+loc:inference-probe-region a :Region ;
+    rdfs:label "Inference Probe Region" .
+
+# Administrative reference slice used by the queries.
+:0300000000 a :Region ; rdfs:label "Central Luzon" .
+:0400000000 a :Region ; rdfs:label "CALABARZON" .
+:0500000000 a :Region ; rdfs:label "Bicol Region" .
+:0600000000 a :Region ; rdfs:label "Western Visayas" .
+:0800000000 a :Region ; rdfs:label "Eastern Visayas" .
+:0900000000 a :Region ; rdfs:label "Zamboanga Peninsula" ; :isPartOf :Mindanao .
+:1100000000 a :Region ; rdfs:label "Davao Region" ; :isPartOf :Mindanao .
+:1200000000 a :Region ; rdfs:label "SOCCSKSARGEN" ; :isPartOf :Mindanao .
+:1300000000 a :Region ; rdfs:label "National Capital Region" .
+:1400000000 a :Region ; rdfs:label "Cordillera Administrative Region" .
+:1600000000 a :Region ; rdfs:label "Caraga" ; :isPartOf :Mindanao .
+:Mindanao a :IslandGroup ; rdfs:label "Mindanao" .
+
+loc:albay a :Province ; rdfs:label "Albay" ; :isPartOf :0500000000 .
+loc:agusan-del-norte a :Province ; rdfs:label "Agusan del Norte" ; :isPartOf :1600000000 .
+loc:benguet a :Province ; rdfs:label "Benguet" ; :isPartOf :1400000000 .
+loc:cotabato a :Province ; rdfs:label "Cotabato" ; :isPartOf :1200000000 .
+loc:davao-del-sur a :Province ; rdfs:label "Davao del Sur" ; :isPartOf :1100000000 .
+loc:iloilo a :Province ; rdfs:label "Iloilo" ; :isPartOf :0600000000 .
+loc:laguna a :Province ; rdfs:label "Laguna" ; :isPartOf :0400000000 .
+loc:leyte a :Province ; rdfs:label "Leyte" ; :isPartOf :0800000000 .
+loc:nueva-ecija a :Province ; rdfs:label "Nueva Ecija" ; :isPartOf :0300000000 .
+loc:zamboanga-del-sur a :Province ; rdfs:label "Zamboanga del Sur" ; :isPartOf :0900000000 .
+
+:0203100000 a :Municipality ; rdfs:label "Ilagan" ; :isPartOf loc:isabela .
+loc:isabela a :Province ; rdfs:label "Isabela" .
+loc:baguio a :Municipality ; rdfs:label "Baguio" ; :isPartOf loc:benguet .
+loc:cabadbaran a :Municipality ; rdfs:label "Cabadbaran" ; :isPartOf loc:agusan-del-norte .
+loc:cabanatuan a :Municipality ; rdfs:label "Cabanatuan" ; :isPartOf loc:nueva-ecija .
+loc:calamba a :Municipality ; rdfs:label "Calamba" ; :isPartOf loc:laguna .
+loc:davao-city a :Municipality ; rdfs:label "Davao City" ; :isPartOf loc:davao-del-sur .
+loc:iloilo-city a :Municipality ; rdfs:label "Iloilo City" ; :isPartOf loc:iloilo .
+loc:kidapawan a :Municipality ; rdfs:label "Kidapawan" ; :isPartOf loc:cotabato .
+loc:legazpi a :Municipality ; rdfs:label "Legazpi" ; :isPartOf loc:albay .
+loc:pagadian a :Municipality ; rdfs:label "Pagadian" ;
+    :incomeClassification "4th" ; :isPartOf loc:zamboanga-del-sur .
+loc:quezon-city a :Municipality ; rdfs:label "Quezon City" ; :isPartOf :1300000000 .
+loc:tacloban a :Municipality ; rdfs:label "Tacloban" ; :isPartOf loc:leyte .
+
+# Event and classification coverage.
+evt:typhoon-alpha a :MajorEvent ;
+    :eventName "Typhoon Alpha" ;
+    :startDate "2023-10-02"^^xsd:date ;
+    :hasDisasterType :TropicalCyclone ;
+    :hasLocation loc:legazpi ;
+    :hasRelatedIncident evt:typhoon-alpha-incident ;
+    :hasAgricultureDamage impact:agriculture-alpha ;
+    :hasSeaportDisruption impact:seaport-alpha ;
+    prov:alternateOf evt:typhoon-alpha-emdat ;
+    prov:wasDerivedFrom report:ndrrmc-alpha .
+
+evt:typhoon-alpha-incident a :Incident ;
+    :eventName "Typhoon Alpha Local Incident" ;
+    :startDate "2023-10-03"^^xsd:date ;
+    :hasDisasterType :TropicalCyclone ;
+    :hasLocation loc:legazpi .
+
+evt:typhoon-alpha-emdat a :MajorEvent ;
+    :eventName "Typhoon Alpha EM-DAT Record" ;
+    :startDate "2023-10-02"^^xsd:date ;
+    prov:wasDerivedFrom report:emdat-alpha .
+
+evt:typhoon-beta a :MajorEvent ;
+    :eventName "Typhoon Beta" ;
+    :startDate "2021-07-01"^^xsd:date ;
+    :hasDisasterType :TropicalCyclone ;
+    :hasLocation loc:calamba ;
+    :hasPreemptiveEvacuation prep:evacuation-beta ;
+    prov:wasDerivedFrom report:dromic-beta .
+
+evt:flash-flood-western a :Incident ;
+    :eventName "Western Visayas Flash Flood" ;
+    :startDate "2022-06-01"^^xsd:date ;
+    :hasDisasterType :FlashFlood ;
+    :hasLocation loc:iloilo-city ;
+    :hasAffectedPopulation impact:population-western .
+
+evt:riverine-flood-caraga a :MajorEvent ;
+    :eventName "Caraga Riverine Flood" ;
+    :startDate "2022-01-15"^^xsd:date ;
+    :hasDisasterType :RiverineFlood ;
+    :hasLocation loc:cabadbaran ;
+    :hasInfrastructureDamage impact:infrastructure-caraga .
+
+evt:mudslide-car a :Incident ;
+    :eventName "CAR Mudslide" ;
+    :startDate "2020-08-12"^^xsd:date ;
+    :hasDisasterType :Mudslide ;
+    :hasLocation loc:baguio .
+
+evt:ground-movement-car a :Incident ;
+    :eventName "CAR Ground Movement" ;
+    :startDate "2022-07-27"^^xsd:date ;
+    :hasDisasterType :GroundMovement ;
+    :hasLocation loc:baguio ;
+    :hasCasualties impact:casualties-dead, impact:casualties-injured ;
+    :hasAirportDisruption impact:airport-car .
+
+evt:ashfall-bicol a :Incident ;
+    :eventName "Bicol Ashfall" ;
+    :startDate "2020-01-12"^^xsd:date ;
+    :hasDisasterType :Ashfall ;
+    :hasLocation loc:legazpi .
+
+evt:lahar-central-luzon a :Incident ;
+    :eventName "Central Luzon Lahar" ;
+    :startDate "2021-07-30"^^xsd:date ;
+    :hasDisasterType :Lahar ;
+    :hasLocation loc:cabanatuan .
+
+evt:lava-flow-western-visayas a :Incident ;
+    :eventName "Western Visayas Lava Flow" ;
+    :startDate "2019-04-05"^^xsd:date ;
+    :hasDisasterType :LavaFlow ;
+    :hasLocation loc:iloilo-city .
+
+evt:central-luzon-fire a :Incident ;
+    :eventName "Central Luzon Fire" ;
+    :startDate "2022-02-01"^^xsd:date ;
+    :hasDisasterType :FireMiscellaneous ;
+    :hasLocation loc:cabanatuan .
+
+evt:calabarzon-road-accident a :Incident ;
+    :eventName "CALABARZON Road Accident" ;
+    :startDate "2022-03-01"^^xsd:date ;
+    :hasDisasterType :Road ;
+    :hasLocation loc:calamba .
+
+evt:central-luzon-conflict a :Incident ;
+    :eventName "Central Luzon Armed Conflict" ;
+    :startDate "2022-04-01"^^xsd:date ;
+    :hasDisasterType :ArmedConflict ;
+    :hasLocation loc:cabanatuan .
+
+evt:calabarzon-forest-fire a :Incident ;
+    :eventName "CALABARZON Forest Fire" ;
+    :startDate "2022-05-01"^^xsd:date ;
+    :hasDisasterType :ForestFire ;
+    :hasLocation loc:calamba .
+
+evt:eastern-visayas-cyclone a :Incident ;
+    :eventName "Eastern Visayas Cyclone" ;
+    :startDate "2020-11-10"^^xsd:date ;
+    :hasDisasterType :TropicalCyclone ;
+    :hasLocation loc:tacloban ;
+    :hasHousingDamage impact:housing-eastern .
+
+evt:ncr-class-suspension a :Incident ;
+    :eventName "NCR Class Suspension Event" ;
+    :hasClassSuspension impact:class-suspension-ncr .
+
+evt:isabela-assistance a :Incident ;
+    :eventName "Isabela Assistance Event" ;
+    :hasAssistance response:assistance-isabela ;
+    prov:wasDerivedFrom report:ndrrmc-isabela .
+
+evt:soccsksargen-calamity a :Incident ;
+    :eventName "SOCCSKSARGEN Calamity Event" ;
+    :hasLocation loc:kidapawan ;
+    :hasDeclarationOfCalamity response:calamity-soccsksargen .
+
+evt:mindanao-rescue a :Incident ;
+    :eventName "Mindanao Rescue Event" ;
+    :hasRescue response:rescue-mindanao .
+
+evt:zamboanga-evacuation a :Incident ;
+    :eventName "Zamboanga Evacuation Event" ;
+    :hasLocation loc:pagadian ;
+    :hasPreemptiveEvacuation prep:evacuation-zamboanga .
+
+evt:dromic-fire a :Incident ;
+    :eventName "DROMIC Fire Incident" ;
+    :hasDisasterType :FireMiscellaneous ;
+    prov:wasDerivedFrom report:dromic-fire .
+
+evt:emdat-fire a :MajorEvent ;
+    :eventName "EM-DAT Industrial Fire" ;
+    :hasDisasterType :FireIndustrial ;
+    prov:wasDerivedFrom report:emdat-fire .
+
+# Impact, preparedness, and response records remain separate from their events.
+impact:population-western a :AffectedPopulation ;
+    :hasLocation loc:iloilo-city ;
+    :displacedFamilies 12 ;
+    :displacedPersons 48 .
+
+impact:casualties-dead a :Casualties ;
+    :hasLocation loc:baguio ;
+    :casualtyCount 2 ;
+    :isOfCasualtyType :Dead .
+
+impact:casualties-injured a :Casualties ;
+    :hasLocation loc:baguio ;
+    :casualtyCount 5 ;
+    :isOfCasualtyType :Injured .
+
+prep:evacuation-beta a :PreemptiveEvacuation ;
+    :hasLocation loc:calamba ;
+    :evacuationCenters 4 .
+
+prep:evacuation-zamboanga a :PreemptiveEvacuation ;
+    :hasLocation loc:pagadian ;
+    :evacuationCenters 2 .
+
+impact:infrastructure-caraga a :InfrastructureDamage ;
+    :hasLocation loc:cabadbaran ;
+    :commercialDamageAmount impact:commercial-value ;
+    :crossSectoralDamageAmount impact:cross-sectoral-value ;
+    :infraDamageAmount impact:infrastructure-value ;
+    :socialDamageAmount impact:social-value .
+
+impact:commercial-value a qudt:QuantityValue ; qudt:numericValue 10.0 ; qudt:unit :PHP_millions .
+impact:cross-sectoral-value a qudt:QuantityValue ; qudt:numericValue 2.0 ; qudt:unit :PHP_millions .
+impact:infrastructure-value a qudt:QuantityValue ; qudt:numericValue 3.0 ; qudt:unit :PHP_millions .
+impact:social-value a qudt:QuantityValue ; qudt:numericValue 5.0 ; qudt:unit :PHP_millions .
+
+impact:housing-eastern a :HousingDamage ;
+    :hasLocation loc:tacloban ;
+    :partiallyDamagedHouses 3 ;
+    :totallyDamagedHouses 1 .
+
+impact:agriculture-alpha a :AgricultureDamage ;
+    :hasLocation loc:legazpi ;
+    :agriDamageAmount impact:agriculture-value ;
+    :productionLossCost impact:production-cost-value ;
+    :productionLossVolume 7.5 .
+
+impact:agriculture-value a qudt:QuantityValue ; qudt:numericValue 50.0 ; qudt:unit :PHP_millions .
+impact:production-cost-value a qudt:QuantityValue ; qudt:numericValue 20.0 ; qudt:unit :PHP_millions .
+
+impact:seaport-alpha a :SeaportDisruption ;
+    :hasLocation loc:legazpi ;
+    :portOrTerminalName "Legazpi Port" ;
+    :portStatus "Operations resumed" .
+
+impact:airport-car a :AirportDisruption ;
+    :hasLocation loc:baguio ;
+    :portOrTerminalName "Loakan Airport" ;
+    :cancellationDateTime "2022-07-27T08:00:00Z"^^xsd:dateTime ;
+    :resumptionDateTime "2022-07-27T14:00:00Z"^^xsd:dateTime .
+
+impact:class-suspension-ncr a :ClassSuspension ;
+    :hasLocation loc:quezon-city ;
+    :fromClassLevel "Kindergarten" ;
+    :toClassLevel "Grade 12" .
+
+response:assistance-isabela a :Assistance ;
+    :hasLocation :0203100000 ;
+    :itemTypeOrNeeds "Food packs" ;
+    :contributingOrg org:DSWD ;
+    :contributionAmount response:assistance-value .
+
+response:assistance-value a qudt:QuantityValue ;
+    qudt:numericValue 1000.0 ;
+    qudt:unit :PHP_millions .
+
+response:calamity-soccsksargen a :DeclarationOfCalamity ;
+    :hasLocation loc:kidapawan ;
+    :declarationType "State of calamity" ;
+    :resolutionDate "2022-09-01T00:00:00Z"^^xsd:dateTime .
+
+response:rescue-mindanao a :Rescue ;
+    :hasLocation loc:davao-city ;
+    :rescueUnit "Davao Rescue Unit 1" ;
+    :rescueEquipment "Inflatable boat" .
+
+# Source lineage used by CQ8, CQ15, CQ19, and CQ20.
+org:CRED a prov:Organization ; rdfs:label "Centre for Research on the Epidemiology of Disasters" .
+org:DROMIC a prov:Organization ; rdfs:label "DROMIC" .
+org:DSWD a prov:Organization ; rdfs:label "Department of Social Welfare and Development" .
+org:NDRRMC a prov:Organization ; rdfs:label "NDRRMC" .
+
+report:dromic-beta a prov:Entity ; prov:wasAttributedTo org:DROMIC .
+report:dromic-fire a prov:Entity ; prov:wasAttributedTo org:DROMIC .
+report:emdat-alpha a prov:Entity ; prov:wasAttributedTo org:CRED .
+report:emdat-fire a prov:Entity ; prov:wasAttributedTo org:CRED .
+report:ndrrmc-alpha a prov:Entity ; prov:wasAttributedTo org:NDRRMC .
+report:ndrrmc-isabela a prov:Entity ; prov:wasAttributedTo org:NDRRMC .
