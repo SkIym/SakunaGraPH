@@ -5,6 +5,10 @@
         <uri id="SakunaGraPH vendored GeoSPARQL 1.1 import" name="http://www.opengis.net/ont/geosparql/1.1" uri="geosparql-1.1.ttl"/>
         <uri id="SakunaGraPH vendored GeoSPARQL ontology IRI" name="http://www.opengis.net/ont/geosparql" uri="geosparql-1.1.ttl"/>
         <uri id="SakunaGraPH vendored GeoSPARQL 1.1 version IRI" name="http://www.opengis.net/ont/geosparql#1.1" uri="geosparql-1.1.ttl"/>
+        <uri id="SakunaGraPH vendored QUDT 3.5.1 all-in-one import" name="http://qudt.org/3.5.1/qudt-all" uri="qudt-3.5.1-all.ttl"/>
+        <uri id="SakunaGraPH vendored QUDT all-in-one ontology IRI" name="http://qudt.org/qudt-all" uri="qudt-3.5.1-all.ttl"/>
+        <uri id="SakunaGraPH vendored VAEM ontology IRI" name="http://www.linkedmodel.org/schema/vaem" uri="vaem-2.0.rdf"/>
+        <uri id="SakunaGraPH vendored VAEM 2.0 version IRI" name="http://www.linkedmodel.org/2.0/schema/vaem" uri="vaem-2.0.rdf"/>
         <uri id="SakunaGraPH vendored SKOS import" name="http://www.w3.org/2004/02/skos/core" uri="skos-2009.rdf"/>
         <uri id="SakunaGraPH vendored PROV-O dated import" name="http://www.w3.org/ns/prov-o-20130430" uri="prov-o-20130430.owl"/>
         <uri id="SakunaGraPH vendored PROV-O ontology IRI" name="http://www.w3.org/ns/prov-o#" uri="prov-o-20130430.owl"/>

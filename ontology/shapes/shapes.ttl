@@ -274,13 +274,13 @@ sgsh:DisasterEventBawHasClimateParameterMeasurementPropertyShape a sh:PropertySh
     sh:class baw:ClimateParameter .
 
 sgsh:DisasterEventBawHasDisasterStartPropertyShape a sh:PropertyShape ;
-    rdfs:comment "beAWARE disaster start follows xsd:dateTime and is equivalent to startDate." ;
+    rdfs:comment "beAWARE disaster start follows xsd:dateTime and specializes startDate." ;
     sh:path baw:hasDisasterStart ;
     sh:datatype xsd:dateTime ;
     sh:lessThanOrEquals baw:hasDisasterEnd .
 
 sgsh:DisasterEventBawHasDisasterEndPropertyShape a sh:PropertyShape ;
-    rdfs:comment "beAWARE disaster end follows xsd:dateTime and is equivalent to endDate." ;
+    rdfs:comment "beAWARE disaster end follows xsd:dateTime and specializes endDate." ;
     sh:path baw:hasDisasterEnd ;
     sh:datatype xsd:dateTime .
 

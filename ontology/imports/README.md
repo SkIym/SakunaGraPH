@@ -15,12 +15,15 @@ for the current direct and transitive imports.
 | --- | --- | --- | --- | --- |
 | `https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology` | Embedded `owl:versionInfo` 1.0; original commit/date unknown | `beAWARE_ontology.owl` | `d63f3f666b8bc533d10edb6712f7a7d2764c8056b2a8783766216dda2439698b` | Local; Apache-2.0; checksum-pinned baseline |
 | `http://www.opengis.net/ont/geosparql/1.1` | GeoSPARQL `owl:versionIRI` 1.1; file metadata reports 1.1.1 | `geosparql-1.1.ttl` | `7e6ee2d0ff5a04bd03cf849e822740204219bf11488a8036522a84d444f33619` | Local; Apache-2.0 |
+| `http://qudt.org/3.5.1/qudt-all` | QUDT 3.5.1, published 2026-08-29; version IRI `http://qudt.org/3.5.1/qudt-all` | `qudt-3.5.1-all.ttl` | `0a64bd88304a2a89c46badc870928e94c8a75b14fb4918045d5c81c62be8c66c` | Local; CC BY 4.0 |
 | `http://www.w3.org/2004/02/skos/core` | W3C Recommendation, 18 August 2009 | `skos-2009.rdf` | `e79633b8d0564816cee8a99f5c9acf9a0e6fc7257c7209acd684ecad53a89dd6` | Local; W3C Document License |
 | `http://www.w3.org/ns/prov-o-20130430` | W3C Recommendation version 2013-04-30 | `prov-o-20130430.owl` | `71ecff298c82b8c12aca0714a7bcbfd0b798cda9a7b3c89d9aeb0ef358cb79d0` | Local; W3C Document License |
+| `http://www.linkedmodel.org/schema/vaem` | VAEM 2.0; version IRI `http://www.linkedmodel.org/2.0/schema/vaem` | `vaem-2.0.rdf` | `b2f19510a089aeee23b7773b7f619fe06f05e6e4185f250a0829df1d8d9cf62c` | Local transitive dependency; CC BY-SA 3.0 US |
 
-The beAWARE ontology also imports SKOS. The catalog resolves all four direct imports, that
-transitive SKOS import, the SakunaGraPH ontology IRI, and the applicable GeoSPARQL and PROV-O
-ontology/version aliases. `THIRD_PARTY_NOTICES.md` records attribution and redistribution terms.
+The beAWARE ontology imports SKOS. QUDT 3.5.1 imports SKOS and VAEM 2.0. The catalog resolves all
+five direct imports, both transitive dependencies, the SakunaGraPH ontology IRI, and the applicable
+GeoSPARQL, QUDT, PROV-O, and VAEM ontology/version aliases. `THIRD_PARTY_NOTICES.md` records
+attribution and redistribution terms.
 
 ### Snapshot provenance
 
@@ -28,8 +31,16 @@ ontology/version aliases. `THIRD_PARTY_NOTICES.md` records attribution and redis
 | --- | --- | --- | --- |
 | `beAWARE_ontology.owl` | beAWARE GitHub repository | Unknown historical revision; current upstream differs semantically | Original retrieval unknown; accepted as the checksum-pinned 2.0.0 baseline on 2026-09-14 |
 | `geosparql-1.1.ttl` | OGC `geosemantics-semantic-resources` repository | Commit `ac303373bd0cf149d31f110cf8c1ed281ff66c60` | 2026-09-14T12:02:13Z |
+| `qudt-3.5.1-all.ttl` | QUDT versioned all-in-one OWL graph at `http://qudt.org/3.5.1/qudt-all` | Release 3.5.1 | 2026-09-18T11:19:15Z |
 | `skos-2009.rdf` | W3C SKOS Recommendation RDF/XML namespace document | Recommendation dated 2009-08-18 | 2026-09-14T12:02:13Z |
 | `prov-o-20130430.owl` | W3C dated PROV-O version IRI | Recommendation dated 2013-04-30 | 2026-09-14T12:02:13Z |
+| `vaem-2.0.rdf` | Resolved VAEM ontology at `http://www.linkedmodel.org/schema/vaem` | Embedded version IRI 2.0 | 2026-09-18T11:19:15Z |
+
+The QUDT 3.5.1 review replaced the deprecated legacy currency resources `cur:PHP` and `cur:USD` with
+`unit:CCY_PHP` and `unit:CCY_USD`. The local scaled units now follow QUDT's current derived-unit
+pattern with `qudt:scalingOf`, `qudt:prefix`, and decimal conversion multipliers. VAEM is included
+only because QUDT imports it; SakunaGraPH does not directly align local terms to VAEM. Both
+snapshots first apply to the 2.0.0 release candidate.
 
 ## What "vendoring imports" means
 
@@ -61,8 +72,9 @@ gap: future validation can still prove it is using these exact bytes.
 The maintainer selected option A on 2026-09-14:
 
 - **A -- Vendor the complete import closure (recommended):** Store reviewed snapshots of beAWARE,
-  GeoSPARQL 1.1, SKOS, PROV-O, and any transitive imports whose licenses permit redistribution.
-  This gives the strongest offline and reproducible-build guarantee.
+  GeoSPARQL 1.1, SKOS, PROV-O, QUDT 3.5.1, VAEM 2.0, and any future transitive imports whose
+  licenses permit redistribution. This gives the strongest offline and reproducible-build
+  guarantee.
 - **B -- Vendor beAWARE only:** Keep the project-specific dependency local but allow standards such
   as GeoSPARQL, SKOS, and PROV-O to resolve over the network. This is smaller and easier to maintain,
   but validation is not fully offline or insulated from availability problems.
@@ -104,7 +116,7 @@ There are no known missing files in the current import closure. Before releasing
 2. confirm the core ontology has not added another direct import;
 3. keep `beAWARE_ontology.owl` unchanged unless a reviewed semantic upgrade is intentionally made;
    and
-4. package `THIRD_PARTY_NOTICES.md` and `licenses/Apache-2.0.txt` with redistributed snapshots.
+4. package `THIRD_PARTY_NOTICES.md` and the files under `licenses/` with redistributed snapshots.
 
 The automated regression test is
 `sakunagraph_etl/tests/test_ontology_import_catalog.py`. It starts from the SakunaGraPH ontology,

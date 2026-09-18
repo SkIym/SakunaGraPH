@@ -186,8 +186,8 @@ through implicit conventions.
 
 ### Repository mapping
 
-- Terms: `qudt:QuantityValue`, `qudt:CurrencyUnit`, `qudt:numericValue`, `cur:PHP`,
-  `cur:USD`, `:PHP_millions`, `:USD_thousands`, and amount properties.
+- Terms: `qudt:QuantityValue`, `qudt:CurrencyUnit`, `qudt:numericValue`, `unit:CCY_PHP`,
+  `unit:CCY_USD`, `:PHP_millions`, `:USD_thousands`, and amount properties.
 - CQs: CQ9, CQ11, CQ15.
 - Shapes: amount-property class constraints, `sgsh:QuantityValueShape`, and
   `sgsh:CurrencyUnitShape`.

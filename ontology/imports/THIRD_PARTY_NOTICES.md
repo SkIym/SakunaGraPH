@@ -40,5 +40,26 @@ endorse SakunaGraPH.
 - Copyright 2013 W3C (MIT, ERCIM, Keio, Beihang), All Rights Reserved.
 - Redistribution: W3C Document License; <https://www.w3.org/copyright/document-license-2015/>
 
+## QUDT 3.5.1
+
+- File: `qudt-3.5.1-all.ttl`
+- Publisher: QUDT.org
+- Source/version IRI: <http://qudt.org/3.5.1/qudt-all>
+- Release: <https://github.com/qudt/qudt-public-repo/releases/tag/v3.5.1>
+- License: Creative Commons Attribution 4.0 International; see
+  `licenses/CC-BY-4.0.txt`
+- Attribution: QUDT.org
+
+## VAEM 2.0
+
+- File: `vaem-2.0.rdf`
+- Title: Vocabulary for Attaching Essential Metadata (VAEM), Version 2.0
+- Publisher and attribution: TopQuadrant, Inc.
+- Source/ontology IRI: <http://www.linkedmodel.org/schema/vaem>
+- Version IRI: <http://www.linkedmodel.org/2.0/schema/vaem>
+- License declared by the artifact: Creative Commons Attribution-ShareAlike 3.0 United States;
+  see `licenses/CC-BY-SA-3.0-US.html`
+- SakunaGraPH redistributes VAEM only as QUDT's transitive import.
+
 The W3C snapshots must be redistributed unchanged with their attribution and source information.
 See the linked license for the controlling terms.

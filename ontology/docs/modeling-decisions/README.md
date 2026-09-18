@@ -46,6 +46,7 @@ the current implementation has complete automated validation.
 | [ODR-0016](0016-model-clusters-with-membership-and-pairwise-alternates.md) | Model clusters with membership and pairwise alternates | Accepted (maintainer decision) | OR-05 |
 | [ODR-0017](0017-use-owl-for-semantics-and-shacl-for-operational-validation.md) | Use OWL for semantics and SHACL for operational validation | Accepted (maintainer decision) | OR-01-OR-08 |
 | [ODR-0018](0018-use-source-aware-shacl-severity-profiles.md) | Use source-aware SHACL severity profiles | Accepted (maintainer decision) | OR-01-OR-08 |
+| [ODR-0019](0019-use-directional-external-alignments.md) | Use only justified directional external alignments | Accepted (maintainer decision) | OR-01, OR-06, OR-08 |
 
 ## Evidence boundary
 

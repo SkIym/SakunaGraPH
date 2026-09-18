@@ -2,7 +2,7 @@
 
 ## Status
 
-There are no unanswered Step 2 ontology decisions as of 2026-09-14. Cross-store portability is an
+There are no unanswered Step 2 ontology decisions as of 2026-09-18. Cross-store portability is an
 explicitly deferred scope item in ODR-0015, not an assumed requirement.
 
 ## Resolved questions
@@ -18,6 +18,7 @@ explicitly deferred scope item in ODR-0015, not an assumed requirement.
 | Q7: GraphDB runtime and ruleset | [ODR-0015](0015-run-graphdb-11-1-3-with-owl2-rl-reasoning.md) |
 | Q8: OWL/SHACL responsibility boundary | [ODR-0017](0017-use-owl-for-semantics-and-shacl-for-operational-validation.md) |
 | Q9: open-world and publication-quality policy | [ODR-0018](0018-use-source-aware-shacl-severity-profiles.md) |
+| Q10: external alignment strength and QUDT pinning | [ODR-0019](0019-use-directional-external-alignments.md) |
 
 ## Deferred or excluded scope
 

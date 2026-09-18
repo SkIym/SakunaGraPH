@@ -401,7 +401,7 @@ documented conversion.
 
 - `qudt:QuantityValue` and `qudt:CurrencyUnit`.
 - `qudt:numericValue` and unit/currency resources.
-- `cur:PHP`, `cur:USD`, `:PHP_millions`, and `:USD_thousands`.
+- `unit:CCY_PHP`, `unit:CCY_USD`, `:PHP_millions`, and `:USD_thousands`.
 - Amount properties such as `:infraDamageAmount`, `:agriDamageAmount`,
   `:productionLossCost`, `:contributionAmount`, and `:housingDamageAmount`.
 

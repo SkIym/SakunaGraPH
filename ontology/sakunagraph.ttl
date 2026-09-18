@@ -1,6 +1,5 @@
 @prefix : <https://sakuna.ph/> .
 @prefix baw: <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#> .
-@prefix cur: <http://qudt.org/vocab/currency/> .
 @prefix geo: <http://www.opengis.net/ont/geosparql#> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
@@ -10,30 +9,18 @@
 @prefix qudt: <http://qudt.org/schema/qudt/> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 @prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+@prefix qprefix: <http://qudt.org/vocab/prefix/> .
 @prefix qkind: <http://qudt.org/vocab/quantitykind/> .
+@prefix unit: <http://qudt.org/vocab/unit/> .
 @base <https://sakuna.ph/> .
 
 <https://sakuna.ph/> rdf:type owl:Ontology ;
                       owl:imports <http://www.opengis.net/ont/geosparql/1.1> ,
+                                  <http://qudt.org/3.5.1/qudt-all> ,
                                   <http://www.w3.org/2004/02/skos/core> ,
                                   <http://www.w3.org/ns/prov-o-20130430> ,
                                   <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology> ;
                       rdfs:label "SakunaGraPH" .
-
-#################################################################
-#    Annotation properties
-#################################################################
-
-###  http://qudt.org/schema/qudt/conversionMultiplier
-qudt:conversionMultiplier rdf:type owl:AnnotationProperty .
-
-
-###  http://qudt.org/schema/qudt/conversionOffset
-qudt:conversionOffset rdf:type owl:AnnotationProperty .
-
-
-###  http://qudt.org/schema/qudt/hasQuantityKind
-qudt:hasQuantityKind rdf:type owl:AnnotationProperty .
 
 
 #################################################################
@@ -59,8 +46,7 @@ baw:hasDisasterLocation rdf:type owl:ObjectProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterOccurrence
 baw:hasDisasterOccurrence rdf:type owl:ObjectProperty ;
-                          owl:inverseOf baw:isOfDisasterType ,
-                                        :hasDisasterType ;
+                          owl:inverseOf baw:isOfDisasterType ;
                           rdfs:domain baw:NaturalDisasterType ;
                           rdfs:range baw:NaturalDisaster ;
                           rdfs:label "has disaster occurrence" ;
@@ -142,7 +128,6 @@ baw:isOfClimateParameterType rdf:type owl:ObjectProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#isOfDisasterType
 baw:isOfDisasterType rdf:type owl:ObjectProperty ;
-                     owl:equivalentProperty :hasDisasterType ;
                      rdfs:domain baw:NaturalDisaster ;
                      rdfs:range baw:NaturalDisasterType ;
                      rdfs:label "is of disaster type" .
@@ -574,7 +559,7 @@ baw:isOfDisasterType rdf:type owl:ObjectProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterEnd
 baw:hasDisasterEnd rdf:type owl:DatatypeProperty ;
-                   owl:equivalentProperty :endDate ;
+                   rdfs:subPropertyOf :endDate ;
                    rdfs:domain baw:NaturalDisaster ;
                    rdfs:range xsd:dateTime ;
                    rdfs:label "has disaster end" ;
@@ -583,7 +568,7 @@ baw:hasDisasterEnd rdf:type owl:DatatypeProperty ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#hasDisasterStart
 baw:hasDisasterStart rdf:type owl:DatatypeProperty ;
-                     owl:equivalentProperty :startDate ;
+                     rdfs:subPropertyOf :startDate ;
                      rdfs:domain baw:NaturalDisaster ;
                      rdfs:range xsd:dateTime ;
                      rdfs:label "has disaster start" ;
@@ -1516,21 +1501,18 @@ baw:ClimateParameterType rdf:type owl:Class ;
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Impact
 baw:Impact rdf:type owl:Class ;
-           owl:equivalentClass :Impact ;
            rdfs:label "Impact" ;
            skos:definition "Represents the impact of natural disasters and incidents." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Incident
 baw:Incident rdf:type owl:Class ;
-             owl:equivalentClass :Incident ;
              rdfs:label "Incident" ;
              skos:definition "Represents the various incidents taking place during a natural disaster." .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#Location
-baw:Location rdf:type owl:Class ;
-             owl:equivalentClass :Location .
+baw:Location rdf:type owl:Class .
 
 
 ###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisaster
@@ -2280,22 +2262,6 @@ baw:NaturalDisaster rdf:type owl:Class ;
 #    Individuals
 #################################################################
 
-###  http://qudt.org/vocab/currency/PHP
-cur:PHP rdf:type owl:NamedIndividual .
-
-
-###  http://qudt.org/vocab/currency/USD
-cur:USD rdf:type owl:NamedIndividual .
-
-
-###  https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#NaturalDisasterType
-baw:NaturalDisasterType rdf:type owl:NamedIndividual .
-
-
-
-
-
-
 ###  https://sakuna.ph/AtmosphericPressure
 :AtmosphericPressure rdf:type owl:NamedIndividual ,
                               baw:ClimateParameterType .
@@ -2405,11 +2371,13 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 
 ###  https://sakuna.ph/PHP_millions
 :PHP_millions rdf:type owl:NamedIndividual ,
-                       qudt:CurrencyUnit ;
-              skos:broader cur:PHP ;
-              qudt:conversionMultiplier 1000000 ;
-              qudt:conversionOffset 0 ;
+                       qudt:CurrencyUnit ,
+                       qudt:DerivedUnit ,
+                       qudt:Unit ;
+              qudt:conversionMultiplier 1000000.0 ;
               qudt:hasQuantityKind qkind:Currency ;
+              qudt:prefix qprefix:Mega ;
+              qudt:scalingOf unit:CCY_PHP ;
               rdfs:label "Philippine Peso (millions)"@en .
 
 
@@ -2453,11 +2421,13 @@ baw:NaturalDisasterType rdf:type owl:NamedIndividual .
 
 ###  https://sakuna.ph/USD_thousands
 :USD_thousands rdf:type owl:NamedIndividual ,
-                        qudt:CurrencyUnit ;
-               skos:broader cur:USD ;
-               qudt:conversionMultiplier 1000 ;
-               qudt:conversionOffset 0 ;
+                        qudt:CurrencyUnit ,
+                        qudt:DerivedUnit ,
+                        qudt:Unit ;
+               qudt:conversionMultiplier 1000.0 ;
                qudt:hasQuantityKind qkind:Currency ;
+               qudt:prefix qprefix:Kilo ;
+               qudt:scalingOf unit:CCY_USD ;
                rdfs:label "US Dollar (thousands)"@en .
 
 

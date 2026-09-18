@@ -31,6 +31,7 @@ and thousands of USD rather than normalizing silently.
 - Queries require an additional hop through `qudt:QuantityValue`.
 - Scale and conversion policy must be explicit; QUDT use alone does not make different currencies
   or scales comparable.
+- ODR-0019 records the reviewed QUDT 3.5.1 scaled-unit pattern and import pinning.
 
 ## Validation
 
