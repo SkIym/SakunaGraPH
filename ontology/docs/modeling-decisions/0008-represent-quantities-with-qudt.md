@@ -35,10 +35,11 @@ and thousands of USD rather than normalizing silently.
 ## Validation
 
 - CQ9, CQ11, and CQ15 exercise monetary/quantitative values.
-- Amount property shapes require QUDT value nodes, but current `sgsh:QuantityValueShape` does not
-  yet enforce both numeric value and unit completeness.
-- Positive/negative OR-06 fixtures should cover PHP millions, USD thousands, a non-currency unit,
-  missing units, and prohibited cross-unit aggregation.
+- Amount property shapes require QUDT value nodes, and `sgsh:QuantityValueShape` requires exactly
+  one non-negative numeric value and one controlled unit IRI.
+- The post-paper SHACL fixture suite covers PHP millions, USD thousands, a non-currency unit, zero,
+  missing numeric values, missing units, literal units, and uncontrolled unit IRIs. Cross-unit
+  aggregation remains a query/consumer policy and must not silently combine incompatible values.
 
 ## Evidence
 

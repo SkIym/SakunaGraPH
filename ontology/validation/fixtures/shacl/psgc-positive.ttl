@@ -1,0 +1,51 @@
+@prefix : <https://sakuna.ph/> .
+@prefix fixture: <https://sakuna.ph/fixture/shacl/positive/psgc/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+fixture:location a :Country ;
+    rdfs:label "Fixture country" ;
+    :geographicLevel "Country" ;
+    :population2024 0 .
+
+fixture:administrative-location a :Region ;
+    :geographicLevel "Reg"^^xsd:string ;
+    :psgcCode "0100000000"^^xsd:string .
+
+fixture:country a :Country ;
+    :geographicLevel "Country" .
+
+fixture:island-group a :IslandGroup ;
+    :geographicLevel "Island Group" ;
+    :isPartOf fixture:parent-country .
+fixture:parent-country a :Country .
+
+fixture:region a :Region ;
+    :geographicLevel "Reg"^^xsd:string ;
+    :isPartOf fixture:parent-island-group .
+fixture:parent-island-group a :IslandGroup .
+
+fixture:province a :Province ;
+    :geographicLevel "Prov"^^xsd:string ;
+    :isPartOf fixture:parent-region .
+fixture:parent-region a :Region .
+
+fixture:municipality a :Municipality ;
+    :geographicLevel "Mun"^^xsd:string ;
+    :isPartOf fixture:parent-province .
+fixture:parent-province a :Province .
+
+fixture:city a :City ;
+    :geographicLevel "City"^^xsd:string ;
+    :isPartOf fixture:city-parent-region .
+fixture:city-parent-region a :Region .
+
+fixture:sub-municipality a :SubMunicipality ;
+    :geographicLevel "SubMun"^^xsd:string ;
+    :isPartOf fixture:parent-city .
+fixture:parent-city a :City .
+
+fixture:barangay a :Barangay ;
+    :geographicLevel "Bgy"^^xsd:string ;
+    :isPartOf fixture:parent-municipality .
+fixture:parent-municipality a :Municipality .

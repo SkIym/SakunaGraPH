@@ -1,0 +1,49 @@
+@prefix : <https://sakuna.ph/> .
+@prefix fixture: <https://sakuna.ph/fixture/shacl/publication/psgc/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+fixture:country a :Country ;
+    rdfs:label "Philippines fixture" ;
+    :geographicLevel "Country" .
+
+fixture:island-group a :IslandGroup ;
+    rdfs:label "Luzon fixture" ;
+    :geographicLevel "Island Group" ;
+    :isPartOf fixture:country .
+
+fixture:region a :Region ;
+    rdfs:label "Region fixture" ;
+    :geographicLevel "Reg"^^xsd:string ;
+    :psgcCode "0100000000"^^xsd:string ;
+    :isPartOf fixture:island-group .
+
+fixture:province a :Province ;
+    rdfs:label "Province fixture" ;
+    :geographicLevel "Prov"^^xsd:string ;
+    :psgcCode "0123400000"^^xsd:string ;
+    :isPartOf fixture:region .
+
+fixture:municipality a :Municipality ;
+    rdfs:label "Municipality fixture" ;
+    :geographicLevel "Mun"^^xsd:string ;
+    :psgcCode "0123456000"^^xsd:string ;
+    :isPartOf fixture:province .
+
+fixture:city a :City ;
+    rdfs:label "City fixture" ;
+    :geographicLevel "City"^^xsd:string ;
+    :psgcCode "0123457000"^^xsd:string ;
+    :isPartOf fixture:region .
+
+fixture:sub-municipality a :SubMunicipality ;
+    rdfs:label "Sub-municipality fixture" ;
+    :geographicLevel "SubMun"^^xsd:string ;
+    :psgcCode "0123458000"^^xsd:string ;
+    :isPartOf fixture:city .
+
+fixture:barangay a :Barangay ;
+    rdfs:label "Barangay fixture" ;
+    :geographicLevel "Bgy"^^xsd:string ;
+    :psgcCode "0123456789"^^xsd:string ;
+    :isPartOf fixture:municipality .

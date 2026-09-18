@@ -1,0 +1,68 @@
+@prefix : <https://sakuna.ph/> .
+@prefix baw: <https://raw.githubusercontent.com/beAWARE-project/ontology/master/beAWARE_ontology#> .
+@prefix fixture: <https://sakuna.ph/fixture/shacl/positive/> .
+@prefix geo: <http://www.opengis.net/ont/geosparql#> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix skos: <http://www.w3.org/2004/02/skos/core#> .
+
+# Literal helpers exercise zero as a valid boundary value.
+fixture:integer-holder fixture:value 0 .
+fixture:decimal-holder fixture:value 0.0 .
+
+fixture:disaster-event a :DisasterEvent .
+fixture:incident a :Incident .
+fixture:major-event a :MajorEvent .
+fixture:disaster-type a :DisasterType ;
+    skos:inScheme :DisasterTypeScheme .
+:DisasterTypeScheme a skos:ConceptScheme .
+
+fixture:impact a :Impact .
+fixture:affected-population a :AffectedPopulation .
+fixture:agriculture-damage a :AgricultureDamage .
+fixture:airport-disruption a :AirportDisruption .
+fixture:casualties a :Casualties ;
+    :casualtyCount 0 .
+fixture:casualty-type a :CasualtyType .
+fixture:class-suspension a :ClassSuspension .
+fixture:communication-line-disruption a :CommunicationLineDisruption .
+fixture:damage-general a :DamageGeneral .
+fixture:flight-disruption a :FlightDisruption .
+fixture:housing-damage a :HousingDamage .
+fixture:infrastructure-damage a :InfrastructureDamage .
+fixture:power-disruption a :PowerDisruption .
+fixture:road-and-bridges-damage a :RoadAndBridgesDamage .
+fixture:seaport-disruption a :SeaportDisruption .
+fixture:stranded-event a :StrandedEvent .
+fixture:water-disruption a :WaterDisruption .
+fixture:work-suspension a :WorkSuspension .
+
+fixture:preparedness a :Preparedness .
+fixture:preemptive-evacuation a :PreemptiveEvacuation .
+fixture:warning a :Warning .
+fixture:response a :Response .
+fixture:assistance a :Assistance .
+fixture:declaration-of-calamity a :DeclarationOfCalamity .
+fixture:recovery a :Recovery .
+fixture:rescue a :Rescue .
+
+fixture:source a :Source ;
+    :format "PDF" ;
+    :reportName "Synthetic SHACL source" .
+
+fixture:quantity-value a qudt:QuantityValue ;
+    qudt:numericValue 0.0 ;
+    qudt:unit :PHP_millions .
+:PHP_millions a qudt:CurrencyUnit .
+fixture:quantity-usd a qudt:QuantityValue ;
+    qudt:numericValue 1.0 ;
+    qudt:unit :USD_thousands .
+:USD_thousands a qudt:CurrencyUnit .
+fixture:quantity-hectares a qudt:QuantityValue ;
+    qudt:numericValue 1.0 ;
+    qudt:unit fixture:hectare-unit .
+fixture:hectare-unit a qudt:Unit .
+fixture:currency-unit a qudt:CurrencyUnit .
+
+fixture:climate-parameter a baw:ClimateParameter .
+fixture:climate-parameter-type a baw:ClimateParameterType .
+fixture:geo-feature a geo:Feature .

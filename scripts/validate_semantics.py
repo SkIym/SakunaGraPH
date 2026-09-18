@@ -1,8 +1,8 @@
-"""Run reproducible semantic checks for SakunaGraPH.
+"""Run reproducible competency-query and SHACL checks for SakunaGraPH.
 
-The RDFLib lane is an offline preflight. Release evidence must use the GraphDB lane against a
-dedicated GraphDB 11.1.3 repository configured with the OWL2-RL ruleset and loaded only with the
-pinned ontology closure, taxonomy, and immutable competency fixture.
+The RDFLib competency lane is an offline preflight. Release evidence for inference must use the
+GraphDB lane against a dedicated GraphDB 11.1.3 repository configured with the OWL2-RL ruleset.
+The pySHACL lane checks the separate, post-paper publication contract.
 """
 
 from __future__ import annotations
@@ -536,10 +536,16 @@ def write_report(path: Path, report: dict[str, Any]) -> None:
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument(
+    suites = parser.add_mutually_exclusive_group(required=True)
+    suites.add_argument(
         "--competency",
         action="store_true",
         help="run the 20 competency-question regression cases",
+    )
+    suites.add_argument(
+        "--shacl",
+        action="store_true",
+        help="run the post-paper SHACL publication-contract fixtures",
     )
     parser.add_argument(
         "--engine",
@@ -569,15 +575,54 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         help="maintainer-only: rewrite expected CSVs from the RDFLib fixture lane",
     )
     args = parser.parse_args(argv)
-    if not args.competency:
-        parser.error("select a validation suite (currently: --competency)")
     if args.timeout <= 0:
         parser.error("--timeout must be positive")
+    if args.shacl and args.engine != "rdflib":
+        parser.error("--shacl is an offline pySHACL suite and does not accept --engine graphdb")
+    if args.shacl and args.update_expected:
+        parser.error("--update-expected applies only to --competency")
     return args
 
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.shacl:
+        try:
+            from sakunagraph_etl.quality.shacl_fixtures import (
+                ShaclFixtureError,
+                run_shacl_fixture_suite,
+            )
+
+            suite_result = run_shacl_fixture_suite()
+        except (ImportError, ShaclFixtureError) as exc:
+            print(f"ERROR: {exc}", file=sys.stderr)
+            return 1
+
+        report = suite_result.report
+        if args.report:
+            report_path = args.report if args.report.is_absolute() else ROOT / args.report
+            write_report(report_path, report)
+            print(
+                f"Report: "
+                f"{relative(report_path) if report_path.is_relative_to(ROOT) else report_path}"
+            )
+
+        for outcome in report["cases"]:
+            marker = "PASS" if outcome["status"] == "passed" else "FAIL"
+            count = "?" if outcome["result_count"] is None else outcome["result_count"]
+            print(f"{marker} {outcome['case_id']} [{count} validation results]")
+        if suite_result.failures:
+            print("\nSHACL fixture failures:", file=sys.stderr)
+            for failure in suite_result.failures:
+                print(f"- {failure}", file=sys.stderr)
+            return 1
+
+        print(
+            f"\nPASS: validated all {len(report['cases'])} post-paper SHACL fixture cases "
+            "across the disaster and PSGC publication contracts."
+        )
+        return 0
+
     username = os.environ.get("GRAPHDB_READ_ONLY_USERNAME")
     password = os.environ.get("GRAPHDB_READ_ONLY_PASSWORD")
     if (username is None) != (password is None):

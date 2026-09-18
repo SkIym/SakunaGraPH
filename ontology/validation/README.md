@@ -17,6 +17,8 @@ sources. The competency fixture is synthetic and contains no restricted source r
 | `fixtures/competency-v1.ttl` | Immutable synthetic RDF fixture and GraphDB inference probes |
 | `queries/cq01.rq` through `queries/cq20.rq` | One executable SPARQL query per paper competency question |
 | `expected/cq01.csv` through `expected/cq20.csv` | Exact expected rows using normalized N-Triples terms |
+| `shacl-manifest.json` | Post-paper fixture inventory, source applicability, severity policy, checksums, and exact expected validation results |
+| `fixtures/shacl/` | Synthetic positive, negative, boundary, and full-publication Turtle graphs for core disaster and PSGC shapes |
 | `reports/` | Ignored location for generated machine-readable reports |
 | `competency_questions.md` | Human-readable index and historical transcription notes |
 
@@ -91,3 +93,31 @@ python scripts/validate_semantics.py --competency
 ```
 
 Never regenerate expectations merely to make an unexplained semantic change pass.
+
+## Post-paper SHACL publication contract
+
+SHACL was not part of the validation method reported in the paper. The SHACL suite is therefore
+current engineering evidence for the repository's publication contract; it must not be presented
+as a retrospective reproduction of the study's results.
+
+Run the offline suite from the repository root after installing the standalone ETL package:
+
+```bash
+python scripts/validate_semantics.py --shacl
+```
+
+The manifest currently runs 79 cases: one isolated smallest-valid case for each of the 49 node
+shapes, two full positive publication graphs, and 28 focused negative cases. It checks missing
+required properties, datatypes, controlled values and QUDT units, event date ordering, PSGC parent
+hierarchy, provenance metadata, and zero/negative boundaries. The manifest loader enforces complete
+node-shape coverage and requires every property shape with `sh:minCount` to have a corresponding
+omission case.
+
+Cases declare which of the DROMIC, NDRRMC, GDA, EM-DAT, and PSGC publication profiles they apply
+to. A `sh:Violation` blocks publication; warning and informational results are retained and
+reported. Source-specific warning/information shapes remain governed by ODR-0018 and can be added
+without weakening the shared integrity cases.
+
+Fixture checksums use SHA-256 after LF normalization. When a fixture changes deliberately, review
+the semantic difference, update its expected results if required, and then update the checksum in
+`shacl-manifest.json`.

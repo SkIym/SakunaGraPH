@@ -19,6 +19,7 @@ sgsh:ShapeGraph a owl:Ontology ;
 
 sgsh:IntegerLiteralShape a sh:NodeShape ;
     rdfs:comment "Reusable literal shape for ontology integer fields; accepts xsd:int and xsd:integer to tolerate common RDF serializer output." ;
+    sh:minInclusive 0 ;
     sh:or (
         [ sh:datatype xsd:int ]
         [ sh:datatype xsd:integer ]
@@ -26,6 +27,7 @@ sgsh:IntegerLiteralShape a sh:NodeShape ;
 
 sgsh:DecimalLiteralShape a sh:NodeShape ;
     rdfs:comment "Reusable literal shape for ontology decimal fields; accepts decimal and integer lexical datatypes for numeric quantities." ;
+    sh:minInclusive 0 ;
     sh:or (
         [ sh:datatype xsd:decimal ]
         [ sh:datatype xsd:int ]
@@ -1148,6 +1150,24 @@ sgsh:ClimateParameterBawIsClimateParameterOfIncidentPropertyShape a sh:PropertyS
     sh:path baw:isClimateParameterOfIncident ;
     sh:class baw:Incident .
 
+sgsh:QuantityValueNumericValuePropertyShape a sh:PropertyShape ;
+    rdfs:comment "Every publishable QUDT quantity has exactly one non-negative numeric value." ;
+    sh:path qudt:numericValue ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:node sgsh:DecimalLiteralShape .
+
+sgsh:QuantityValueUnitPropertyShape a sh:PropertyShape ;
+    rdfs:comment "Every publishable QUDT quantity has exactly one declared QUDT unit or currency unit." ;
+    sh:path qudt:unit ;
+    sh:minCount 1 ;
+    sh:maxCount 1 ;
+    sh:nodeKind sh:IRI ;
+    sh:or (
+        [ sh:class qudt:Unit ]
+        [ sh:class qudt:CurrencyUnit ]
+    ) .
+
 #################################################################
 # Core event and classification shapes
 #################################################################
@@ -1529,8 +1549,11 @@ sgsh:SourceShape a sh:NodeShape ;
         sgsh:SourceReportNamePropertyShape .
 
 sgsh:QuantityValueShape a sh:NodeShape ;
-    rdfs:comment "Targets QUDT QuantityValue resources used by monetary and amount object properties for auditability." ;
-    sh:targetClass qudt:QuantityValue .
+    rdfs:comment "Requires numeric values and explicit controlled units on publishable QUDT quantities." ;
+    sh:targetClass qudt:QuantityValue ;
+    sh:property
+        sgsh:QuantityValueNumericValuePropertyShape,
+        sgsh:QuantityValueUnitPropertyShape .
 
 sgsh:CurrencyUnitShape a sh:NodeShape ;
     rdfs:comment "Targets QUDT CurrencyUnit resources used by amount values for auditability." ;

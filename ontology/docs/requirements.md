@@ -423,12 +423,13 @@ currency. A quantity missing `qudt:numericValue` or its required unit MUST fail 
 validation. Cross-unit aggregation MUST either normalize through a declared conversion or be
 rejected.
 
-### Remaining evidence gap
+### Post-paper validation evidence
 
-The current `sgsh:QuantityValueShape` and `sgsh:CurrencyUnitShape` identify target resources but do
-not fully enforce numeric-value/unit completeness. Per ODR-0017, operational completeness belongs
-in SHACL. Add explicit property constraints and positive and negative fixtures before considering
-OR-06 fully verified.
+`sgsh:QuantityValueShape` now requires exactly one non-negative `qudt:numericValue` and one
+controlled unit IRI. The Step 5 SHACL suite covers PHP millions, USD thousands, a non-currency
+unit, zero, missing numeric values, missing units, literal units, and uncontrolled unit IRIs. This
+is current publication-contract evidence under ODR-0017, not a validation method retrospectively
+attributed to the paper.
 
 ## OR-07: Preparedness, response, and service disruption
 
@@ -484,11 +485,13 @@ record, and one service-disruption record. Each MUST retain its event and most-g
 location, conform to SHACL, and appear in the relevant CQ8/CQ12-CQ18 result. A record with only a
 location and no reported detail MUST fail the shared detail constraint.
 
-### Remaining evidence gap
+### Post-paper validation evidence
 
-The competency suite now covers the report-level response and preparedness information needs.
-SHACL conformance of positive/negative fixtures remains Step 5 work. Full rescue mission/team
-workflows remain intentionally unsupported and must not be implied by the smaller `:Rescue` class.
+The competency suite covers the report-level response and preparedness information needs. The
+Step 5 SHACL suite now exercises every response, preparedness, and service-disruption node shape,
+including the shared rule that rejects a record containing only geographic context. Full rescue
+mission/team workflows remain intentionally unsupported and must not be implied by the smaller
+`:Rescue` class.
 
 ## OR-08: IRDR/EM-DAT-aligned SKOS disaster taxonomy
 

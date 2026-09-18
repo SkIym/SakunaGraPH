@@ -1,0 +1,1196 @@
+{
+  "schema_version": 1,
+  "suite": "SakunaGraPH SHACL publication contract v1",
+  "historical_scope": "post-paper-publication-contract",
+  "ontology": "sakunagraph.ttl",
+  "shape_graphs": {
+    "core": "shapes/shapes.ttl",
+    "psgc": "shapes/psgc/shapes.ttl"
+  },
+  "source_profiles": ["dromic", "emdat", "gda", "ndrrmc", "psgc"],
+  "severity_policy": {
+    "Violation": "block",
+    "Warning": "report",
+    "Info": "report"
+  },
+  "fixture_catalogs": {
+    "core-positive": {
+      "path": "validation/fixtures/shacl/core-positive.ttl",
+      "sha256_lf": "b13e807438ae414358ab0e0e3584bd8e67cee65d6e7b6a969646fa80bf86f842"
+    },
+    "core-negative": {
+      "path": "validation/fixtures/shacl/core-negative.ttl",
+      "sha256_lf": "1815e0b01779337f74ad27c97f65fe63520e05bd5041cdc86c54bb26eded5cf8"
+    },
+    "psgc-positive": {
+      "path": "validation/fixtures/shacl/psgc-positive.ttl",
+      "sha256_lf": "a46296a2bcf1563ff5e6baae2340d53bd21801936843cdf4825916faf57d7881"
+    },
+    "psgc-negative": {
+      "path": "validation/fixtures/shacl/psgc-negative.ttl",
+      "sha256_lf": "7985bd64fdfde1f7439d5304adf95c29991931901971d21a72a134562bd66c34"
+    },
+    "psgc-publication-positive": {
+      "path": "validation/fixtures/shacl/psgc-publication-positive.ttl",
+      "sha256_lf": "8a77f632668243c310b7ba9677540fc2392203acf294f20a27333e62da13d8e0"
+    }
+  },
+  "cases": [
+    {
+      "id": "positive-affected-population",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/AffectedPopulationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/affected-population>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/affected-population>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-agriculture-damage",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/AgricultureDamageShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/agriculture-damage>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/agriculture-damage>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-airport-disruption",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/AirportDisruptionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/airport-disruption>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/airport-disruption>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-assistance",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/AssistanceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/assistance>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/assistance>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-casualties-zero",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/CasualtiesShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/casualties>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/casualties>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["boundary-value"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-casualty-type",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/CasualtyTypeShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/casualty-type>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/casualty-type>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-class-suspension",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/ClassSuspensionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/class-suspension>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/class-suspension>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-climate-parameter",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/ClimateParameterShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/climate-parameter>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/climate-parameter>"],
+      "profiles": ["ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-climate-parameter-type",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/ClimateParameterTypeShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/climate-parameter-type>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/climate-parameter-type>"],
+      "profiles": ["ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-communication-line-disruption",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/CommunicationLineDisruptionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/communication-line-disruption>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/communication-line-disruption>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-currency-unit",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/CurrencyUnitShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/currency-unit>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/currency-unit>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-damage-general",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/DamageGeneralShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/damage-general>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/damage-general>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-decimal-literal-zero",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/DecimalLiteralShape>",
+      "focus": "\"0.0\"^^<http://www.w3.org/2001/XMLSchema#decimal>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/decimal-holder>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["boundary-value"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-declaration-of-calamity",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/DeclarationOfCalamityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/declaration-of-calamity>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/declaration-of-calamity>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-disaster-event",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/DisasterEventShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/disaster-event>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/disaster-event>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-disaster-type-scheme",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/DisasterTypeSchemeShape>",
+      "focus": "<https://sakuna.ph/DisasterTypeScheme>",
+      "subjects": ["<https://sakuna.ph/DisasterTypeScheme>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-disaster-type",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/DisasterTypeShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/disaster-type>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/disaster-type>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-flight-disruption",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/FlightDisruptionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/flight-disruption>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/flight-disruption>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-geo-feature",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/GeoFeatureShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/geo-feature>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/geo-feature>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-housing-damage",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/HousingDamageShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/housing-damage>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/housing-damage>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-impact",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/ImpactShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/impact>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/impact>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-incident",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/IncidentShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/incident>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/incident>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-infrastructure-damage",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/InfrastructureDamageShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/infrastructure-damage>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/infrastructure-damage>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-integer-literal-zero",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/IntegerLiteralShape>",
+      "focus": "\"0\"^^<http://www.w3.org/2001/XMLSchema#integer>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/integer-holder>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["boundary-value"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-major-event",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/MajorEventShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/major-event>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/major-event>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-power-disruption",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/PowerDisruptionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/power-disruption>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/power-disruption>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-preemptive-evacuation",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/PreemptiveEvacuationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/preemptive-evacuation>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/preemptive-evacuation>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-preparedness",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/PreparednessShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/preparedness>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/preparedness>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-quantity-value-zero",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/QuantityValueShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/quantity-value>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/quantity-value>",
+        "<https://sakuna.ph/PHP_millions>"
+      ],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["boundary-value"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-recovery",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/RecoveryShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/recovery>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/recovery>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-rescue",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/RescueShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/rescue>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/rescue>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-response",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/ResponseShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/response>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/response>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-road-and-bridges-damage",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/RoadAndBridgesDamageShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/road-and-bridges-damage>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/road-and-bridges-damage>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-seaport-disruption",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/SeaportDisruptionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/seaport-disruption>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/seaport-disruption>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-source",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/SourceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/source>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/source>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-stranded-event",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/StrandedEventShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/stranded-event>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/stranded-event>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-warning",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/WarningShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/warning>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/warning>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-water-disruption",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/WaterDisruptionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/water-disruption>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/water-disruption>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-work-suspension",
+      "kind": "positive",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "shape": "<https://sakuna.ph/shapes/WorkSuspensionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/work-suspension>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/work-suspension>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+
+    {
+      "id": "positive-psgc-barangay",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/BarangayShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/barangay>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/barangay>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/parent-municipality>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-city",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/CityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/city>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/city>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/city-parent-region>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-country",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/CountryShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/country>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/psgc/country>"],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-island-group",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/IslandGroupShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/island-group>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/island-group>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/parent-country>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-municipality",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/MunicipalityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/municipality>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/municipality>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/parent-province>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-administrative-location",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCAdministrativeLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/administrative-location>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/psgc/administrative-location>"],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-location-zero-population",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/location>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/positive/psgc/location>"],
+      "profiles": ["psgc"],
+      "categories": ["boundary-value"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-province",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/ProvinceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/province>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/province>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/parent-region>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-region",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/RegionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/region>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/region>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/parent-island-group>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-sub-municipality",
+      "kind": "positive",
+      "shape_graph": "psgc",
+      "fixture": "psgc-positive",
+      "shape": "<https://sakuna.ph/shapes/psgc/SubMunicipalityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/positive/psgc/sub-municipality>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/sub-municipality>",
+        "<https://sakuna.ph/fixture/shacl/positive/psgc/parent-city>"
+      ],
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+
+    {
+      "id": "positive-core-publication-graph",
+      "kind": "positive",
+      "mode": "full",
+      "shape_graph": "core",
+      "fixture": "core-positive",
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "expected_conforms": true
+    },
+    {
+      "id": "positive-psgc-publication-graph",
+      "kind": "positive",
+      "mode": "full",
+      "shape_graph": "psgc",
+      "fixture": "psgc-publication-positive",
+      "profiles": ["psgc"],
+      "expected_conforms": true
+    },
+
+    {
+      "id": "negative-integer-wrong-datatype",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/IntegerLiteralShape>",
+      "focus": "\"zero\"",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/integer-wrong-datatype-holder>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["wrong-datatype"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/IntegerLiteralShape>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-integer-below-zero",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/IntegerLiteralShape>",
+      "focus": "\"-1\"^^<http://www.w3.org/2001/XMLSchema#integer>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/integer-negative-holder>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["invalid-boundary-value"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/IntegerLiteralShape>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-event-reversed-dates",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/DisasterEventShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/event-reversed-dates>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/event-reversed-dates>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["inconsistent-date-range"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/DisasterEventStartDatePropertyShape>",
+          "path": "<https://sakuna.ph/startDate>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-casualty-count-wrong-datatype",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/CasualtiesShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/casualties-wrong-datatype>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/casualties-wrong-datatype>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["wrong-datatype"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/CasualtiesCasualtyCountPropertyShape>",
+          "path": "<https://sakuna.ph/casualtyCount>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-casualty-controlled-value",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/CasualtiesShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/casualties-invalid-type>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/casualties-invalid-type>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["invalid-unit-or-controlled-resource"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/CasualtiesIsOfCasualtyTypePropertyShape>",
+          "path": "<https://sakuna.ph/isOfCasualtyType>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-impact-location-only",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/ImpactShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/impact-location-only>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/negative/impact-location-only>",
+        "<https://sakuna.ph/fixture/shacl/negative/impact-location>"
+      ],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/ImpactShape>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-source-missing-format",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/SourceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/source-missing-format>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/source-missing-format>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["missing-required-property", "provenance-omission"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/SourceFormatPropertyShape>",
+          "path": "<https://sakuna.ph/format>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-source-missing-report-name",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/SourceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/source-missing-report-name>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/source-missing-report-name>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["missing-required-property", "provenance-omission"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/SourceReportNamePropertyShape>",
+          "path": "<https://sakuna.ph/reportName>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-source-format-wrong-datatype",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/SourceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/source-wrong-format-datatype>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/source-wrong-format-datatype>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["wrong-datatype"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/SourceFormatPropertyShape>",
+          "path": "<https://sakuna.ph/format>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-quantity-missing-value",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/QuantityValueShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/quantity-missing-value>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/negative/quantity-missing-value>",
+        "<https://sakuna.ph/PHP_millions>"
+      ],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/QuantityValueNumericValuePropertyShape>",
+          "path": "<http://qudt.org/schema/qudt/numericValue>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-quantity-missing-unit",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/QuantityValueShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/quantity-missing-unit>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/quantity-missing-unit>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/QuantityValueUnitPropertyShape>",
+          "path": "<http://qudt.org/schema/qudt/unit>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-quantity-literal-unit",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/QuantityValueShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/quantity-literal-unit>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/quantity-literal-unit>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["invalid-unit-or-controlled-resource"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/QuantityValueUnitPropertyShape>",
+          "path": "<http://qudt.org/schema/qudt/unit>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-quantity-uncontrolled-unit",
+      "kind": "negative",
+      "shape_graph": "core",
+      "fixture": "core-negative",
+      "shape": "<https://sakuna.ph/shapes/QuantityValueShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/quantity-uncontrolled-unit>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/quantity-uncontrolled-unit>"],
+      "profiles": ["dromic", "emdat", "gda", "ndrrmc"],
+      "categories": ["invalid-unit-or-controlled-resource"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/QuantityValueUnitPropertyShape>",
+          "path": "<http://qudt.org/schema/qudt/unit>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+
+    {
+      "id": "negative-psgc-missing-label",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/location-missing-label>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/location-missing-label>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/RequiredLabelShape>",
+          "path": "<http://www.w3.org/2000/01/rdf-schema#label>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-missing-rdf-type",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/location-missing-type>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/location-missing-type>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/RDFTypeShape>",
+          "path": "<http://www.w3.org/1999/02/22-rdf-syntax-ns#type>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-missing-geographic-level",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/location-missing-level>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/location-missing-level>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/GeographicLevelShape>",
+          "path": "<https://sakuna.ph/geographicLevel>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-population-wrong-datatype",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/location-wrong-population>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/location-wrong-population>"],
+      "profiles": ["psgc"],
+      "categories": ["wrong-datatype"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/Population2024Shape>",
+          "path": "<https://sakuna.ph/population2024>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-missing-code",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCAdministrativeLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/administrative-missing-code>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/administrative-missing-code>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/PSGCCodeShape>",
+          "path": "<https://sakuna.ph/psgcCode>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-invalid-code",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCAdministrativeLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/administrative-invalid-code>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/administrative-invalid-code>"],
+      "profiles": ["psgc"],
+      "categories": ["invalid-unit-or-controlled-resource"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/PSGCCodeShape>",
+          "path": "<https://sakuna.ph/psgcCode>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-invalid-level",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/PSGCAdministrativeLocationShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/administrative-invalid-level>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/administrative-invalid-level>"],
+      "profiles": ["psgc"],
+      "categories": ["invalid-unit-or-controlled-resource"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/AdministrativeGeographicLevelShape>",
+          "path": "<https://sakuna.ph/geographicLevel>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-island-group-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/IslandGroupShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/island-group-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/island-group-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/IslandGroupParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-region-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/RegionShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/region-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/region-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/RegionParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-province-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/ProvinceShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/province-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/province-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/ProvinceParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-municipality-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/MunicipalityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/municipality-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/municipality-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/MunicipalityParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-city-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/CityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/city-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/city-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/CityParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-sub-municipality-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/SubMunicipalityShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/sub-municipality-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/sub-municipality-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/SubMunicipalityParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-barangay-missing-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/BarangayShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/barangay-missing-parent>",
+      "subjects": ["<https://sakuna.ph/fixture/shacl/negative/psgc/barangay-missing-parent>"],
+      "profiles": ["psgc"],
+      "categories": ["missing-required-property"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/BarangayParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    },
+    {
+      "id": "negative-psgc-invalid-parent",
+      "kind": "negative",
+      "shape_graph": "psgc",
+      "fixture": "psgc-negative",
+      "shape": "<https://sakuna.ph/shapes/psgc/BarangayShape>",
+      "focus": "<https://sakuna.ph/fixture/shacl/negative/psgc/barangay-invalid-parent>",
+      "subjects": [
+        "<https://sakuna.ph/fixture/shacl/negative/psgc/barangay-invalid-parent>",
+        "<https://sakuna.ph/fixture/shacl/negative/psgc/province-parent>"
+      ],
+      "profiles": ["psgc"],
+      "categories": ["invalid-geography-hierarchy"],
+      "expected_conforms": false,
+      "expected_blocks_publication": true,
+      "expected_results": [
+        {
+          "source_shape": "<https://sakuna.ph/shapes/psgc/BarangayParentShape>",
+          "path": "<https://sakuna.ph/isPartOf>",
+          "severity": "<http://www.w3.org/ns/shacl#Violation>"
+        }
+      ]
+    }
+  ]
+}

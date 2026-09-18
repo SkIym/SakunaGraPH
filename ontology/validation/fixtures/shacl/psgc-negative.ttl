@@ -1,0 +1,56 @@
+@prefix : <https://sakuna.ph/> .
+@prefix fixture: <https://sakuna.ph/fixture/shacl/negative/psgc/> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+fixture:location-missing-label a :Country ;
+    :geographicLevel "Country" .
+
+fixture:location-missing-type
+    rdfs:label "Missing RDF type" ;
+    :geographicLevel "Country" .
+
+fixture:location-missing-level a :Country ;
+    rdfs:label "Missing geographic level" .
+
+fixture:location-wrong-population a :Country ;
+    rdfs:label "Wrong population datatype" ;
+    :geographicLevel "Country" ;
+    :population2024 "zero" .
+
+fixture:administrative-missing-code a :Region ;
+    :geographicLevel "Reg"^^xsd:string .
+
+fixture:administrative-invalid-code a :Region ;
+    :geographicLevel "Reg"^^xsd:string ;
+    :psgcCode "ABC"^^xsd:string .
+
+fixture:administrative-invalid-level a :Region ;
+    :geographicLevel "County"^^xsd:string ;
+    :psgcCode "0100000000"^^xsd:string .
+
+fixture:island-group-missing-parent a :IslandGroup ;
+    :geographicLevel "Island Group" .
+
+fixture:region-missing-parent a :Region ;
+    :geographicLevel "Reg"^^xsd:string .
+
+fixture:province-missing-parent a :Province ;
+    :geographicLevel "Prov"^^xsd:string .
+
+fixture:municipality-missing-parent a :Municipality ;
+    :geographicLevel "Mun"^^xsd:string .
+
+fixture:city-missing-parent a :City ;
+    :geographicLevel "City"^^xsd:string .
+
+fixture:sub-municipality-missing-parent a :SubMunicipality ;
+    :geographicLevel "SubMun"^^xsd:string .
+
+fixture:barangay-missing-parent a :Barangay ;
+    :geographicLevel "Bgy"^^xsd:string .
+
+fixture:barangay-invalid-parent a :Barangay ;
+    :geographicLevel "Bgy"^^xsd:string ;
+    :isPartOf fixture:province-parent .
+fixture:province-parent a :Province .

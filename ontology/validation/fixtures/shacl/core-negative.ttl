@@ -1,0 +1,48 @@
+@prefix : <https://sakuna.ph/> .
+@prefix fixture: <https://sakuna.ph/fixture/shacl/negative/> .
+@prefix qudt: <http://qudt.org/schema/qudt/> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+fixture:integer-wrong-datatype-holder fixture:value "zero" .
+fixture:integer-negative-holder fixture:value -1 .
+fixture:decimal-wrong-datatype-holder fixture:value "zero" .
+
+fixture:event-reversed-dates a :DisasterEvent ;
+    :startDate "2026-02-02T00:00:00Z"^^xsd:dateTime ;
+    :endDate "2026-02-01T00:00:00Z"^^xsd:dateTime .
+
+fixture:casualties-wrong-datatype a :Casualties ;
+    :casualtyCount "1" .
+
+fixture:casualties-invalid-type a :Casualties ;
+    :isOfCasualtyType fixture:not-a-casualty-type .
+
+fixture:impact-location-only a :Impact ;
+    :hasLocation fixture:impact-location .
+fixture:impact-location a :Region .
+
+fixture:source-missing-format a :Source ;
+    :reportName "Report without format" .
+
+fixture:source-missing-report-name a :Source ;
+    :format "PDF" .
+
+fixture:source-wrong-format-datatype a :Source ;
+    :format 7 ;
+    :reportName "Wrong format datatype" .
+
+fixture:quantity-missing-value a qudt:QuantityValue ;
+    qudt:unit :PHP_millions .
+
+fixture:quantity-missing-unit a qudt:QuantityValue ;
+    qudt:numericValue 1.0 .
+
+fixture:quantity-literal-unit a qudt:QuantityValue ;
+    qudt:numericValue 1.0 ;
+    qudt:unit "PHP" .
+
+fixture:quantity-uncontrolled-unit a qudt:QuantityValue ;
+    qudt:numericValue 1.0 ;
+    qudt:unit fixture:not-a-qudt-unit .
+
+:PHP_millions a qudt:CurrencyUnit .
