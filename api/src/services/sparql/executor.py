@@ -211,6 +211,7 @@ async def execute_sparql(
     *,
     timeout_seconds: float | None = None,
     max_rows: int | None = None,
+    include_inferred: bool | None = None,
 ) -> dict[Any, Any] | str:
     if not query or not query.strip():
         return "A non-empty SPARQL query is required."
@@ -232,13 +233,16 @@ async def execute_sparql(
         else None
     )
     timeout = timeout_seconds or settings.graphdb_query_timeout_seconds
+    request_params = {"timeout": str(max(1, int(timeout)))}
+    if include_inferred is not None:
+        request_params["infer"] = "true" if include_inferred else "false"
 
     try:
         async with httpx.AsyncClient(timeout=timeout, auth=auth) as client:
             response = await client.post(
                 settings.graphdb_endpoint,
                 content=query.encode(),
-                params={"timeout": str(max(1, int(timeout)))},
+                params=request_params,
                 headers={
                     "Content-Type": "application/sparql-query",
                     "Accept": "application/sparql-results+json",

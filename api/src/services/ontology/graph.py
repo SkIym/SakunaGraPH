@@ -63,6 +63,7 @@ PREFIX owl:    <http://www.w3.org/2002/07/owl#>
 
 SELECT DISTINCT ?class ?propLabel ?range WHERE {
     ?prop a owl:DatatypeProperty .
+    FILTER NOT EXISTS { ?prop a owl:ObjectProperty }
     {
         ?prop rdfs:domain ?class .
         FILTER(isIRI(?class))
@@ -71,18 +72,6 @@ SELECT DISTINCT ?class ?propLabel ?range WHERE {
         FILTER(isIRI(?class))
     }
     FILTER(STRSTARTS(STR(?class), "https://sakuna.ph/"))
-    FILTER NOT EXISTS {
-        ?sub rdfs:subClassOf ?class .
-        FILTER(?sub != ?class)
-        FILTER(STRSTARTS(STR(?sub), "https://sakuna.ph/"))
-        {
-            ?prop rdfs:domain ?sub .
-            FILTER(isIRI(?sub))
-        } UNION {
-            ?prop rdfs:domain/owl:unionOf/rdf:rest*/rdf:first ?sub .
-            FILTER(isIRI(?sub))
-        }
-    }
     OPTIONAL { ?prop rdfs:label ?propLabel }
     OPTIONAL {
         ?prop rdfs:range ?range .
@@ -219,7 +208,9 @@ async def get_ontology_graph() -> OntologyGraphResponse:
         execute_sparql(_GRAPH_CLASSES_QUERY),
         execute_sparql(_GRAPH_SUBCLASSOF_QUERY),
         execute_sparql(_GRAPH_OBJPROPS_QUERY),
-        execute_sparql(_GRAPH_DATAPROPS_QUERY),
+        # A reasoned repository infers superclass domains for datatype properties.
+        # The inspector must show only the domains asserted by the ontology.
+        execute_sparql(_GRAPH_DATAPROPS_QUERY, include_inferred=False),
     )
 
     errors = [r for r in (class_res, subclassof_res, objprop_res, dataprop_res) if isinstance(r, str)]

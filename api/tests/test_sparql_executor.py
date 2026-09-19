@@ -178,6 +178,31 @@ LIMIT 10"""
 
         self.assertEqual(result, "GraphDB request timed out.")
 
+    async def test_can_exclude_inferred_graphdb_statements(self) -> None:
+        response = unittest.mock.Mock(
+            status_code=200,
+            json=unittest.mock.Mock(
+                return_value={"head": {"vars": []}, "results": {"bindings": []}}
+            ),
+        )
+        client_context = unittest.mock.MagicMock()
+        client_context.__aenter__ = AsyncMock()
+        client_context.__aenter__.return_value.post = AsyncMock(return_value=response)
+        client_context.__aexit__ = AsyncMock(return_value=False)
+        with patch(
+            "src.services.sparql.executor.httpx.AsyncClient",
+            return_value=client_context,
+        ):
+            await execute_sparql(
+                "SELECT ?event WHERE { ?event a :DisasterEvent } LIMIT 10",
+                include_inferred=False,
+            )
+
+        self.assertEqual(
+            client_context.__aenter__.return_value.post.await_args.kwargs["params"],
+            {"timeout": "30", "infer": "false"},
+        )
+
     async def test_correction_failure_preserves_query_and_error(self) -> None:
         generated = "SELECT COUNT ?event WHERE { ?event a :DisasterEvent . }"
         with (

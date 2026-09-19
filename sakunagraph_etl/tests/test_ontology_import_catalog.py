@@ -158,6 +158,13 @@ class OntologyImportCatalogTests(unittest.TestCase):
             (QUDT.hasQuantityKind, RDF.type, OWL.AnnotationProperty), graph
         )
 
+    def test_casualty_type_relation_is_object_property_only(self) -> None:
+        graph = Graph().parse(REPOSITORY_ROOT / "ontology" / "sakunagraph.ttl")
+
+        self.assertIn((SG.isOfCasualtyType, RDF.type, OWL.ObjectProperty), graph)
+        self.assertIn((SG.isOfCasualtyType, RDFS.range, SG.CasualtyType), graph)
+        self.assertNotIn((SG.isOfCasualtyType, RDF.type, OWL.DatatypeProperty), graph)
+
 
 if __name__ == "__main__":
     unittest.main()
