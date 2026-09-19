@@ -976,10 +976,6 @@ baw:hasValue rdf:type owl:DatatypeProperty ;
                       rdfs:label "interruption datetime"@en .
 
 
-###  https://sakuna.ph/isOfCasualtyType
-:isOfCasualtyType rdf:type owl:DatatypeProperty .
-
-
 ###  https://sakuna.ph/itemQuantity
 :itemQuantity rdf:type owl:DatatypeProperty ;
               rdfs:subPropertyOf owl:topDataProperty ;
