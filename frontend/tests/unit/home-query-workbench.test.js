@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from 'vitest';
+import { COMPETENCY_QUESTIONS } from '../../src/lib/competency_queries.js';
 import {
 	createQueryWorkbench,
 	isSelectQuery,
@@ -7,6 +8,23 @@ import {
 } from '../../src/lib/features/home/queryWorkbench.svelte.js';
 
 describe('landing query workbench', () => {
+	it('preloads a competency question by stable ID without executing it', () => {
+		const execute = vi.fn();
+		const workbench = createQueryWorkbench({ execute, initialCompetencyId: 'CQ06' });
+		const question = COMPETENCY_QUESTIONS.find(({ id }) => id === 'CQ06');
+
+		expect(workbench.selectedCompetency).toBe('CQ06');
+		expect(workbench.query).toBe(question.query);
+		expect(execute).not.toHaveBeenCalled();
+	});
+
+	it('falls back to the default query for an unknown competency ID', () => {
+		const workbench = createQueryWorkbench({ initialCompetencyId: 'CQ99' });
+
+		expect(workbench.selectedCompetency).toBe('');
+		expect(workbench.query).toMatch(/SELECT DISTINCT \?event \?disasterType/);
+	});
+
 	it('blocks write operations before transport', async () => {
 		const execute = vi.fn();
 		const workbench = createQueryWorkbench({ execute });

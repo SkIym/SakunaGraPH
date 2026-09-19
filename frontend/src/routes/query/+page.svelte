@@ -1,5 +1,7 @@
 <script>
 	import QueryPage from '$lib/features/query/QueryPage.svelte';
+
+	let { data } = $props();
 </script>
 
-<QueryPage />
+<QueryPage initialCompetencyId={data.competencyId} />

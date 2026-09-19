@@ -4,6 +4,7 @@
 	import { getOntologyGraph, getOntologyPsgc, getOntologyTaxonomy } from '$lib/api/ontology.js';
 	import CoreOntologyPanel from './components/CoreOntologyPanel.svelte';
 	import OntologyTabs from './components/OntologyTabs.svelte';
+	import OntologyWalkthrough from './components/OntologyWalkthrough.svelte';
 	import PsgcPanel from './components/PsgcPanel.svelte';
 	import TaxonomyPanel from './components/TaxonomyPanel.svelte';
 
@@ -44,6 +45,7 @@
 	// ══════════════════════════════════════════════════════════════════════════
 	let svgEl = $state(null);
 	let loading = $state(true);
+	let graphError = $state('');
 	let hoveredNode = $state(null);
 	let selectedNode = $state(null);
 	let tooltipX = $state(0);
@@ -96,7 +98,10 @@
 				else cleanup = disposeGraph;
 			})
 			.catch((requestError) => {
-				if (requestError.name !== 'AbortError') loading = false;
+				if (requestError.name !== 'AbortError') {
+					loading = false;
+					graphError = 'The core ontology graph could not be loaded.';
+				}
 			});
 		return () => {
 			disposed = true;
@@ -453,6 +458,7 @@
 	// ══════════════════════════════════════════════════════════════════════════
 	let taxSvgEl = $state(null);
 	let taxLoading = $state(true);
+	let taxError = $state('');
 	let taxSelected = $state(null);
 
 	const TAX_COLOR = {
@@ -479,9 +485,13 @@
 		if (taxSvgEl) {
 			const controller = new AbortController();
 			taxLoading = true;
+			taxError = '';
 			taxSelected = null;
 			void initTaxonomy(controller.signal).catch((requestError) => {
-				if (requestError.name !== 'AbortError') taxLoading = false;
+				if (requestError.name !== 'AbortError') {
+					taxLoading = false;
+					taxError = 'The disaster taxonomy could not be loaded.';
+				}
 			});
 			return () => controller.abort();
 		}
@@ -716,6 +726,7 @@
 	// ══════════════════════════════════════════════════════════════════════════
 	let psgcSvgEl = $state(null);
 	let psgcLoading = $state(true);
+	let psgcError = $state('');
 	let psgcSelected = $state(null);
 	let psgcSim = null;
 
@@ -730,9 +741,13 @@
 		if (psgcSvgEl) {
 			const controller = new AbortController();
 			psgcLoading = true;
+			psgcError = '';
 			psgcSelected = null;
 			void initPsgc(controller.signal).catch((requestError) => {
-				if (requestError.name !== 'AbortError') psgcLoading = false;
+				if (requestError.name !== 'AbortError') {
+					psgcLoading = false;
+					psgcError = 'The PSGC location graph could not be loaded.';
+				}
 			});
 			return () => {
 				controller.abort();
@@ -1002,7 +1017,16 @@
 </script>
 
 <svelte:head>
-	<title>Ontology · SakunaGraPH</title>
+	<title>Disaster ontology atlas · SakunaGraPH</title>
+	<meta
+		name="description"
+		content="Explore the SakunaGraPH disaster ontology, hazard taxonomy, and linked Philippine geographic registry."
+	/>
+	<meta property="og:title" content="Disaster ontology atlas · SakunaGraPH" />
+	<meta
+		property="og:description"
+		content="An interactive atlas of the concepts and relationships behind Philippine disaster data."
+	/>
 </svelte:head>
 
 <NodeCanvas />
@@ -1016,35 +1040,71 @@
 {/if}
 
 <main class="ontology-page">
-	<header class="ontology-intro">
-		<div class="intro-copy">
-			<p class="workspace-kicker">Schema atlas · OWL 2</p>
-			<h1>See how disaster knowledge connects.</h1>
-			<p class="intro-summary">
-				Explore classes, hazard categories, and Philippine places—and the links that make every
-				record explainable.
+	<header class="ontology-hero">
+		<div class="hero-copy">
+			<p class="workspace-kicker">The SakunaGraPH ontology · OWL 2</p>
+			<h1>A living map of <em>disaster knowledge.</em></h1>
+			<p class="hero-summary">
+				Follow the concepts that turn reports from five Philippine and international sources into
+				one queryable, explainable record of an event.
 			</p>
+			<nav class="hero-actions" aria-label="Ontology page sections">
+				<a class="primary-action" href="#ontology-explorer">
+					Enter the atlas
+					<svg aria-hidden="true" viewBox="0 0 20 20">
+						<path d="M10 3v13M5 11l5 5 5-5" />
+					</svg>
+				</a>
+				<a class="text-action" href="#question-to-query">Follow a question to SPARQL</a>
+			</nav>
 		</div>
 
-		<aside class="atlas-note" aria-label="About the ontology explorer">
-			<span aria-hidden="true">03</span>
-			<div>
-				<p>Connected lenses</p>
-				<small>Class model, disaster taxonomy, and PSGC geography in one research view.</small>
+		<aside class="schema-specimen" aria-label="Ontology model summary">
+			<div class="specimen-label">
+				<span>Schema specimen</span>
+				<code>sakuna:DisasterEvent</code>
+			</div>
+			<svg class="specimen-graph" aria-hidden="true" viewBox="0 0 560 300" fill="none">
+				<path d="M83 154H220M340 154h137M280 94V48M280 214v42" />
+				<path class="branch" d="M131 154 82 78M429 154l49-76M131 154l-49 76M429 154l49 76" />
+				<circle cx="280" cy="154" r="60" />
+				<circle cx="82" cy="78" r="17" />
+				<circle cx="478" cy="78" r="17" />
+				<circle cx="82" cy="230" r="17" />
+				<circle cx="478" cy="230" r="17" />
+				<rect x="250" y="28" width="60" height="20" rx="4" />
+				<rect x="250" y="256" width="60" height="20" rx="4" />
+				<text x="280" y="150">Disaster</text>
+				<text x="280" y="169">Event</text>
+				<text x="82" y="82">type</text>
+				<text x="478" y="82">place</text>
+				<text x="82" y="234">impact</text>
+				<text x="478" y="234">source</text>
+			</svg>
+			<div class="specimen-stats" aria-label="Ontology scope">
+				<p><strong>03</strong><span>connected views</span></p>
+				<p><strong>20</strong><span>competency questions</span></p>
+				<p><strong>05</strong><span>source systems</span></p>
 			</div>
 		</aside>
 	</header>
 
-	<section class="ontology-workbench" aria-labelledby="ontology-view-title">
+	<section id="ontology-explorer" class="ontology-workbench" aria-labelledby="ontology-view-title">
 		<header class="workbench-header">
+			<p class="workbench-index">Atlas / {activeViewNumber}</p>
 			<div class="view-copy">
-				<p><span>{activeViewNumber}</span> {activeView.kicker}</p>
+				<p>{activeView.kicker}</p>
 				<h2 id="ontology-view-title">{activeView.title}</h2>
 				<p>{activeView.description}</p>
 			</div>
 
 			<div class="workbench-controls">
-				<OntologyTabs tabs={TABS} active={activeTab} onChange={(tab) => (activeTab = tab)} />
+				<OntologyTabs
+					tabs={TABS}
+					active={activeTab}
+					orientation="rail"
+					onChange={(tab) => (activeTab = tab)}
+				/>
 				<p class="interaction-guide">
 					<span>
 						<svg aria-hidden="true" viewBox="0 0 24 24" fill="none">
@@ -1052,16 +1112,22 @@
 						</svg>
 						Select a node
 					</span>
-					<i aria-hidden="true"></i>
-					<span>Drag or scroll to navigate</span>
+					<span>Drag the canvas · scroll to zoom</span>
 				</p>
 			</div>
+
+			<p class="standards-note">
+				Built on <abbr title="Web Ontology Language">OWL 2</abbr>, PROV-O, GeoSPARQL, SKOS, QUDT,
+				and the EM-DAT disaster classification.
+			</p>
 		</header>
 
 		<div class="graph-stage">
+			<div class="stage-status" aria-hidden="true"><span></span> Interactive canvas</div>
 			<CoreOntologyPanel
 				active={activeTab === 'graph'}
 				{loading}
+				error={graphError}
 				{selectedNode}
 				groupColors={GROUP_COLOR}
 				groupLabels={GROUP_LABEL}
@@ -1071,6 +1137,7 @@
 			<TaxonomyPanel
 				active={activeTab === 'taxonomy'}
 				loading={taxLoading}
+				error={taxError}
 				selectedNode={taxSelected}
 				colors={TAX_COLOR}
 				bind:svgElement={taxSvgEl}
@@ -1079,111 +1146,286 @@
 			<PsgcPanel
 				active={activeTab === 'psgc'}
 				loading={psgcLoading}
+				error={psgcError}
 				selectedNode={psgcSelected}
 				islandColors={ISLAND_COLOR}
 				bind:svgElement={psgcSvgEl}
 			/>
 		</div>
 	</section>
+
+	<OntologyWalkthrough />
 </main>
 
 <style>
 	.ontology-page {
 		position: relative;
 		z-index: 1;
-		width: min(100%, 90rem);
+		width: min(100%, 96rem);
 		min-height: calc(100dvh - var(--app-nav-height));
 		margin: 0 auto;
-		padding: clamp(1.5rem, 3.5vw, 3.5rem) clamp(1rem, 3vw, 2.5rem) 3rem;
+		padding: 0 clamp(1rem, 3vw, 2.75rem) clamp(4rem, 7vw, 7rem);
 	}
 
-	.ontology-intro {
+	.ontology-hero {
 		display: grid;
-		grid-template-columns: minmax(0, 1.45fr) minmax(16rem, 0.55fr);
-		align-items: end;
-		gap: clamp(2rem, 6vw, 7rem);
-		padding: 0.5rem clamp(0rem, 2vw, 1.5rem) clamp(2rem, 4vw, 3.5rem);
+		grid-template-columns: minmax(0, 1.08fr) minmax(25rem, 0.92fr);
+		align-items: center;
+		gap: clamp(3rem, 7vw, 8rem);
+		min-height: min(42rem, calc(100dvh - var(--app-nav-height)));
+		padding: clamp(3.5rem, 7vw, 7rem) clamp(0rem, 2vw, 1.5rem) clamp(4rem, 7vw, 6.5rem);
 	}
 
-	.intro-copy {
-		max-width: 52rem;
+	.hero-copy {
+		max-width: 48rem;
 	}
 
-	.intro-copy h1 {
-		max-width: 56rem;
-		margin: 0.65rem 0 0;
+	.hero-copy h1 {
+		max-width: 13ch;
+		margin: 0.85rem 0 0;
 		font-family: 'Playfair Display', Georgia, serif;
-		font-size: clamp(2.5rem, 4.3vw, 4rem);
+		font-size: clamp(3.35rem, 6.2vw, 6rem);
 		font-weight: 900;
-		line-height: 0.98;
-		letter-spacing: -0.045em;
+		line-height: 0.91;
+		letter-spacing: -0.052em;
 		color: var(--color-text);
 		text-wrap: balance;
 	}
 
-	.intro-summary {
-		max-width: 44rem;
-		margin: 1.25rem 0 0;
-		font-size: clamp(0.875rem, 1.4vw, 1rem);
-		line-height: 1.7;
+	.hero-copy h1 em {
+		font-weight: 700;
+		color: var(--color-brand);
+	}
+
+	.hero-summary {
+		max-width: 58ch;
+		margin: 1.5rem 0 0;
+		font-size: clamp(0.95rem, 1.4vw, 1.1rem);
+		line-height: 1.75;
 		color: var(--color-text-secondary);
 		text-wrap: pretty;
 	}
 
-	.atlas-note {
-		display: grid;
-		grid-template-columns: auto minmax(0, 1fr);
+	.hero-actions {
+		display: flex;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.75rem 1.25rem;
+		margin-top: 2rem;
+	}
+
+	.hero-actions a {
+		min-height: 2.9rem;
+		font-size: 0.75rem;
+		font-weight: 750;
+		transition:
+			background-color 180ms ease,
+			color 180ms ease,
+			transform 150ms ease;
+	}
+
+	.hero-actions a:active {
+		transform: translateY(1px);
+	}
+
+	.primary-action {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.65rem;
+		border-radius: 0.25rem;
+		background: var(--color-brand);
+		padding: 0 1rem;
+		color: white;
+		text-decoration: none;
+		box-shadow: 0 0.8rem 2rem -1.15rem rgb(0 56 168 / 0.68);
+	}
+
+	.primary-action:hover {
+		background: var(--color-brand-hover);
+	}
+
+	.primary-action svg {
+		width: 1rem;
+		height: 1rem;
+		fill: none;
+		stroke: currentColor;
+		stroke-linecap: round;
+		stroke-linejoin: round;
+		stroke-width: 1.7;
+	}
+
+	.text-action {
+		display: inline-flex;
+		align-items: center;
+		color: var(--color-text-secondary);
+		text-decoration-color: var(--color-border);
+		text-underline-offset: 0.3rem;
+	}
+
+	.text-action:hover {
+		color: var(--color-brand);
+		text-decoration-color: var(--color-brand-medium);
+	}
+
+	.schema-specimen {
+		position: relative;
+		overflow: hidden;
+		border-radius: 1.5rem 0.35rem 1.5rem 0.35rem;
+		background: radial-gradient(circle at 78% 18%, rgb(47 83 137 / 0.38), transparent 32%), #182236;
+		padding: 1.25rem;
+		box-shadow: 0 2.5rem 5rem -3rem rgb(14 30 58 / 0.72);
+		color: #f8fafc;
+	}
+
+	.schema-specimen::after {
+		position: absolute;
+		inset: 0;
+		background-image: radial-gradient(rgb(255 255 255 / 0.12) 0.7px, transparent 0.7px);
+		background-size: 0.65rem 0.65rem;
+		content: '';
+		mask-image: linear-gradient(to bottom, black, transparent 68%);
+		pointer-events: none;
+	}
+
+	.specimen-label,
+	.specimen-stats {
+		position: relative;
+		z-index: 1;
+	}
+
+	.specimen-label {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
 		gap: 1rem;
-		border-top: 1px solid var(--color-border);
+		border-bottom: 1px solid rgb(255 255 255 / 0.14);
+		padding-bottom: 1rem;
+		font-family: var(--font-mono);
+		font-size: 0.625rem;
+		line-height: 1.4;
+		color: #aebbd0;
+	}
+
+	.specimen-label span {
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	.specimen-label code {
+		color: #f3d451;
+	}
+
+	.specimen-graph {
+		position: relative;
+		z-index: 1;
+		display: block;
+		width: 100%;
+		margin: 0.5rem 0;
+	}
+
+	.specimen-graph path,
+	.specimen-graph circle,
+	.specimen-graph rect {
+		stroke: #8fa8d2;
+		stroke-width: 1.25;
+	}
+
+	.specimen-graph .branch {
+		stroke: #5574a8;
+		stroke-dasharray: 4 5;
+	}
+
+	.specimen-graph circle,
+	.specimen-graph rect {
+		fill: #1e2e49;
+	}
+
+	.specimen-graph circle:first-of-type {
+		fill: #213b65;
+		stroke: #f3d451;
+		stroke-width: 1.8;
+	}
+
+	.specimen-graph text {
+		fill: #dbe5f4;
+		font-family: var(--font-mono);
+		font-size: 11px;
+		text-anchor: middle;
+	}
+
+	.specimen-graph text:nth-of-type(-n + 2) {
+		fill: white;
+		font-size: 13px;
+		font-weight: 600;
+	}
+
+	.specimen-stats {
+		display: grid;
+		grid-template-columns: repeat(3, minmax(0, 1fr));
+		border-top: 1px solid rgb(255 255 255 / 0.14);
 		padding-top: 1rem;
 	}
 
-	.atlas-note > span {
-		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-		font-size: 1.5rem;
-		font-weight: 600;
-		line-height: 1;
-		color: var(--color-brand);
-	}
-
-	.atlas-note p,
-	.atlas-note small {
+	.specimen-stats p {
 		margin: 0;
+		padding: 0 0.75rem;
 	}
 
-	.atlas-note p {
-		font-size: 0.75rem;
-		font-weight: 700;
-		line-height: 1.3;
-		letter-spacing: 0.08em;
-		text-transform: uppercase;
-		color: var(--color-text);
+	.specimen-stats p:first-child {
+		padding-left: 0;
 	}
 
-	.atlas-note small {
+	.specimen-stats p + p {
+		border-left: 1px solid rgb(255 255 255 / 0.14);
+	}
+
+	.specimen-stats strong,
+	.specimen-stats span {
 		display: block;
-		margin-top: 0.35rem;
-		font-size: 0.75rem;
-		line-height: 1.55;
-		color: var(--color-text-muted);
+	}
+
+	.specimen-stats strong {
+		font-family: var(--font-mono);
+		font-size: 1rem;
+		font-variant-numeric: tabular-nums;
+		color: #f3d451;
+	}
+
+	.specimen-stats span {
+		margin-top: 0.25rem;
+		font-size: 0.625rem;
+		line-height: 1.35;
+		color: #aebbd0;
 	}
 
 	.ontology-workbench {
+		display: grid;
+		grid-template-columns: minmax(17.5rem, 0.26fr) minmax(0, 1fr);
 		overflow: hidden;
 		border: 1px solid var(--color-border);
-		border-radius: var(--radius-surface);
+		border-radius: 1.5rem 0.35rem 1.5rem 0.35rem;
 		background: var(--color-canvas);
-		box-shadow: var(--shadow-surface);
+		box-shadow: 0 2rem 5rem -3.25rem rgb(18 42 78 / 0.5);
+		scroll-margin-top: calc(var(--app-nav-height) + 1rem);
 	}
 
 	.workbench-header {
-		display: grid;
-		grid-template-columns: minmax(17rem, 0.8fr) minmax(28rem, 1.2fr);
-		align-items: end;
-		gap: 2rem;
-		border-bottom: 1px solid var(--color-border);
-		background: var(--color-canvas);
-		padding: 1.25rem 1.5rem 1.35rem;
+		display: flex;
+		min-width: 0;
+		flex-direction: column;
+		border-right: 1px solid var(--color-border);
+		background: #f5f7fb;
+		padding: clamp(1.5rem, 2.6vw, 2.25rem);
+	}
+
+	.workbench-index {
+		margin: 0 0 clamp(2.5rem, 6vw, 5rem);
+		font-family: var(--font-mono);
+		font-size: 0.625rem;
+		font-variant-numeric: tabular-nums;
+		letter-spacing: 0.08em;
+		text-transform: uppercase;
+		color: var(--color-text-secondary);
 	}
 
 	.view-copy > p:first-child {
@@ -1196,15 +1438,10 @@
 		color: var(--color-brand);
 	}
 
-	.view-copy > p:first-child span {
-		margin-right: 0.45rem;
-		font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
-	}
-
 	.view-copy h2 {
-		margin: 0.25rem 0 0;
+		margin: 0.35rem 0 0;
 		font-family: 'Playfair Display', Georgia, serif;
-		font-size: clamp(1.45rem, 2.2vw, 2rem);
+		font-size: clamp(1.75rem, 2.4vw, 2.45rem);
 		font-weight: 900;
 		line-height: 1.1;
 		letter-spacing: -0.025em;
@@ -1216,24 +1453,23 @@
 		margin: 0.55rem 0 0;
 		font-size: 0.75rem;
 		line-height: 1.55;
-		color: var(--color-text-muted);
+		color: var(--color-text-secondary);
 		text-wrap: pretty;
 	}
 
 	.workbench-controls {
 		display: grid;
-		gap: 0.75rem;
-		justify-items: end;
+		gap: 1.15rem;
+		margin-top: 2rem;
 	}
 
 	.interaction-guide {
-		display: flex;
-		align-items: center;
-		gap: 0.75rem;
+		display: grid;
+		gap: 0.4rem;
 		margin: 0;
 		font-size: 0.6875rem;
 		line-height: 1.4;
-		color: var(--color-text-muted);
+		color: var(--color-text-secondary);
 	}
 
 	.interaction-guide span {
@@ -1255,22 +1491,58 @@
 		stroke-linejoin: round;
 	}
 
-	.interaction-guide i {
-		width: 1px;
-		height: 0.75rem;
-		background: var(--color-border);
+	.standards-note {
+		margin: auto 0 0;
+		border-top: 1px solid var(--color-border);
+		padding-top: 1rem;
+		font-size: 0.625rem;
+		line-height: 1.6;
+		color: var(--color-text-secondary);
+	}
+
+	.standards-note abbr {
+		text-decoration-color: var(--color-brand-medium);
+		text-underline-offset: 0.18rem;
 	}
 
 	.graph-stage {
 		position: relative;
-		height: clamp(34rem, 64dvh, 48rem);
-		min-height: 34rem;
+		height: clamp(39rem, 76dvh, 50rem);
+		min-height: 39rem;
 		overflow: hidden;
-		background-color: #fcfdff;
+		background-color: #fbfcfe;
 		background-image:
-			linear-gradient(var(--color-brand-soft) 1px, transparent 1px),
-			linear-gradient(90deg, var(--color-brand-soft) 1px, transparent 1px);
-		background-size: 2.5rem 2.5rem;
+			linear-gradient(rgb(0 56 168 / 0.055) 1px, transparent 1px),
+			linear-gradient(90deg, rgb(0 56 168 / 0.055) 1px, transparent 1px);
+		background-size: 2rem 2rem;
+	}
+
+	.stage-status {
+		position: absolute;
+		z-index: 10;
+		top: 1rem;
+		right: 1rem;
+		display: flex;
+		align-items: center;
+		gap: 0.45rem;
+		border: 1px solid rgb(203 213 225 / 0.85);
+		border-radius: 0.35rem;
+		background: rgb(255 255 255 / 0.82);
+		padding: 0.42rem 0.6rem;
+		font-family: var(--font-mono);
+		font-size: 0.5625rem;
+		letter-spacing: 0.04em;
+		color: var(--color-text-muted);
+		backdrop-filter: blur(0.5rem);
+		pointer-events: none;
+	}
+
+	.stage-status span {
+		width: 0.4rem;
+		height: 0.4rem;
+		border-radius: 50%;
+		background: #2f7d56;
+		box-shadow: 0 0 0 0.2rem rgb(47 125 86 / 0.13);
 	}
 
 	.graph-stage :global(g[role='button']:focus) {
@@ -1321,78 +1593,132 @@
 		color: #cbd5e1;
 	}
 
-	@media (max-width: 900px) {
-		.ontology-intro {
+	@media (max-width: 1050px) {
+		.ontology-hero {
 			grid-template-columns: 1fr;
-			gap: 1.5rem;
+			gap: 3rem;
+			min-height: auto;
 		}
 
-		.atlas-note {
-			max-width: 34rem;
+		.hero-copy h1 {
+			max-width: 12ch;
+		}
+
+		.schema-specimen {
+			width: min(100%, 42rem);
+			margin-left: auto;
+		}
+
+		.ontology-workbench {
+			grid-template-columns: 1fr;
 		}
 
 		.workbench-header {
-			grid-template-columns: 1fr;
-			gap: 1.25rem;
+			display: grid;
+			grid-template-columns: minmax(14rem, 0.8fr) minmax(24rem, 1.2fr);
+			gap: 1.5rem 2rem;
+			border-right: 0;
+			border-bottom: 1px solid var(--color-border);
+		}
+
+		.workbench-index {
+			grid-column: 1 / -1;
+			margin-bottom: 0;
 		}
 
 		.workbench-controls {
-			justify-items: stretch;
+			margin-top: 0;
 		}
 
-		.interaction-guide {
-			justify-content: flex-end;
+		.standards-note {
+			grid-column: 1 / -1;
+			margin-top: 0;
+		}
+
+		.graph-stage {
+			height: clamp(36rem, 70dvh, 46rem);
+			min-height: 36rem;
 		}
 	}
 
 	@media (max-width: 639px) {
 		.ontology-page {
-			padding: 1.25rem 0.75rem 1.5rem;
+			padding: 0 0.75rem 4rem;
 		}
 
-		.ontology-intro {
-			padding: 0.25rem 0.5rem 2rem;
+		.ontology-hero {
+			gap: 2.5rem;
+			padding: 3.75rem 0.5rem 4.5rem;
 		}
 
-		.intro-copy h1 {
-			font-size: clamp(2.35rem, 11vw, 3rem);
-			line-height: 1;
+		.hero-copy h1 {
+			font-size: clamp(3.25rem, 15.5vw, 4.6rem);
+			line-height: 0.9;
 		}
 
-		.intro-summary {
-			margin-top: 1rem;
+		.hero-summary {
+			margin-top: 1.25rem;
+			font-size: 0.9375rem;
 		}
 
-		.atlas-note {
-			display: none;
+		.hero-actions {
+			align-items: stretch;
+			flex-direction: column;
+			margin-top: 1.5rem;
+		}
+
+		.hero-actions a {
+			width: fit-content;
+		}
+
+		.schema-specimen {
+			margin: 0;
+			border-radius: 1rem 0.25rem 1rem 0.25rem;
+			padding: 1rem;
+		}
+
+		.specimen-graph {
+			margin: 0;
+		}
+
+		.specimen-stats span {
+			font-size: 0.5625rem;
 		}
 
 		.workbench-header {
-			gap: 1rem;
-			padding: 1rem 0.875rem;
+			display: flex;
+			gap: 0;
+			padding: 1.25rem 1rem;
+		}
+
+		.workbench-index {
+			margin-bottom: 2rem;
 		}
 
 		.view-copy {
-			padding-inline: 0.125rem;
+			padding-inline: 0.15rem;
 		}
 
-		.view-copy > p:last-child {
-			display: none;
+		.view-copy h2 {
+			font-size: 1.8rem;
 		}
 
-		.interaction-guide {
-			justify-content: flex-start;
-			padding-inline: 0.125rem;
+		.workbench-controls {
+			margin-top: 1.5rem;
 		}
 
-		.interaction-guide span:last-child,
-		.interaction-guide i {
-			display: none;
+		.standards-note {
+			margin-top: 1.5rem;
 		}
 
 		.graph-stage {
-			height: max(34rem, 68dvh);
+			height: max(35rem, 70dvh);
+			min-height: 35rem;
 			background-size: 2rem 2rem;
+		}
+
+		.stage-status {
+			display: none;
 		}
 	}
 
@@ -1404,6 +1730,7 @@
 	}
 
 	@media (forced-colors: active) {
+		.schema-specimen,
 		.ontology-workbench,
 		.graph-stage {
 			border-color: CanvasText;

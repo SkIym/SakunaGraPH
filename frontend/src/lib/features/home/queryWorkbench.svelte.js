@@ -124,10 +124,13 @@ export function isSelectQuery(query) {
 	return /^SELECT\b/i.test(withoutPrologue);
 }
 
-export function createQueryWorkbench({ execute = runSparql } = {}) {
-	let query = $state(DEFAULT_QUERY);
+export function createQueryWorkbench({ execute = runSparql, initialCompetencyId = '' } = {}) {
+	const initialCompetency = COMPETENCY_QUESTIONS.find(
+		(question) => question.id === initialCompetencyId,
+	);
+	let query = $state(initialCompetency?.query ?? DEFAULT_QUERY);
 	let editorKey = $state(0);
-	let selectedCompetency = $state('');
+	let selectedCompetency = $state(initialCompetency?.id ?? '');
 	let results = $state(null);
 	let loading = $state(false);
 	let error = $state('');
@@ -142,7 +145,7 @@ export function createQueryWorkbench({ execute = runSparql } = {}) {
 
 	function selectCompetency() {
 		if (!selectedCompetency) return;
-		const competency = COMPETENCY_QUESTIONS[Number.parseInt(selectedCompetency, 10)];
+		const competency = COMPETENCY_QUESTIONS.find((question) => question.id === selectedCompetency);
 		if (competency) loadQuery(competency.query);
 	}
 

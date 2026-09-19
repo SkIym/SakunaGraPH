@@ -1,8 +1,8 @@
 <script>
-	let { tabs = [], active = '', onChange = () => {} } = $props();
+	let { tabs = [], active = '', orientation = 'inline', onChange = () => {} } = $props();
 </script>
 
-<nav class="ontology-tabs" aria-label="Ontology views">
+<nav class="ontology-tabs" class:rail={orientation === 'rail'} aria-label="Ontology views">
 	<div class="tab-list">
 		{#each tabs as tab, index}
 			<button
@@ -54,7 +54,8 @@
 		color: var(--color-text-muted);
 		transition:
 			background 150ms ease,
-			color 150ms ease;
+			color 150ms ease,
+			transform 120ms ease;
 	}
 
 	button::after {
@@ -84,6 +85,46 @@
 		transform: scaleX(1);
 	}
 
+	button:active {
+		transform: translateY(1px);
+	}
+
+	.ontology-tabs.rail {
+		overflow: visible;
+		border: 1px solid var(--color-border);
+		border-radius: 0.35rem;
+		background: rgb(255 255 255 / 0.72);
+	}
+
+	.rail .tab-list {
+		width: 100%;
+		min-width: 0;
+		flex-direction: column;
+	}
+
+	.rail button {
+		width: 100%;
+		justify-content: flex-start;
+		border-bottom: 1px solid var(--color-border);
+		padding: 0.75rem 0.85rem;
+		font-size: 0.75rem;
+	}
+
+	.rail button:last-child {
+		border-bottom: 0;
+	}
+
+	.rail button::after {
+		inset: 0 auto 0 -1px;
+		width: 3px;
+		height: auto;
+		transform: scaleY(0);
+	}
+
+	.rail button.active::after {
+		transform: scaleY(1);
+	}
+
 	@media (hover: hover) {
 		button:not(.active):hover {
 			background: var(--color-brand-soft);
@@ -101,6 +142,71 @@
 
 		button > span {
 			display: none;
+		}
+	}
+
+	@media (min-width: 640px) and (max-width: 1050px) {
+		.ontology-tabs.rail {
+			overflow-x: auto;
+			border: 0;
+			border-bottom: 1px solid var(--color-border);
+			border-radius: 0;
+		}
+
+		.rail .tab-list {
+			width: max-content;
+			min-width: 100%;
+			flex-direction: row;
+		}
+
+		.rail button {
+			width: auto;
+			border-bottom: 0;
+			padding: 0.6rem 0.8rem;
+		}
+
+		.rail button::after {
+			inset: auto 0.8rem -1px;
+			width: auto;
+			height: 3px;
+			transform: scaleX(0);
+		}
+
+		.rail button.active::after {
+			transform: scaleX(1);
+		}
+	}
+
+	@media (max-width: 639px) {
+		.ontology-tabs.rail {
+			overflow-x: auto;
+			border: 0;
+			border-bottom: 1px solid var(--color-border);
+			border-radius: 0;
+		}
+
+		.rail .tab-list {
+			width: max-content;
+			min-width: 100%;
+			flex-direction: row;
+		}
+
+		.rail button {
+			width: auto;
+			flex: 1;
+			justify-content: center;
+			border-bottom: 0;
+		}
+
+		.rail button::after {
+			inset: auto 0.6rem -1px;
+			width: auto;
+			height: 3px;
+			transform: scaleX(0);
+		}
+
+		.rail button.active::after {
+			transform: scaleX(1);
 		}
 	}
 

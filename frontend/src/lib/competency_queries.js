@@ -12,6 +12,7 @@ PREFIX cur:  <http://qudt.org/vocab/currency/>
 
 export const COMPETENCY_QUESTIONS = [
 	{
+		id: 'CQ01',
 		label: 'CQ1 — Tropical Cyclone events with related incidents',
 		query:
 			P +
@@ -28,6 +29,7 @@ WHERE {
 ORDER BY DESC(?startDate)`,
 	},
 	{
+		id: 'CQ02',
 		label: 'CQ2 — Flash Flood / Riverine Flood events by location & region',
 		query:
 			P +
@@ -50,6 +52,7 @@ WHERE {
 ORDER BY DESC(?startDate)`,
 	},
 	{
+		id: 'CQ03',
 		label: 'CQ3 — Mudslide type hierarchy & event counts per level',
 		query:
 			P +
@@ -65,6 +68,7 @@ GROUP BY ?ancestor ?ancestorLabel
 ORDER BY DESC(?eventCount)`,
 	},
 	{
+		id: 'CQ04',
 		label: 'CQ4 — Volcanic subtypes affecting Regions III, V, VI',
 		query:
 			P +
@@ -93,6 +97,7 @@ WHERE {
 ORDER BY ?subtype ?provinceName`,
 	},
 	{
+		id: 'CQ05',
 		label: 'CQ5 — Fire / Transport / Armed Conflict events in 2022 (C. Luzon & CALABARZON)',
 		query:
 			P +
@@ -115,6 +120,7 @@ GROUP BY ?eventType ?region
 ORDER BY DESC(?eventCount)`,
 	},
 	{
+		id: 'CQ06',
 		label: 'CQ6 — Displaced families & persons in Western Visayas',
 		query:
 			P +
@@ -138,6 +144,7 @@ GROUP BY ?eventName ?event
 ORDER BY DESC(?totalPersons) DESC(?totalFamilies)`,
 	},
 	{
+		id: 'CQ07',
 		label: 'CQ7 — Ground Movement casualties by province (CAR)',
 		query:
 			P +
@@ -162,6 +169,7 @@ GROUP BY ?provName ?casualtyType
 ORDER BY DESC(?total)`,
 	},
 	{
+		id: 'CQ08',
 		label: 'CQ8 — Evacuation centers for Tropical Cyclone in CALABARZON 2021',
 		query:
 			P +
@@ -181,6 +189,7 @@ GROUP BY ?source
 ORDER BY DESC(?total)`,
 	},
 	{
+		id: 'CQ09',
 		label: 'CQ9 — Infrastructure damage cost for Flood events in Region XIII',
 		query:
 			P +
@@ -212,6 +221,7 @@ GROUP BY ?event ?eventName
 ORDER BY DESC(?total)`,
 	},
 	{
+		id: 'CQ10',
 		label: 'CQ10 — Housing damage by Meteorological events in Region VIII',
 		query:
 			P +
@@ -240,6 +250,7 @@ WHERE {
 GROUP BY ?provName`,
 	},
 	{
+		id: 'CQ11',
 		label: 'CQ11 — Agriculture damage by Tropical Cyclone in Region V (Bicol)',
 		query:
 			P +
@@ -265,6 +276,7 @@ WHERE {
 GROUP BY ?event ?eventName`,
 	},
 	{
+		id: 'CQ12',
 		label: 'CQ12 — Seaport disruptions caused by Tropical Cyclones',
 		query:
 			P +
@@ -284,6 +296,7 @@ WHERE {
 }`,
 	},
 	{
+		id: 'CQ13',
 		label: 'CQ13 — Airport disruptions from Geophysical events (duration in hours)',
 		query:
 			`PREFIX ofn:  <http://www.ontotext.com/sparql/functions/>
@@ -307,6 +320,7 @@ WHERE {
 }`,
 	},
 	{
+		id: 'CQ14',
 		label: 'CQ14 — Class suspensions in NCR by grade level',
 		query:
 			P +
@@ -325,6 +339,7 @@ WHERE {
 }`,
 	},
 	{
+		id: 'CQ15',
 		label: 'CQ15 — Assistance provided in Isabela by source & organization',
 		query:
 			P +
@@ -344,6 +359,7 @@ WHERE {
 }`,
 	},
 	{
+		id: 'CQ16',
 		label: 'CQ16 — Declarations of Calamity in Region XII (SOCCSKSARGEN)',
 		query:
 			P +
@@ -373,6 +389,7 @@ WHERE {
 GROUP BY ?provName`,
 	},
 	{
+		id: 'CQ17',
 		label: 'CQ17 — Rescue operations in Mindanao (units & equipment)',
 		query:
 			P +
@@ -390,6 +407,7 @@ WHERE {
 }`,
 	},
 	{
+		id: 'CQ18',
 		label: 'CQ18 — 4th income class municipalities in Region 9 with preemptive evacuation',
 		query:
 			P +
@@ -414,6 +432,7 @@ WHERE {
 GROUP BY ?mun ?munName ?provName`,
 	},
 	{
+		id: 'CQ19',
 		label: 'CQ19 — Fire incidents: DROMIC vs. EM-DAT (CRED) counts',
 		query:
 			P +
@@ -428,6 +447,7 @@ WHERE {
 GROUP BY ?targetOrgs`,
 	},
 	{
+		id: 'CQ20',
 		label: 'CQ20 — Events reported in more than one source',
 		query:
 			P +

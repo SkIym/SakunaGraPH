@@ -1,9 +1,11 @@
 <script>
+	import OntologyError from './OntologyError.svelte';
 	import OntologyLoading from './OntologyLoading.svelte';
 
 	let {
 		active = false,
 		loading = false,
+		error = '',
 		selectedNode = null,
 		colors = {},
 		svgElement = $bindable(null),
@@ -29,6 +31,7 @@
 {#if active}
 	<div class="ontology-panel">
 		{#if loading}<OntologyLoading label="Building taxonomy tree…" />{/if}
+		{#if error}<OntologyError message={error} />{/if}
 
 		<svg
 			bind:this={svgElement}
@@ -37,7 +40,7 @@
 			aria-label="Interactive disaster taxonomy graph"
 		></svg>
 
-		<aside class="ontology-legend">
+		<aside class="ontology-legend" class:hidden={Boolean(error)}>
 			<button
 				type="button"
 				aria-expanded={legendOpen}
@@ -80,6 +83,10 @@
 	.ontology-panel {
 		position: absolute;
 		inset: 0;
+	}
+
+	.hidden {
+		display: none;
 	}
 
 	.graph-canvas {

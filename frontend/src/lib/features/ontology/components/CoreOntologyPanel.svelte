@@ -1,9 +1,11 @@
 <script>
+	import OntologyError from './OntologyError.svelte';
 	import OntologyLoading from './OntologyLoading.svelte';
 
 	let {
 		active = false,
 		loading = false,
+		error = '',
 		selectedNode = null,
 		groupColors = {},
 		groupLabels = {},
@@ -14,6 +16,7 @@
 
 <div class="ontology-panel" class:hidden={!active}>
 	{#if loading}<OntologyLoading label="Rendering ontology graph…" />{/if}
+	{#if error}<OntologyError message={error} />{/if}
 
 	<svg
 		bind:this={svgElement}
@@ -22,7 +25,7 @@
 		aria-label="Interactive core ontology class graph"
 	></svg>
 
-	<aside class="ontology-legend">
+	<aside class="ontology-legend" class:hidden={Boolean(error)}>
 		<button
 			type="button"
 			aria-expanded={legendOpen}

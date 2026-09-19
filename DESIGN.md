@@ -164,6 +164,8 @@ The application uses a centered workbench capped near 48rem, surrounded by gener
 
 Home uses two stacked viewport-scale sections: the query workbench first, then team attribution. Team profiles stack on phones and align horizontally when their content fits. Ask is a bounded vertical workspace with a scrollable conversation and a safe-area-aware composer.
 
+Ontology uses a wider atlas canvas capped near 90rem. Its editorial introduction leads immediately into the selectable question-to-query walkthrough before the expert graph explorer. Above 1100px, the walkthrough reads as four linked columns; from 721px to 1100px it becomes a two-by-two sequence; at 720px and below, both the question selector and the four stations become a clear vertical progression. The home-page process teaser pairs editorial copy with a compact two-by-two mechanism board, stacks copy above the board below 800px, and preserves the two-by-two sequence until extremely narrow screens require one column.
+
 **The Content Decides the Breakpoint Rule.** Columns collapse before their content compresses, and wordmarks scale to the available inline size rather than clipping.
 
 ## Elevation & Depth
@@ -226,6 +228,23 @@ User prompts use dark ink bubbles; graph answers use paper surfaces with progres
 
 The shared background is a deterministic set of graph fragments, held static at rest. Query execution may send one 900ms trace through the central relation path; it never drifts, follows the pointer, or loops. On compact screens the central spine is omitted so content remains dominant.
 
+### Question-to-Query Walkthrough
+
+The ontology's primary explanation is one large selectable mechanism, not a collection of interchangeable documentation cards. A compact selector changes the active executable competency question while one shared surface preserves this four-station order: **Ask**, **Find the concepts**, **Connect the model**, then **Ask the graph**.
+
+- **Selection:** Each selector is a button with a 44px-or-larger target, `aria-pressed`, and a shared controlled region. Hover uses soft blue; the current question uses soft yellow and retains its pressed state as a non-color cue.
+- **Question:** Lead with a realistic public-language question in Playfair, supported by a small monospace category label.
+- **Concepts:** Present required classes, properties, values, and operators as compact monospace chips. Blue distinguishes ontology classes; yellow identifies concrete selected values; a restrained additional hue may distinguish operators when necessary.
+- **Relationships:** Show explicit subject-predicate-object statements with directional rules. Keep predicate names in monospace and add a brief plain-language insight where a graph path or aggregation would otherwise be opaque.
+- **Query:** Show a concise dark-ink SPARQL preview labeled `SELECT · read only`, disclose the complete query on request, then link the same competency question into the expert query workspace.
+- **Motion and state:** On selection, update the controlled flow as a polite live region and run one 850ms left-to-right trace across the desktop sequence. Remove the trace in two-column and mobile layouts, and suppress the animation under reduced-motion preferences.
+
+**The Four-Station Trace Rule.** The same chosen competency question must drive every station in order; never mix illustrative concepts, relationships, or SPARQL from different questions.
+
+### Ontology Process Teaser
+
+The home teaser compresses the same four stations into a ruled two-by-two board beside a short editorial invitation. The question cell uses soft yellow, the terminal SPARQL cell uses dark Research Ink, and the center marker makes the sequence feel connected without adding ambient motion. The entire teaser points to the ontology walkthrough anchor; it previews the mechanism rather than duplicating the full selector or complete query.
+
 ### Maps
 
 Province geometry uses flag-blue outlines and pale blue fills where color supports orientation. On the home preview, hover and keyboard focus change the current province to sun yellow. Up to five flag-red region-centroid markers may show the highest real linked-record counts; omit them when ranking data is unavailable rather than fabricating hotspots. A visible legend and accessible text must explain all three signals. A selected province on the full map changes to sun yellow with a visible outline and an explicit name or pressed state. Region-level data may use a broader categorical palette when adjacent areas must remain distinguishable.
@@ -238,6 +257,8 @@ Province geometry uses flag-blue outlines and pale blue fills where color suppor
 - **Do** maintain at least 4.5:1 contrast for body, helper, placeholder, and status text.
 - **Do** preserve 44px targets and visible blue keyboard focus across input methods.
 - **Do** pair yellow with dark ink or blue and reinforce selection with shape, outline, text, or state attributes.
+- **Do** explain ontology mechanics through a realistic question, its required concepts, explicit relationships, and the exact read-only query, then offer a direct path to the expert workspace.
+- **Do** preserve the four-station order, pressed-state semantics, live-region update, and progressive query disclosure across responsive layouts.
 - **Do** stack content before it clips, and use dynamic viewport units for full-height task surfaces.
 - **Do** stop nonessential work when motion is reduced or the page is not visible.
 
@@ -248,4 +269,6 @@ Province geometry uses flag-blue outlines and pale blue fills where color suppor
 - **Don't** apply monospace to ordinary prose or serif type to routine controls.
 - **Don't** manufacture depth with nested shadows, decorative blur, and repeated glass cards.
 - **Don't** hide graph evidence to make an answer appear simpler than its provenance permits.
+- **Don't** reduce the ontology mechanism to a generic documentation card stack or disconnect the home teaser from the full walkthrough.
+- **Don't** invent illustrative SPARQL for the walkthrough; use executable competency questions and label direct graph access as read only.
 - **Don't** use equal doses of flag blue, red, and yellow or turn the interface into a literal flag composition.

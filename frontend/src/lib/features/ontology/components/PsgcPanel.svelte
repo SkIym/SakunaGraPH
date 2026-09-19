@@ -1,9 +1,11 @@
 <script>
+	import OntologyError from './OntologyError.svelte';
 	import OntologyLoading from './OntologyLoading.svelte';
 
 	let {
 		active = false,
 		loading = false,
+		error = '',
 		selectedNode = null,
 		islandColors = {},
 		svgElement = $bindable(null),
@@ -20,6 +22,7 @@
 {#if active}
 	<div class="ontology-panel">
 		{#if loading}<OntologyLoading label="Loading PSGC graph…" />{/if}
+		{#if error}<OntologyError message={error} />{/if}
 
 		<svg
 			bind:this={svgElement}
@@ -28,7 +31,7 @@
 			aria-label="Interactive PSGC location graph"
 		></svg>
 
-		<aside class="ontology-legend">
+		<aside class="ontology-legend" class:hidden={Boolean(error)}>
 			<button
 				type="button"
 				aria-expanded={legendOpen}
@@ -117,6 +120,10 @@
 	.ontology-panel {
 		position: absolute;
 		inset: 0;
+	}
+
+	.hidden {
+		display: none;
 	}
 
 	.graph-canvas {

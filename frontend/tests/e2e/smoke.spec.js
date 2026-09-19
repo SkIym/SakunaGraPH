@@ -216,6 +216,27 @@ test('ontology graph and secondary datasets load', async ({ page }) => {
 	await expect(page.getByText('Island Group', { exact: true })).toBeVisible();
 });
 
+test('ontology walkthrough hands the selected question to the SPARQL workspace', async ({
+	page,
+}) => {
+	await gotoReady(page, '/');
+	await page.getByRole('link', { name: 'Follow the ontology process' }).click();
+	await expect(page).toHaveURL(/\/ontology#question-to-query$/);
+	await expect(
+		page.getByRole('heading', { name: 'See a question become a graph query.' }),
+	).toBeVisible();
+
+	await page.getByRole('button', { name: /One event, multiple sources/ }).click();
+	expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(
+		true,
+	);
+	await page.getByRole('link', { name: 'Open CQ20 in the query workspace' }).click();
+
+	await expect(page).toHaveURL(/\/query\?cq=CQ20$/);
+	await expect(page.locator('#query-example')).toHaveValue('CQ20');
+	await expect(page.locator('.cm-content')).toContainText('prov:alternateOf');
+});
+
 test('analysis overview, table, metrics, timeline, and event details load', async ({ page }) => {
 	await gotoReady(page, '/analysis');
 	await expect(page.getByRole('heading', { name: 'Current scope' })).toBeVisible();

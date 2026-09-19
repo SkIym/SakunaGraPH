@@ -1,5 +1,5 @@
 <script>
-	import { onDestroy } from 'svelte';
+	import { onDestroy, untrack } from 'svelte';
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import SparqlEditor from '$lib/components/SparqlEditor.svelte';
 	import { COMPETENCY_QUESTIONS } from '$lib/competency_queries.js';
@@ -9,7 +9,10 @@
 		QUERY_PRESETS,
 	} from '$lib/features/home/queryWorkbench.svelte.js';
 
-	const workbench = createQueryWorkbench();
+	let { initialCompetencyId = '' } = $props();
+	const workbench = createQueryWorkbench({
+		initialCompetencyId: untrack(() => initialCompetencyId),
+	});
 	let ResultsModalComponent = $state(null);
 	let runButton = $state(null);
 
@@ -78,8 +81,8 @@
 						class="min-h-11 w-full cursor-pointer appearance-none rounded-lg border border-slate-300 bg-white px-3 py-2 pr-9 text-sm text-slate-700 transition-colors focus:border-[var(--color-focus)] focus:outline-none focus:ring-2 focus:ring-[var(--color-brand-medium)]"
 					>
 						<option value="">Write your own query</option>
-						{#each COMPETENCY_QUESTIONS as question, index}
-							<option value={String(index)}>{question.label}</option>
+						{#each COMPETENCY_QUESTIONS as question}
+							<option value={question.id}>{question.label}</option>
 						{/each}
 					</select>
 					<svg

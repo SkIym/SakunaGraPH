@@ -1,6 +1,7 @@
 <script>
 	import NodeCanvas from '$lib/components/NodeCanvas.svelte';
 	import HomeMapFigure from './HomeMapFigure.svelte';
+	import OntologyProcessTeaser from './OntologyProcessTeaser.svelte';
 
 	const researchTools = [
 		{
@@ -206,6 +207,10 @@
 			</nav>
 		</div>
 	</section>
+
+	<div class="process-section">
+		<OntologyProcessTeaser />
+	</div>
 
 	<section
 		class="evidence-section relative px-5 py-20 lg:px-8 lg:pt-28 lg:pb-32"
@@ -534,6 +539,11 @@
 	.research-section {
 		border-bottom: 1px solid var(--color-border);
 		background: rgba(241, 244, 250, 0.82);
+	}
+
+	.process-section {
+		border-bottom: 1px solid var(--color-border);
+		background: rgba(255, 255, 255, 0.92);
 	}
 
 	.research-index {
