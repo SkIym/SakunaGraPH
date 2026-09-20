@@ -1,11 +1,33 @@
 <script>
-	let { citations = [], retrieval = null } = $props();
+	let { citations = [], retrieval = null, method = null } = $props();
 
 	const modeLabels = {
 		graphrag: 'Graph-grounded retrieval',
 		legacy: 'SPARQL retrieval',
 		fallback: 'Fallback retrieval',
 	};
+
+	const planningLabels = { llm: 'AI interpretation' };
+	const queryLabels = {
+		service: 'Predefined service query',
+		compiler: 'Deterministic SPARQL',
+		model_fallback: 'AI-generated SPARQL',
+		not_run: 'No query run',
+	};
+	const answerLabels = {
+		deterministic: 'Rule-based answer',
+		llm: 'AI-written answer',
+	};
+
+	let methodStages = $derived(
+		method
+			? [
+					planningLabels[method.planning],
+					queryLabels[method.query],
+					answerLabels[method.answer],
+				].filter(Boolean)
+			: [],
+	);
 
 	function citationHref(uri) {
 		try {
@@ -16,6 +38,17 @@
 		}
 	}
 </script>
+
+{#if methodStages.length}
+	<section class="method-ledger" aria-label="Answer method">
+		<strong>Method used</strong>
+		<ol>
+			{#each methodStages as stage}
+				<li>{stage}</li>
+			{/each}
+		</ol>
+	</section>
+{/if}
 
 {#if retrieval?.mode && modeLabels[retrieval.mode]}
 	<div class="retrieval-ledger">
@@ -67,6 +100,44 @@
 {/if}
 
 <style>
+	.method-ledger {
+		display: grid;
+		grid-template-columns: auto minmax(0, 1fr);
+		align-items: center;
+		gap: 0.85rem;
+		border-block-start: 1px solid var(--color-border);
+		padding: 0.75rem 1.2rem;
+	}
+
+	.method-ledger > strong {
+		font-size: 0.68rem;
+		color: var(--color-text);
+	}
+
+	.method-ledger ol {
+		display: flex;
+		min-width: 0;
+		align-items: center;
+		flex-wrap: wrap;
+		gap: 0.35rem 0;
+		margin: 0;
+		padding: 0;
+		list-style: none;
+	}
+
+	.method-ledger li {
+		font-family: var(--font-mono);
+		font-size: 0.58rem;
+		line-height: 1.5;
+		color: var(--color-text-secondary);
+	}
+
+	.method-ledger li + li::before {
+		content: '→';
+		margin-inline: 0.5rem;
+		color: var(--color-brand);
+	}
+
 	.retrieval-ledger {
 		display: grid;
 		grid-template-columns: auto minmax(0, 1fr) auto;
@@ -202,6 +273,11 @@
 	}
 
 	@media (max-width: 30rem) {
+		.method-ledger {
+			grid-template-columns: 1fr;
+			gap: 0.35rem;
+		}
+
 		.retrieval-ledger {
 			grid-template-columns: auto minmax(0, 1fr);
 		}

@@ -30,4 +30,14 @@ describe('AskComposer', () => {
 		render(AskComposer, { input: '', maxLength: 120 });
 		expect(screen.getByRole('textbox', { name: 'Question' })).toHaveAttribute('maxlength', '120');
 	});
+
+	it('offers an accessible AI-query toggle', async () => {
+		render(AskComposer, { input: 'Question' });
+		const toggle = screen.getByRole('checkbox', { name: /AI builds query/ });
+
+		expect(toggle).not.toBeChecked();
+		await fireEvent.click(toggle);
+		expect(toggle).toBeChecked();
+		expect(screen.getByText(/validated read-only SPARQL/)).toBeVisible();
+	});
 });

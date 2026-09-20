@@ -43,6 +43,7 @@
 		/>
 		<AskComposer
 			bind:input={ask.input}
+			bind:forceLlmQuery={ask.forceLlmQuery}
 			sending={ask.sending}
 			error={ask.inputError}
 			maxLength={ASK_QUESTION_MAX_LENGTH}

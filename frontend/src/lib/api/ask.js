@@ -13,30 +13,33 @@ export function preferredAskMode() {
 
 // This shape-compatible operation remains the default and the streaming rollout fallback.
 export function askQuestion(query, options = {}) {
+	const { queryMode = 'auto', ...requestOptions } = options;
 	return apiJson('/api/ask', {
 		method: 'POST',
-		json: { query },
+		json: { query, query_mode: queryMode },
 		timeoutMs: 120_000,
-		...options,
+		...requestOptions,
 	});
 }
 
 export function previewAsk(query, options = {}) {
+	const { queryMode = 'auto', ...requestOptions } = options;
 	return apiJson('/api/ask/preview', {
 		method: 'POST',
-		json: { query },
+		json: { query, query_mode: queryMode },
 		timeoutMs: 60_000,
-		...options,
+		...requestOptions,
 	});
 }
 
 // Event parsing stays in the ask feature so this API module remains transport-only.
 export function openAskStream(query, options = {}) {
+	const { queryMode = 'auto', ...requestOptions } = options;
 	return apiResponse('/api/ask/stream', {
 		method: 'POST',
-		json: { query },
+		json: { query, query_mode: queryMode },
 		timeoutMs: 120_000,
-		...options,
-		headers: { Accept: 'text/event-stream', ...options.headers },
+		...requestOptions,
+		headers: { Accept: 'text/event-stream', ...requestOptions.headers },
 	});
 }

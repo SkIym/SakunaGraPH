@@ -23,7 +23,7 @@ describe('GraphRAG answer stream', () => {
 	it('parses partial SSE chunks, additive events, tokens, and versioned citations', async () => {
 		const response = responseFromChunks([
 			'data: {"type":"meta","sparql":"SELECT * WHERE {}","rows":[{"event":"one"}],',
-			'"retrieval":{"mode":"graphrag","indexVersion":"2026-07"}}\r\n\r\n',
+			'"retrieval":{"mode":"graphrag","indexVersion":"2026-07"},"method":{"planning":"llm","query":"model_fallback","answer":"llm"}}\r\n\r\n',
 			'data: {"type":"future.v2","value":true}\n\n',
 			'data: {"type":"token","text":"One "}\n\ndata: {"type":"token","text":"event."}\n\n',
 			'event: citation.v1\ndata: {"id":"source-1","label":"Situation Report","uri":"https://example.test/report","excerpt":"Verified source"}\n\n',
@@ -46,6 +46,7 @@ describe('GraphRAG answer stream', () => {
 				},
 			],
 			retrieval: { mode: 'graphrag', indexVersion: '2026-07' },
+			method: { planning: 'llm', query: 'model_fallback', answer: 'llm' },
 			requestId: null,
 		});
 		expect(onToken).toHaveBeenCalledTimes(2);

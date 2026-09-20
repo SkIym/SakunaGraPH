@@ -1,13 +1,15 @@
 from enum import StrEnum
+from typing import Literal
 
 from pydantic import BaseModel, Field, field_validator
 
 from src.schemas.answer_context import AskAnswerContext, AskEvidence
-from src.schemas.ask_execution import QueryArtifact
+from src.schemas.ask_execution import QueryArtifact, QueryOrigin
 from src.schemas.entity_resolution import EntityAmbiguity, ResolvedAskPlan
 
 
 ASK_QUERY_MAX_LENGTH = 2_000
+AskQueryMode = Literal["auto", "llm"]
 
 
 class AskStatus(StrEnum):
@@ -22,6 +24,7 @@ class AskStatus(StrEnum):
 
 class AskRequest(BaseModel):
     query: str = Field(min_length=1, max_length=ASK_QUERY_MAX_LENGTH)
+    query_mode: AskQueryMode = "auto"
 
     @field_validator("query")
     @classmethod
@@ -30,6 +33,14 @@ class AskRequest(BaseModel):
         if not query:
             raise ValueError("Query must contain non-whitespace characters.")
         return query
+
+
+class AskMethod(BaseModel):
+    """Auditable record of how an Ask response was produced."""
+
+    planning: Literal["llm"] = "llm"
+    query: QueryOrigin | Literal["not_run"]
+    answer: Literal["deterministic", "llm"]
 
 
 class AskResponse(BaseModel):
@@ -45,6 +56,7 @@ class AskResponse(BaseModel):
     approximate: bool | None = None
     evidence: list[AskEvidence] = Field(default_factory=list)
     answer_context: AskAnswerContext | None = None
+    method: AskMethod | None = None
 
 
 class AskPreviewResponse(BaseModel):

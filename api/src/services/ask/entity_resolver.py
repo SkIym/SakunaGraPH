@@ -23,6 +23,9 @@ from src.services.sparql import execute_sparql
 _CACHE_TTL_SECONDS = 900.0
 _FUZZY_THRESHOLD = 0.86
 _FUZZY_AMBIGUITY_MARGIN = 0.035
+_LOCATION_WITH_PSGC_CODE_RE = re.compile(
+    r"^\s*(?P<label>.+?)\s*\(\s*(?P<code>\d{10})\s*\)\s*$"
+)
 _catalog_cache: dict[str, tuple[float, list[EntityCatalogEntry]]] = {}
 
 _LOCATION_CATALOG_QUERY = """
@@ -142,6 +145,18 @@ _DISASTER_ALIASES: dict[str, tuple[str, ...]] = {
     "wildfires": ("Wildfire",),
     "volcanic eruption": ("VolcanicActivity",),
     "volcanic eruptions": ("VolcanicActivity",),
+}
+
+# Broad terms that intentionally select more than one controlled concept. These are
+# kept separate from aliases because multiple ordinary alias matches are ambiguous,
+# while every member of an expansion is part of the requested filter.
+_DISASTER_EXPANSIONS: dict[str, tuple[str, ...]] = {
+    "fire": ("FireIndustrial", "FireMiscellaneous", "Wildfire"),
+    "fires": ("FireIndustrial", "FireMiscellaneous", "Wildfire"),
+    "technological fire": ("FireIndustrial", "FireMiscellaneous"),
+    "technological fires": ("FireIndustrial", "FireMiscellaneous"),
+    "urban fire": ("FireIndustrial", "FireMiscellaneous"),
+    "urban fires": ("FireIndustrial", "FireMiscellaneous"),
 }
 
 _CASUALTY_ALIASES: dict[str, tuple[str, ...]] = {
@@ -445,11 +460,38 @@ def _match_values(entry: EntityCatalogEntry) -> tuple[list[str], list[str]]:
     return (_unique(direct), _unique(entry.hierarchy_aliases))
 
 
+def _coded_location_matches(
+    mention: str,
+    entries: list[EntityCatalogEntry],
+) -> list[ResolvedEntity] | None:
+    """Resolve a catalog label followed by its canonical 10-digit PSGC code."""
+    match = _LOCATION_WITH_PSGC_CODE_RE.fullmatch(mention)
+    if match is None:
+        return None
+
+    code = match.group("code")
+    label_key = _normalize(match.group("label"))
+    matches: list[ResolvedEntity] = []
+    for entry in entries:
+        if entry.id != code:
+            continue
+        direct, hierarchy = _match_values(entry)
+        if label_key not in {_normalize(value) for value in (*direct, *hierarchy)}:
+            continue
+        matches.append(_resolved(entry, mention, "exact", 1.0))
+    return matches
+
+
 def _direct_matches(
     mention: str,
     entries: list[EntityCatalogEntry],
     entity_type: EntityType,
 ) -> list[ResolvedEntity]:
+    if entity_type == "location":
+        coded_matches = _coded_location_matches(mention, entries)
+        if coded_matches is not None:
+            return coded_matches
+
     key = _normalize(mention)
     id_matches = [entry for entry in entries if key == _normalize(entry.id)]
     if id_matches:
@@ -482,6 +524,33 @@ def _alias_matches(
         for entry in entries
         if _normalize(entry.id) in target_keys or _normalize(entry.label) in target_keys
     ]
+
+
+def _expansion_matches(
+    mention: str,
+    entries: list[EntityCatalogEntry],
+    expansions: dict[str, tuple[str, ...]],
+) -> tuple[list[ResolvedEntity], list[str]] | None:
+    target_ids = expansions.get(_normalize(mention))
+    if not target_ids:
+        return None
+
+    by_id: dict[str, list[EntityCatalogEntry]] = {}
+    for entry in entries:
+        by_id.setdefault(_normalize(entry.id), []).append(entry)
+
+    matched: list[ResolvedEntity] = []
+    missing: list[str] = []
+    for target_id in target_ids:
+        target_entries = by_id.get(_normalize(target_id), [])
+        if not target_entries:
+            missing.append(target_id)
+            continue
+        matched.extend(
+            _resolved(entry, mention, "alias", 0.98)
+            for entry in target_entries
+        )
+    return matched, missing
 
 
 def _fuzzy_matches(
@@ -519,6 +588,7 @@ def resolve_mentions(
     entity_type: EntityType,
     *,
     aliases: dict[str, tuple[str, ...]] | None = None,
+    expansions: dict[str, tuple[str, ...]] | None = None,
 ) -> tuple[list[ResolvedEntity], list[EntityAmbiguity], list[str]]:
     """Resolve mentions only to entries supplied by an approved GraphDB catalog."""
     resolved: list[ResolvedEntity] = []
@@ -527,6 +597,18 @@ def resolve_mentions(
 
     for mention in mentions:
         candidates = _direct_matches(mention, entries, entity_type)
+        if not candidates and expansions:
+            expansion = _expansion_matches(mention, entries, expansions)
+            if expansion is not None:
+                expanded, missing = expansion
+                if missing:
+                    warnings.append(
+                        f"The {entity_type.replace('_', ' ')} expansion for {mention!r} "
+                        "is incomplete in GraphDB; missing: " + ", ".join(missing) + "."
+                    )
+                else:
+                    resolved.extend(expanded)
+                continue
         if not candidates and aliases:
             candidates = _alias_matches(mention, entries, aliases)
         if not candidates:
@@ -594,21 +676,35 @@ async def resolve_ask_plan(question: str, plan: AskPlan) -> ResolvedAskPlan:
 
     resolved_plan = ResolvedAskPlan(plan=plan)
     requests: tuple[
-        tuple[str, list[str], EntityType, dict[str, tuple[str, ...]] | None], ...
+        tuple[
+            str,
+            list[str],
+            EntityType,
+            dict[str, tuple[str, ...]] | None,
+            dict[str, tuple[str, ...]] | None,
+        ],
+        ...,
     ] = (
-        ("locations", plan.location_mentions, "location", None),
+        ("locations", plan.location_mentions, "location", None, None),
         (
             "disaster_types",
             plan.disaster_type_mentions,
             "disaster_type",
             _DISASTER_ALIASES,
+            _DISASTER_EXPANSIONS,
         ),
-        ("events", plan.event_mentions, "event", None),
-        ("organizations", plan.organization_mentions, "organization", None),
-        ("casualty_types", casualty_mentions, "casualty_type", _CASUALTY_ALIASES),
+        ("events", plan.event_mentions, "event", None, None),
+        ("organizations", plan.organization_mentions, "organization", None, None),
+        (
+            "casualty_types",
+            casualty_mentions,
+            "casualty_type",
+            _CASUALTY_ALIASES,
+            None,
+        ),
     )
 
-    for field, mentions, entity_type, aliases in requests:
+    for field, mentions, entity_type, aliases, expansions in requests:
         if not mentions:
             continue
         matches, ambiguities, warnings = resolve_mentions(
@@ -616,6 +712,7 @@ async def resolve_ask_plan(question: str, plan: AskPlan) -> ResolvedAskPlan:
             catalogs[field],
             entity_type,
             aliases=aliases,
+            expansions=expansions,
         )
         _extend_unique(getattr(resolved_plan, field), matches)
         resolved_plan.ambiguities.extend(ambiguities)

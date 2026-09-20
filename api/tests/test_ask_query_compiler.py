@@ -486,6 +486,61 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
         graphdb.assert_awaited_once()
         model_query.assert_not_awaited()
 
+    async def test_forced_llm_mode_builds_and_validates_the_query_with_the_model(self) -> None:
+        plan = AskPlan(intent="event_count", metric="events")
+        resolved = ResolvedAskPlan(plan=plan)
+        generated = "SELECT (COUNT(DISTINCT ?event) AS ?total) WHERE { ?event a :DisasterEvent . }"
+        raw = {
+            "head": {"vars": ["total"]},
+            "results": {
+                "bindings": [{"total": {"type": "literal", "value": "3"}}]
+            },
+        }
+        report = QueryValidationReport(
+            summary=ParsedQuerySummary(
+                projected_columns=["total"],
+                has_aggregate=True,
+            )
+        )
+        with (
+            patch(
+                "src.services.ask.service.plan_question",
+                new=AsyncMock(return_value=plan),
+            ),
+            patch(
+                "src.services.ask.service.resolve_ask_plan",
+                new=AsyncMock(return_value=resolved),
+            ),
+            patch(
+                "src.services.ask.service.nl_to_sparql",
+                new=AsyncMock(return_value=generated),
+            ) as model_query,
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(return_value=report),
+            ) as query_validator,
+            patch(
+                "src.services.ask.service.execute_sparql",
+                new=AsyncMock(return_value=raw),
+            ) as graphdb,
+            patch(
+                "src.services.ask.service.execute_service_route",
+                new=AsyncMock(),
+            ) as service,
+        ):
+            response = await ask_question(
+                "How many events occurred?",
+                query_mode="llm",
+            )
+
+        self.assertEqual(response.query_artifact.origin, "model_fallback")
+        self.assertEqual(response.method.query, "model_fallback")
+        self.assertEqual(response.answer, "The validated count is 3 events [E1].")
+        model_query.assert_awaited_once()
+        query_validator.assert_awaited_once()
+        graphdb.assert_awaited_once()
+        service.assert_not_awaited()
+
     async def test_common_preview_is_deterministic(self) -> None:
         plan = AskPlan(intent="list_events", limit=5)
         resolved = ResolvedAskPlan(plan=plan)

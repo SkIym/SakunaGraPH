@@ -332,6 +332,9 @@ class GroundedAnswerGenerationTests(unittest.IsolatedAsyncioTestCase):
 
         model.assert_not_awaited()
         self.assertEqual(response.answer, "The validated count is 7 events [E1].")
+        self.assertEqual(response.method.planning, "llm")
+        self.assertEqual(response.method.query, "service")
+        self.assertEqual(response.method.answer, "deterministic")
         self.assertEqual(response.evidence[0].values["total"], "7")
         self.assertEqual(response.answer_context.row_count, 1)
 
@@ -375,6 +378,10 @@ class AskStreamingPhaseSixTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(legacy_types, ["meta", "token", "done"])
         self.assertEqual(event_types, ["meta", "results", "warning", "token", "done"])
         self.assertIn("answer_context", payloads[0])
+        self.assertEqual(
+            payloads[0]["method"],
+            {"planning": "llm", "query": "service", "answer": "deterministic"},
+        )
         self.assertEqual(payloads[1]["evidence"][0]["id"], "E1")
         self.assertTrue(payloads[-1]["truncated"])
         model_stream.assert_not_awaited()

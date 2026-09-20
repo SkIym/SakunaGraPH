@@ -22,6 +22,8 @@ function requestErrorMessage(error) {
 		return 'The data service is receiving too many questions. Wait a moment, then try again.';
 	}
 	if (error?.status === 400 || error?.status === 422) {
+		const detail = String(error?.message ?? '').trim();
+		if (detail && !/^unprocessable entity$/i.test(detail)) return detail;
 		return 'The question could not be processed as written. Rephrase it with a place, date, or disaster type.';
 	}
 	if (error?.name === 'AskStreamUpstreamError' && error?.message) return error.message;
@@ -46,6 +48,7 @@ export function createAskState({
 	let sending = $state(false);
 	let announcement = $state('');
 	let inputError = $state('');
+	let forceLlmQuery = $state(false);
 	let activeRequest = null;
 
 	function updateAssistant(index, values) {
@@ -81,14 +84,18 @@ export function createAskState({
 					: fallback
 						? { mode: 'fallback' }
 						: null,
+			method: response?.method && typeof response.method === 'object' ? response.method : null,
 			requestId: response?.requestId ?? null,
 		});
 	}
 
-	async function runStream(question, assistantIndex, controller) {
+	async function runStream(question, assistantIndex, controller, queryMode) {
 		let receivedMeta = false;
 		try {
-			const response = await openStream(question, { signal: controller.signal });
+			const response = await openStream(question, {
+				signal: controller.signal,
+				queryMode,
+			});
 			return await consumeAskStream(response, {
 				signal: controller.signal,
 				onMeta: async (result) => {
@@ -101,6 +108,7 @@ export function createAskState({
 						rows: result.rows,
 						citations: result.citations,
 						retrieval: result.retrieval,
+						method: result.method,
 						requestId: result.requestId,
 					});
 					await onUpdated();
@@ -128,7 +136,10 @@ export function createAskState({
 			});
 		} catch (error) {
 			if (isCancellationError(error) || receivedMeta) throw error;
-			const response = await submit(question, { signal: controller.signal });
+			const response = await submit(question, {
+				signal: controller.signal,
+				queryMode,
+			});
 			applyLegacyResponse(assistantIndex, response, { fallback: true });
 			return response;
 		}
@@ -158,15 +169,19 @@ export function createAskState({
 		const assistantIndex = messages.length;
 		messages = [...messages, { role: 'assistant', loading: true }];
 		const controller = new AbortController();
-		const request = { controller, assistantIndex };
+		const queryMode = forceLlmQuery ? 'llm' : 'auto';
+		const request = { controller, assistantIndex, queryMode };
 		activeRequest = request;
 		await onUpdated();
 
 		try {
 			if (mode === ASK_MODES.STREAM) {
-				await runStream(question, assistantIndex, controller);
+				await runStream(question, assistantIndex, controller, queryMode);
 			} else {
-				const response = await submit(question, { signal: controller.signal });
+				const response = await submit(question, {
+					signal: controller.signal,
+					queryMode,
+				});
 				applyLegacyResponse(assistantIndex, response);
 			}
 			if (activeRequest === request) announcement = 'Answer ready.';
@@ -217,6 +232,12 @@ export function createAskState({
 		},
 		get inputError() {
 			return inputError;
+		},
+		get forceLlmQuery() {
+			return forceLlmQuery;
+		},
+		set forceLlmQuery(value) {
+			forceLlmQuery = Boolean(value);
 		},
 		get mode() {
 			return mode;

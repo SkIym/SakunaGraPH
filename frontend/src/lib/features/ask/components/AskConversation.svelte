@@ -114,7 +114,11 @@
 										<div class="cancelled-status">Answer stopped.</div>
 									{/if}
 
-									<AskAnswerMeta citations={message.citations} retrieval={message.retrieval} />
+									<AskAnswerMeta
+										citations={message.citations}
+										retrieval={message.retrieval}
+										method={message.method}
+									/>
 
 									{#if message.sparql}
 										<details class="evidence-disclosure">
@@ -444,7 +448,7 @@
 		width: min(96%, 46rem);
 		overflow: hidden;
 		border: 1px solid var(--color-border);
-		border-inline-start: 3px solid var(--color-brand);
+		border-inline-start-color: var(--color-brand);
 		border-radius: 0.35rem var(--radius-surface) var(--radius-surface) var(--radius-surface);
 		background: var(--color-surface);
 	}
@@ -502,7 +506,6 @@
 	}
 
 	.answer-error {
-		border-inline-start: 3px solid var(--color-danger);
 		background: var(--color-danger-surface);
 		padding: 1rem 1.15rem 1.15rem;
 		color: #881323;

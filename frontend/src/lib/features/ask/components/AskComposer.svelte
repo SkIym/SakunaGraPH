@@ -1,6 +1,7 @@
 <script>
 	let {
 		input = $bindable(''),
+		forceLlmQuery = $bindable(false),
 		sending = false,
 		error = '',
 		maxLength = 1_000,
@@ -62,6 +63,13 @@
 
 		<div class="composer-meta">
 			<div>
+				<label class="query-mode">
+					<input type="checkbox" bind:checked={forceLlmQuery} />
+					<span>
+						<strong>AI builds query</strong>
+						<small>Forces AI-generated, validated read-only SPARQL</small>
+					</span>
+				</label>
 				<p id="ask-input-help">
 					{sending
 						? 'Enter to replace the current question · Stop answer ends the current response'
@@ -131,7 +139,7 @@
 		border-radius: var(--radius-surface);
 		background: transparent;
 		padding: 0.9rem 1rem;
-		font-family: 'Inter', system-ui, sans-serif;
+		font-family: inherit;
 		font-size: 0.875rem;
 		line-height: 1.55;
 		color: var(--color-text);
@@ -212,6 +220,75 @@
 		margin: 0;
 	}
 
+	.query-mode {
+		display: inline-flex;
+		min-height: 2.75rem;
+		cursor: pointer;
+		align-items: center;
+		gap: 0.65rem;
+	}
+
+	.query-mode input {
+		position: relative;
+		width: 2.25rem;
+		height: 1.25rem;
+		flex: none;
+		appearance: none;
+		border: 1px solid var(--color-text-muted);
+		border-radius: 9999px;
+		background: var(--color-canvas);
+		transition:
+			background-color 160ms ease,
+			border-color 160ms ease;
+	}
+
+	.query-mode input::after {
+		position: absolute;
+		width: 0.8rem;
+		height: 0.8rem;
+		border-radius: 50%;
+		background: var(--color-text-secondary);
+		content: '';
+		inset-block-start: 0.16rem;
+		inset-inline-start: 0.18rem;
+		transition:
+			background-color 160ms ease,
+			transform 160ms ease;
+	}
+
+	.query-mode input:checked {
+		border-color: #c29f00;
+		background: var(--color-accent);
+	}
+
+	.query-mode input:checked::after {
+		background: var(--color-text);
+		transform: translateX(0.96rem);
+	}
+
+	.query-mode input:focus-visible {
+		outline: 3px solid var(--color-brand-medium);
+		outline-offset: 2px;
+	}
+
+	.query-mode > span {
+		display: grid;
+		gap: 0.05rem;
+		text-align: start;
+	}
+
+	.query-mode strong {
+		font-size: 0.68rem;
+		line-height: 1.35;
+		color: var(--color-text);
+	}
+
+	.query-mode small {
+		font-size: 0.625rem;
+		line-height: 1.4;
+		color: var(--color-text-secondary);
+	}
+
 	.input-error {
 		margin-top: 0.25rem !important;
 		font-weight: 700;
@@ -245,13 +322,22 @@
 		}
 
 		.composer-meta {
+			align-items: stretch;
+			flex-direction: column;
+			gap: 0.25rem;
 			font-size: 0.625rem;
+		}
+
+		.input-limit {
+			align-self: flex-end;
 		}
 	}
 
 	@media (prefers-reduced-motion: reduce) {
 		.composer-control,
-		button {
+		button,
+		.query-mode input,
+		.query-mode input::after {
 			transition: none;
 		}
 	}
@@ -259,6 +345,14 @@
 	@media (forced-colors: active) {
 		.composer-control {
 			border: 2px solid CanvasText;
+		}
+
+		.query-mode input {
+			appearance: auto;
+		}
+
+		.query-mode input::after {
+			display: none;
 		}
 	}
 </style>

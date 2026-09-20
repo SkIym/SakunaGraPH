@@ -80,7 +80,7 @@ def ensure_resolved_plan_ready(resolved: ResolvedAskPlan) -> None:
         raise _compilation_error("Ambiguous entities must be clarified before compilation.")
     if resolved.warnings:
         raise _compilation_error(
-            "Every requested entity must resolve before deterministic compilation: "
+            "Every requested entity must resolve before query compilation: "
             + " ".join(resolved.warnings)
         )
     for entities in (

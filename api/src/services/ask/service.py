@@ -2,7 +2,13 @@ import json
 from collections.abc import AsyncIterator
 
 from src.config import settings
-from src.schemas.ask import AskPreviewResponse, AskResponse, AskStatus
+from src.schemas.ask import (
+    AskMethod,
+    AskPreviewResponse,
+    AskQueryMode,
+    AskResponse,
+    AskStatus,
+)
 from src.schemas.ask_execution import QueryArtifact
 from src.schemas.entity_resolution import ResolvedAskPlan
 from src.schemas.query_validation import ResultValidationReport
@@ -34,6 +40,17 @@ from src.services.sparql.executor import nl_to_sparql
 
 _ontology_context = load_ontology_context()
 ASK_DETERMINISTIC_EXECUTION_ERROR_CODE = "ask_deterministic_execution"
+
+
+def _ask_method(
+    artifact: QueryArtifact | None,
+    *,
+    answer_uses_llm: bool,
+) -> AskMethod:
+    return AskMethod(
+        query=artifact.origin if artifact is not None else "not_run",
+        answer="llm" if answer_uses_llm else "deterministic",
+    )
 
 
 def _display_value(term: dict) -> str:
@@ -143,8 +160,10 @@ def _deterministic_artifact(resolved_plan: ResolvedAskPlan) -> QueryArtifact:
 async def _preview_artifact(
     query: str,
     resolved_plan: ResolvedAskPlan,
+    *,
+    query_mode: AskQueryMode = "auto",
 ) -> QueryArtifact:
-    if resolved_plan.plan.intent == "open_graph_query":
+    if query_mode == "llm" or resolved_plan.plan.intent == "open_graph_query":
         ensure_resolved_plan_ready(resolved_plan)
         sparql = await nl_to_sparql(query, _ontology_context)
         artifact = _model_fallback_artifact(sparql, resolved_plan)
@@ -166,8 +185,14 @@ async def _preview_artifact(
 async def _execute_artifact(
     query: str,
     resolved_plan: ResolvedAskPlan,
+    *,
+    query_mode: AskQueryMode = "auto",
 ) -> tuple[QueryArtifact, dict, ResultValidationReport]:
-    artifact = await _preview_artifact(query, resolved_plan)
+    artifact = await _preview_artifact(
+        query,
+        resolved_plan,
+        query_mode=query_mode,
+    )
     if artifact.service_route:
         try:
             service_result = await execute_service_route(
@@ -204,7 +229,11 @@ async def _execute_artifact(
     return artifact, raw_results, result_report
 
 
-async def preview_question(query: str) -> AskPreviewResponse:
+async def preview_question(
+    query: str,
+    *,
+    query_mode: AskQueryMode = "auto",
+) -> AskPreviewResponse:
     # Phase 2 validation gate: unrestricted query generation is never reached
     # unless the model first produces a valid, query-language-free AskPlan.
     plan = await plan_question(query)
@@ -217,7 +246,11 @@ async def preview_question(query: str) -> AskPreviewResponse:
             warnings=resolved_plan.warnings,
             ambiguities=resolved_plan.ambiguities,
         )
-    artifact = await _preview_artifact(query, resolved_plan)
+    artifact = await _preview_artifact(
+        query,
+        resolved_plan,
+        query_mode=query_mode,
+    )
     return AskPreviewResponse(
         sparql=artifact.sparql,
         interpretation=resolved_plan,
@@ -227,7 +260,11 @@ async def preview_question(query: str) -> AskPreviewResponse:
     )
 
 
-async def ask_question(query: str) -> AskResponse:
+async def ask_question(
+    query: str,
+    *,
+    query_mode: AskQueryMode = "auto",
+) -> AskResponse:
     plan = await plan_question(query)
     resolved_plan = await resolve_ask_plan(query, plan)
     if resolved_plan.ambiguities:
@@ -239,8 +276,13 @@ async def ask_question(query: str) -> AskResponse:
             interpretation=resolved_plan,
             warnings=resolved_plan.warnings,
             ambiguities=resolved_plan.ambiguities,
+            method=_ask_method(None, answer_uses_llm=False),
         )
-    artifact, raw_results, result_report = await _execute_artifact(query, resolved_plan)
+    artifact, raw_results, result_report = await _execute_artifact(
+        query,
+        resolved_plan,
+        query_mode=query_mode,
+    )
     answer_context = build_answer_context(
         query,
         raw_results,
@@ -249,7 +291,8 @@ async def ask_question(query: str) -> AskResponse:
         result_report,
     )
     answer = deterministic_answer(answer_context)
-    if answer is None:
+    answer_uses_llm = answer is None
+    if answer_uses_llm:
         answer = await ground_answer(answer_context)
     return AskResponse(
         status=_result_status(raw_results),
@@ -264,10 +307,15 @@ async def ask_question(query: str) -> AskResponse:
         approximate=answer_context.approximate,
         evidence=answer_context.evidence,
         answer_context=answer_context,
+        method=_ask_method(artifact, answer_uses_llm=answer_uses_llm),
     )
 
 
-async def stream_answer_events(query: str) -> AsyncIterator[str]:
+async def stream_answer_events(
+    query: str,
+    *,
+    query_mode: AskQueryMode = "auto",
+) -> AsyncIterator[str]:
     plan = await plan_question(query)
     resolved_plan = await resolve_ask_plan(query, plan)
     interpretation = resolved_plan.model_dump(mode="json")
@@ -277,6 +325,7 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
     ]
     if resolved_plan.ambiguities:
         status = AskStatus.NEEDS_DISAMBIGUATION
+        method = _ask_method(None, answer_uses_llm=False)
         meta = {
             "type": "meta",
             "status": status,
@@ -288,6 +337,7 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
             "truncated": False,
             "approximate": False,
             "evidence": [],
+            "method": method.model_dump(mode="json"),
         }
         yield f"data: {json.dumps(meta)}\n\n"
         yield f"data: {json.dumps({'type': 'token', 'text': _ambiguity_answer(resolved_plan)})}\n\n"
@@ -301,7 +351,11 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
         yield f"data: {json.dumps(done)}\n\n"
         return
 
-    artifact, raw_results, result_report = await _execute_artifact(query, resolved_plan)
+    artifact, raw_results, result_report = await _execute_artifact(
+        query,
+        resolved_plan,
+        query_mode=query_mode,
+    )
     rows = _result_rows(raw_results)
     status = _result_status(raw_results)
     answer_context = build_answer_context(
@@ -311,6 +365,9 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
         artifact,
         result_report,
     )
+    fixed_answer = deterministic_answer(answer_context)
+    answer_uses_llm = fixed_answer is None
+    method = _ask_method(artifact, answer_uses_llm=answer_uses_llm)
 
     meta = {
         "type": "meta",
@@ -325,6 +382,7 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
         "approximate": answer_context.approximate,
         "evidence": [item.model_dump(mode="json") for item in answer_context.evidence],
         "answer_context": answer_context.model_dump(mode="json"),
+        "method": method.model_dump(mode="json"),
     }
     yield f"data: {json.dumps(meta)}\n\n"
 
@@ -341,7 +399,6 @@ async def stream_answer_events(query: str) -> AsyncIterator[str]:
     for warning in answer_context.warnings:
         yield f"data: {json.dumps({'type': 'warning', 'text': warning})}\n\n"
 
-    fixed_answer = deterministic_answer(answer_context)
     if fixed_answer is not None:
         yield f"data: {json.dumps({'type': 'token', 'text': fixed_answer})}\n\n"
     else:

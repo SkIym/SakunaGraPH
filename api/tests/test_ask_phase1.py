@@ -45,6 +45,15 @@ class AskRequestValidationTests(unittest.TestCase):
                 with self.assertRaises(ValidationError):
                     AskRequest(query=query)
 
+    def test_accepts_only_supported_query_modes(self) -> None:
+        self.assertEqual(AskRequest(query="List events").query_mode, "auto")
+        self.assertEqual(
+            AskRequest(query="List events", query_mode="llm").query_mode,
+            "llm",
+        )
+        with self.assertRaises(ValidationError):
+            AskRequest(query="List events", query_mode="unsupported")
+
 
 class AskContextTests(unittest.TestCase):
     def test_uses_controlled_casualty_iris_instead_of_string_literals(self) -> None:
@@ -120,6 +129,8 @@ class AskFailureSemanticsTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(response.status, AskStatus.ANSWERED)
         self.assertEqual(response.answer, "One event was found.")
         self.assertEqual(response.rows, [{"event": "one"}])
+        self.assertEqual(response.method.query, "model_fallback")
+        self.assertEqual(response.method.answer, "llm")
 
     async def test_valid_empty_results_have_no_data_status(self) -> None:
         with (

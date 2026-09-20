@@ -78,6 +78,13 @@ LOCATION_CATALOG = [
     _entry("location", "1130700000", "Davao City", level="City"),
     _entry("location", "1430300000", "Baguio City", level="City"),
     _entry("location", "Mindanao", "Mindanao", level="Island Group"),
+    _entry(
+        "location",
+        "0301400000",
+        "Province of Bulacan",
+        hierarchy_aliases=["Bulacan", "Bulacan Province"],
+        level="Province",
+    ),
 ]
 
 DISASTER_CATALOG = [
@@ -90,6 +97,9 @@ DISASTER_CATALOG = [
     ),
     _entry("disaster_type", "Earthquake", "Earthquake"),
     _entry("disaster_type", "Drought", "Drought"),
+    _entry("disaster_type", "FireIndustrial", "Fire (Industrial)"),
+    _entry("disaster_type", "FireMiscellaneous", "Fire (Misc)"),
+    _entry("disaster_type", "Wildfire", "Wildfire"),
 ]
 
 EVENT_CATALOG = [
@@ -181,6 +191,76 @@ class EntityResolverGoldenTests(unittest.TestCase):
         self.assertEqual(matches[0].match_type, "fuzzy")
         self.assertFalse(ambiguities)
         self.assertFalse(warnings)
+
+    def test_location_label_with_psgc_code_resolves_exactly(self) -> None:
+        matches, ambiguities, warnings = resolve_mentions(
+            ["Bulacan (0301400000)"],
+            LOCATION_CATALOG,
+            "location",
+        )
+
+        self.assertEqual(len(matches), 1)
+        self.assertEqual(matches[0].id, "0301400000")
+        self.assertEqual(matches[0].label, "Province of Bulacan")
+        self.assertEqual(matches[0].match_type, "exact")
+        self.assertFalse(ambiguities)
+        self.assertFalse(warnings)
+
+    def test_location_label_must_agree_with_its_psgc_code(self) -> None:
+        matches, ambiguities, warnings = resolve_mentions(
+            ["Cebu (0301400000)"],
+            LOCATION_CATALOG,
+            "location",
+        )
+
+        self.assertFalse(matches)
+        self.assertFalse(ambiguities)
+        self.assertEqual(
+            warnings,
+            [
+                "No location entity in GraphDB matched "
+                "'Cebu (0301400000)'."
+            ],
+        )
+
+    def test_collective_fire_term_expands_to_controlled_graph_entities(self) -> None:
+        matches, ambiguities, warnings = resolve_mentions(
+            ["fire"],
+            DISASTER_CATALOG,
+            "disaster_type",
+            aliases=entity_resolver._DISASTER_ALIASES,
+            expansions=entity_resolver._DISASTER_EXPANSIONS,
+        )
+
+        self.assertEqual(
+            [match.id for match in matches],
+            ["FireIndustrial", "FireMiscellaneous", "Wildfire"],
+        )
+        self.assertTrue(all(match.match_type == "alias" for match in matches))
+        self.assertFalse(ambiguities)
+        self.assertFalse(warnings)
+
+    def test_collective_expansion_rejects_an_incomplete_graph_catalog(self) -> None:
+        matches, ambiguities, warnings = resolve_mentions(
+            ["fire"],
+            [
+                entry
+                for entry in DISASTER_CATALOG
+                if entry.id != "Wildfire"
+            ],
+            "disaster_type",
+            expansions=entity_resolver._DISASTER_EXPANSIONS,
+        )
+
+        self.assertFalse(matches)
+        self.assertFalse(ambiguities)
+        self.assertEqual(
+            warnings,
+            [
+                "The disaster type expansion for 'fire' is incomplete in GraphDB; "
+                "missing: Wildfire."
+            ],
+        )
 
     def test_ambiguous_location_is_surfaced_instead_of_guessed(self) -> None:
         matches, ambiguities, warnings = resolve_mentions(
@@ -318,6 +398,25 @@ class GraphDbCatalogTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(resolved.organizations[0].id, "NDRRMC")
         self.assertEqual(resolved.casualty_types[0].id, "Dead")
         self.assertFalse(resolved.ambiguities)
+
+    async def test_fire_expansion_flows_through_ask_plan_resolution(self) -> None:
+        plan = AskPlan(
+            intent="event_count",
+            metric="events",
+            disaster_type_mentions=["fire"],
+        )
+        with patch(
+            "src.services.ask.entity_resolver._disaster_catalog",
+            new=AsyncMock(return_value=DISASTER_CATALOG),
+        ):
+            resolved = await resolve_ask_plan("How many fire events occurred?", plan)
+
+        self.assertEqual(
+            [entity.id for entity in resolved.disaster_types],
+            ["FireIndustrial", "FireMiscellaneous", "Wildfire"],
+        )
+        self.assertFalse(resolved.ambiguities)
+        self.assertFalse(resolved.warnings)
 
 
 class AskAmbiguityGateTests(unittest.IsolatedAsyncioTestCase):

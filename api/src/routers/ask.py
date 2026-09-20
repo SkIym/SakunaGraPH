@@ -8,6 +8,7 @@ from fastapi.responses import JSONResponse, StreamingResponse
 from src.schemas.ask import (
     AskErrorResponse,
     AskPreviewResponse,
+    AskQueryMode,
     AskRequest,
     AskResponse,
     AskStatus,
@@ -65,9 +66,12 @@ def _ask_error_response(exc: ServiceError) -> JSONResponse:
     )
 
 
-async def _stream_with_errors(query: str) -> AsyncIterator[str]:
+async def _stream_with_errors(
+    query: str,
+    query_mode: AskQueryMode,
+) -> AsyncIterator[str]:
     try:
-        async for event in stream_answer_events(query):
+        async for event in stream_answer_events(query, query_mode=query_mode):
             yield event
     except ServiceError as exc:
         yield f"data: {json.dumps({'type': 'error', 'status': exc.status_code, 'ask_status': _ask_failure_status(exc), 'detail': exc.detail})}\n\n"
@@ -95,7 +99,7 @@ async def ask_models() -> dict[str, Any]:
 @router.post("/ask", response_model=AskResponse, response_model_exclude_none=True)
 async def ask(request: AskRequest) -> AskResponse | JSONResponse:
     try:
-        return await ask_question(request.query)
+        return await ask_question(request.query, query_mode=request.query_mode)
     except ServiceError as exc:
         return _ask_error_response(exc)
 
@@ -107,7 +111,7 @@ async def ask(request: AskRequest) -> AskResponse | JSONResponse:
 )
 async def ask_preview(request: AskRequest) -> AskPreviewResponse | JSONResponse:
     try:
-        return await preview_question(request.query)
+        return await preview_question(request.query, query_mode=request.query_mode)
     except ServiceError as exc:
         return _ask_error_response(exc)
 
@@ -115,7 +119,7 @@ async def ask_preview(request: AskRequest) -> AskPreviewResponse | JSONResponse:
 @router.post("/ask/stream")
 async def ask_stream(request: AskRequest) -> StreamingResponse:
     return StreamingResponse(
-        _stream_with_errors(request.query),
+        _stream_with_errors(request.query, request.query_mode),
         media_type="text/event-stream",
         headers={
             "Cache-Control": "no-cache, no-transform",

@@ -97,9 +97,10 @@ export const CONSUMED_API_OPERATIONS = Object.freeze({
 /** @typedef {{ head?: {vars?: string[]}, results?: {bindings?: Record<string, SparqlTerm>[]}, boolean?: boolean }} SparqlQueryResponse */
 /** @typedef {{ id: string, label: string, uri: string, sourceRecord?: string, excerpt?: string }} AskCitation */
 /** @typedef {{ mode?: 'legacy'|'graphrag'|'fallback', indexVersion?: string, sourceCount?: number }} AskRetrieval */
-/** @typedef {{ sparql: string, answer: string, rows: Record<string, unknown>[], citations?: AskCitation[], retrieval?: AskRetrieval }} AskResponse */
+/** @typedef {{ planning: 'llm', query: 'service'|'compiler'|'model_fallback'|'not_run', answer: 'deterministic'|'llm' }} AskMethod */
+/** @typedef {{ sparql: string, answer: string, rows: Record<string, unknown>[], citations?: AskCitation[], retrieval?: AskRetrieval, method?: AskMethod }} AskResponse */
 /** @typedef {{ sparql: string }} AskPreviewResponse */
-/** @typedef {{ type: 'meta', sparql: string, rows: Record<string, unknown>[], citations?: AskCitation[], retrieval?: AskRetrieval, requestId?: string }} AskStreamMetaEvent */
+/** @typedef {{ type: 'meta', sparql: string, rows: Record<string, unknown>[], citations?: AskCitation[], retrieval?: AskRetrieval, method?: AskMethod, requestId?: string }} AskStreamMetaEvent */
 /** @typedef {{ type: 'token', text: string }} AskStreamTokenEvent */
 /** @typedef {{ type: 'citation'|`citation.v${number}`, citation: AskCitation }} AskStreamCitationEvent */
 /** @typedef {{ type: 'done', citations?: AskCitation[], retrieval?: AskRetrieval }} AskStreamDoneEvent */

@@ -2887,6 +2887,38 @@
 			"title": "AskEvidence",
 			"type": "object"
 		},
+		"AskMethod": {
+			"description": "Auditable record of how an Ask response was produced.",
+			"properties": {
+				"answer": {
+					"enum": ["deterministic", "llm"],
+					"title": "Answer",
+					"type": "string"
+				},
+				"planning": {
+					"const": "llm",
+					"default": "llm",
+					"title": "Planning",
+					"type": "string"
+				},
+				"query": {
+					"anyOf": [
+						{
+							"enum": ["service", "compiler", "model_fallback"],
+							"type": "string"
+						},
+						{
+							"const": "not_run",
+							"type": "string"
+						}
+					],
+					"title": "Query"
+				}
+			},
+			"required": ["query", "answer"],
+			"title": "AskMethod",
+			"type": "object"
+		},
 		"AskPlan": {
 			"additionalProperties": false,
 			"description": "Validated, query-language-free interpretation of an Ask question.",
@@ -3165,6 +3197,12 @@
 					"minLength": 1,
 					"title": "Query",
 					"type": "string"
+				},
+				"query_mode": {
+					"default": "auto",
+					"enum": ["auto", "llm"],
+					"title": "Query Mode",
+					"type": "string"
 				}
 			},
 			"required": ["query"],
@@ -3223,6 +3261,16 @@
 					"anyOf": [
 						{
 							"$ref": "#/components/schemas/ResolvedAskPlan"
+						},
+						{
+							"type": "null"
+						}
+					]
+				},
+				"method": {
+					"anyOf": [
+						{
+							"$ref": "#/components/schemas/AskMethod"
 						},
 						{
 							"type": "null"

@@ -186,6 +186,7 @@ export async function consumeAskStream(
 		rows: [],
 		citations: [],
 		retrieval: null,
+		method: null,
 		requestId: null,
 	};
 	let seenMeta = false;
@@ -216,6 +217,7 @@ export async function consumeAskStream(
 			result.rows = payload.rows;
 			result.citations = mergeCitations(result.citations, payload.citations ?? []);
 			result.retrieval = payload.retrieval ?? null;
+			result.method = payload.method && typeof payload.method === 'object' ? payload.method : null;
 			result.requestId = payload.requestId ?? null;
 			await onMeta?.({ ...result }, payload);
 			continue;

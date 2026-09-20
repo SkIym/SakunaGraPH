@@ -35,4 +35,19 @@ describe('AskAnswerMeta', () => {
 		expect(screen.queryByRole('link', { name: 'Unsafe source' })).not.toBeInTheDocument();
 		expect(screen.getByText('Unsafe source')).toBeVisible();
 	});
+
+	it.each([
+		['service', 'deterministic', 'Predefined service query', 'Rule-based answer'],
+		['compiler', 'llm', 'Deterministic SPARQL', 'AI-written answer'],
+		['model_fallback', 'llm', 'AI-generated SPARQL', 'AI-written answer'],
+	])('labels the %s query and %s answer methods', (query, answer, queryLabel, answerLabel) => {
+		render(AskAnswerMeta, {
+			method: { planning: 'llm', query, answer },
+		});
+
+		expect(screen.getByRole('region', { name: 'Answer method' })).toBeVisible();
+		expect(screen.getByText('AI interpretation')).toBeVisible();
+		expect(screen.getByText(queryLabel)).toBeVisible();
+		expect(screen.getByText(answerLabel)).toBeVisible();
+	});
 });

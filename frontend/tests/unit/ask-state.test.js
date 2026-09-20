@@ -39,6 +39,7 @@ describe('ask state', () => {
 			answer: 'One event was found.',
 			sparql: 'SELECT * WHERE {}',
 			rows: [{ event: 'Event 1' }],
+			method: { planning: 'llm', query: 'compiler', answer: 'deterministic' },
 		});
 		const ask = createAskState({ submit, onUpdated });
 		ask.input = 'Show one event';
@@ -47,6 +48,7 @@ describe('ask state', () => {
 
 		expect(submit).toHaveBeenCalledWith('Show one event', {
 			signal: expect.any(AbortSignal),
+			queryMode: 'auto',
 		});
 		expect(ask.messages).toEqual([
 			{ role: 'user', text: 'Show one event' },
@@ -59,6 +61,7 @@ describe('ask state', () => {
 				rows: [{ event: 'Event 1' }],
 				citations: [],
 				retrieval: null,
+				method: { planning: 'llm', query: 'compiler', answer: 'deterministic' },
 				requestId: null,
 			},
 		]);
@@ -78,6 +81,38 @@ describe('ask state', () => {
 			streaming: false,
 			error:
 				'Could not reach the data service. Check your connection, then send the question again.',
+		});
+	});
+
+	it('shows the exact API detail for an unprocessable Ask request', async () => {
+		const submit = vi.fn().mockRejectedValue({
+			name: 'ApiHttpError',
+			kind: 'http',
+			status: 422,
+			message: 'Metric total_missing is not supported for event queries.',
+		});
+		const ask = createAskState({ submit });
+
+		await ask.send('Show the unsupported metric');
+
+		expect(ask.messages.at(-1)).toEqual({
+			role: 'assistant',
+			loading: false,
+			streaming: false,
+			error: 'Metric total_missing is not supported for event queries.',
+		});
+	});
+
+	it('forces model query generation when the AI-query toggle is enabled', async () => {
+		const submit = vi.fn().mockResolvedValue({ answer: 'Answer', sparql: '', rows: [] });
+		const ask = createAskState({ submit });
+		ask.forceLlmQuery = true;
+
+		await ask.send('Build this query with AI');
+
+		expect(submit).toHaveBeenCalledWith('Build this query with AI', {
+			signal: expect.any(AbortSignal),
+			queryMode: 'llm',
 		});
 	});
 
@@ -103,6 +138,7 @@ describe('ask state', () => {
 					sparql: 'SELECT * WHERE {}',
 					rows: [{ event: 'Event 1' }],
 					retrieval: { mode: 'graphrag', indexVersion: 'v1' },
+					method: { planning: 'llm', query: 'model_fallback', answer: 'llm' },
 				},
 				{ type: 'token', text: 'One ' },
 				{ type: 'token', text: 'event.' },
@@ -131,6 +167,7 @@ describe('ask state', () => {
 			rows: [{ event: 'Event 1' }],
 			citations: [{ id: 'source-1', label: 'Report', uri: 'https://example.test/report' }],
 			retrieval: { mode: 'graphrag', indexVersion: 'v1' },
+			method: { planning: 'llm', query: 'model_fallback', answer: 'llm' },
 		});
 		expect(ask.announcement).toBe('Answer ready.');
 	});
@@ -148,6 +185,7 @@ describe('ask state', () => {
 
 		expect(submit).toHaveBeenCalledWith('Use rollout fallback', {
 			signal: expect.any(AbortSignal),
+			queryMode: 'auto',
 		});
 		expect(ask.messages.at(-1)).toMatchObject({
 			text: 'Legacy answer',
