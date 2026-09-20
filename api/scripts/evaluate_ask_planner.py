@@ -127,7 +127,7 @@ async def _run(args: argparse.Namespace) -> int:
     if not cases:
         raise ValueError("No fixture cases matched the selected filters")
 
-    # Sequential execution keeps local-model load and result ordering stable.
+    # Sequential execution bounds Bedrock load and keeps result ordering stable.
     results = [await evaluate_plan_case(case) for case in cases]
     summary = summarize_plan_results(results)
     summary["required_field_accuracy"] = args.threshold

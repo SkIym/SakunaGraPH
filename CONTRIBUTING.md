@@ -122,7 +122,7 @@ contracts, and deployment.
 ## Data policy
 
 Only synthetic or explicitly redistributable fixtures belong in Git. Raw data paths, downloads,
-logs, generated RDF, secrets, and local model artifacts must remain ignored. Consult
+logs, generated RDF, secrets, and generated model-evaluation artifacts must remain ignored. Consult
 `DATA_SOURCES.md` before adding a fixture derived from an external source.
 
 ## Pull request checklist

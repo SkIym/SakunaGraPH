@@ -7,8 +7,10 @@ The root `docker-compose.yml` runs three services:
 - `frontend`: the production SvelteKit adapter-node build, running as the unprivileged `node` user.
 - `api`: the FastAPI application, running as the unprivileged `sakuna` user.
 
-Copy `.env.compose.example` to `.env` and adjust the GraphDB and local-model addresses when they
-are not running on the Docker host. Then build and start the application from the repository root:
+Copy `.env.compose.example` to `.env` for the stack settings and `api/.env.example` to `api/.env`
+for Bedrock. Adjust the GraphDB address, then set the exact Bedrock model or inference-profile ID
+and credentials in `api/.env`. Prefer a short-lived workload role in deployed environments. Then
+build and start the application from the repository root:
 
 ```bash
 docker compose up --build --wait
@@ -23,8 +25,8 @@ The liveness endpoints are:
 - Gateway/frontend: `GET /health`
 - API through the gateway: `GET /api/health`
 
-These checks report process availability only. They intentionally do not fail when GraphDB or the
-local model server is unavailable.
+These checks report process availability only. They intentionally do not fail when GraphDB or
+Amazon Bedrock is unavailable.
 
 ## Deployment contract
 
@@ -34,6 +36,6 @@ From `frontend/`, run:
 npm run test:deployment
 ```
 
-The command builds the real images with a deterministic test-only GraphDB/model upstream, starts
+The command builds the real images with a deterministic test-only GraphDB/Bedrock upstream, starts
 the same Caddy topology on port 4176, and verifies direct routes, same-origin API routing, GeoJSON,
 and unbuffered GraphRAG streaming. It always removes its containers and network afterward.

@@ -3,7 +3,7 @@
 The SakunaGraPH API is a FastAPI application that exposes the disaster
 knowledge graph through analytics, map, ontology, event-detail, SPARQL, and
 natural-language question-answering endpoints. GraphDB is the system of record.
-A configurable local language model helps interpret questions and, when
+A configured Amazon Bedrock text model helps interpret questions and, when
 necessary, word answers from already validated graph evidence.
 
 ## Current GraphRAG scope
@@ -38,12 +38,12 @@ FastAPI application
   |-- disasters router -----> disaster services -----|
   |-- SPARQL router ---------------------------------+
   `-- Ask router
-        |-- structured planning --------------------------> local LLM
+        |-- structured planning --------------------------> Amazon Bedrock Converse
         |-- entity resolution ----------------------------> GraphDB
         |-- service routing / deterministic compilation
         |-- SPARQL validation when query-backed; result validation for all paths
         |-- graph retrieval ------------------------------> GraphDB
-        `-- conditional grounded answer generation ------> local LLM
+        `-- conditional grounded answer generation ------> Amazon Bedrock Converse/ConverseStream
 ```
 
 The application is a layered modular monolith:
@@ -55,7 +55,7 @@ The application is a layered modular monolith:
 | Contracts | `src/schemas/` | Pydantic request, response, planning, execution, and evidence models |
 | Domain services | `src/services/analysis/`, `disasters/`, `map/`, `ontology/`, `ask/` | Implement feature behavior and shape graph results |
 | GraphDB adapter | `src/services/sparql/` | Validate and execute read-only SPARQL |
-| LLM adapter | `src/services/llm.py` | Non-streaming and streaming calls to the configured local model |
+| LLM adapter | `src/services/llm.py` | Typed non-streaming and streaming calls to Amazon Bedrock |
 | Shared errors | `src/services/common/` | Carry HTTP-safe status codes and error details across layers |
 
 All feature routers are mounted under `/api`. The API also exposes `/health` and
@@ -136,7 +136,7 @@ the Ask service or LLM is called.
 ### 2. Structured planning
 
 `src/services/ask/planner.py` sends the question, the current date, planning
-rules, examples, and the JSON Schema for `AskPlan` to the local model. The model
+rules, examples, and the JSON Schema for `AskPlan` to the configured Bedrock model. The model
 must return one JSON object rather than SPARQL.
 
 The plan records:
@@ -223,7 +223,7 @@ response semantics. The compiler uses resolved IRIs, normalized dates, fixed
 graph patterns, deterministic ordering, and a bounded `LIMIT`; it does not
 interpolate the original question.
 
-For `open_graph_query`, the local model receives a fixed SakunaGraPH ontology
+For `open_graph_query`, the configured Bedrock model receives a fixed SakunaGraPH ontology
 summary from `src/services/ask/context.py` and proposes a SELECT query. That
 proposal still has to pass every validation step below.
 
@@ -351,7 +351,7 @@ The API first attempts a deterministic answer. Current deterministic renderers
 cover zero-row results, ungrouped counts and summaries, and event,
 disaster-type, or source listings.
 
-When no deterministic renderer fits, the local model receives only the
+When no deterministic renderer fits, the configured Bedrock model receives only the
 validated structured answer context. The grounding prompt requires the model to
 cite factual statements with evidence IDs, preserve units, mention truncation
 or approximation, and avoid inventing facts, identifiers, provenance, or
@@ -413,9 +413,11 @@ evidence, and answer context. A disambiguation stream emits `meta`, a clarificat
 
 ## Configuration
 
-Settings are loaded from environment variables and an optional `.env` file in
-the working directory. Run local commands from `api/` so its `.env` file is
-found.
+Settings are loaded from environment variables and `api/.env`. The file path is
+resolved from the application package, so it is found even when the API is
+started from another working directory. Copy `.env.example` to `.env`, then
+paste the Bedrock credentials and model configuration into that file. Real
+environment variables take precedence over values in `.env`.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
@@ -424,11 +426,21 @@ found.
 | `GRAPHDB_READ_ONLY_USERNAME` | unset | Optional read-only GraphDB user |
 | `GRAPHDB_READ_ONLY_PASSWORD` | unset | Optional read-only GraphDB password |
 | `GRAPHDB_QUERY_TIMEOUT_SECONDS` | `30` | GraphDB query timeout |
-| `LOCAL_LLM_BASE_URL` | `http://127.0.0.1:1234` | Local model server |
-| `LOCAL_LLM_CHAT_PATH` | `/api/v1/chat` | Chat endpoint path |
-| `LOCAL_LLM_MODEL` | `google/gemma-4-e4b` | Requested model identifier |
-| `LOCAL_LLM_TIMEOUT` | `120` | Model request timeout |
-| `LOCAL_LLM_STORE` | `false` | Whether the model server may store requests |
+| `AWS_BEARER_TOKEN_BEDROCK` | unset | Bedrock API key for local development |
+| `AWS_ACCESS_KEY_ID` | unset | Optional standard AWS access-key ID |
+| `AWS_SECRET_ACCESS_KEY` | unset | Secret paired with `AWS_ACCESS_KEY_ID` |
+| `AWS_SESSION_TOKEN` | unset | Optional token for temporary AWS credentials |
+| `AWS_REGION` | `ap-southeast-1` | AWS Region used by the Bedrock Runtime client |
+| `BEDROCK_MODEL_ID` | unset (required for Ask) | Exact foundation-model or inference-profile ID |
+| `BEDROCK_ENDPOINT_URL` | unset | Optional Bedrock Runtime or test endpoint override |
+| `BEDROCK_CONNECT_TIMEOUT` | `10` | SDK connection timeout in seconds |
+| `BEDROCK_READ_TIMEOUT` | `120` | SDK response/read timeout in seconds |
+| `BEDROCK_MAX_ATTEMPTS` | `3` | Total standard-mode SDK attempts, including the initial request |
+| `BEDROCK_MAX_CONCURRENCY` | `8` | Maximum concurrent Bedrock calls per API process |
+| `BEDROCK_MAX_TOKENS` | `4096` | Maximum generated tokens per invocation |
+| `BEDROCK_TEMPERATURE` | `0` | Converse sampling temperature |
+| `BEDROCK_TOP_P` | `1` | Converse nucleus-sampling threshold |
+| `BEDROCK_STREAMING` | `true` | Use ConverseStream for the SSE answer-generation phase |
 | `ASK_SPARQL_MAX_LENGTH` | `30000` | Maximum validated Ask query length |
 | `ASK_SPARQL_MAX_TRIPLES` | `80` | Maximum triple patterns |
 | `ASK_SPARQL_MAX_OPTIONALS` | `30` | Maximum OPTIONAL blocks |
@@ -436,14 +448,28 @@ found.
 | `ASK_SPARQL_MAX_SUBQUERIES` | `12` | Maximum subqueries |
 | `ASK_RESULT_ROW_LIMIT` | `100` | Maximum Ask result rows |
 
-Both GraphDB credential variables must be set together. The liveness route does
-not check GraphDB or the LLM.
+Both GraphDB credential variables must be set together. For local Bedrock authentication, set
+either `AWS_BEARER_TOKEN_BEDROCK` or the `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` pair in
+`api/.env`; do not mix the two methods. `AWS_SESSION_TOKEN` is also required when the access-key
+pair contains temporary credentials. The API loads the file into the process before Boto3 creates
+its client, so the values participate in the standard AWS SDK credential chain. Prefer workload
+roles in deployed environments, and never commit the populated `.env`. The liveness route does
+not check GraphDB or Bedrock.
+
+The runtime role needs `bedrock:InvokeModel` for `Converse` and, when streaming is enabled,
+`bedrock:InvokeModelWithResponseStream` for `ConverseStream`. Scope both actions to the exact model
+or inference-profile resources selected for the deployment. The adapter uses bounded standard-mode
+SDK retries, explicit connect/read timeouts, a per-process concurrency limit, and response-shape
+validation. It records request IDs, latency, token counts, retry counts, and error classes without
+logging prompts or generated text.
 
 ## Local development
 
 From `api/`:
 
 ```powershell
+Copy-Item .env.example .env
+# Edit .env and paste the Bedrock API key after AWS_BEARER_TOKEN_BEDROCK=
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 python -m pip install --requirement requirements.txt
@@ -456,9 +482,9 @@ Then open:
 - OpenAPI schema: `http://127.0.0.1:8000/openapi.json`
 - Liveness: `http://127.0.0.1:8000/health`
 
-Graph-backed endpoints require the configured GraphDB repository. Ask endpoints
-also require the local model for structured planning, even when the final answer
-can be rendered deterministically.
+Graph-backed endpoints require the configured GraphDB repository. Ask endpoints also require AWS
+credentials with access to the configured Bedrock model for structured planning, even when the
+final answer can be rendered deterministically.
 
 ## Tests and evaluation
 
@@ -486,8 +512,8 @@ python scripts/evaluate_ask_planner.py
 
 ## Container deployment
 
-The repository-root `docker-compose.yml` starts Caddy, the frontend, and this
-API. GraphDB and the local model remain configurable upstream services.
+The repository-root `docker-compose.yml` starts Caddy, the frontend, and this API. GraphDB remains
+a configurable upstream service; model inference uses the regional Bedrock Runtime endpoint.
 
 From the repository root:
 
@@ -503,13 +529,13 @@ user and exposes port 8000 only to the internal Compose network.
 ## Important operational boundaries
 
 - GraphDB is authoritative for graph entities and retrieved facts.
-- The local model is required for Ask planning but never receives GraphDB
-  credentials.
+- Bedrock is required for Ask planning but never receives GraphDB credentials. The application
+  sends planning prompts or typed, validated evidence contexts, not GraphDB access.
 - Direct and generated SPARQL are restricted to SELECT operations by application
   policy; deployments should also use a read-only GraphDB identity.
 - In-memory caches are local to one API process and are neither persistent nor
   shared between workers.
-- The current `/health` endpoint reports process liveness, not GraphDB or LLM
+- The current `/health` endpoint reports process liveness, not GraphDB or Bedrock
   readiness.
 - A future vector or embedding index should be built and versioned outside API
   startup.

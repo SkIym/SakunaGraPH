@@ -5,8 +5,8 @@ Run from the API directory:
 
     .venv/bin/python scripts/evaluate_ask.py
 
-The runner is intentionally sequential by default so it does not overwhelm the
-local model server or GraphDB. It does not mutate GraphDB. Reports are written
+The runner is intentionally sequential by default so it does not overwhelm
+Amazon Bedrock or GraphDB. It does not mutate GraphDB. Reports are written
 under ``api/evaluation/reports`` unless ``--output`` is supplied.
 """
 

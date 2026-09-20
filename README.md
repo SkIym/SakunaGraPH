@@ -88,7 +88,7 @@ flowchart LR
 
     graphdb --> api["FastAPI graph services"]
     api --> web["SvelteKit exploration UI"]
-    llm["Local OpenAI-compatible LLM"] -. "structured planning and evidence-constrained wording" .-> api
+    llm["Amazon Bedrock"] -. "structured planning and evidence-constrained wording" .-> api
 
     quality -. "reject" .-> quarantine["Quarantine"]
     shacl -. "reject" .-> quarantine
@@ -165,12 +165,15 @@ package.
 ## Run the web application
 
 The application Compose stack contains the Caddy gateway, SvelteKit frontend, and FastAPI service.
-It expects two services to be available on the host or at configured URLs:
+It expects GraphDB plus configured access to Amazon Bedrock:
 
 1. A GraphDB/RDF4J repository containing the SakunaGraPH ontology and data.
-2. An OpenAI-compatible local model endpoint for the Ask planner and conditional answer wording.
+2. An enabled Bedrock text model or inference profile for the Ask planner and conditional answer
+   wording.
 
-Copy `.env.compose.example` to `.env`, update the endpoints, then run:
+Copy `.env.compose.example` to `.env` for the stack settings and `api/.env.example` to `api/.env`
+for Bedrock. Paste the Bedrock API key and model configuration into `api/.env`, update the GraphDB
+endpoint, then run:
 
 ```bash
 docker compose up --build --wait

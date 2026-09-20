@@ -8,9 +8,14 @@ function json(response, status, body) {
 	response.end(JSON.stringify(body));
 }
 
-async function requestBody(request) {
+async function requestText(request) {
 	let body = '';
 	for await (const chunk of request) body += chunk;
+	return body;
+}
+
+async function requestBody(request) {
+	const body = await requestText(request);
 	return body ? JSON.parse(body) : {};
 }
 
@@ -23,40 +28,84 @@ const server = createServer(async (request, response) => {
 	}
 
 	if (request.method === 'POST' && url.pathname === '/graphdb') {
+		const body = await requestText(request);
+		const query = request.headers['content-type']?.includes('application/sparql-query')
+			? body
+			: (new URLSearchParams(body).get('query') ?? '');
+		if (query.includes('SELECT ?region ?label (COUNT(DISTINCT ?event) AS ?count)')) {
+			json(response, 200, {
+				head: { vars: ['region', 'label', 'count'] },
+				results: {
+					bindings: [
+						{
+							region: { type: 'uri', value: 'https://sakuna.ph/psgc/0100000000' },
+							label: { type: 'literal', value: 'Ilocos Region' },
+							count: { type: 'literal', value: '1' },
+						},
+					],
+				},
+			});
+			return;
+		}
+		if (query.includes('SELECT (COUNT(DISTINCT ?event) AS ?count)')) {
+			json(response, 200, {
+				head: { vars: ['count'] },
+				results: {
+					bindings: [{ count: { type: 'literal', value: '1' } }],
+				},
+			});
+			return;
+		}
+		if (query.includes('SELECT DISTINCT ?event ?eventName ?eventClass ?startDate ?endDate')) {
+			json(response, 200, {
+				head: { vars: ['event', 'eventName', 'eventClass', 'startDate', 'endDate'] },
+				results: {
+					bindings: [
+						{
+							event: { type: 'uri', value: 'https://sakuna.ph/ndrrmc-event/deployment-test' },
+							eventName: { type: 'literal', value: 'Compose Deployment Test Event' },
+							eventClass: { type: 'uri', value: 'https://sakuna.ph/MajorEvent' },
+							startDate: { type: 'literal', value: '2026-01-01' },
+							endDate: { type: 'literal', value: '2026-01-02' },
+						},
+					],
+				},
+			});
+			return;
+		}
 		json(response, 200, {
-			head: { vars: ['eventName'] },
-			results: {
-				bindings: [{ eventName: { type: 'literal', value: 'Compose Deployment Test Event' } }],
-			},
+			head: { vars: [] },
+			results: { bindings: [] },
 		});
 		return;
 	}
 
-	if (request.method === 'POST' && url.pathname === '/api/v1/chat') {
+	if (
+		request.method === 'POST' &&
+		url.pathname.startsWith('/model/') &&
+		url.pathname.endsWith('/converse')
+	) {
 		const body = await requestBody(request);
-		if (!body.stream) {
-			json(response, 200, {
-				output: [
-					{
-						type: 'message',
-						content:
-							'```sparql\nSELECT ?eventName WHERE { ?event <https://sakuna.ph/eventName> ?eventName } LIMIT 1\n```',
-					},
-				],
-			});
-			return;
-		}
-
-		response.writeHead(200, {
-			'content-type': 'application/x-ndjson',
-			'cache-control': 'no-store',
+		const prompt = body.messages?.[0]?.content?.[0]?.text ?? '';
+		const isGroundingRequest = prompt.includes('Structured answer context:');
+		if (isGroundingRequest) await new Promise((resolve) => setTimeout(resolve, 500));
+		json(response, 200, {
+			output: {
+				message: {
+					role: 'assistant',
+					content: [
+						{
+							text: isGroundingRequest
+								? 'Compose stream reached the browser [E1].'
+								: '{"intent":"region_ranking","metric":"events","group_by":"region","limit":25}',
+						},
+					],
+				},
+			},
+			stopReason: 'end_turn',
+			usage: { inputTokens: 5, outputTokens: 6, totalTokens: 11 },
+			metrics: { latencyMs: 500 },
 		});
-		setTimeout(() => {
-			response.write(
-				`${JSON.stringify({ output: [{ type: 'message', content: 'Compose stream reached the browser.' }] })}\n`,
-			);
-			setTimeout(() => response.end(`${JSON.stringify({ done: true })}\n`), 100);
-		}, 500);
 		return;
 	}
 

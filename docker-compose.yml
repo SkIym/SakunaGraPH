@@ -41,13 +41,12 @@ services:
     build:
       context: ./api
     restart: unless-stopped
+    env_file:
+      - path: ./api/.env
+        required: false
     environment:
       CORS_ORIGINS: '["${ORIGIN:-http://localhost:8080}"]'
       GRAPHDB_ENDPOINT: ${GRAPHDB_ENDPOINT:-http://host.docker.internal:7200/repositories/SakunaGraph}
-      LOCAL_LLM_BASE_URL: ${LOCAL_LLM_BASE_URL:-http://host.docker.internal:1234}
-      LOCAL_LLM_CHAT_PATH: ${LOCAL_LLM_CHAT_PATH:-/api/v1/chat}
-      LOCAL_LLM_MODEL: ${LOCAL_LLM_MODEL:-google/gemma-4-e4b}
-      LOCAL_LLM_TIMEOUT: ${LOCAL_LLM_TIMEOUT:-120}
     extra_hosts:
       - "host.docker.internal:host-gateway"
     expose:

@@ -1,3 +1,5 @@
 fastapi[standard]
+boto3
 httpx
+python-dotenv
 rdflib

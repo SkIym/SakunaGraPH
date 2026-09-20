@@ -33,7 +33,8 @@ set being published.
 
 - The current Ask implementation is graph-grounded retrieval and does not yet maintain a vector
   index or text-chunk retrieval layer.
-- The application Compose stack requires separately configured GraphDB and local model endpoints.
+- The application Compose stack requires a configured GraphDB endpoint plus Amazon Bedrock model
+  access through the AWS SDK credential chain.
 - Repository licensing does not relicense third-party datasets or imported ontology material.
 
 ## [sakunagraphv.1.0] - 2026-06-19

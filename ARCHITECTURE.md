@@ -40,7 +40,7 @@ flowchart TB
     subgraph runtime[Query runtime]
         graph[(GraphDB)]
         api[FastAPI]
-        model[Local OpenAI-compatible model]
+        model[Amazon Bedrock text model]
         ui[SvelteKit UI]
     end
 
@@ -112,7 +112,7 @@ gateway routes and exposes Home, Map, Ontology, Ask, Query, and Analysis surface
 sequenceDiagram
     actor User
     participant API
-    participant LLM as Local LLM
+    participant LLM as Amazon Bedrock
     participant Resolver
     participant Policy
     participant GraphDB
@@ -193,11 +193,13 @@ Cross-source matches add canonical and alternate relationships rather than overw
 identity. This supports auditability and corrections. It also means consumers must understand the
 difference between source records and canonical events.
 
-### Local model endpoint
+### Amazon Bedrock model boundary
 
-The Ask service targets an OpenAI-compatible local endpoint so sensitive graph context need not be
-sent to a hosted provider. This improves deployment control but makes model availability, latency,
-and hardware capacity explicit operational dependencies.
+The Ask service uses the model-agnostic Amazon Bedrock Converse and ConverseStream APIs. The AWS
+SDK credential chain supplies short-lived workload credentials, and deployments pin an exact model
+or inference-profile ID. Only planning prompts and validated evidence contexts cross this boundary;
+model availability, Region support, latency, quotas, and invocation-logging policy remain explicit
+operational dependencies.
 
 ### Graph-grounded retrieval without a vector index
 

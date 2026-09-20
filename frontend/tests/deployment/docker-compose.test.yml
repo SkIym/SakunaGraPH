@@ -2,10 +2,13 @@ services:
   api:
     environment:
       GRAPHDB_ENDPOINT: http://deployment-upstream:9090/graphdb
-      LOCAL_LLM_BASE_URL: http://deployment-upstream:9090
-      LOCAL_LLM_CHAT_PATH: /api/v1/chat
-      LOCAL_LLM_MODEL: deployment-test-model
-      LOCAL_LLM_TIMEOUT: 10
+      AWS_REGION: ap-southeast-1
+      AWS_ACCESS_KEY_ID: deployment-test-key
+      AWS_SECRET_ACCESS_KEY: deployment-test-secret
+      BEDROCK_MODEL_ID: deployment-test-model
+      BEDROCK_ENDPOINT_URL: http://deployment-upstream:9090
+      BEDROCK_READ_TIMEOUT: 10
+      BEDROCK_STREAMING: 'false'
     depends_on:
       deployment-upstream:
         condition: service_healthy
