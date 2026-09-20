@@ -46,7 +46,8 @@ _STRING_IRI_OR_COMMENT_RE = re.compile(
     re.DOTALL,
 )
 _PREFIXED_NAME_RE = re.compile(
-    r"(?<![\w?])(?P<prefix>[A-Za-z][\w.-]*)?:(?P<local>[A-Za-z0-9_][\w.-]*)"
+    r"(?<![\w?])(?P<prefix>[A-Za-z][\w.-]*)?:"
+    r"(?P<local>[A-Za-z0-9_](?:[\w.-]*[\w-])?)"
 )
 _BAD_AGGREGATE_RE = re.compile(
     r"\b(?:COUNT|SUM|AVG|MIN|MAX|SAMPLE|GROUP_CONCAT)\s+(?!\()",
@@ -59,6 +60,21 @@ _FILTER_TRIPLE_PATTERN_RE = re.compile(
     r"(?==|!=|<=|>=|<|>)",
     re.IGNORECASE | re.DOTALL,
 )
+_KEYWORD_ADJACENT_VARIABLE_RE = re.compile(
+    r"\b(?P<keyword>SELECT|VALUES|AS|BY)(?=[?$][A-Za-z_])",
+    re.IGNORECASE,
+)
+_PREFIXED_NAME_ADJACENT_VARIABLE_RE = re.compile(
+    r"(?<![\w?])(?P<name>(?:[A-Za-z][\w.-]*)?:[A-Za-z0-9_][\w.-]*)"
+    r"(?=[?$][A-Za-z_])"
+)
+_PATH_OR_LOGICAL_ADJACENT_VARIABLE_RE = re.compile(
+    r"(?P<operator>&&|\|\||[*+])(?=[?$][A-Za-z_])"
+)
+_VARIABLE_ADJACENT_VARIABLE_RE = re.compile(
+    r"(?P<variable>[?$][A-Za-z_][\w-]*)(?=[?$][A-Za-z_])"
+)
+_TRAILING_STANDALONE_DOT_RE = re.compile(r"(?:\r?\n|\A)\s*\.\s*\Z")
 
 WRITE_PATTERNS = [
     re.compile(r"\bINSERT\b", re.IGNORECASE),
@@ -113,6 +129,38 @@ def ensure_sparql_prefixes(query: str) -> str:
     if not missing:
         return stripped
     return "\n".join([*missing, stripped])
+
+
+def _normalize_generated_segment(segment: str) -> str:
+    normalized = _KEYWORD_ADJACENT_VARIABLE_RE.sub(
+        lambda match: f'{match.group("keyword")} ',
+        segment,
+    )
+    normalized = _PREFIXED_NAME_ADJACENT_VARIABLE_RE.sub(
+        lambda match: f'{match.group("name")} ',
+        normalized,
+    )
+    normalized = _PATH_OR_LOGICAL_ADJACENT_VARIABLE_RE.sub(
+        lambda match: f'{match.group("operator")} ',
+        normalized,
+    )
+    return _VARIABLE_ADJACENT_VARIABLE_RE.sub(
+        lambda match: f'{match.group("variable")} ',
+        normalized,
+    )
+
+
+def normalize_generated_sparql(query: str) -> str:
+    """Repair conservative token-spacing defects outside literals, IRIs, and comments."""
+    pieces: list[str] = []
+    cursor = 0
+    for match in _STRING_IRI_OR_COMMENT_RE.finditer(query):
+        pieces.append(_normalize_generated_segment(query[cursor : match.start()]))
+        pieces.append(match.group(0))
+        cursor = match.end()
+    pieces.append(_normalize_generated_segment(query[cursor:]))
+    normalized = "".join(pieces)
+    return _TRAILING_STANDALONE_DOT_RE.sub("", normalized).strip()
 
 
 def validate_sparql(query: str) -> str | None:
@@ -194,16 +242,49 @@ def _extract_sparql(text: str) -> str:
     return text.strip()
 
 
-async def nl_to_sparql(nl_query: str, ontology_context: str) -> str:
+async def nl_to_sparql(
+    nl_query: str,
+    ontology_context: str,
+    *,
+    requirements: str | None = None,
+) -> str:
+    requirements_section = (
+        f"\n\nValidated query requirements:\n{requirements}" if requirements else ""
+    )
     prompt = (
         f"{ontology_context}\n\n"
         "Convert the following natural language question into a valid SPARQL SELECT query "
         "for the SakunaGraPH knowledge graph. "
-        "Return ONLY the SPARQL query inside a ```sparql code block, no explanation.\n\n"
+        "Return ONLY the SPARQL query inside a ```sparql code block, no explanation."
+        f"{requirements_section}\n\n"
         f"Question: {nl_query}"
     )
     generated = await generate_text_async(prompt)
-    return ensure_sparql_prefixes(_extract_sparql(generated))
+    return ensure_sparql_prefixes(normalize_generated_sparql(_extract_sparql(generated)))
+
+
+async def repair_sparql(
+    nl_query: str,
+    ontology_context: str,
+    sparql: str,
+    error: str,
+    *,
+    requirements: str | None = None,
+) -> str:
+    requirements_section = (
+        f"\n\nValidated query requirements:\n{requirements}" if requirements else ""
+    )
+    prompt = (
+        f"{ontology_context}\n\n"
+        f'The SPARQL query below for the question "{nl_query}" failed validation.\n\n'
+        f"Query:\n```sparql\n{sparql}\n```\n\n"
+        f"Validation error:\n{error}"
+        f"{requirements_section}\n\n"
+        "Fix every reported issue. Return ONLY the corrected SPARQL inside a "
+        "```sparql code block."
+    )
+    corrected = await generate_text_async(prompt)
+    return ensure_sparql_prefixes(normalize_generated_sparql(_extract_sparql(corrected)))
 
 
 async def execute_sparql(
@@ -292,15 +373,12 @@ async def sparql_with_correction(
             )
 
         if attempt < max_retries:
-            correction_prompt = (
-                f"{ontology_context}\n\n"
-                f'The SPARQL query below for the question "{nl_query}" produced an error.\n\n'
-                f"Query:\n```sparql\n{sparql}\n```\n\n"
-                f"Error:\n{result}\n\n"
-                "Fix the query and return ONLY the corrected SPARQL inside a ```sparql code block."
+            sparql = await repair_sparql(
+                nl_query,
+                ontology_context,
+                sparql,
+                result,
             )
-            corrected = await generate_text_async(correction_prompt)
-            sparql = ensure_sparql_prefixes(_extract_sparql(corrected))
 
     raise SparqlCorrectionError(
         sparql=sparql,

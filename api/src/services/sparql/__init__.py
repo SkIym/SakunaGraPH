@@ -4,6 +4,8 @@ from src.services.sparql.executor import (
     execute_sparql,
     is_graphdb_error,
     is_write_operation,
+    normalize_generated_sparql,
+    repair_sparql,
     sparql_with_correction,
     validate_sparql,
 )
@@ -16,6 +18,8 @@ __all__ = [
     "ensure_sparql_prefixes",
     "is_graphdb_error",
     "is_write_operation",
+    "normalize_generated_sparql",
+    "repair_sparql",
     "run_sparql_query",
     "SparqlCorrectionError",
     "sparql_with_correction",

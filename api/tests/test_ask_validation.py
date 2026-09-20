@@ -164,6 +164,33 @@ class ParsedQueryPolicyTests(unittest.TestCase):
 
 
 class SchemaAndPlanValidationTests(unittest.IsolatedAsyncioTestCase):
+    async def test_resolved_prefixed_entity_before_triple_dot_is_recognized(self) -> None:
+        location = _resolved_entity("location", "0301400000")
+        resolved = ResolvedAskPlan(
+            plan=AskPlan(
+                intent="event_count",
+                location_mentions=["Bulacan (0301400000)"],
+                metric="events",
+            ),
+            locations=[location],
+        )
+        artifact = QueryArtifact(
+            sparql="""PREFIX : <https://sakuna.ph/>
+SELECT (COUNT(?event) AS ?total) WHERE {
+  ?event a :DisasterEvent ; :hasLocation ?location.
+  ?location :isPartOf* :0301400000.
+}""",
+            origin="model_fallback",
+        )
+        with patch(
+            "src.services.ask.query_validator.get_schema_catalog",
+            new=AsyncMock(return_value=_catalog()),
+        ):
+            report = await validate_query_artifact(artifact, resolved)
+
+        self.assertTrue(report.summary.has_aggregate)
+        self.assertIn("https://sakuna.ph/0301400000", report.validated_terms)
+
     async def test_valid_compiled_query_passes_schema_and_plan_validation(self) -> None:
         location = _resolved_entity("location", "0706000000")
         resolved = ResolvedAskPlan(
@@ -365,6 +392,10 @@ LIMIT 10
                 new=AsyncMock(return_value=generated),
             ),
             patch(
+                "src.services.ask.service.repair_sparql",
+                new=AsyncMock(return_value=generated),
+            ) as repair,
+            patch(
                 "src.services.ask.query_validator.get_schema_catalog",
                 new=AsyncMock(return_value=_catalog()),
             ),
@@ -377,6 +408,7 @@ LIMIT 10
                 await ask_question("Use made up data")
 
         graphdb.assert_not_awaited()
+        repair.assert_awaited_once()
 
 
 if __name__ == "__main__":

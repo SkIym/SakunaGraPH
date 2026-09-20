@@ -9,12 +9,39 @@ from src.services.sparql.executor import (
     SparqlCorrectionError,
     ensure_sparql_prefixes,
     execute_sparql,
+    normalize_generated_sparql,
     sparql_with_correction,
     validate_sparql,
 )
 
 
 class SparqlNormalizationTests(unittest.TestCase):
+    def test_repairs_model_token_spacing_without_touching_literals(self) -> None:
+        generated = '''SELECT?municipalityLabel (COUNT(?event) AS?eventCount)
+WHERE {
+  VALUES?dtype { :FlashFlood :RiverineFlood }
+  ?event :hasLocation?location ; :startDate?startDate.
+  FILTER(?startDate >= "SELECT?untouched" &&?startDate < "2024-01-01")
+  ?location :isPartOf*?municipality.
+  ?municipality rdfs:label?municipalityLabel.
+}
+GROUP BY?municipalityLabel
+ORDER BY DESC(?eventCount)
+.'''
+
+        normalized = normalize_generated_sparql(generated)
+        query = ensure_sparql_prefixes(normalized)
+
+        self.assertIn("SELECT ?municipalityLabel", normalized)
+        self.assertIn("AS ?eventCount", normalized)
+        self.assertIn("VALUES ?dtype", normalized)
+        self.assertIn(":hasLocation ?location", normalized)
+        self.assertIn(":isPartOf* ?municipality", normalized)
+        self.assertIn("rdfs:label ?municipalityLabel", normalized)
+        self.assertIn('"SELECT?untouched"', normalized)
+        self.assertFalse(normalized.endswith("."))
+        self.assertIsNone(validate_sparql(query))
+
     def test_adds_known_prefixes_to_model_query(self) -> None:
         query = "SELECT ?event WHERE { ?event a :DisasterEvent . }"
 

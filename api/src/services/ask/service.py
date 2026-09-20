@@ -26,7 +26,10 @@ from src.services.ask.query_compiler import (
     compile_query,
     ensure_resolved_plan_ready,
 )
-from src.services.ask.query_validator import validate_query_artifact
+from src.services.ask.query_validator import (
+    ASK_QUERY_VALIDATION_ERROR_CODE,
+    validate_query_artifact,
+)
 from src.services.ask.result_validator import validate_query_results
 from src.services.ask.service_router import (
     execute_service_route,
@@ -36,7 +39,7 @@ from src.services.ask.service_router import (
 from src.services.common import ServiceError
 from src.services.llm import stream_text_async
 from src.services.sparql import execute_sparql
-from src.services.sparql.executor import nl_to_sparql
+from src.services.sparql.executor import nl_to_sparql, repair_sparql
 
 _ontology_context = load_ontology_context()
 ASK_DETERMINISTIC_EXECUTION_ERROR_CODE = "ask_deterministic_execution"
@@ -149,6 +152,40 @@ def _model_fallback_artifact(
     )
 
 
+def _model_query_requirements(resolved_plan: ResolvedAskPlan) -> str:
+    entities = [
+        {
+            "type": entity.entity_type,
+            "mention": entity.mention,
+            "label": entity.label,
+            "id": entity.id,
+            "iri": entity.iri,
+        }
+        for group in (
+            resolved_plan.locations,
+            resolved_plan.disaster_types,
+            resolved_plan.events,
+            resolved_plan.organizations,
+            resolved_plan.casualty_types,
+        )
+        for entity in group
+    ]
+    return json.dumps(
+        {
+            "structured_plan": resolved_plan.plan.model_dump(mode="json"),
+            "resolved_entities": entities,
+            "rules": [
+                "Use every resolved entity in the query by its exact IRI or approved prefixed name.",
+                "Generate SELECT only.",
+                "Grouped and listing queries require a top-level LIMIT.",
+                f"LIMIT must not exceed {settings.ask_result_row_limit}.",
+            ],
+        },
+        indent=2,
+        sort_keys=True,
+    )
+
+
 def _deterministic_artifact(resolved_plan: ResolvedAskPlan) -> QueryArtifact:
     route = select_service_route(resolved_plan)
     if route:
@@ -165,13 +202,31 @@ async def _preview_artifact(
 ) -> QueryArtifact:
     if query_mode == "llm" or resolved_plan.plan.intent == "open_graph_query":
         ensure_resolved_plan_ready(resolved_plan)
-        sparql = await nl_to_sparql(query, _ontology_context)
+        requirements = _model_query_requirements(resolved_plan)
+        sparql = await nl_to_sparql(
+            query,
+            _ontology_context,
+            requirements=requirements,
+        )
         artifact = _model_fallback_artifact(sparql, resolved_plan)
     else:
         artifact = _deterministic_artifact(resolved_plan)
     if artifact.service_route is not None:
         return artifact
-    report = await validate_query_artifact(artifact, resolved_plan)
+    try:
+        report = await validate_query_artifact(artifact, resolved_plan)
+    except ServiceError as exc:
+        if artifact.origin != "model_fallback" or exc.code != ASK_QUERY_VALIDATION_ERROR_CODE:
+            raise
+        repaired_sparql = await repair_sparql(
+            query,
+            _ontology_context,
+            artifact.sparql,
+            exc.detail,
+            requirements=_model_query_requirements(resolved_plan),
+        )
+        artifact = _model_fallback_artifact(repaired_sparql, resolved_plan)
+        report = await validate_query_artifact(artifact, resolved_plan)
     if not artifact.projected_columns:
         artifact = artifact.model_copy(
             update={

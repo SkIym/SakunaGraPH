@@ -27,7 +27,8 @@ _LITERAL_OR_COMMENT_RE = re.compile(
     re.DOTALL,
 )
 _PREFIXED_NAME_RE = re.compile(
-    r"(?<![\w?])(?P<prefix>[A-Za-z][\w.-]*)?:(?P<local>[A-Za-z0-9_][\w.-]*)"
+    r"(?<![\w?])(?P<prefix>[A-Za-z][\w.-]*)?:"
+    r"(?P<local>[A-Za-z0-9_](?:[\w.-]*[\w-])?)"
 )
 _VARIABLE_TYPE_RE = re.compile(
     r"\?(?P<variable>[A-Za-z_][\w-]*)\s+(?:a|rdf:type)\s+:(?P<class>[A-Za-z0-9_][\w.-]*)",
@@ -213,7 +214,8 @@ def _entity_occurs(query: str, entity_iri: str, entity_id: str) -> bool:
         return True
     return bool(
         re.search(
-            rf"(?<![\w.-])(?:[A-Za-z][\w.-]*)?:{re.escape(entity_id)}(?![\w.-])",
+            rf"(?<![\w.-])(?:[A-Za-z][\w.-]*)?:{re.escape(entity_id)}"
+            r"(?![\w-]|\.[\w-])",
             query,
         )
     )

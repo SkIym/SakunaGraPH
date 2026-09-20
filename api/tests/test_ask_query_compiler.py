@@ -541,6 +541,102 @@ class DeterministicAskIntegrationTests(unittest.IsolatedAsyncioTestCase):
         graphdb.assert_awaited_once()
         service.assert_not_awaited()
 
+    async def test_forced_llm_mode_repairs_a_query_that_fails_validation(self) -> None:
+        plan = AskPlan(
+            intent="event_count",
+            metric="events",
+            group_by="location",
+            location_mentions=["Bulacan (0301400000)"],
+        )
+        resolved = ResolvedAskPlan(
+            plan=plan,
+            locations=[
+                _entity(
+                    "location",
+                    "0301400000",
+                    label="Bulacan",
+                )
+            ],
+        )
+        malformed = "SELECT?group (COUNT(?event) AS?total) WHERE {} GROUP BY?group"
+        repaired = """SELECT ?group (COUNT(?event) AS ?total) WHERE {
+  ?event a :DisasterEvent ; :hasLocation ?group .
+  ?group :isPartOf* :0301400000 .
+}
+GROUP BY ?group
+LIMIT 25"""
+        raw = {
+            "head": {"vars": ["group", "total"]},
+            "results": {
+                "bindings": [
+                    {
+                        "group": {"type": "literal", "value": "Bulacan"},
+                        "total": {"type": "literal", "value": "2"},
+                    }
+                ]
+            },
+        }
+        report = QueryValidationReport(
+            summary=ParsedQuerySummary(
+                projected_columns=["group", "total"],
+                has_aggregate=True,
+                limit=25,
+            )
+        )
+        validation_error = ServiceError(
+            422,
+            "A bounded top-level LIMIT is required for this SELECT query.",
+            code="ask_query_validation",
+        )
+        with (
+            patch(
+                "src.services.ask.service.plan_question",
+                new=AsyncMock(return_value=plan),
+            ),
+            patch(
+                "src.services.ask.service.resolve_ask_plan",
+                new=AsyncMock(return_value=resolved),
+            ),
+            patch(
+                "src.services.ask.service.nl_to_sparql",
+                new=AsyncMock(return_value=malformed),
+            ) as model_query,
+            patch(
+                "src.services.ask.service.repair_sparql",
+                new=AsyncMock(return_value=repaired),
+            ) as repair,
+            patch(
+                "src.services.ask.service.validate_query_artifact",
+                new=AsyncMock(side_effect=[validation_error, report]),
+            ) as query_validator,
+            patch(
+                "src.services.ask.service.execute_sparql",
+                new=AsyncMock(return_value=raw),
+            ) as graphdb,
+            patch(
+                "src.services.ask.service.ground_answer",
+                new=AsyncMock(return_value="Bulacan has two matching events [E1]."),
+            ),
+        ):
+            response = await ask_question(
+                "Count flood events by municipality in Bulacan during 2023",
+                query_mode="llm",
+            )
+
+        self.assertEqual(response.sparql, repaired)
+        self.assertEqual(response.method.query, "model_fallback")
+        model_query.assert_awaited_once()
+        repair.assert_awaited_once()
+        self.assertEqual(query_validator.await_count, 2)
+        graphdb.assert_awaited_once_with(
+            repaired,
+            timeout_seconds=30.0,
+            max_rows=100,
+        )
+        requirements = model_query.await_args.kwargs["requirements"]
+        self.assertIn("0301400000", requirements)
+        self.assertIn("top-level LIMIT", requirements)
+
     async def test_common_preview_is_deterministic(self) -> None:
         plan = AskPlan(intent="list_events", limit=5)
         resolved = ResolvedAskPlan(plan=plan)
