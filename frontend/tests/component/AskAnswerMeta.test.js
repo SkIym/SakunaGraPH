@@ -1,9 +1,9 @@
-import { render, screen } from '@testing-library/svelte';
+import { fireEvent, render, screen } from '@testing-library/svelte';
 import { describe, expect, it } from 'vitest';
 import AskAnswerMeta from '../../src/lib/features/ask/components/AskAnswerMeta.svelte';
 
 describe('AskAnswerMeta', () => {
-	it('renders retrieval provenance and citation links separately from answer prose', () => {
+	it('renders retrieval provenance and citation links separately from answer prose', async () => {
 		render(AskAnswerMeta, {
 			retrieval: { mode: 'graphrag', sourceCount: 1, indexVersion: '2026-07' },
 			citations: [
@@ -17,11 +17,12 @@ describe('AskAnswerMeta', () => {
 			],
 		});
 
-		expect(screen.getByText('Graph-grounded retrieval')).toBeVisible();
+		await fireEvent.click(screen.getByText('How this answer was made'));
+		expect(screen.getByText('Matched records from the knowledge graph')).toBeVisible();
 		expect(screen.getByText(/1 source/)).toBeVisible();
-		expect(screen.getByText(/Index 2026-07/)).toBeVisible();
+		expect(screen.getByText(/Data index 2026-07/)).toBeVisible();
 		expect(screen.getByRole('region', { name: 'Answer sources' })).toBeVisible();
-		expect(screen.getByRole('link', { name: 'NDRRMC Situation Report' })).toHaveAttribute(
+		expect(screen.getByRole('link', { name: /NDRRMC Situation Report/ })).toHaveAttribute(
 			'href',
 			'https://example.test/report',
 		);
@@ -37,17 +38,26 @@ describe('AskAnswerMeta', () => {
 	});
 
 	it.each([
-		['service', 'deterministic', 'Predefined service query', 'Rule-based answer'],
-		['compiler', 'llm', 'Deterministic SPARQL', 'AI-written answer'],
-		['model_fallback', 'llm', 'AI-generated SPARQL', 'AI-written answer'],
-	])('labels the %s query and %s answer methods', (query, answer, queryLabel, answerLabel) => {
-		render(AskAnswerMeta, {
-			method: { planning: 'llm', query, answer },
-		});
+		['service', 'deterministic', 'Used a prepared lookup', 'Answer calculated from the results'],
+		['compiler', 'llm', 'Built a read-only graph lookup', 'Answer summarized from the results'],
+		[
+			'model_fallback',
+			'llm',
+			'Built a read-only lookup with AI',
+			'Answer summarized from the results',
+		],
+	])(
+		'labels the %s query and %s answer methods',
+		async (query, answer, queryLabel, answerLabel) => {
+			render(AskAnswerMeta, {
+				method: { planning: 'llm', query, answer },
+			});
 
-		expect(screen.getByRole('region', { name: 'Answer method' })).toBeVisible();
-		expect(screen.getByText('AI interpretation')).toBeVisible();
-		expect(screen.getByText(queryLabel)).toBeVisible();
-		expect(screen.getByText(answerLabel)).toBeVisible();
-	});
+			await fireEvent.click(screen.getByText('How this answer was made'));
+			expect(screen.getByRole('region', { name: 'Answer method' })).toBeVisible();
+			expect(screen.getByText('Question interpreted')).toBeVisible();
+			expect(screen.getByText(queryLabel)).toBeVisible();
+			expect(screen.getByText(answerLabel)).toBeVisible();
+		},
+	);
 });

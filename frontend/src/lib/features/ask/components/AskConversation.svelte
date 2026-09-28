@@ -4,10 +4,14 @@
 	let {
 		messages = [],
 		suggestions = [],
+		followUps = [],
 		announcement = '',
 		onSend = () => {},
+		onCopy = () => {},
 		bottomElement = $bindable(null),
 	} = $props();
+
+	let showAllSuggestions = $state(false);
 </script>
 
 <div class="ask-scroll" id="messages-scroll">
@@ -16,14 +20,18 @@
 		{#if messages.length === 0}
 			<section class="ask-intro" aria-labelledby="ask-title">
 				<div class="intro-copy">
-					<p class="workspace-kicker">Graph research assistant</p>
 					<h1 id="ask-title">
 						Ask SakunaGraPH.
 						<em>Trace the evidence.</em>
 					</h1>
 					<p class="intro-description">
-						Question Philippine disaster records in plain language. Every answer keeps its matched
-						rows, query, and sources within reach.
+						<span class="desktop-description">
+							Question Philippine disaster records in plain language. Every answer keeps its matched
+							rows, query, and sources within reach.
+						</span>
+						<span class="mobile-description"
+							>Ask about Philippine disasters and inspect every source.</span
+						>
 					</p>
 					<dl class="answer-contract">
 						<div>
@@ -39,15 +47,12 @@
 
 				<aside class="prompt-ledger" aria-labelledby="prompt-ledger-title">
 					<header>
-						<div>
-							<p class="workspace-kicker">Starting points</p>
-							<h2 id="prompt-ledger-title">Questions for the graph</h2>
-						</div>
+						<h2 id="prompt-ledger-title">Start with an example</h2>
 						<span>{String(suggestions.length).padStart(2, '0')} prompts</span>
 					</header>
 					<ol>
 						{#each suggestions as suggestion, index}
-							<li>
+							<li class:compact-extra={index > 1} class:visible={showAllSuggestions}>
 								<button type="button" onclick={() => onSend(suggestion)}>
 									<span>{String(index + 1).padStart(2, '0')}</span>
 									<strong>{suggestion}</strong>
@@ -56,14 +61,21 @@
 							</li>
 						{/each}
 					</ol>
+					{#if suggestions.length > 2}
+						<button
+							type="button"
+							class="show-more"
+							onclick={() => (showAllSuggestions = !showAllSuggestions)}
+							aria-expanded={showAllSuggestions}
+						>
+							{showAllSuggestions ? 'Show fewer examples' : 'Show more examples'}
+						</button>
+					{/if}
 				</aside>
 			</section>
 		{:else}
 			<header class="session-header">
-				<div>
-					<p class="workspace-kicker">Evidence session</p>
-					<h1>Ask SakunaGraPH</h1>
-				</div>
+				<h1>Research notes</h1>
 				<span>
 					{Math.ceil(messages.length / 2).toLocaleString()} question{messages.length > 2 ? 's' : ''}
 				</span>
@@ -82,7 +94,19 @@
 						<article class="message-row answer-message" aria-label="Graph answer">
 							<div class="answer-record">
 								<header class="answer-record-header">
-									<strong>Graph answer</strong>
+									<strong>{message.loading ? 'Checking records' : 'Graph response'}</strong>
+									{#if !message.loading && !message.streaming && !message.error && message.text}
+										<div class="answer-actions">
+											<button type="button" onclick={() => onCopy(message.text, 'Answer')}
+												>Copy answer</button
+											>
+											{#if message.sparql}
+												<button type="button" onclick={() => onCopy(message.sparql, 'Graph query')}
+													>Copy query</button
+												>
+											{/if}
+										</div>
+									{/if}
 								</header>
 
 								{#if message.loading}
@@ -133,7 +157,7 @@
 													class="chevron"
 													aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg
 												>
-												Query used
+												View graph query
 											</summary>
 											<pre>{message.sparql}</pre>
 										</details>
@@ -153,7 +177,9 @@
 													class="chevron"
 													aria-hidden="true"><path d="m9 18 6-6-6-6" /></svg
 												>
-												Results · {message.rows.length} row{message.rows.length === 1 ? '' : 's'}
+												View matched records · {message.rows.length} row{message.rows.length === 1
+													? ''
+													: 's'}
 											</summary>
 											<div class="results-table-wrap">
 												<table>
@@ -181,6 +207,17 @@
 											No records matched this question. Try a broader place, date range, or disaster
 											type.
 										</div>
+									{/if}
+
+									{#if index === messages.length - 1 && !message.streaming && !message.cancelled && !message.error && followUps.length}
+										<section class="follow-up" aria-label="Continue this research">
+											<strong>Continue this research</strong>
+											<div>
+												{#each followUps as followUp}
+													<button type="button" onclick={() => onSend(followUp)}>{followUp}</button>
+												{/each}
+											</div>
+										</section>
 									{/if}
 								{/if}
 							</div>
@@ -252,6 +289,10 @@
 		text-wrap: pretty;
 	}
 
+	.mobile-description {
+		display: none;
+	}
+
 	.answer-contract {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -272,7 +313,7 @@
 
 	.answer-contract dt {
 		font-family: var(--font-mono);
-		font-size: 0.58rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.1em;
 		text-transform: uppercase;
@@ -281,7 +322,7 @@
 
 	.answer-contract dd {
 		margin: 0.35rem 0 0;
-		font-size: 0.7rem;
+		font-size: 0.75rem;
 		line-height: 1.55;
 		color: var(--color-text-secondary);
 	}
@@ -317,7 +358,7 @@
 	.session-header > span {
 		flex: none;
 		font-family: var(--font-mono);
-		font-size: 0.6rem;
+		font-size: 0.75rem;
 		color: var(--color-text-muted);
 	}
 
@@ -357,7 +398,7 @@
 
 	.prompt-ledger button > span {
 		font-family: var(--font-mono);
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		color: var(--color-brand);
 	}
@@ -378,6 +419,18 @@
 
 	.prompt-ledger button:hover i {
 		transform: translateX(3px);
+	}
+
+	.prompt-ledger .show-more {
+		display: none;
+		width: 100%;
+		min-height: 2.75rem;
+		border: 0;
+		border-block-start: 1px solid var(--color-border);
+		background: var(--color-surface-subtle);
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-brand-hover);
 	}
 
 	.session-header {
@@ -427,7 +480,7 @@
 		display: block;
 		margin-bottom: 0.3rem;
 		font-family: var(--font-mono);
-		font-size: 0.56rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.08em;
 		text-transform: uppercase;
@@ -456,6 +509,7 @@
 	.answer-record-header {
 		display: flex;
 		align-items: center;
+		justify-content: space-between;
 		gap: 0.6rem;
 		min-height: 2.75rem;
 		border-block-end: 1px solid var(--color-border);
@@ -465,7 +519,7 @@
 
 	.answer-record-header strong {
 		font-family: var(--font-mono);
-		font-size: 0.6rem;
+		font-size: 0.75rem;
 	}
 
 	.answer-record-header strong {
@@ -473,6 +527,28 @@
 		letter-spacing: 0.07em;
 		text-transform: uppercase;
 		color: var(--color-text-secondary);
+	}
+
+	.answer-actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+		gap: 0.25rem;
+	}
+
+	.answer-actions button {
+		min-height: 2.75rem;
+		border: 0;
+		border-radius: var(--radius-control);
+		background: transparent;
+		padding-inline: 0.7rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-brand-hover);
+	}
+
+	.answer-actions button:hover {
+		background: var(--color-brand-soft);
 	}
 
 	.answer-status {
@@ -559,7 +635,7 @@
 	.cancelled-status {
 		border-block-start: 1px solid var(--color-border);
 		padding: 0.7rem 1.2rem;
-		font-size: 0.7rem;
+		font-size: 0.75rem;
 		color: var(--color-text-secondary);
 	}
 
@@ -592,7 +668,7 @@
 		gap: 0.5rem;
 		padding: 0.65rem 1.2rem;
 		font-family: var(--font-mono);
-		font-size: 0.64rem;
+		font-size: 0.75rem;
 		font-weight: 600;
 		color: var(--color-text-secondary);
 		list-style: none;
@@ -617,7 +693,7 @@
 		background: var(--color-surface-subtle);
 		padding: 1rem 1.2rem 1.2rem;
 		font-family: var(--font-mono);
-		font-size: 0.68rem;
+		font-size: 0.75rem;
 		line-height: 1.7;
 		white-space: pre;
 		color: var(--color-text-secondary);
@@ -648,7 +724,7 @@
 		border-block-end: 1px solid var(--color-border);
 		padding: 0.45rem 1rem 0.45rem 0;
 		font-family: var(--font-mono);
-		font-size: 0.58rem;
+		font-size: 0.75rem;
 		font-weight: 700;
 		letter-spacing: 0.06em;
 		text-align: left;
@@ -674,9 +750,40 @@
 		border-block-start: 1px solid var(--color-border);
 		background: var(--color-accent-soft);
 		padding: 0.85rem 1.2rem;
-		font-size: 0.72rem;
+		font-size: 0.75rem;
 		line-height: 1.55;
 		color: var(--color-text-secondary);
+	}
+
+	.follow-up {
+		display: grid;
+		gap: 0.65rem;
+		border-block-start: 1px solid var(--color-border);
+		background: var(--color-accent-soft);
+		padding: 0.9rem 1.2rem 1.1rem;
+	}
+
+	.follow-up > strong {
+		font-size: 0.75rem;
+		color: var(--color-text);
+	}
+
+	.follow-up > div {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.5rem;
+	}
+
+	.follow-up button {
+		min-height: 2.75rem;
+		border: 1px solid #c29f00;
+		border-radius: var(--radius-control);
+		background: var(--color-canvas);
+		padding: 0.55rem 0.75rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		text-align: start;
+		color: var(--color-text);
 	}
 
 	@keyframes evidence-trace {
@@ -708,24 +815,31 @@
 
 	@media (max-width: 36rem) {
 		.ask-scroll {
-			padding: 1.5rem 1rem 2rem;
+			padding: 1rem 1rem 1.5rem;
 		}
 
 		.ask-intro {
 			align-content: start;
-			padding-block: 1rem 2rem;
+			gap: 1.25rem;
+			padding-block: 0 1rem;
 		}
 
 		.intro-copy h1 {
-			font-size: clamp(2.35rem, 12vw, 3.2rem);
+			font-size: clamp(2.25rem, 11vw, 3rem);
 		}
 
+		.intro-copy h1 em,
+		.desktop-description,
 		.answer-contract {
-			grid-template-columns: 1fr;
+			display: none;
 		}
 
-		.answer-contract div + div {
-			padding-inline-start: 0;
+		.mobile-description {
+			display: inline;
+		}
+
+		.intro-description {
+			margin-top: 0.75rem;
 		}
 
 		.prompt-ledger header {
@@ -738,6 +852,14 @@
 			padding-inline: 1rem;
 		}
 
+		.prompt-ledger li.compact-extra:not(.visible) {
+			display: none;
+		}
+
+		.prompt-ledger .show-more {
+			display: block;
+		}
+
 		.session-header {
 			align-items: start;
 		}
@@ -748,6 +870,47 @@
 
 		.answer-record {
 			width: 100%;
+		}
+
+		.answer-record-header {
+			align-items: flex-start;
+			flex-direction: column;
+		}
+
+		.answer-actions {
+			width: 100%;
+			justify-content: flex-start;
+		}
+	}
+
+	@media (max-height: 44rem) and (max-width: 42rem) {
+		.ask-scroll {
+			padding-block-start: 1rem;
+		}
+
+		.ask-intro {
+			gap: 1.25rem;
+			padding-block: 0 1rem;
+		}
+
+		.intro-copy h1 {
+			font-size: clamp(2rem, 10vw, 2.6rem);
+		}
+
+		.intro-description {
+			margin-top: 0.75rem;
+		}
+
+		.answer-contract {
+			display: none;
+		}
+
+		.prompt-ledger li.compact-extra:not(.visible) {
+			display: none;
+		}
+
+		.prompt-ledger .show-more {
+			display: block;
 		}
 	}
 

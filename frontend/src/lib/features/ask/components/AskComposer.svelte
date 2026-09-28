@@ -33,7 +33,7 @@
 					bind:value={input}
 					onkeydown={handleKeydown}
 					aria-label="Question"
-					aria-describedby="ask-input-help ask-input-limit"
+					aria-describedby="ask-input-trust ask-input-help ask-input-limit"
 					aria-invalid={error ? 'true' : undefined}
 					maxlength={maxLength}
 					rows="1"
@@ -61,20 +61,26 @@
 			</div>
 		</form>
 
+		<p id="ask-input-trust" class="trust-note">
+			Answers use loaded records and always show their sources.
+		</p>
 		<div class="composer-meta">
-			<div>
-				<label class="query-mode">
-					<input type="checkbox" bind:checked={forceLlmQuery} />
-					<span>
-						<strong>AI builds query</strong>
-						<small>Forces AI-generated, validated read-only SPARQL</small>
-					</span>
-				</label>
+			<div class="composer-guidance">
 				<p id="ask-input-help">
 					{sending
-						? 'Enter to replace the current question · Stop answer ends the current response'
-						: 'Enter to send · Shift+Enter for a new line'}
+						? 'Enter replaces the current question · Stop answer ends this response'
+						: 'Enter sends · Shift+Enter adds a new line'}
 				</p>
+				<details class="advanced-options">
+					<summary>Advanced query options</summary>
+					<label class="query-mode">
+						<input type="checkbox" bind:checked={forceLlmQuery} />
+						<span>
+							<strong>Build a custom graph query with AI</strong>
+							<small>Use this when the automatic search misses the meaning of your question.</small>
+						</span>
+					</label>
+				</details>
 				{#if error}
 					<p class="input-error" role="alert">{error}</p>
 				{/if}
@@ -105,7 +111,6 @@
 		grid-template-columns: minmax(0, 1fr) auto;
 		align-items: end;
 		border: 1px solid var(--color-border);
-		border-block-start: 3px solid var(--color-brand);
 		border-radius: var(--radius-surface);
 		background: var(--color-canvas);
 		box-shadow: var(--shadow-surface);
@@ -123,7 +128,6 @@
 
 	.composer-control.has-error {
 		border-color: var(--color-danger-border);
-		border-block-start-color: var(--color-danger);
 		background: var(--color-danger-surface);
 	}
 
@@ -211,7 +215,7 @@
 		justify-content: space-between;
 		gap: 1rem;
 		padding: 0.45rem 0.25rem 0;
-		font-size: 0.65rem;
+		font-size: 0.75rem;
 		line-height: 1.45;
 		color: var(--color-text-secondary);
 	}
@@ -220,12 +224,46 @@
 		margin: 0;
 	}
 
+	.trust-note {
+		margin: 0.55rem 0.25rem 0;
+		font-size: 0.75rem;
+		line-height: 1.45;
+		color: var(--color-text-secondary);
+	}
+
+	.composer-guidance {
+		display: grid;
+		gap: 0.35rem;
+	}
+
+	.advanced-options {
+		width: fit-content;
+	}
+
+	.advanced-options summary {
+		width: fit-content;
+		min-height: 2.75rem;
+		cursor: pointer;
+		align-content: center;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-brand-hover);
+		text-decoration: underline;
+		text-decoration-color: var(--color-brand-medium);
+		text-underline-offset: 0.2em;
+	}
+
 	.query-mode {
 		display: inline-flex;
 		min-height: 2.75rem;
 		cursor: pointer;
 		align-items: center;
 		gap: 0.65rem;
+		max-width: 32rem;
+		border: 1px solid var(--color-border);
+		border-radius: var(--radius-control);
+		background: var(--color-surface-subtle);
+		padding: 0.65rem 0.75rem;
 	}
 
 	.query-mode input {
@@ -267,7 +305,7 @@
 	}
 
 	.query-mode input:focus-visible {
-		outline: 3px solid var(--color-brand-medium);
+		outline: 3px solid var(--color-focus);
 		outline-offset: 2px;
 	}
 
@@ -278,13 +316,13 @@
 	}
 
 	.query-mode strong {
-		font-size: 0.68rem;
+		font-size: 0.75rem;
 		line-height: 1.35;
 		color: var(--color-text);
 	}
 
 	.query-mode small {
-		font-size: 0.625rem;
+		font-size: 0.75rem;
 		line-height: 1.4;
 		color: var(--color-text-secondary);
 	}
@@ -325,11 +363,22 @@
 			align-items: stretch;
 			flex-direction: column;
 			gap: 0.25rem;
-			font-size: 0.625rem;
+			font-size: 0.75rem;
 		}
 
 		.input-limit {
 			align-self: flex-end;
+		}
+	}
+
+	@media (max-height: 44rem) and (max-width: 42rem) {
+		.trust-note,
+		#ask-input-help {
+			display: none;
+		}
+
+		.composer-dock {
+			padding-block-start: 0.55rem;
 		}
 	}
 

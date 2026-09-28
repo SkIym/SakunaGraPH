@@ -2,21 +2,21 @@
 	let { citations = [], retrieval = null, method = null } = $props();
 
 	const modeLabels = {
-		graphrag: 'Graph-grounded retrieval',
-		legacy: 'SPARQL retrieval',
-		fallback: 'Fallback retrieval',
+		graphrag: 'Matched records from the knowledge graph',
+		legacy: 'Direct graph lookup',
+		fallback: 'Backup graph lookup',
 	};
 
-	const planningLabels = { llm: 'AI interpretation' };
+	const planningLabels = { llm: 'Question interpreted' };
 	const queryLabels = {
-		service: 'Predefined service query',
-		compiler: 'Deterministic SPARQL',
-		model_fallback: 'AI-generated SPARQL',
-		not_run: 'No query run',
+		service: 'Used a prepared lookup',
+		compiler: 'Built a read-only graph lookup',
+		model_fallback: 'Built a read-only lookup with AI',
+		not_run: 'No graph lookup needed',
 	};
 	const answerLabels = {
-		deterministic: 'Rule-based answer',
-		llm: 'AI-written answer',
+		deterministic: 'Answer calculated from the results',
+		llm: 'Answer summarized from the results',
 	};
 
 	let methodStages = $derived(
@@ -39,32 +39,38 @@
 	}
 </script>
 
-{#if methodStages.length}
-	<section class="method-ledger" aria-label="Answer method">
-		<strong>Method used</strong>
-		<ol>
-			{#each methodStages as stage}
-				<li>{stage}</li>
-			{/each}
-		</ol>
-	</section>
-{/if}
-
-{#if retrieval?.mode && modeLabels[retrieval.mode]}
-	<div class="retrieval-ledger">
-		<span aria-hidden="true"></span>
-		<p>
-			<strong>{modeLabels[retrieval.mode]}</strong>
-			{#if retrieval.sourceCount !== undefined}
-				<small>
-					{retrieval.sourceCount} source{retrieval.sourceCount === 1 ? '' : 's'}
-				</small>
+{#if methodStages.length || (retrieval?.mode && modeLabels[retrieval.mode])}
+	<details class="method-disclosure">
+		<summary>How this answer was made</summary>
+		<div class="method-details">
+			{#if retrieval?.mode && modeLabels[retrieval.mode]}
+				<div class="retrieval-ledger">
+					<span aria-hidden="true"></span>
+					<p>
+						<strong>{modeLabels[retrieval.mode]}</strong>
+						{#if retrieval.sourceCount !== undefined}
+							<small>
+								{retrieval.sourceCount} source{retrieval.sourceCount === 1 ? '' : 's'} checked
+							</small>
+						{/if}
+					</p>
+					{#if retrieval.indexVersion}
+						<code>Data index {retrieval.indexVersion}</code>
+					{/if}
+				</div>
 			{/if}
-		</p>
-		{#if retrieval.indexVersion}
-			<code>Index {retrieval.indexVersion}</code>
-		{/if}
-	</div>
+			{#if methodStages.length}
+				<section class="method-ledger" aria-label="Answer method">
+					<strong>Steps</strong>
+					<ol>
+						{#each methodStages as stage}
+							<li>{stage}</li>
+						{/each}
+					</ol>
+				</section>
+			{/if}
+		</div>
+	</details>
 {/if}
 
 {#if citations?.length}
@@ -82,6 +88,7 @@
 							<a href={citationHref(citation.uri)} target="_blank" rel="noreferrer">
 								{citation.label}
 								<i aria-hidden="true">↗</i>
+								<span class="sr-only"> (opens in a new tab)</span>
 							</a>
 						{:else}
 							<strong>{citation.label}</strong>
@@ -100,6 +107,28 @@
 {/if}
 
 <style>
+	.method-disclosure {
+		border-block-start: 1px solid var(--color-border);
+	}
+
+	.method-disclosure > summary {
+		min-height: 2.75rem;
+		cursor: pointer;
+		align-content: center;
+		padding: 0.65rem 1.2rem;
+		font-size: 0.75rem;
+		font-weight: 700;
+		color: var(--color-brand-hover);
+	}
+
+	.method-disclosure > summary:hover {
+		background: var(--color-brand-soft);
+	}
+
+	.method-details {
+		border-block-start: 1px solid var(--color-border);
+	}
+
 	.method-ledger {
 		display: grid;
 		grid-template-columns: auto minmax(0, 1fr);
@@ -127,7 +156,7 @@
 
 	.method-ledger li {
 		font-family: var(--font-mono);
-		font-size: 0.58rem;
+		font-size: 0.75rem;
 		line-height: 1.5;
 		color: var(--color-text-secondary);
 	}
@@ -166,7 +195,7 @@
 
 	.retrieval-ledger strong,
 	.retrieval-ledger small {
-		font-size: 0.68rem;
+		font-size: 0.75rem;
 		line-height: 1.4;
 	}
 
@@ -181,7 +210,7 @@
 
 	.retrieval-ledger code {
 		font-family: var(--font-mono);
-		font-size: 0.58rem;
+		font-size: 0.75rem;
 		color: var(--color-text-secondary);
 	}
 

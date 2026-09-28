@@ -9,7 +9,16 @@ export const ASK_SUGGESTIONS = Object.freeze([
 	'What types of disasters occurred in Mindanao?',
 ]);
 
+export const ASK_FOLLOW_UPS = Object.freeze([
+	'Show the source records behind this answer.',
+	'Break these results down by year.',
+]);
+
 export const ASK_QUESTION_MAX_LENGTH = 1_000;
+
+function cloneMessages(value) {
+	return JSON.parse(JSON.stringify(value));
+}
 
 function requestErrorMessage(error) {
 	if (error?.kind === 'network') {
@@ -42,6 +51,7 @@ export function createAskState({
 	submit = askQuestion,
 	openStream = openAskStream,
 	onUpdated = async () => {},
+	onChanged = () => {},
 } = {}) {
 	let messages = $state([]);
 	let input = $state('');
@@ -51,9 +61,14 @@ export function createAskState({
 	let forceLlmQuery = $state(false);
 	let activeRequest = null;
 
+	function changed() {
+		onChanged();
+	}
+
 	function updateAssistant(index, values) {
 		if (!messages[index]) return;
 		messages[index] = { ...messages[index], ...values };
+		changed();
 	}
 
 	function finishCancelled(index) {
@@ -168,6 +183,7 @@ export function createAskState({
 		messages = [...messages, { role: 'user', text: question }];
 		const assistantIndex = messages.length;
 		messages = [...messages, { role: 'assistant', loading: true }];
+		changed();
 		const controller = new AbortController();
 		const queryMode = forceLlmQuery ? 'llm' : 'auto';
 		const request = { controller, assistantIndex, queryMode };
@@ -213,6 +229,37 @@ export function createAskState({
 		void onUpdated();
 	}
 
+	function restore({
+		messages: restoredMessages = [],
+		draft = '',
+		forceLlmQuery: force = false,
+	} = {}) {
+		cancel();
+		messages = Array.isArray(restoredMessages) ? cloneMessages(restoredMessages) : [];
+		input = String(draft ?? '').slice(0, ASK_QUESTION_MAX_LENGTH);
+		forceLlmQuery = Boolean(force);
+		inputError = '';
+		announcement = messages.length ? 'Saved research restored.' : 'New research ready.';
+		sending = false;
+	}
+
+	function reset() {
+		restore();
+		changed();
+	}
+
+	function snapshot() {
+		return {
+			messages: cloneMessages(messages),
+			draft: input,
+			forceLlmQuery,
+		};
+	}
+
+	function announce(message) {
+		announcement = String(message ?? '');
+	}
+
 	return {
 		get messages() {
 			return messages;
@@ -223,6 +270,7 @@ export function createAskState({
 		set input(value) {
 			input = value;
 			if (inputError && String(value).trim().length <= ASK_QUESTION_MAX_LENGTH) inputError = '';
+			changed();
 		},
 		get sending() {
 			return sending;
@@ -238,11 +286,16 @@ export function createAskState({
 		},
 		set forceLlmQuery(value) {
 			forceLlmQuery = Boolean(value);
+			changed();
 		},
 		get mode() {
 			return mode;
 		},
 		send,
 		cancel,
+		restore,
+		reset,
+		snapshot,
+		announce,
 	};
 }
